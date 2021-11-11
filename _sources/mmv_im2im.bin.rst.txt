@@ -1,0 +1,21 @@
+mmv\_im2im.bin package
+======================
+
+Submodules
+----------
+
+mmv\_im2im.bin.my\_example module
+---------------------------------
+
+.. automodule:: mmv_im2im.bin.my_example
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mmv_im2im.bin
+   :members:
+   :undoc-members:
+   :show-inheritance:

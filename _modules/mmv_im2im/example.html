@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mmv_im2im.example &mdash; MMV Im2Im Transformation 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> MMV Im2Im Transformation
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../mmv_im2im.html">mmv_im2im package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im.example">mmv_im2im.example module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">MMV Im2Im Transformation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="../mmv_im2im.html">mmv_im2im</a> &raquo;</li>
+      <li>mmv_im2im.example</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mmv_im2im.example</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Imports should be grouped into:</span>
+<span class="c1"># Standard library imports</span>
+<span class="c1"># Related third party imports</span>
+<span class="c1"># Local application / relative imports</span>
+<span class="c1"># in that order</span>
+
+<span class="c1"># Standard library</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="c1"># Third party</span>
+
+<span class="c1"># Relative</span>
+
+<span class="c1">###############################################################################</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1">###############################################################################</span>
+
+
+<div class="viewcode-block" id="Example"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.example.Example">[docs]</a><span class="k">class</span> <span class="nc">Example</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an example object. Use this example for ideas on how to write doc strings,</span>
+<span class="sd">    use logging, construct objects. This is not an exhaustive example but a decent</span>
+<span class="sd">    start.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    init_value: int</span>
+<span class="sd">        An integer value to initialize the object with.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Static methods are available to the user regardless of if they have initialized</span>
+    <span class="c1"># an instance of the class. They are useful when you have small portions of code</span>
+    <span class="c1"># that while relevant to the class may not depend on entire class state.</span>
+    <span class="c1"># In this case, this function isn&#39;t incredibly valuable outside of the usage of</span>
+    <span class="c1"># this class and therefore we use the &quot;Python&quot; standard of prefixing the method</span>
+    <span class="c1"># with an underscore.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_value</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the value is an integer. If not, raises a ValueError.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Provided value: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> (type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="si">}</span><span class="s2">, is not an integer.)&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="c1"># Check initial value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_value</span><span class="p">(</span><span class="n">init_value</span><span class="p">)</span>
+
+        <span class="c1"># Set values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">=</span> <span class="n">init_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Example.update_value"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.example.Example.update_value">[docs]</a>    <span class="k">def</span> <span class="nf">update_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save old value and set new value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_value: int</span>
+<span class="sd">            The new value to assign to the object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        old_value: int</span>
+<span class="sd">            The previous value stored in the object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check new value before assign</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_value</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
+
+        <span class="c1"># Passed, now assign</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">=</span> <span class="n">new_value</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updating value from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">old_value</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_value</span></div>
+
+<div class="viewcode-block" id="Example.get_value"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.example.Example.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        current_value: int</span>
+<span class="sd">            The current value stored in the object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span></div>
+
+<div class="viewcode-block" id="Example.get_previous_value"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.example.Example.get_previous_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_previous_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the previous value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        previous_value: int</span>
+<span class="sd">            The previous value stored in the object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_value</span></div>
+
+    <span class="c1"># And example of a property accessor</span>
+    <span class="c1"># When using this object, this &quot;function&quot; can be called using attribute style</span>
+    <span class="c1"># These are useful when you want to hide that computation or IO is happening from</span>
+    <span class="c1"># the user. Usually, these are used when you need to lazy load something or have</span>
+    <span class="c1"># &quot;immutability&quot; of an object property.</span>
+    <span class="c1"># ```</span>
+    <span class="c1"># e = Example(10)</span>
+    <span class="c1"># stored = e.values</span>
+    <span class="c1"># ```</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get both values stored in the object as a tuple of integers.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        values: Tuple[int]</span>
+<span class="sd">            The current and old values stored in a tuple in (current_value, old_value)</span>
+<span class="sd">            order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;Example [current: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_value</span><span class="si">}</span><span class="s2">, previous: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">old_value</span><span class="si">}</span><span class="s2">]&gt;&quot;</span>
+
+    <span class="c1"># Representation&#39;s (reprs) are useful when using interactive Python sessions or</span>
+    <span class="c1"># when you log an object. They are the shorthand of the object state. In this case,</span>
+    <span class="c1"># our string method provides a good representation.</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jianxu Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

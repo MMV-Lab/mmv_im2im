@@ -1,0 +1,29 @@
+mmv\_im2im package
+==================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mmv_im2im.bin
+
+Submodules
+----------
+
+mmv\_im2im.example module
+-------------------------
+
+.. automodule:: mmv_im2im.example
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mmv_im2im
+   :members:
+   :undoc-members:
+   :show-inheritance:
