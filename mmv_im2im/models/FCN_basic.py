@@ -1,6 +1,6 @@
 import pytorch_lightning as pl
 import torchio as tio
-from mmv_im2im.utils.misc import parse_config
+from mmv_im2im.utils.misc import parse_config, parse_config_func
 
 
 class Model(pl.LightningModule):
@@ -8,11 +8,10 @@ class Model(pl.LightningModule):
         super().__init__()
         self.net = parse_config[model_cfg["net"]]
         self.criterion = parse_config[model_cfg["criterion"]]
-        self.optimizer_class = parse_config[model_cfg["optimizer"]]
+        self.optimizer_func = parse_config_func[model_cfg["optimizer"]]
 
     def configure_optimizers(self):
-        # TODO: need to check lr, weight_decay, etc., whether the callable is correct
-        optimizer = self.optimizer_class(self.parameters())
+        optimizer = self.optimizer_func(self.net.parameters())
         return optimizer
 
     def prepare_batch(self, batch):

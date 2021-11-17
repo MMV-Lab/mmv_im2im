@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Union, Dict, List
 from pathlib import Path
+from functools import partial
 import importlib
 import torchio as tio
 
@@ -15,6 +16,13 @@ def parse_config(info):
     my_module = importlib.import_module(info["module_name"])
     my_func = getattr(my_module, info["func_name"])
     return my_func(**info["params"])
+
+
+def parse_config_func(info):
+    my_module = importlib.import_module(info["module_name"])
+    my_func = getattr(my_module, info["func_name"])
+    child_func = partial(my_func, **info["params"])
+    return child_func
 
 
 def parse_ops_list(trans_func: List[Dict]):
