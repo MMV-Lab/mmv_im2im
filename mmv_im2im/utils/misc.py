@@ -1,0 +1,141 @@
+import numpy as np
+from typing import Union, Dict, List
+from pathlib import Path
+import importlib
+import torchio as tio
+
+
+def get_max_shape(self, subjects):
+    dataset = tio.SubjectsDataset(subjects)
+    shapes = np.array([s.spatial_shape for s in dataset])
+    return shapes.max(axis=0)
+
+
+def parse_config(info):
+    my_module = importlib.import_module(info["module_name"])
+    my_func = getattr(my_module, info["func_name"])
+    return my_func(**info["params"])
+
+
+def parse_ops_list(trans_func: List[Dict]):
+    op_list = []
+    # {"module_name":"numpy.random",
+    #  "func_name":"randint",
+    #  "params":{"low":0,"high":1}}
+    # load functions according to config
+    for trans_dict in trans_func:
+        op_list.append(parse_config(trans_dict))
+        # trans_module = importlib.import_module(trans_dict["module_name"])
+        # trans_func = getattr(trans_module, trans_dict["func_name"])
+        # op_list.append(trans_func(**trans_dict["params"]))
+
+
+def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
+    """
+    different options for "data":
+    - one CSV (columns: source, target, cmap), then split
+    - one folder (_IM.tiff, _GT.tiff, CM.tiff), then split
+    - a dictionary of two or three folders (Im, GT, CM), then split
+
+    Return
+        a list of dict, each dict contains 2 or 3 keys
+        "source_fn", "target_fn", "costmap_fn" (optional)
+    """
+    dataset_list = []
+    if isinstance(data, str):
+        data = Path(data)
+        if data.is_file():
+            # should be a csv of dataframe
+            import pandas as pd
+            df = pd.read_csv(data)
+            assert "source_path" in df.columns, "column source_path not found"
+            assert "target_path" in df.columns, "column target_path not found"
+
+            # check if costmap is needed
+            if "costmap_path" in df.columns:
+                cm_flag = True
+            else:
+                cm_flag = False
+
+            for row in df.itertuples():
+                if cm_flag:
+                    dataset_list.append(
+                        {
+                            "source_fn": row.source_path,
+                            "target_fn": row.target_path,
+                            "costmap_fn": row.costmap_path
+                        }
+                    )
+                else:
+                    dataset_list.append(
+                        {
+                            "source_fn": row.source_path,
+                            "target_fn": row.target_path
+                        }
+                    )
+        elif data.is_dir():
+            all_filename = data.glob("*_IM.*")
+            assert len(all_filename) > 0, f"no file found in {data}"
+
+            all_filename.sort()
+            for fn in all_filename:
+                target_fn = data / fn.name.replace("_IM.", "_GT.")
+                costmap_fn = data / fn.name.replace("_IM.", "_CM.")
+                if costmap_fn.is_file():
+                    dataset_list.append(
+                        {
+                            "source_fn": fn,
+                            "target_fn": target_fn,
+                            "costmap_fn": costmap_fn
+                        }
+                    )
+                else:
+                    dataset_list.append(
+                        {
+                            "source_fn": fn,
+                            "target_fn": target_fn,
+                        }
+                    )
+        else:
+            print(f"{data} is not a valid file or directory")
+
+    elif isinstance(data, Dict):
+        # assume 3~4 keys: "source_dir", "target_dir", and
+        # "image_type", "costmap_dir" (optional)
+        if "costmap_dir" in data:
+            cm_path = Path(data["costmap_dir"])
+        else:
+            cm_path = None
+
+        source_path = Path(data["source_dir"])
+        target_path = Path(data["target_dir"])
+
+        data_type = data["image_type"]
+
+        all_filename = source_path.glob(f"*.{data_type}")
+        assert len(all_filename) > 0, f"no file found in {source_path}"
+        all_filename.sort()
+
+        for fn in all_filename:
+            target_fn = target_path / fn.name
+            if cm_path is not None:
+                costmap_fn = cm_path / fn.name
+                dataset_list.append(
+                    {
+                        "source_fn": fn,
+                        "target_fn": target_fn,
+                        "costmap_fn": costmap_fn
+                    }
+                )
+            else:
+                dataset_list.append(
+                    {
+                        "source_fn": fn,
+                        "target_fn": target_fn
+                    }
+                )
+
+    else:
+        print("unsupported data type")
+
+    return dataset_list
