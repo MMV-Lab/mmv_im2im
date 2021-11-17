@@ -1,19 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Imports should be grouped into:
-# Standard library imports
-# Related third party imports
-# Local application / relative imports
-# in that order
-
-# Standard library
 import logging
 from typing import Any, Tuple
 
-# Third party
-
-# Relative
 
 ###############################################################################
 
@@ -22,16 +11,13 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-class Example(object):
+class ProjectTrainer(object):
     """
-    This is an example object. Use this example for ideas on how to write doc strings,
-    use logging, construct objects. This is not an exhaustive example but a decent
-    start.
+    entry for training models
 
     Parameters
     ----------
-    init_value: int
-        An integer value to initialize the object with.
+    cfg: configuration
     """
 
     # Static methods are available to the user regardless of if they have initialized
@@ -57,6 +43,9 @@ class Example(object):
         # Set values
         self.current_value = init_value
         self.old_value = None
+
+    def run_training(self):
+        pass
 
     def update_value(self, new_value: int) -> int:
         """

@@ -70,7 +70,7 @@ setup(
     description="A python package for deep learing based image to image transformation",
     entry_points={
         "console_scripts": [
-            "my_example=mmv_im2im.bin.my_example:main"
+            "run_im2im=mmv_im2im.bin.run_im2im:main"
         ],
     },
     install_requires=requirements,
