@@ -12,6 +12,7 @@ import sys
 import traceback
 
 from mmv_im2im import get_module_version
+from mmv_im2im.utils.misc import load_yaml_cfg
 
 ###############################################################################
 
@@ -75,12 +76,11 @@ def main():
         assert torch.cuda.is_available(), "GPU is not available."
         torch.cuda.set_device(torch.device("cuda:0"))
 
+        opt = load_yaml_cfg(args.filename)
         if args.mode == TRAIN_MODE or args.mode.lower() == TRAIN_MODE:
-            opt = BaseOptions(args.filename, TRAIN_MODE).parse()
             exe = ProjectTrainer(opt)
             exe.run_training()
         elif args.mode == INFER_MODE or args.mode.lower() == INFER_MODE:
-            opt = BaseOptions(args.filename, INFER_MODE).parse()
             exe = ProjectTester(opt)
             exe.run_inference()
         else:

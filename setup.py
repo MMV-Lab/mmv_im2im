@@ -43,6 +43,7 @@ requirements = [
     "monai",
     "aicsimageio",
     "pandas",
+    "munch",
 ]
 
 extra_requirements = {

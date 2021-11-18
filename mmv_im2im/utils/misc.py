@@ -4,9 +4,20 @@ from pathlib import Path
 from functools import partial
 import importlib
 import torchio as tio
+from munch import Munch
 
 
-def get_max_shape(self, subjects):
+def load_yaml_cfg(yaml_path):
+    with open(yaml_path, "r") as stream:
+        opt_dict = yaml.load(stream)
+
+    # convert dictionary to attribute-like object
+    opt = Munch(opt_dict)
+    
+    return opt
+
+
+def get_max_shape(subjects):
     dataset = tio.SubjectsDataset(subjects)
     shapes = np.array([s.spatial_shape for s in dataset])
     return shapes.max(axis=0)

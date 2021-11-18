@@ -21,7 +21,7 @@ from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.misc import generate_dataset_dict
 
 
-class Pair3dDataModule(pl.LightningDataModule):
+class Im2ImDataModule(pl.LightningDataModule):
     def __init__(self, data_cfg):
         super().__init__()
         self.data_path = data_cfg["data_path"]

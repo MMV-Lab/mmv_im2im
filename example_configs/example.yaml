@@ -1,6 +1,7 @@
 
 # everything about data
 data:
+  category: "pair_3d"
   target_type: "Label" # or "Image
   data_path: "/mnt/data/xyz.csv"
   # data_path: "/mnt/data/trainset"
@@ -35,6 +36,7 @@ data:
         p: 0.5
 # model
 model:
+  category: FCN
   net:
     module_name: monai.networks.nets
     func_name: UNet

@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 import logging
 from typing import Any, Tuple
+from importlib import import_module
 
+from mmv_im2im.utils.misc import parse_config
 
 ###############################################################################
 
@@ -36,86 +38,39 @@ class ProjectTrainer(object):
                 f"Provided value: {val} (type: {type(val)}, is not an integer.)"
             )
 
-    def __init__(self, init_value: int = 10):
-        # Check initial value
-        self._check_value(init_value)
+    def __init__(self, cfg):
 
-        # Set values
-        self.current_value = init_value
-        self.old_value = None
+        # extract the three major chuck of the config
+        self.model_cfg = cfg.model
+        self.train_cfg = cfg.training
+        self.data_cfg = cfg.data
+        
+        # define variables
+        self.model = None
+        self.data = None
 
     def run_training(self):
-        pass
+        # set up data
+        data_category = self.data_cfg.pop("category")
+        data_cls_module = import_module(f"mmv_im2im.data_modules.dm_{data_category}")
+        my_data_funcs = getattr(data_cls_module, "Im2ImDataModule")
 
-    def update_value(self, new_value: int) -> int:
-        """
-        Save old value and set new value.
+        self.data = my_data_funcs(self.data_cfg)
 
-        Parameters
-        ----------
-        new_value: int
-            The new value to assign to the object.
+        # set up model
+        model_category = self.model_cfg.pop("category")
+        model_module = import_module(f"mmv_im2im.models.{model_category}_basic")
+        my_model_func = getattr(model_module, "Model")
 
-        Returns
-        -------
-        old_value: int
-            The previous value stored in the object.
-        """
-        # Check new value before assign
-        self._check_value(new_value)
+        self.model = my_model_func(self.model_cfg)
 
-        # Passed, now assign
-        self.old_value = self.current_value
-        self.current_value = new_value
-        log.info(f"Updating value from {self.old_value} to {self.current_value}")
-        return self.old_value
+        # set up training
+        if "callbacks" in self.train_cfg:
+            callback_list = parse_config(self.train_cfg["callback"])
+        trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg["params"])
 
-    def get_value(self) -> int:
-        """
-        Get the current value.
-
-        Returns
-        -------
-        current_value: int
-            The current value stored in the object.
-        """
-        return self.current_value
-
-    def get_previous_value(self) -> int:
-        """
-        Get the previous value.
-
-        Returns
-        -------
-        previous_value: int
-            The previous value stored in the object.
-        """
-        return self.old_value
-
-    # And example of a property accessor
-    # When using this object, this "function" can be called using attribute style
-    # These are useful when you want to hide that computation or IO is happening from
-    # the user. Usually, these are used when you need to lazy load something or have
-    # "immutability" of an object property.
-    # ```
-    # e = Example(10)
-    # stored = e.values
-    # ```
-    @property
-    def values(self) -> Tuple[int]:
-        """
-        Get both values stored in the object as a tuple of integers.
-
-        Returns
-        -------
-        values: Tuple[int]
-            The current and old values stored in a tuple in (current_value, old_value)
-            order.
-        """
-        return (self.current_value, self.old_value)
-
-    def __str__(self):
-        return f"<Example [current: {self.current_value}, previous: {self.old_value}]>"
+        # start training
+        trainer.fit(model=self.model, datamodule=self.data)
 
     # Representation's (reprs) are useful when using interactive Python sessions or
     # when you log an object. They are the shorthand of the object state. In this case,
