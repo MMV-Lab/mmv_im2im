@@ -44,6 +44,7 @@ requirements = [
     "aicsimageio",
     "pandas",
     "munch",
+    "scikit-image",
 ]
 
 extra_requirements = {

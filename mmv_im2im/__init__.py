@@ -12,5 +12,5 @@ __version__ = "0.0.1"
 def get_module_version():
     return __version__
 
-
-from .example import Example  # noqa: F401
+from .proj_tester import ProjectTester
+from .proj_trainer import ProjectTrainer

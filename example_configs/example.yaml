@@ -3,8 +3,8 @@
 data:
   category: "pair_3d"
   target_type: "Label" # or "Image
-  data_path: "/mnt/data/xyz.csv"
-  # data_path: "/mnt/data/trainset"
+  # data_path: "/mnt/data/xyz.csv"
+  data_path: "~/automount/Home/projects/data/syn_3D_seg"
   # data_path:
   #   source_path:
   #   target_path:
@@ -20,11 +20,11 @@ data:
     - module_name: torchio
       func_name: RescaleIntensity
       params:
-        out_min_max: (-1, 1)
+        out_min_max: [-1, 1]
     - module_name: torchio
       func_name: CropOrPad
       params:
-        target_shape: (70, 1000, 1000)
+        target_shape: [64, 512, 512]
     - module_name: torchio
       func_name: OneHot
       params:
@@ -43,9 +43,9 @@ model:
     params:
       spatial_dims: 3
       in_channels: 1
-      out_channels: 3,
-      channels: (8, 16, 32, 64),
-      strides: (2, 2, 2)
+      out_channels: 2
+      channels: [8, 16, 32, 64]
+      strides: [2, 2, 2]
   criterion:
     module_name: monai.losses
     func_name: DiceCELoss
@@ -55,17 +55,18 @@ model:
     module_name: torch.optim
     func_name: AdamW
     params:
-      betas: (0.9, 0.999)
+      betas: [0.9, 0.999]
       weight_decay: 0.01
       lr: 0.000001
 # training
-trainer:
+training:
   params:
     gpus: 1
     precision: 16
+    stochastic_weight_avg: True
   callbacks:
     - module_name: pytorch_lightning.callbacks.early_stopping
       func_name: EarlyStopping
-      parms:
+      params:
         monitor: 'val_loss'
     

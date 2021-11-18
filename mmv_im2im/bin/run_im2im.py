@@ -11,8 +11,11 @@ import logging
 import sys
 import traceback
 
+import torch
+
 from mmv_im2im import get_module_version
 from mmv_im2im.utils.misc import load_yaml_cfg
+from mmv_im2im import ProjectTester, ProjectTrainer
 
 ###############################################################################
 

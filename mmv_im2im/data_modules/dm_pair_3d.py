@@ -24,6 +24,8 @@ from mmv_im2im.utils.misc import generate_dataset_dict
 class Im2ImDataModule(pl.LightningDataModule):
     def __init__(self, data_cfg):
         super().__init__()
+
+        self.target_type = data_cfg["target_type"]
         self.data_path = data_cfg["data_path"]
 
         # all subjects
@@ -54,6 +56,8 @@ class Im2ImDataModule(pl.LightningDataModule):
             target_image_class = getattr(tio_image_module, "LabelMap")
         elif self.target_type == "Image":
             target_image_class = getattr(tio_image_module, "ScalarImage")
+        else:
+            print("unsupported target type")
         self.subjects = []
         for ds in dataset_list:
             if "costmap_fn" in ds:
@@ -64,8 +68,8 @@ class Im2ImDataModule(pl.LightningDataModule):
                 )
             else:
                 subject = tio.Subject(
-                    source=tio.ScalarImage(ds["source_fn"]),
-                    target=target_image_class(ds["target_fn"]),
+                    source=tio.ScalarImage(ds["source_fn"], dims_bioformat="CZYX", S=0, T=0),
+                    target=target_image_class(ds["target_fn"], dims_bioformat="CZYX", S=0, T=0),
                 )
             self.subjects.append(subject)
 

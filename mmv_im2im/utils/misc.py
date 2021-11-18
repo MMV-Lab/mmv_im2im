@@ -1,15 +1,17 @@
-import numpy as np
 from typing import Union, Dict, List
 from pathlib import Path
 from functools import partial
 import importlib
-import torchio as tio
+import yaml
+
+import numpy as np
 from munch import Munch
+import torchio as tio
 
 
 def load_yaml_cfg(yaml_path):
     with open(yaml_path, "r") as stream:
-        opt_dict = yaml.load(stream)
+        opt_dict = yaml.safe_load(stream)
 
     # convert dictionary to attribute-like object
     opt = Munch(opt_dict)
@@ -47,13 +49,13 @@ def parse_ops_list(trans_func: List[Dict]):
         # trans_module = importlib.import_module(trans_dict["module_name"])
         # trans_func = getattr(trans_module, trans_dict["func_name"])
         # op_list.append(trans_func(**trans_dict["params"]))
-
+    return op_list
 
 def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     """
     different options for "data":
     - one CSV (columns: source, target, cmap), then split
-    - one folder (_IM.tiff, _GT.tiff, CM.tiff), then split
+    - one folder (_IM.tiff, _GT.tiff, _CM.tiff), then split
     - a dictionary of two or three folders (Im, GT, CM), then split
 
     Return
@@ -62,7 +64,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     """
     dataset_list = []
     if isinstance(data, str):
-        data = Path(data)
+        data = Path(data).expanduser()
         if data.is_file():
             # should be a csv of dataframe
             import pandas as pd
@@ -93,7 +95,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
                         }
                     )
         elif data.is_dir():
-            all_filename = data.glob("*_IM.*")
+            all_filename = sorted(data.glob("*_IM.*"))
             assert len(all_filename) > 0, f"no file found in {data}"
 
             all_filename.sort()
@@ -122,16 +124,16 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
         # assume 3~4 keys: "source_dir", "target_dir", and
         # "image_type", "costmap_dir" (optional)
         if "costmap_dir" in data:
-            cm_path = Path(data["costmap_dir"])
+            cm_path = Path(data["costmap_dir"]).expanduser()
         else:
             cm_path = None
 
-        source_path = Path(data["source_dir"])
-        target_path = Path(data["target_dir"])
+        source_path = Path(data["source_dir"]).expanduser()
+        target_path = Path(data["target_dir"]).expanduser()
 
         data_type = data["image_type"]
 
-        all_filename = source_path.glob(f"*.{data_type}")
+        all_filename = sorted(source_path.glob(f"*.{data_type}"))
         assert len(all_filename) > 0, f"no file found in {source_path}"
         all_filename.sort()
 
@@ -156,5 +158,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
 
     else:
         print("unsupported data type")
+
+    assert len(dataset_list) > 0, "empty dataset"
 
     return dataset_list
