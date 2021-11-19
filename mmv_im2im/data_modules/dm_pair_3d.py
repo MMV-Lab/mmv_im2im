@@ -68,8 +68,8 @@ class Im2ImDataModule(pl.LightningDataModule):
                 )
             else:
                 subject = tio.Subject(
-                    source=tio.ScalarImage(ds["source_fn"], dims_bioformat="CZYX", S=0, T=0),
-                    target=target_image_class(ds["target_fn"], dims_bioformat="CZYX", S=0, T=0),
+                    source=tio.ScalarImage(ds["source_fn"]),
+                    target=target_image_class(ds["target_fn"]),
                 )
             self.subjects.append(subject)
 
@@ -88,10 +88,10 @@ class Im2ImDataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, **self.loader_params)
+        return DataLoader(self.train_set, shuffle=True, **self.loader_params)
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, **self.loader_params)
+        return DataLoader(self.val_set, shuffle=False, **self.loader_params)
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case

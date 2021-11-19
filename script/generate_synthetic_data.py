@@ -49,6 +49,11 @@ class Args(argparse.Namespace):
             help="tyep of target: mask or im"
         )
         p.add_argument(
+            "--large",
+            action="store_true",
+            help="whether to generate large image"
+        )
+        p.add_argument(
             "--num",
             default=10,
             type=int,
@@ -88,17 +93,20 @@ def generate_data(args):
 
 
         if args.dim == 3:
-            im = np.zeros((64, 512, 512))
+            if args.large:
+                im = np.zeros((64, 512, 512))
+            else:
+                im = np.zeros((64, 128, 128))
             for obj in range(num_obj):
-                py = randint(50, 450)
-                px = randint(50, 450)
+                py = randint(15, im.shape[-2]-15)
+                px = randint(15, im.shape[-1]-15)
                 im[31, py, px] = 1
             im = dilation(im>0, ball(2))
 
             if args.type == "mask" and not args.unpair:
-                gt = im.astype(np.uint8)
+                gt = im.astype(np.float32)
                 gt[gt > 0] = 1
-                imsave(out_gt_fn, gt.astype(float))
+                imsave(out_gt_fn, gt)
             else:
                 print("Not impletemented yet")
                 exit(0)

@@ -12,7 +12,7 @@ class Model(pl.LightningModule):
         self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
 
     def configure_optimizers(self):
-        optimizer = self.optimizer_func(self.net.parameters())
+        optimizer = self.optimizer_func(self.parameters())
         return optimizer
 
     def prepare_batch(self, batch):
