@@ -49,10 +49,13 @@
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.html">mmv_im2im package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.example">mmv_im2im.example module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
 </ul>
 </li>
@@ -93,38 +96,37 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
- | <a href="#D"><strong>D</strong></a>
- | <a href="#E"><strong>E</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
- | <a href="#U"><strong>U</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#V"><strong>V</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.bin.html#mmv_im2im.bin.my_example.Args">Args (class in mmv_im2im.bin.my_example)</a>
+      <li><a href="mmv_im2im.bin.html#mmv_im2im.bin.run_im2im.Args">Args (class in mmv_im2im.bin.run_im2im)</a>
 </li>
   </ul></td>
 </tr></table>
 
-<h2 id="D">D</h2>
+<h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.bin.html#mmv_im2im.bin.my_example.Args.DEFAULT_FIRST">DEFAULT_FIRST (mmv_im2im.bin.my_example.Args attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.bin.html#mmv_im2im.bin.my_example.Args.DEFAULT_SECOND">DEFAULT_SECOND (mmv_im2im.bin.my_example.Args attribute)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.configure_optimizers">configure_optimizers() (mmv_im2im.models.FCN_basic.Model method)</a>
 </li>
   </ul></td>
 </tr></table>
 
-<h2 id="E">E</h2>
+<h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.html#mmv_im2im.example.Example">Example (class in mmv_im2im.example)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.forward">forward() (mmv_im2im.models.FCN_basic.Model method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -132,13 +134,21 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.html#mmv_im2im.get_module_version">get_module_version() (in module mmv_im2im)</a>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict">generate_dataset_dict() (in module mmv_im2im.utils.misc)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.html#mmv_im2im.example.Example.get_previous_value">get_previous_value() (mmv_im2im.example.Example method)</a>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.get_max_shape">get_max_shape() (in module mmv_im2im.utils.misc)</a>
 </li>
-      <li><a href="mmv_im2im.html#mmv_im2im.example.Example.get_value">get_value() (mmv_im2im.example.Example method)</a>
+      <li><a href="mmv_im2im.html#mmv_im2im.get_module_version">get_module_version() (in module mmv_im2im)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.load_yaml_cfg">load_yaml_cfg() (in module mmv_im2im.utils.misc)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -146,7 +156,7 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.bin.html#mmv_im2im.bin.my_example.main">main() (in module mmv_im2im.bin.my_example)</a>
+      <li><a href="mmv_im2im.bin.html#mmv_im2im.bin.run_im2im.main">main() (in module mmv_im2im.bin.run_im2im)</a>
 </li>
       <li>
     mmv_im2im
@@ -163,21 +173,79 @@
 </li>
       </ul></li>
       <li>
-    mmv_im2im.bin.my_example
+    mmv_im2im.bin.run_im2im
 
       <ul>
-        <li><a href="mmv_im2im.bin.html#module-mmv_im2im.bin.my_example">module</a>
+        <li><a href="mmv_im2im.bin.html#module-mmv_im2im.bin.run_im2im">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.FCN_basic
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.FCN_basic">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.GAN_basic
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.GAN_basic">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.layers_and_blocks
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.layers_and_blocks">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.proj_tester
+
+      <ul>
+        <li><a href="mmv_im2im.html#module-mmv_im2im.proj_tester">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.proj_trainer
+
+      <ul>
+        <li><a href="mmv_im2im.html#module-mmv_im2im.proj_trainer">module</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    mmv_im2im.example
+    mmv_im2im.utils
 
       <ul>
-        <li><a href="mmv_im2im.html#module-mmv_im2im.example">module</a>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils">module</a>
 </li>
       </ul></li>
+      <li>
+    mmv_im2im.utils.for_transform
+
+      <ul>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.utils.misc
+
+      <ul>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.misc">module</a>
+</li>
+      </ul></li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model">Model (class in mmv_im2im.models.FCN_basic)</a>
+</li>
       <li>
     module
 
@@ -186,18 +254,74 @@
 </li>
         <li><a href="mmv_im2im.bin.html#module-mmv_im2im.bin">mmv_im2im.bin</a>
 </li>
-        <li><a href="mmv_im2im.bin.html#module-mmv_im2im.bin.my_example">mmv_im2im.bin.my_example</a>
+        <li><a href="mmv_im2im.bin.html#module-mmv_im2im.bin.run_im2im">mmv_im2im.bin.run_im2im</a>
 </li>
-        <li><a href="mmv_im2im.html#module-mmv_im2im.example">mmv_im2im.example</a>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models">mmv_im2im.models</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.FCN_basic">mmv_im2im.models.FCN_basic</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.GAN_basic">mmv_im2im.models.GAN_basic</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.layers_and_blocks">mmv_im2im.models.layers_and_blocks</a>
+</li>
+        <li><a href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester</a>
+</li>
+        <li><a href="mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils">mmv_im2im.utils</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform">mmv_im2im.utils.for_transform</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.misc">mmv_im2im.utils.misc</a>
 </li>
       </ul></li>
   </ul></td>
 </tr></table>
 
-<h2 id="U">U</h2>
+<h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.html#mmv_im2im.example.Example.update_value">update_value() (mmv_im2im.example.Example method)</a>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config">parse_config() (in module mmv_im2im.utils.misc)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func">parse_config_func() (in module mmv_im2im.utils.misc)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_ops_list">parse_ops_list() (in module mmv_im2im.utils.misc)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_tio_ops">parse_tio_ops() (in module mmv_im2im.utils.for_transform)</a>
+</li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.prepare_batch">prepare_batch() (mmv_im2im.models.FCN_basic.Model method)</a>
+</li>
+      <li><a href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester">ProjectTester (class in mmv_im2im.proj_tester)</a>
+</li>
+      <li><a href="mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer">ProjectTrainer (class in mmv_im2im.proj_trainer)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.run_inference">run_inference() (mmv_im2im.proj_tester.ProjectTester method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.run_step">run_step() (mmv_im2im.models.FCN_basic.Model method)</a>
+</li>
+      <li><a href="mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer.run_training">run_training() (mmv_im2im.proj_trainer.ProjectTrainer method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.training">training (mmv_im2im.models.FCN_basic.Model attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.training_step">training_step() (mmv_im2im.models.FCN_basic.Model method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -205,7 +329,7 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.html#mmv_im2im.example.Example.values">values (mmv_im2im.example.Example property)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.validation_step">validation_step() (mmv_im2im.models.FCN_basic.Model method)</a>
 </li>
   </ul></td>
 </tr></table>

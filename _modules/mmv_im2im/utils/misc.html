@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mmv_im2im.utils.misc &mdash; MMV Im2Im Transformation 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MMV Im2Im Transformation
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../mmv_im2im.html">mmv_im2im package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMV Im2Im Transformation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../mmv_im2im.html">mmv_im2im</a> &raquo;</li>
+      <li>mmv_im2im.utils.misc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mmv_im2im.utils.misc</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">munch</span> <span class="kn">import</span> <span class="n">Munch</span>
+<span class="kn">import</span> <span class="nn">torchio</span> <span class="k">as</span> <span class="nn">tio</span>
+
+
+<div class="viewcode-block" id="load_yaml_cfg"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.load_yaml_cfg">[docs]</a><span class="k">def</span> <span class="nf">load_yaml_cfg</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="n">opt_dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+    <span class="c1"># convert dictionary to attribute-like object</span>
+    <span class="n">opt</span> <span class="o">=</span> <span class="n">Munch</span><span class="p">(</span><span class="n">opt_dict</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">opt</span></div>
+
+
+<div class="viewcode-block" id="get_max_shape"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.get_max_shape">[docs]</a><span class="k">def</span> <span class="nf">get_max_shape</span><span class="p">(</span><span class="n">subjects</span><span class="p">):</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">tio</span><span class="o">.</span><span class="n">SubjectsDataset</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">spatial_shape</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">shapes</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse_config"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config">[docs]</a><span class="k">def</span> <span class="nf">parse_config</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+    <span class="n">my_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">])</span>
+    <span class="n">my_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">my_module</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">my_func</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="parse_config_func"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func">[docs]</a><span class="k">def</span> <span class="nf">parse_config_func</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+    <span class="n">my_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">])</span>
+    <span class="n">my_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">my_module</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">])</span>
+    <span class="n">child_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">child_func</span></div>
+
+
+<div class="viewcode-block" id="parse_ops_list"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_ops_list">[docs]</a><span class="k">def</span> <span class="nf">parse_ops_list</span><span class="p">(</span><span class="n">trans_func</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
+    <span class="n">op_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># {&quot;module_name&quot;:&quot;numpy.random&quot;,</span>
+    <span class="c1">#  &quot;func_name&quot;:&quot;randint&quot;,</span>
+    <span class="c1">#  &quot;params&quot;:{&quot;low&quot;:0,&quot;high&quot;:1}}</span>
+    <span class="c1"># load functions according to config</span>
+    <span class="k">for</span> <span class="n">trans_dict</span> <span class="ow">in</span> <span class="n">trans_func</span><span class="p">:</span>
+        <span class="n">op_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_config</span><span class="p">(</span><span class="n">trans_dict</span><span class="p">))</span>
+        <span class="c1"># trans_module = importlib.import_module(trans_dict[&quot;module_name&quot;])</span>
+        <span class="c1"># trans_func = getattr(trans_module, trans_dict[&quot;func_name&quot;])</span>
+        <span class="c1"># op_list.append(trans_func(**trans_dict[&quot;params&quot;]))</span>
+    <span class="k">return</span> <span class="n">op_list</span></div>
+
+
+<div class="viewcode-block" id="generate_dataset_dict"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict">[docs]</a><span class="k">def</span> <span class="nf">generate_dataset_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    different options for &quot;data&quot;:</span>
+<span class="sd">    - one CSV (columns: source, target, cmap), then split</span>
+<span class="sd">    - one folder (_IM.tiff, _GT.tiff, _CM.tiff), then split</span>
+<span class="sd">    - a dictionary of two or three folders (Im, GT, CM), then split</span>
+
+<span class="sd">    Return</span>
+<span class="sd">        a list of dict, each dict contains 2 or 3 keys</span>
+<span class="sd">        &quot;source_fn&quot;, &quot;target_fn&quot;, &quot;costmap_fn&quot; (optional)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="c1"># should be a csv of dataframe</span>
+            <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="s2">&quot;source_path&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s2">&quot;column source_path not found&quot;</span>
+            <span class="k">assert</span> <span class="s2">&quot;target_path&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s2">&quot;column target_path not found&quot;</span>
+
+            <span class="c1"># check if costmap is needed</span>
+            <span class="k">if</span> <span class="s2">&quot;costmap_path&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">cm_flag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cm_flag</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">cm_flag</span><span class="p">:</span>
+                    <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;source_fn&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span>
+                            <span class="s2">&quot;target_fn&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">target_path</span><span class="p">,</span>
+                            <span class="s2">&quot;costmap_fn&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">costmap_path</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;source_fn&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span>
+                            <span class="s2">&quot;target_fn&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">target_path</span><span class="p">,</span>
+                        <span class="p">}</span>  <span class="c1"># noqa E501</span>
+                    <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">all_filename</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*_IM.*&quot;</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;no file found in </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="n">all_filename</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">all_filename</span><span class="p">:</span>
+                <span class="n">target_fn</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_IM.&quot;</span><span class="p">,</span> <span class="s2">&quot;_GT.&quot;</span><span class="p">)</span>
+                <span class="n">costmap_fn</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_IM.&quot;</span><span class="p">,</span> <span class="s2">&quot;_CM.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">costmap_fn</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;source_fn&quot;</span><span class="p">:</span> <span class="n">fn</span><span class="p">,</span>
+                            <span class="s2">&quot;target_fn&quot;</span><span class="p">:</span> <span class="n">target_fn</span><span class="p">,</span>
+                            <span class="s2">&quot;costmap_fn&quot;</span><span class="p">:</span> <span class="n">costmap_fn</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;source_fn&quot;</span><span class="p">:</span> <span class="n">fn</span><span class="p">,</span>
+                            <span class="s2">&quot;target_fn&quot;</span><span class="p">:</span> <span class="n">target_fn</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> is not a valid file or directory&quot;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Dict</span><span class="p">):</span>
+        <span class="c1"># assume 3~4 keys: &quot;source_dir&quot;, &quot;target_dir&quot;, and</span>
+        <span class="c1"># &quot;image_type&quot;, &quot;costmap_dir&quot; (optional)</span>
+        <span class="k">if</span> <span class="s2">&quot;costmap_dir&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">cm_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;costmap_dir&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cm_path</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">source_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;source_dir&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="n">target_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;target_dir&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+
+        <span class="n">data_type</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;image_type&quot;</span><span class="p">]</span>
+
+        <span class="n">all_filename</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">source_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*.</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;no file found in </span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">all_filename</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">all_filename</span><span class="p">:</span>
+            <span class="n">target_fn</span> <span class="o">=</span> <span class="n">target_path</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="n">cm_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">costmap_fn</span> <span class="o">=</span> <span class="n">cm_path</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;source_fn&quot;</span><span class="p">:</span> <span class="n">fn</span><span class="p">,</span>
+                        <span class="s2">&quot;target_fn&quot;</span><span class="p">:</span> <span class="n">target_fn</span><span class="p">,</span>
+                        <span class="s2">&quot;costmap_fn&quot;</span><span class="p">:</span> <span class="n">costmap_fn</span><span class="p">,</span>
+                    <span class="p">}</span>  <span class="c1"># noqa E501</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;source_fn&quot;</span><span class="p">:</span> <span class="n">fn</span><span class="p">,</span> <span class="s2">&quot;target_fn&quot;</span><span class="p">:</span> <span class="n">target_fn</span><span class="p">})</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;unsupported data type&quot;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;empty dataset&quot;</span>
+
+    <span class="k">return</span> <span class="n">dataset_list</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jianxu Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
