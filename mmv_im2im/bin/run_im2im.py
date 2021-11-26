@@ -21,7 +21,7 @@ from mmv_im2im import ProjectTester, ProjectTrainer
 
 log = logging.getLogger()
 logging.basicConfig(
-    level=logging.INFO, format="[%(levelname)4s:%(lineno)4s %(asctime)s] %(message)s"
+    level=logging.INFO, format="[%(levelname)4s:%(lineno)4s %(asctime)s] %(message)s"  # noqa E501
 )
 
 ###############################################################################

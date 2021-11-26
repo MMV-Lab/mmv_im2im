@@ -18,7 +18,7 @@ from tifffile import imsave
 
 log = logging.getLogger()
 logging.basicConfig(
-    level=logging.INFO, format="[%(levelname)4s:%(lineno)4s %(asctime)s] %(message)s"
+    level=logging.INFO, format="[%(levelname)4s:%(lineno)4s %(asctime)s] %(message)s"  # noqa E501
 )
 
 
@@ -91,7 +91,6 @@ def generate_data(args):
         if args.costmap:
             out_cm_fn = out_path / f"img_{1000+ii}_CM.tiff"
 
-
         if args.dim == 3:
             if args.large:
                 im = np.zeros((64, 512, 512))
@@ -101,7 +100,7 @@ def generate_data(args):
                 py = randint(15, im.shape[-2]-15)
                 px = randint(15, im.shape[-1]-15)
                 im[31, py, px] = 1
-            im = dilation(im>0, ball(2))
+            im = dilation(im > 0, ball(2))
 
             if args.type == "mask" and not args.unpair:
                 gt = im.astype(np.float32)
@@ -121,7 +120,7 @@ def generate_data(args):
         else:
             print("Not impletemented yet")
             exit(0)
-        
+
 
 def main():
     try:

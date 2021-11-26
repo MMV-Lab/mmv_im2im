@@ -46,7 +46,9 @@ for row in meta_df_lamin.itertuples():
 
     # extract the bf and lamin channel
     reader = AICSImage(local_fn)
-    bf_img = reader.get_image_data("ZYX", C=row.ChannelBrightField, S=0, T=0)
+    import pdb
+    pdb.set_trace()
+    bf_img = reader.get_image_data("ZYX", C=row.ChannelBrightfield, S=0, T=0)
     str_img = reader.get_image_data("ZYX", C=row.ChannelStructure, S=0, T=0)
 
     im_fn = data_path / f"{row.FOVId}_IM.tiff"

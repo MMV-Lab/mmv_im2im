@@ -80,8 +80,8 @@ class Im2ImDataModule(pl.LightningDataModule):
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
 
-        self.train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
-        self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
+        self.train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)  # noqa E501
+        self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)  # noqa E501
 
     def train_dataloader(self):
         return DataLoader(self.train_set, shuffle=True, **self.loader_params)
