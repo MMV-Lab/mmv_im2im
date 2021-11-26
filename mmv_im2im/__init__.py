@@ -13,4 +13,5 @@ def get_module_version():
     return __version__
 
 
-from .example import Example  # noqa: F401
+from .proj_tester import ProjectTester  # noqa F401
+from .proj_trainer import ProjectTrainer  # noqa F401

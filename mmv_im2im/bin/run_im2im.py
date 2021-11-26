@@ -11,35 +11,35 @@ import logging
 import sys
 import traceback
 
-from mmv_im2im import Example, get_module_version
+import torch
+
+from mmv_im2im import get_module_version
+from mmv_im2im.utils.misc import load_yaml_cfg
+from mmv_im2im import ProjectTester, ProjectTrainer
 
 ###############################################################################
 
 log = logging.getLogger()
 logging.basicConfig(
-    level=logging.INFO, format="[%(levelname)4s:%(lineno)4s %(asctime)s] %(message)s"
+    level=logging.INFO,
+    format="[%(levelname)4s:%(lineno)4s %(asctime)s] %(message)s",  # noqa E501
 )
 
 ###############################################################################
+TRAIN_MODE = "train"
+INFER_MODE = "inference"
 
 
 class Args(argparse.Namespace):
-
-    DEFAULT_FIRST = 10
-    DEFAULT_SECOND = 20
-
     def __init__(self):
         # Arguments that could be passed in through the command line
-        self.first = self.DEFAULT_FIRST
-        self.second = self.DEFAULT_SECOND
         self.debug = False
-        #
         self.__parse()
 
     def __parse(self):
         p = argparse.ArgumentParser(
-            prog="run_exmaple",
-            description="A simple example of a bin script",
+            prog="run_im2im",
+            description="running im2im",
         )
 
         p.add_argument(
@@ -49,22 +49,15 @@ class Args(argparse.Namespace):
             version="%(prog)s " + get_module_version(),
         )
         p.add_argument(
-            "-f",
-            "--first",
-            action="store",
-            dest="first",
-            type=int,
-            default=self.first,
-            help="The first argument value",
+            "--config",
+            dest="filename",
+            required=True,
+            help="path to configuration file",
         )
         p.add_argument(
-            "-s",
-            "--second",
-            action="store",
-            dest="second",
-            type=int,
-            default=self.second,
-            help="The first argument value",
+            "--mode",
+            required=True,
+            help="the type of operation: train or inference",
         )
         p.add_argument(
             "--debug",
@@ -83,13 +76,20 @@ def main():
         args = Args()
         dbg = args.debug
 
-        # Do your work here - preferably in a class or function,
-        # passing in your args. E.g.
-        exe = Example(args.first)
-        exe.update_value(args.second)
-        print(
-            "First : {}\nSecond: {}".format(exe.get_value(), exe.get_previous_value())
-        )
+        # check gpu option
+        assert torch.cuda.is_available(), "GPU is not available."
+        torch.cuda.set_device(torch.device("cuda:0"))
+
+        opt = load_yaml_cfg(args.filename)
+        if args.mode == TRAIN_MODE or args.mode.lower() == TRAIN_MODE:
+            exe = ProjectTrainer(opt)
+            exe.run_training()
+        elif args.mode == INFER_MODE or args.mode.lower() == INFER_MODE:
+            exe = ProjectTester(opt)
+            exe.run_inference()
+        else:
+            log.error(f"Mode {args.mode} is not supported yet")
+            sys.exit(1)
 
     except Exception as e:
         log.error("=============================================")

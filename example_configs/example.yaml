@@ -1,0 +1,66 @@
+
+# everything about data
+data:
+  category: "pair_3d"
+  target_type: "Label" # or "Image
+  # data_path: "/mnt/data/xyz.csv"
+  data_path: "~/automount/Home/projects/data/syn_3D_seg"
+  # data_path:
+  #   source_path:
+  #   target_path:
+  #   costmap_path: optional
+  #   image_type: "tiff"
+  dataloader_params:
+    batch_size: 4
+    pin_memory: True
+    num_workers: 4
+  train_val_ratio: 0.2
+  preprocess:
+    - module_name: torchio
+      func_name: RescaleIntensity
+      params:
+        out_min_max: [-1, 1]
+    - module_name: torchio
+      func_name: CropOrPad
+      params:
+        target_shape: [64, 128, 128]
+  augmentation:
+    - module_name: torchio
+      func_name: RandomAffine
+      params:
+        p: 0.5
+# model
+model:
+  category: FCN
+  net:
+    module_name: monai.networks.nets
+    func_name: UNet
+    params:
+      spatial_dims: 3
+      in_channels: 1
+      out_channels: 2
+      channels: [8, 16, 32, 64]
+      strides: [2, 2, 2]
+  criterion:
+    module_name: monai.losses
+    func_name: DiceCELoss
+    params:
+      softmax: True
+      to_onehot_y: True
+  optimizer:
+    module_name: torch.optim
+    func_name: AdamW
+    params:
+      lr: 0.02
+# training
+training:
+  params:
+    gpus: 1
+    precision: 16
+    stochastic_weight_avg: True
+  callbacks:
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+    

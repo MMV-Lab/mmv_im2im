@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# plt
+lightning_logs/
+
 # Distribution / packaging
 .Python
 env/
