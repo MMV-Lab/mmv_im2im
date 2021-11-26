@@ -22,6 +22,7 @@ class ProjectTrainer(object):
     ----------
     cfg: configuration
     """
+
     def __init__(self, cfg):
 
         # seed everything before start
@@ -31,7 +32,7 @@ class ProjectTrainer(object):
         self.model_cfg = cfg.model
         self.train_cfg = cfg.training
         self.data_cfg = cfg.data
-        
+
         # define variables
         self.model = None
         self.data = None

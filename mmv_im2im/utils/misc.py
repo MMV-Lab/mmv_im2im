@@ -15,7 +15,7 @@ def load_yaml_cfg(yaml_path):
 
     # convert dictionary to attribute-like object
     opt = Munch(opt_dict)
-    
+
     return opt
 
 
@@ -51,6 +51,7 @@ def parse_ops_list(trans_func: List[Dict]):
         # op_list.append(trans_func(**trans_dict["params"]))
     return op_list
 
+
 def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     """
     different options for "data":
@@ -68,6 +69,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
         if data.is_file():
             # should be a csv of dataframe
             import pandas as pd
+
             df = pd.read_csv(data)
             assert "source_path" in df.columns, "column source_path not found"
             assert "target_path" in df.columns, "column target_path not found"
@@ -84,15 +86,12 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
                         {
                             "source_fn": row.source_path,
                             "target_fn": row.target_path,
-                            "costmap_fn": row.costmap_path
+                            "costmap_fn": row.costmap_path,
                         }
                     )
                 else:
                     dataset_list.append(
-                        {
-                            "source_fn": row.source_path,
-                            "target_fn": row.target_path
-                        }
+                        {"source_fn": row.source_path, "target_fn": row.target_path}
                     )
         elif data.is_dir():
             all_filename = sorted(data.glob("*_IM.*"))
@@ -107,7 +106,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
                         {
                             "source_fn": fn,
                             "target_fn": target_fn,
-                            "costmap_fn": costmap_fn
+                            "costmap_fn": costmap_fn,
                         }
                     )
                 else:
@@ -142,19 +141,10 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
             if cm_path is not None:
                 costmap_fn = cm_path / fn.name
                 dataset_list.append(
-                    {
-                        "source_fn": fn,
-                        "target_fn": target_fn,
-                        "costmap_fn": costmap_fn
-                    }
+                    {"source_fn": fn, "target_fn": target_fn, "costmap_fn": costmap_fn}
                 )
             else:
-                dataset_list.append(
-                    {
-                        "source_fn": fn,
-                        "target_fn": target_fn
-                    }
-                )
+                dataset_list.append({"source_fn": fn, "target_fn": target_fn})
 
     else:
         print("unsupported data type")

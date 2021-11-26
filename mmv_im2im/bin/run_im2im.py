@@ -28,8 +28,8 @@ logging.basicConfig(
 TRAIN_MODE = "train"
 INFER_MODE = "inference"
 
-class Args(argparse.Namespace):
 
+class Args(argparse.Namespace):
     def __init__(self):
         # Arguments that could be passed in through the command line
         self.debug = False

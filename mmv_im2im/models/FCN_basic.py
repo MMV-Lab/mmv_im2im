@@ -16,7 +16,7 @@ class Model(pl.LightningModule):
         return optimizer
 
     def prepare_batch(self, batch):
-        return 
+        return
 
     def forward(self, x):
         return self.net(x)
@@ -28,8 +28,8 @@ class Model(pl.LightningModule):
         else:
             costmap = None
 
-        x = batch['source'][tio.DATA]
-        y = batch['target'][tio.DATA]
+        x = batch["source"][tio.DATA]
+        y = batch["target"][tio.DATA]
 
         y_hat = self(x)
 
@@ -42,10 +42,10 @@ class Model(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss = self.run_step(batch)
-        self.log('train_loss', loss, prog_bar=True)
+        self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         loss = self.run_step(batch)
-        self.log('val_loss', loss)
+        self.log("val_loss", loss)
         return loss

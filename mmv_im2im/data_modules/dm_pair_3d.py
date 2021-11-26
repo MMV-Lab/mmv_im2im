@@ -64,7 +64,7 @@ class Im2ImDataModule(pl.LightningDataModule):
                 subject = tio.Subject(
                     source=tio.ScalarImage(ds["source_fn"]),
                     target=target_image_class(ds["target_fn"]),
-                    costmap=tio.ScalarImage(ds["costmap_fn"])
+                    costmap=tio.ScalarImage(ds["costmap_fn"]),
                 )
             else:
                 subject = tio.Subject(
@@ -80,12 +80,8 @@ class Im2ImDataModule(pl.LightningDataModule):
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
 
-        self.train_set = tio.SubjectsDataset(
-            train_subjects, transform=self.transform
-        )
-        self.val_set = tio.SubjectsDataset(
-            val_subjects, transform=self.preproc
-        )
+        self.train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
+        self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
 
     def train_dataloader(self):
         return DataLoader(self.train_set, shuffle=True, **self.loader_params)
