@@ -45,6 +45,7 @@ requirements = [
     "pandas",
     "munch",
     "scikit-image",
+    "quilt3",
 ]
 
 extra_requirements = {
@@ -69,7 +70,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
-    description="A python package for deep learing based image to image transformation",
+    description="A python package for deep learing based image to image transformation",  # noqa E501
     entry_points={
         "console_scripts": [
             "run_im2im=mmv_im2im.bin.run_im2im:main"
