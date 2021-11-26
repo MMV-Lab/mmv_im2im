@@ -91,7 +91,10 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
                     )
                 else:
                     dataset_list.append(
-                        {"source_fn": row.source_path, "target_fn": row.target_path}  # noqa E501
+                        {
+                            "source_fn": row.source_path,
+                            "target_fn": row.target_path,
+                        }  # noqa E501
                     )
         elif data.is_dir():
             all_filename = sorted(data.glob("*_IM.*"))
@@ -141,7 +144,11 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
             if cm_path is not None:
                 costmap_fn = cm_path / fn.name
                 dataset_list.append(
-                    {"source_fn": fn, "target_fn": target_fn, "costmap_fn": costmap_fn}  # noqa E501
+                    {
+                        "source_fn": fn,
+                        "target_fn": target_fn,
+                        "costmap_fn": costmap_fn,
+                    }  # noqa E501
                 )
             else:
                 dataset_list.append({"source_fn": fn, "target_fn": target_fn})

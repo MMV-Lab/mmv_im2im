@@ -39,21 +39,27 @@ class ProjectTrainer(object):
     def run_training(self):
         # set up data
         data_category = self.data_cfg.pop("category")
-        data_cls_module = import_module(f"mmv_im2im.data_modules.dm_{data_category}")  # noqa E501
+        data_cls_module = import_module(
+            f"mmv_im2im.data_modules.dm_{data_category}"
+        )  # noqa E501
         my_data_funcs = getattr(data_cls_module, "Im2ImDataModule")
 
         self.data = my_data_funcs(self.data_cfg)
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(f"mmv_im2im.models.{model_category}_basic")  # noqa E501
+        model_module = import_module(
+            f"mmv_im2im.models.{model_category}_basic"
+        )  # noqa E501
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg)
 
         # set up training
         if "callbacks" in self.train_cfg:
             callback_list = parse_ops_list(self.train_cfg["callbacks"])
-        trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg["params"])  # noqa E501
+        trainer = pl.Trainer(
+            callbacks=callback_list, **self.train_cfg["params"]
+        )  # noqa E501
 
         # start training
         trainer.fit(model=self.model, datamodule=self.data)
