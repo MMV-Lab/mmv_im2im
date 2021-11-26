@@ -52,9 +52,9 @@ class Im2ImDataModule(pl.LightningDataModule):
         dataset_list = generate_dataset_dict(self.data_path)
 
         tio_image_module = import_module("torchio")
-        if self.target_type == "Label":
+        if self.target_type.lower() == "label":
             target_image_class = getattr(tio_image_module, "LabelMap")
-        elif self.target_type == "Image":
+        elif self.target_type.lower() == "image":
             target_image_class = getattr(tio_image_module, "ScalarImage")
         else:
             print("unsupported target type")

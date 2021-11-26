@@ -57,6 +57,8 @@ class ProjectTrainer(object):
         # set up training
         if "callbacks" in self.train_cfg:
             callback_list = parse_ops_list(self.train_cfg["callbacks"])
+        else:
+            callback_list = []
         trainer = pl.Trainer(
             callbacks=callback_list, **self.train_cfg["params"]
         )  # noqa E501

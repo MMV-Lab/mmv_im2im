@@ -46,6 +46,8 @@ requirements = [
     "munch",
     "scikit-image",
     "quilt3",
+    "einops",
+    "albumentations",
 ]
 
 extra_requirements = {
