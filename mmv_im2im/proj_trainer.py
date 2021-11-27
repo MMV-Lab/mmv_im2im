@@ -48,9 +48,7 @@ class ProjectTrainer(object):
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(
-            f"mmv_im2im.models.{model_category}_basic"
-        )  # noqa E501
+        model_module = import_module(f"mmv_im2im.models.{model_category}_basic")
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg)
 
