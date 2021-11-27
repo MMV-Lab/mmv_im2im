@@ -43,6 +43,16 @@ class Im2ImDataModule(pl.LightningDataModule):
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]
+        if "dataloader_patch_queue" in data_cfg:
+            self.patch_loader = True
+            self.patch_loader_params = data_cfg["dataloader_patch_queue"][
+                "params"
+            ]  # noqa E501
+            self.patch_loader_sampler = data_cfg["dataloader_patch_queue"][
+                "sampler"
+            ]  # noqa E501
+        else:
+            self.patch_loader = False
 
         # reserved for test data
         self.test_subjects = None
@@ -80,18 +90,25 @@ class Im2ImDataModule(pl.LightningDataModule):
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
 
-        self.train_set = tio.SubjectsDataset(
-            train_subjects, transform=self.transform
-        )  # noqa E501
-        self.val_set = tio.SubjectsDataset(
-            val_subjects, transform=self.preproc
-        )  # noqa E501
+        self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
+
+        train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
+        if self.patch_loader:
+            # define sampler
+            sampler_module = import_module("torchio.data")
+            sampler_func = getattr(sampler_module, self.patch_loader_sampler["name"])
+            train_sampler = sampler_func(**self.patch_loader_sampler["params"])
+            self.train_set = tio.Queue(
+                train_set, sampler=train_sampler, **self.patch_loader_params
+            )
+        else:
+            self.train_set = train_set
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, shuffle=True, **self.loader_params)
+        return DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, shuffle=False, **self.loader_params)
+        return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case

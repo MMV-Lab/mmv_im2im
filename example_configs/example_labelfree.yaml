@@ -10,10 +10,24 @@ data:
   #   target_path:
   #   costmap_path: optional
   #   image_type: "tiff"
+  dataloader_patch_queue:  # where to use IO queue in
+    sampler:
+      name: UniformSampler
+      func_name: RescaleIntensity
+      params:
+        patch_size: [64, 128, 128]
+    params:
+      num_workers: 4
+      max_length: 400
+      samples_per_volume: 5
   dataloader_params:
-    batch_size: 4
-    pin_memory: True
-    num_workers: 4
+    train:
+      batch_size: 4
+      pin_memory: True
+      num_workers: 0  # if dataload_path_queue is used, num_workers must be 0 here
+    val:
+      batch_size: 1
+      num_workers: 1
   train_val_ratio: 0.2
   preprocess:
     - module_name: torchio
@@ -23,7 +37,7 @@ data:
     - module_name: torchio
       func_name: CropOrPad
       params:
-        target_shape: [64, 128, 128]
+        target_shape: [64, 512, 512]
   augmentation:
     - module_name: torchio
       func_name: RandomAffine
