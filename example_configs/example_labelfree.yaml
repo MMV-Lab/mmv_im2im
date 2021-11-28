@@ -18,8 +18,8 @@ data:
         patch_size: [64, 128, 128]
     params:
       num_workers: 4
-      max_length: 400
-      samples_per_volume: 5
+      max_length: 360
+      samples_per_volume: 4
   dataloader_params:
     train:
       batch_size: 4
@@ -28,7 +28,7 @@ data:
     val:
       batch_size: 1
       num_workers: 1
-  train_val_ratio: 0.2
+  train_val_ratio: 0.1
   preprocess:
     - module_name: torchio
       func_name: RescaleIntensity

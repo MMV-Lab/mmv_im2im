@@ -32,7 +32,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.subjects = None
 
         # train/val split
-        self.train_val_ratio = data_cfg["train_val_ratio"] or 0.2
+        self.train_val_ratio = data_cfg["train_val_ratio"] or 0.8
         self.train_set = None
         self.val_set = None
 
@@ -85,8 +85,8 @@ class Im2ImDataModule(pl.LightningDataModule):
 
     def setup(self, stage=None):
         num_subjects = len(self.subjects)
-        num_train_subjects = int(round(num_subjects * self.train_val_ratio))
-        num_val_subjects = num_subjects - num_train_subjects
+        num_val_subjects = int(round(num_subjects * self.train_val_ratio))
+        num_train_subjects = num_subjects - num_val_subjects
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
 
