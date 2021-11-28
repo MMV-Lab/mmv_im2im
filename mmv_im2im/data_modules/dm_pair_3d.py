@@ -32,7 +32,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.subjects = None
 
         # train/val split
-        self.train_val_ratio = data_cfg["train_val_ratio"] or 0.8
+        self.train_val_ratio = data_cfg["train_val_ratio"] or 0.2
         self.train_set = None
         self.val_set = None
 
@@ -96,7 +96,9 @@ class Im2ImDataModule(pl.LightningDataModule):
         if self.patch_loader:
             # define sampler
             sampler_module = import_module("torchio.data")
-            sampler_func = getattr(sampler_module, self.patch_loader_sampler["name"])
+            sampler_func = getattr(
+                sampler_module, self.patch_loader_sampler["name"]
+            )  # noqa E501
             train_sampler = sampler_func(**self.patch_loader_sampler["params"])
             self.train_set = tio.Queue(
                 train_set, sampler=train_sampler, **self.patch_loader_params
@@ -105,10 +107,14 @@ class Im2ImDataModule(pl.LightningDataModule):
             self.train_set = train_set
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])
+        return DataLoader(
+            self.train_set, shuffle=True, **self.loader_params["train"]
+        )  # noqa E501
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
+        return DataLoader(
+            self.val_set, shuffle=False, **self.loader_params["val"]
+        )  # noqa E501
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case

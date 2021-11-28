@@ -1,6 +1,9 @@
 from typing import Dict
 import pytorch_lightning as pl
 import torchio as tio
+
+from aicsimageio.writers import OmeTiffWriter
+
 from mmv_im2im.utils.misc import parse_config, parse_config_func
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
@@ -35,9 +38,11 @@ class Model(pl.LightningModule):
         if validation_stage:
             y_hat = predict_piecewise(
                 self,
-                x[0,],
+                x[
+                    0,
+                ],
                 dims_max=[1, 64, 128, 128],
-                overlaps=[0, 6, 12, 12]
+                overlaps=[0, 6, 12, 12],
             )
         else:
             y_hat = self(x)
@@ -58,3 +63,20 @@ class Model(pl.LightningModule):
         loss = self.run_step(batch, validation_stage=True)
         self.log("val_loss", loss)
         return loss
+
+    def predict_step(self, batch, batch_idx):
+        img, fn = batch
+        out = self(img)
+        predictions = out.cpu().numpy()
+
+        for ii in range(len(fn)):
+            out_fn = fn[ii]
+            pred = predictions[
+                ii,
+            ]
+            if len(pred.shape()) == 4:
+                OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
+            elif len(pred.shape()) == 3:
+                OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
+            else:
+                print("error in prediction")

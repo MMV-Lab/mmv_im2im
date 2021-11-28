@@ -18,8 +18,8 @@ data:
         patch_size: [64, 128, 128]
     params:
       num_workers: 4
-      max_length: 360
-      samples_per_volume: 4
+      max_length: 12
+      samples_per_volume: 8
   dataloader_params:
     train:
       batch_size: 4

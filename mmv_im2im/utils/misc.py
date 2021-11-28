@@ -52,6 +52,39 @@ def parse_ops_list(trans_func: List[Dict]):
     return op_list
 
 
+def generate_test_dataset_dict(
+    data: Union[str, Path], data_column: str = None, data_type: str = None
+) -> List:
+    """
+    different options for "data":
+    - one CSV
+    - one folder
+    Return
+        a list of filename
+    """
+    dataset_list = []
+    data = Path(data).expanduser()
+    if data.is_file():
+        # should be a csv of dataframe
+        import pandas as pd
+
+        df = pd.read_csv(data)
+        data_column
+
+        for row in df.iterrows():
+            dataset_list.append(row[data_column])
+
+    elif data.is_dir():
+        all_filename = sorted(data.glob(f"*{data_type}"))
+        assert len(all_filename) > 0, f"no file found in {data}"
+
+        all_filename.sort()
+        for fn in all_filename:
+            dataset_list.append(fn)
+    else:
+        print(f"{data} is not a valid file or directory")
+
+
 def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     """
     different options for "data":
