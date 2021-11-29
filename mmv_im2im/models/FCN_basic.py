@@ -14,6 +14,7 @@ class Model(pl.LightningModule):
         self.net = parse_config(model_info_xx["net"])
         self.criterion = parse_config(model_info_xx["criterion"])
         self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
+        self.sliding_window = model_info_xx["sliding_window_params"]
 
     def configure_optimizers(self):
         optimizer = self.optimizer_func(self.parameters())
@@ -41,8 +42,7 @@ class Model(pl.LightningModule):
                 x[
                     0,
                 ],
-                dims_max=[1, 64, 128, 128],
-                overlaps=[0, 6, 12, 12],
+                **self.sliding_window
             )
         else:
             y_hat = self(x)

@@ -13,12 +13,13 @@
 # (e.g. for segmentation) or images (e.g. for labelfree)
 ########################################################
 from importlib import import_module
+from functools import partial
 from torch.utils.data import random_split, DataLoader
 import torchio as tio
 import pytorch_lightning as pl
 
 from mmv_im2im.utils.for_transform import parse_tio_ops
-from mmv_im2im.utils.misc import generate_dataset_dict
+from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 
 
 class Im2ImDataModule(pl.LightningDataModule):
@@ -26,6 +27,9 @@ class Im2ImDataModule(pl.LightningDataModule):
         super().__init__()
 
         self.target_type = data_cfg["target_type"]
+        self.source_type = data_cfg["source_type"]
+        self.target_reader_param = data_cfg["target_reader_params"]
+        self.source_reader_param = data_cfg["source_reader_params"]
         self.data_path = data_cfg["data_path"]
 
         # all subjects
@@ -61,6 +65,7 @@ class Im2ImDataModule(pl.LightningDataModule):
     def prepare_data(self):
         dataset_list = generate_dataset_dict(self.data_path)
 
+        # parse source and target type
         tio_image_module = import_module("torchio")
         if self.target_type.lower() == "label":
             target_image_class = getattr(tio_image_module, "LabelMap")
@@ -68,18 +73,28 @@ class Im2ImDataModule(pl.LightningDataModule):
             target_image_class = getattr(tio_image_module, "ScalarImage")
         else:
             print("unsupported target type")
+        target_reader = partial(aicsimageio_reader, **self.target_reader_param)
+
+        if self.source_type.lower() == "label":
+            source_image_class = getattr(tio_image_module, "LabelMap")
+        elif self.source_type.lower() == "image":
+            source_image_class = getattr(tio_image_module, "ScalarImage")
+        else:
+            print("unsupported source type")
+        source_reader = partial(aicsimageio_reader, **self.source_reader_param)
+
         self.subjects = []
         for ds in dataset_list:
             if "costmap_fn" in ds:
                 subject = tio.Subject(
-                    source=tio.ScalarImage(ds["source_fn"]),
-                    target=target_image_class(ds["target_fn"]),
+                    source=source_image_class(ds["source_fn"], reader=source_reader),
+                    target=target_image_class(ds["target_fn"], reader=target_reader),
                     costmap=tio.ScalarImage(ds["costmap_fn"]),
                 )
             else:
                 subject = tio.Subject(
-                    source=tio.ScalarImage(ds["source_fn"]),
-                    target=target_image_class(ds["target_fn"]),
+                    source=source_image_class(ds["source_fn"], reader=source_reader),
+                    target=target_image_class(ds["target_fn"], reader=target_reader),
                 )
             self.subjects.append(subject)
 
