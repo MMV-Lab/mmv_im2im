@@ -3,15 +3,12 @@
 import logging
 from importlib import import_module
 from pathlib import Path
-import numpy as np
 
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
-import pytorch_lightning as pl
 import torch
 from torchio.data.io import check_uint_to_int
 
-from mmv_im2im.data_modules.dm_inference import Im2ImDataModule
 from mmv_im2im.utils.misc import generate_test_dataset_dict
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
@@ -46,9 +43,7 @@ class ProjectTester(object):
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(
-            f"mmv_im2im.models.{model_category}_basic"
-        )
+        model_module = import_module(f"mmv_im2im.models.{model_category}_basic")
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func.load_from_checkpoint(
             model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
@@ -62,12 +57,14 @@ class ProjectTester(object):
 
         # loop through all images and apply the model
         for ds in dataset_list:
-            img = AICSImage(ds).reader.get_image_dask_data(**self.data_cfg["input"]["reader_params"])
+            img = AICSImage(ds).reader.get_image_dask_data(
+                **self.data_cfg["input"]["reader_params"]
+            )
             x = check_uint_to_int(img.compute())
             y_hat = predict_piecewise(
                 self.model,
                 torch.from_numpy(x).float().cuda(),
-                **self.model_cfg["sliding_window_params"]
+                **self.model_cfg["sliding_window_params"],
             )
             # prepare output
             fn_core = Path(ds).stem
@@ -81,6 +78,12 @@ class ProjectTester(object):
                 OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "find non-trivial batch dimension"
-                OmeTiffWriter.save(pred[0, ], out_fn, dim_order="CZYX")
+                OmeTiffWriter.save(
+                    pred[
+                        0,
+                    ],
+                    out_fn,
+                    dim_order="CZYX",
+                )
             else:
                 print("error in prediction")

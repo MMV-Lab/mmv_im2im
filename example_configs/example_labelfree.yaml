@@ -24,7 +24,7 @@ data:
       name: UniformSampler
       func_name: RescaleIntensity
       params:
-        patch_size: [32, 128, 128]
+        patch_size: [32, 256, 256]
     params:
       num_workers: 4
       max_length: 360
@@ -70,11 +70,11 @@ model:
       reduction: 'mean'
   optimizer:
     module_name: torch.optim
-    func_name: AdamW
+    func_name: Adam  # AdamW
     params:
       lr: 0.001
   sliding_window_params:
-    dims_max: [1, 32, 128, 128]
+    dims_max: [1, 32, 256, 256]
     overlaps: [0, 6, 12, 12]
 # training
 training:
