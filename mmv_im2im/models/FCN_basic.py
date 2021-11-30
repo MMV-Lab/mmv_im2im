@@ -9,12 +9,13 @@ from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_info_xx: Dict):
+    def __init__(self, model_info_xx: Dict, train: bool = True):
         super().__init__()
         self.net = parse_config(model_info_xx["net"])
-        self.criterion = parse_config(model_info_xx["criterion"])
-        self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
         self.sliding_window = model_info_xx["sliding_window_params"]
+        if train:
+            self.criterion = parse_config(model_info_xx["criterion"])
+            self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
 
     def configure_optimizers(self):
         optimizer = self.optimizer_func(self.parameters())
@@ -66,7 +67,11 @@ class Model(pl.LightningModule):
 
     def predict_step(self, batch, batch_idx):
         img, fn = batch
-        out = self(img)
+        x = img["source"][tio.DATA]
+
+        out = predict_piecewise(
+            self, x[0,], **self.sliding_window
+        )
         predictions = out.cpu().numpy()
 
         for ii in range(len(fn)):

@@ -7,16 +7,20 @@ data:
     dir: "~/ambiomgroupdrive/Jianxu/data/labelfree_lamin/test_data"
     params:
       data_type: "tiff"
+    input_type: "Image" # "Label" or "Image
+    input_reader_params:
+      dimension_order_out: "ZYX"
+      C: 0
+      T: 0
   output:
     path: "~/ambiomgroupdrive/Jianxu/data/labelfree_lamin/test_data_prediction"
     suffix: "pred_LMNB1"
   dataloader_params:
-    batch_size: 2
-    num_workers: 2
+    batch_size: 1
+    num_workers: 1
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
-      params:
 # model
 model:
   category: FCN
@@ -29,8 +33,11 @@ model:
       out_channels: 1
       channels: [8, 16, 32, 64]
       strides: [2, 2, 2]
+  sliding_window_params:
+    dims_max: [1, 32, 128, 128]
+    overlaps: [0, 6, 12, 12]
   ckpt:
-    checkpoint_path: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_0/checkpoints/epoch=22-step=114.ckpt
+    checkpoint_path: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_0/checkpoints/epoch=294-step=53099.ckpt
     hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_0/hparams.yaml
 # inference
 run:

@@ -87,12 +87,13 @@ def generate_test_dataset_dict(
     elif data.is_dir():
         all_filename = sorted(data.glob(f"*{data_type}"))
         assert len(all_filename) > 0, f"no file found in {data}"
-
         all_filename.sort()
         for fn in all_filename:
             dataset_list.append(fn)
     else:
         print(f"{data} is not a valid file or directory")
+
+    return dataset_list
 
 
 def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
