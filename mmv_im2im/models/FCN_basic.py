@@ -1,15 +1,21 @@
 from typing import Dict
 import pytorch_lightning as pl
 import torchio as tio
+
+from aicsimageio.writers import OmeTiffWriter
+
 from mmv_im2im.utils.misc import parse_config, parse_config_func
+from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_info_xx: Dict):
+    def __init__(self, model_info_xx: Dict, train: bool = True):
         super().__init__()
         self.net = parse_config(model_info_xx["net"])
-        self.criterion = parse_config(model_info_xx["criterion"])
-        self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
+        self.sliding_window = model_info_xx["sliding_window_params"]
+        if train:
+            self.criterion = parse_config(model_info_xx["criterion"])
+            self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
 
     def configure_optimizers(self):
         optimizer = self.optimizer_func(self.parameters())
@@ -21,7 +27,7 @@ class Model(pl.LightningModule):
     def forward(self, x):
         return self.net(x)
 
-    def run_step(self, batch):
+    def run_step(self, batch, validation_stage):
         if "costmap" in batch:
             costmap = batch.pop("costmap")
             costmap = costmap[tio.DATA]
@@ -31,7 +37,16 @@ class Model(pl.LightningModule):
         x = batch["source"][tio.DATA]
         y = batch["target"][tio.DATA]
 
-        y_hat = self(x)
+        if validation_stage:
+            y_hat = predict_piecewise(
+                self,
+                x[
+                    0,
+                ],
+                **self.sliding_window
+            )
+        else:
+            y_hat = self(x)
 
         if costmap is None:
             loss = self.criterion(y_hat, y)
@@ -41,11 +56,11 @@ class Model(pl.LightningModule):
         return loss
 
     def training_step(self, batch, batch_idx):
-        loss = self.run_step(batch)
+        loss = self.run_step(batch, validation_stage=False)
         self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
-        loss = self.run_step(batch)
+        loss = self.run_step(batch, validation_stage=True)
         self.log("val_loss", loss)
         return loss
