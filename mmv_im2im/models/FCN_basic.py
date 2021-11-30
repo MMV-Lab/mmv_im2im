@@ -64,24 +64,3 @@ class Model(pl.LightningModule):
         loss = self.run_step(batch, validation_stage=True)
         self.log("val_loss", loss)
         return loss
-
-    def predict_step(self, batch, batch_idx):
-        img, fn = batch
-        x = img["source"][tio.DATA]
-
-        out = predict_piecewise(
-            self, x[0,], **self.sliding_window
-        )
-        predictions = out.cpu().numpy()
-
-        for ii in range(len(fn)):
-            out_fn = fn[ii]
-            pred = predictions[
-                ii,
-            ]
-            if len(pred.shape()) == 4:
-                OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
-            elif len(pred.shape()) == 3:
-                OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
-            else:
-                print("error in prediction")
