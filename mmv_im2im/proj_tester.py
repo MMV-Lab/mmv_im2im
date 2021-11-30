@@ -3,6 +3,7 @@
 import logging
 from importlib import import_module
 from pathlib import Path
+import numpy as np
 
 from aicsimageio import AICSImage
 import pytorch_lightning as pl
@@ -41,34 +42,36 @@ class ProjectTester(object):
         self.data = None
 
     def run_inference(self):
-        # set up data
-        # self.data = Im2ImDataModule(self.data_cfg)
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(f"mmv_im2im.models.{model_category}_basic")
+        model_module = import_module(
+            f"mmv_im2im.models.{model_category}_basic"
+        )
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func.load_from_checkpoint(
             model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
         ).cuda()
 
+        # set up data
         dataset_list = generate_test_dataset_dict(
             self.data_cfg["input"]["dir"], **self.data_cfg["input"]["params"]
         )
 
+        # loop through all images and apply the model
         for ds in dataset_list:
-            #fn_core = Path(ds).stem
-            #suffix = self.output["suffix"]
-            #out_path = Path(self.output["path"]) / f"{fn_core}_{suffix}.tiff"
-            img = AICSImage(ds).reader.get_image_dask_data("CZYX", C=[0],T=0)
+            
+            img = AICSImage(ds).reader.get_image_dask_data(**self.data_cfg["input"]["reader_params"])
             x = check_uint_to_int(img.compute())
             out = predict_piecewise(
                 self.model,
                 torch.from_numpy(x).float().cuda(),
-                dims_max=[1, 32, 128, 128],
-                overlaps=[0, 6, 12, 12]
+                **self.model_cfg["sliding_window_params"]
             )
-            print(out)
+            # prepare output dir
+            fn_core = Path(ds).stem
+            suffix = self.output["suffix"]
+            out_path = Path(self.output["path"]) / f"{fn_core}_{suffix}.tiff"
 
         #**self.sliding_window
         # set up trainer

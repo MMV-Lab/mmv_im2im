@@ -65,6 +65,4 @@ class Im2ImDataModule(pl.LightningDataModule):
         pass
 
     def predict_dataloader(self):
-        _ = self.pred_set.__getitem__(0)
-        _ = self.pred_set.__getitem__(1)
         return DataLoader(self.pred_set, shuffle=False, **self.loader_params)
