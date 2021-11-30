@@ -3,10 +3,17 @@ from pathlib import Path
 from functools import partial
 import importlib
 import yaml
-
 import numpy as np
 from munch import Munch
+
+from aicsimageio import AICSImage
 import torchio as tio
+
+
+def aicsimageio_reader(fn, **kwargs):
+    img = AICSImage(fn).reader.get_image_dask_data(**kwargs)
+    img_data = tio.data.io.check_uint_to_int(img.compute())
+    return img_data, np.eye(4)
 
 
 def load_yaml_cfg(yaml_path):
@@ -28,7 +35,10 @@ def get_max_shape(subjects):
 def parse_config(info):
     my_module = importlib.import_module(info["module_name"])
     my_func = getattr(my_module, info["func_name"])
-    return my_func(**info["params"])
+    if "params" in info:
+        return my_func(**info["params"])
+    else:
+        return my_func()
 
 
 def parse_config_func(info):
@@ -50,6 +60,40 @@ def parse_ops_list(trans_func: List[Dict]):
         # trans_func = getattr(trans_module, trans_dict["func_name"])
         # op_list.append(trans_func(**trans_dict["params"]))
     return op_list
+
+
+def generate_test_dataset_dict(
+    data: Union[str, Path], data_column: str = None, data_type: str = None
+) -> List:
+    """
+    different options for "data":
+    - one CSV
+    - one folder
+    Return
+        a list of filename
+    """
+    dataset_list = []
+    data = Path(data).expanduser()
+    if data.is_file():
+        # should be a csv of dataframe
+        import pandas as pd
+
+        df = pd.read_csv(data)
+        data_column
+
+        for row in df.iterrows():
+            dataset_list.append(row[data_column])
+
+    elif data.is_dir():
+        all_filename = sorted(data.glob(f"*{data_type}"))
+        assert len(all_filename) > 0, f"no file found in {data}"
+        all_filename.sort()
+        for fn in all_filename:
+            dataset_list.append(fn)
+    else:
+        print(f"{data} is not a valid file or directory")
+
+    return dataset_list
 
 
 def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
