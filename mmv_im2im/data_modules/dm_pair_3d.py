@@ -122,14 +122,10 @@ class Im2ImDataModule(pl.LightningDataModule):
             self.train_set = train_set
 
     def train_dataloader(self):
-        return DataLoader(
-            self.train_set, shuffle=True, **self.loader_params["train"]
-        )
+        return DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])
 
     def val_dataloader(self):
-        return DataLoader(
-            self.val_set, shuffle=False, **self.loader_params["val"]
-        )
+        return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case

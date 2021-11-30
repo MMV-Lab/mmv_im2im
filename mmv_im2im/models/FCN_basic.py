@@ -2,8 +2,6 @@ from typing import Dict
 import pytorch_lightning as pl
 import torchio as tio
 
-from aicsimageio.writers import OmeTiffWriter
-
 from mmv_im2im.utils.misc import parse_config, parse_config_func
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
@@ -53,14 +51,40 @@ class Model(pl.LightningModule):
         else:
             loss = self.criterion(y_hat, y, costmap)
 
-        return loss
+        return loss, y_hat
 
     def training_step(self, batch, batch_idx):
-        loss = self.run_step(batch, validation_stage=False)
+        loss, y_hat = self.run_step(batch, validation_stage=False)
         self.log("train_loss", loss, prog_bar=True)
+        """
+        src = batch["source"][tio.DATA]
+        tar = batch["target"][tio.DATA]
+        from tifffile import imsave
+        from random import randint
+        fn_rand = randint(100,900)
+        imsave("./train_src_"+str(fn_rand)+".tiff", src[0,0,].cpu().numpy())
+        imsave("./train_tar_"+str(fn_rand)+".tiff", tar[0,0,].cpu().numpy())
+        # tensorboard = self.logger.experiment
+        # tensorboard.add_image("train_source", src)
+        # tensorboard.add_image("train_target", tar)
+        # tensorboard.add_image("train_predict", y_hat)
+        """
         return loss
 
     def validation_step(self, batch, batch_idx):
-        loss = self.run_step(batch, validation_stage=True)
+        loss, y_hat = self.run_step(batch, validation_stage=True)
         self.log("val_loss", loss)
+        """
+        src = batch["source"][tio.DATA]
+        tar = batch["target"][tio.DATA]
+        from tifffile import imsave
+        from random import randint
+        fn_rand = randint(100,900)
+        imsave("./val_src_"+str(fn_rand)+".tiff", src[0,0,].cpu().numpy())
+        imsave("./val_tar_"+str(fn_rand)+".tiff", tar[0,0,].cpu().numpy())
+        # tensorboard = self.logger.experiment
+        # tensorboard.add_image("val_source", src)
+        # tensorboard.add_image("val_target", tar)
+        # tensorboard.add_image("val_predict", y_hat)
+        """
         return loss
