@@ -20,6 +20,14 @@ mmv\_im2im.utils.misc module
    :undoc-members:
    :show-inheritance:
 
+mmv\_im2im.utils.piecewise\_inference module
+--------------------------------------------
+
+.. automodule:: mmv_im2im.utils.piecewise_inference
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

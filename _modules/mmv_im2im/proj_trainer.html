@@ -135,24 +135,22 @@
 <div class="viewcode-block" id="ProjectTrainer.run_training"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer.run_training">[docs]</a>    <span class="k">def</span> <span class="nf">run_training</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># set up data</span>
         <span class="n">data_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
-        <span class="n">data_cls_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;mmv_im2im.data_modules.dm_</span><span class="si">{</span><span class="n">data_category</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>  <span class="c1"># noqa E501</span>
+        <span class="n">data_cls_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mmv_im2im.data_modules.dm_</span><span class="si">{</span><span class="n">data_category</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">my_data_funcs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data_cls_module</span><span class="p">,</span> <span class="s2">&quot;Im2ImDataModule&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">my_data_funcs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">)</span>
 
         <span class="c1"># set up model</span>
         <span class="n">model_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
-        <span class="n">model_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;mmv_im2im.models.</span><span class="si">{</span><span class="n">model_category</span><span class="si">}</span><span class="s2">_basic&quot;</span>
-        <span class="p">)</span>  <span class="c1"># noqa E501</span>
+        <span class="n">model_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mmv_im2im.models.</span><span class="si">{</span><span class="n">model_category</span><span class="si">}</span><span class="s2">_basic&quot;</span><span class="p">)</span>
         <span class="n">my_model_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_module</span><span class="p">,</span> <span class="s2">&quot;Model&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">my_model_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">)</span>
 
         <span class="c1"># set up training</span>
         <span class="k">if</span> <span class="s2">&quot;callbacks&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">:</span>
             <span class="n">callback_list</span> <span class="o">=</span> <span class="n">parse_ops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">callback_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
             <span class="n">callbacks</span><span class="o">=</span><span class="n">callback_list</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
         <span class="p">)</span>  <span class="c1"># noqa E501</span>

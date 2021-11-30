@@ -99,10 +99,17 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">munch</span> <span class="kn">import</span> <span class="n">Munch</span>
+
+<span class="kn">from</span> <span class="nn">aicsimageio</span> <span class="kn">import</span> <span class="n">AICSImage</span>
 <span class="kn">import</span> <span class="nn">torchio</span> <span class="k">as</span> <span class="nn">tio</span>
+
+
+<div class="viewcode-block" id="aicsimageio_reader"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.aicsimageio_reader">[docs]</a><span class="k">def</span> <span class="nf">aicsimageio_reader</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">img_data</span> <span class="o">=</span> <span class="n">tio</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">check_uint_to_int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">img_data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="load_yaml_cfg"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.load_yaml_cfg">[docs]</a><span class="k">def</span> <span class="nf">load_yaml_cfg</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">):</span>
@@ -124,7 +131,10 @@
 <div class="viewcode-block" id="parse_config"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config">[docs]</a><span class="k">def</span> <span class="nf">parse_config</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
     <span class="n">my_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">])</span>
     <span class="n">my_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">my_module</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">my_func</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span></div>
+    <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">my_func</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">my_func</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="parse_config_func"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func">[docs]</a><span class="k">def</span> <span class="nf">parse_config_func</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
@@ -146,6 +156,40 @@
         <span class="c1"># trans_func = getattr(trans_module, trans_dict[&quot;func_name&quot;])</span>
         <span class="c1"># op_list.append(trans_func(**trans_dict[&quot;params&quot;]))</span>
     <span class="k">return</span> <span class="n">op_list</span></div>
+
+
+<div class="viewcode-block" id="generate_test_dataset_dict"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_test_dataset_dict">[docs]</a><span class="k">def</span> <span class="nf">generate_test_dataset_dict</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">data_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    different options for &quot;data&quot;:</span>
+<span class="sd">    - one CSV</span>
+<span class="sd">    - one folder</span>
+<span class="sd">    Return</span>
+<span class="sd">        a list of filename</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="c1"># should be a csv of dataframe</span>
+        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data_column</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">data_column</span><span class="p">])</span>
+
+    <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">all_filename</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;no file found in </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">all_filename</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">all_filename</span><span class="p">:</span>
+            <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> is not a valid file or directory&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset_list</span></div>
 
 
 <div class="viewcode-block" id="generate_dataset_dict"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict">[docs]</a><span class="k">def</span> <span class="nf">generate_dataset_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>

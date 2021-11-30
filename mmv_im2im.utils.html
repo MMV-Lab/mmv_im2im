@@ -116,6 +116,11 @@
 <section id="module-mmv_im2im.utils.misc">
 <span id="mmv-im2im-utils-misc-module"></span><h2>mmv_im2im.utils.misc module<a class="headerlink" href="#module-mmv_im2im.utils.misc" title="Permalink to this headline"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.misc.aicsimageio_reader">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">aicsimageio_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#aicsimageio_reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.aicsimageio_reader" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.utils.misc.generate_dataset_dict">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">generate_dataset_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#generate_dataset_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.generate_dataset_dict" title="Permalink to this definition"></a></dt>
 <dd><p>different options for “data”:
@@ -127,6 +132,18 @@
 “source_fn”, “target_fn”, “costmap_fn” (optional)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.misc.generate_test_dataset_dict">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">generate_test_dataset_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#generate_test_dataset_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.generate_test_dataset_dict" title="Permalink to this definition"></a></dt>
+<dd><p>different options for “data”:
+- one CSV
+- one folder
+Return</p>
+<blockquote>
+<div><p>a list of filename</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
@@ -153,6 +170,34 @@
 <dt class="sig sig-object py" id="mmv_im2im.utils.misc.parse_ops_list">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">parse_ops_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trans_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#parse_ops_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.parse_ops_list" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-mmv_im2im.utils.piecewise_inference">
+<span id="mmv-im2im-utils-piecewise-inference-module"></span><h2>mmv_im2im.utils.piecewise_inference module<a class="headerlink" href="#module-mmv_im2im.utils.piecewise_inference" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.piecewise_inference.predict_piecewise">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.piecewise_inference.</span></span><span class="sig-name descname"><span class="pre">predict_piecewise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_in</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlaps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'fast'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">predict_kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="reference internal" href="_modules/mmv_im2im/utils/piecewise_inference.html#predict_piecewise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.piecewise_inference.predict_piecewise" title="Permalink to this definition"></a></dt>
+<dd><p>Performs piecewise prediction and combines results.
+:Parameters: * <strong>predictor</strong> – An object with a forward() method.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>tensor_in</strong> – Tensor to be input into predictor piecewise. Should be 3d or 4d
+with the first dimension representing channel dimension .</p></li>
+<li><p><strong>dims_max</strong> – Specifies dimensions of each sub prediction.</p></li>
+<li><p><strong>overlaps</strong> – Specifies overlap along each dimension for sub predictions.</p></li>
+<li><p><strong>mode</strong> – “fast” or “efficient”. “fast” mode will use more RAM</p></li>
+<li><p><strong>**predict_kwargs</strong> – Kwargs to pass to predict method.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Prediction with size tensor_in.size().</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-mmv_im2im.utils">
