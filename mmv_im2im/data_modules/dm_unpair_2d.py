@@ -3,9 +3,8 @@
 # ####     (mostly for Cycle-GAN-like models)     ######
 #
 # About transformation:
-# For 2D images, the combination of PIL, torchvision and
-# albumentation would be sufficient for pre-processing
-# and data augmentation
+# We use TorchIO, which can handle 2D data in a more
+# efficient way than torchvision
 #
 # About data in a batch:
 # We woudl expect 2 parts, image_source and image_target

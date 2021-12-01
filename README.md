@@ -15,12 +15,19 @@ A python package for deep learing based image to image transformation
 
 ## Quick Start
 
-```python
-from mmv_im2im import Example
+Here, we use a [3D labelfree determination](https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F) as a test case.
 
-a = Example()
-a.get_value()  # 10
+First, we pull 100 examples from the AllenCell quilt bucket by running the following. Make sure you change the `parent_path` before running.
+```bash
+python  scripts/generate_synthetic_data.py
 ```
+
+Then, we can train a labelfree model like this:
+```base
+run_im2im --config ./mmv_im2im/example_configs/example_labelfree.yaml  --mode train --debug
+```
+Make sure you double check all the file paths in the yaml file.
+
 
 ## Installation
 

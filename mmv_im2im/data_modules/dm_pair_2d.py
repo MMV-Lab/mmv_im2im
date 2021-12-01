@@ -3,9 +3,8 @@
 # ####   (mostly for FCN or CGAN-like models)     ######
 #
 # About transformation:
-# For 2D images, the combination of PIL, torchvision and
-# albumentation would be sufficient for pre-processing
-# and data augmentation
+# We use TorchIO, which can handle 2D data in a more
+# efficient way than torchvision
 #
 # About data in a batch:
 # We woudl expect 3 parts, image_source, image_target,
@@ -15,7 +14,7 @@
 ########################################################
 from importlib import import_module
 from torch.utils.data import random_split, DataLoader
-import albumentations as A
+import torchio as tio
 import pytorch_lightning as pl
 
 from mmv_im2im.utils.for_transform import parse_tio_ops
