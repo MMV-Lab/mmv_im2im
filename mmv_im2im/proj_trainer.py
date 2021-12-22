@@ -31,7 +31,6 @@ class ProjectTrainer(object):
         self.model_cfg = cfg.model
         self.train_cfg = cfg.training
         self.data_cfg = cfg.data
-
         # define variables
         self.model = None
         self.data = None
@@ -50,14 +49,13 @@ class ProjectTrainer(object):
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg)
 
-        # set up training
-        if "callbacks" in self.train_cfg:
-            callback_list = parse_ops_list(self.train_cfg["callbacks"])
-        else:
-            callback_list = []
-        trainer = pl.Trainer(
-            callbacks=callback_list, **self.train_cfg["params"]
-        )  # noqa E501
+
+        # # set up training
+        # if "callbacks" in self.train_cfg:
+        #     callback_list = parse_ops_list(self.train_cfg["callbacks"])
+        # else:
+        #     callback_list = []
+        trainer = pl.Trainer(**self.train_cfg["params"])  # noqa E501
 
         # start training
         trainer.fit(model=self.model, datamodule=self.data)

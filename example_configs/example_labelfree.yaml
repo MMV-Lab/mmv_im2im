@@ -3,17 +3,21 @@
 data:
   category: "pair_3d"
   target_type: "Image" # "Label" or "Image
+  params:
+      data_type: "tiff"
   target_reader_params:
     dimension_order_out: "ZYX"
     C: 0
     T: 0
   source_type: "Image" # "Label" or "Image
+  params:
+      data_type: "tiff"
   source_reader_params:
     dimension_order_out: "ZYX"
     C: 0
     T: 0
   # data_path: "/mnt/data/xyz.csv"
-  data_path: "~/ambiomgroupdrive/Jianxu/data/labelfree_lamin/training_data"
+  data_path: "~/ambiomgroupdrive/Sai/data/paired_dataset/training_data"
   # data_path:
   #   source_path:
   #   target_path:
@@ -76,12 +80,46 @@ model:
   sliding_window_params:
     dims_max: [1, 32, 256, 256]
     overlaps: [0, 6, 12, 12]
+
+  category: pix2pixGAN
+  generator_net :
+    module_name: mmv_im2im.models.pix2pix_generator_discriminator_3D
+    func_name: UNetGenerator
+    params: 
+      in_channels: 3
+      out_channels: 3
+
+  discriminator_net:
+    module_name: mmv_im2im.models.pix2pix_generator_discriminator_3D
+    func_name: Discriminator
+    params:
+      in_channels: 3
+
+  sliding_window_params:
+    dims_max: [1, 3, 128, 128]
+    overlaps: [0, 6, 12, 12]
+
+  L1_criterion:
+    module_name: torch.nn
+    func_name: L1Loss
+  BCE_criterion: 
+    module_name: torch.nn
+    func_name: BCEWithLogitsLoss
+  optimizer: 
+    module_name: torch.optim
+    func_name: Adam
+    params: 
+      lr: 0.0002
+      betas: [0.5,0.999]
+
+
 # training
 training:
   params:
     gpus: 1
-    precision: 16
-    stochastic_weight_avg: True
+    #precision: 16
+    max_epochs: 2
+    #stochastic_weight_avg: True
 #  callbacks:
 #    - module_name: pytorch_lightning.callbacks.early_stopping
 #      func_name: EarlyStopping

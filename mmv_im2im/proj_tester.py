@@ -61,6 +61,7 @@ class ProjectTester(object):
                 **self.data_cfg["input"]["reader_params"]
             )
             x = check_uint_to_int(img.compute())
+            print(x.shape)
             y_hat = predict_piecewise(
                 self.model,
                 torch.from_numpy(x).float().cuda(),

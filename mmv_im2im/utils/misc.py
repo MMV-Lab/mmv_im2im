@@ -9,10 +9,14 @@ from munch import Munch
 from aicsimageio import AICSImage
 import torchio as tio
 
+import torch
+
 
 def aicsimageio_reader(fn, **kwargs):
     img = AICSImage(fn).reader.get_image_dask_data(**kwargs)
     img_data = tio.data.io.check_uint_to_int(img.compute())
+    print(img_data.shape)
+    print(img.shape)
     return img_data, np.eye(4)
 
 

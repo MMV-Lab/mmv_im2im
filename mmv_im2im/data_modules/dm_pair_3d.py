@@ -96,6 +96,8 @@ class Im2ImDataModule(pl.LightningDataModule):
                     source=source_image_class(ds["source_fn"], reader=source_reader),
                     target=target_image_class(ds["target_fn"], reader=target_reader),
                 )
+                print("*************************")
+                print(subject.shape)
             self.subjects.append(subject)
 
     def setup(self, stage=None):
