@@ -6,13 +6,17 @@ import sys
 import traceback
 from pathlib import Path
 import numpy as np
+from numpy import random
 from random import randint
 from tqdm import tqdm
+import matplotlib
 
 from skimage.morphology import dilation, ball
 from skimage.util import random_noise
 from scipy.ndimage import gaussian_filter
 from tifffile import imsave
+from randimage import get_random_image
+from randimage import SaltPepperMask, EPWTPath, ProbabilisticPath, ColoredPath, show_array
 
 ###############################################################################
 
@@ -82,7 +86,7 @@ class Args(argparse.Namespace):
 ###############################################################################
 def generate_data(args):
 
-    num_obj = 10
+    # num_obj = 10
 
     out_path = Path(args.out).expanduser()
     for ii in tqdm(range(args.num)):
@@ -95,24 +99,31 @@ def generate_data(args):
             if args.large:
                 im = np.zeros((64, 512, 512))
             else:
-                im = np.zeros((64, 128, 128))
-            for obj in range(num_obj):
-                py = randint(15, im.shape[-2]-15)
-                px = randint(15, im.shape[-1]-15)
-                im[31, py, px] = 1
-            im = dilation(im > 0, ball(2))
+                im = random.randint(1,256, (128,128))
+                im[im<255] = 0
+                im[im==255] = 1
 
-            if args.type == "mask" and not args.unpair:
+            # for obj in range(num_obj):
+            #     py = randint(15, im.shape[-2]-15)
+            #     px = randint(15, im.shape[-1]-15)
+            #     im[31, py, px] = 1
+            # im = dilation(im > 0, ball(10))
+
+            if args.type == "im" and args.unpair:
                 gt = im.astype(np.float32)
-                gt[gt > 0] = 1
                 imsave(out_gt_fn, gt)
-            else:
-                print("Not impletemented yet")
-                exit(0)
+            elif args.type == "mask" and (not args.unpair):
+               img_size = (128,128)
+               mask = SaltPepperMask(img_size).get_mask()
+               ppath = ProbabilisticPath(mask).get_path()
+               epwtpath = EPWTPath(mask).get_path()
+               cmap = 'Spectral'
+               pimg = ColoredPath(ppath, mask.shape).get_colored_path(cmap)
+               matplotlib.image.imsave(out_gt_fn, pimg)
+               matplotlib.image.imsave(out_raw_fn, mask, cmap='gray')
 
-            raw = gaussian_filter(im.astype(np.float32), 5)
-            raw = random_noise(raw).astype(np.float32)
-            imsave(out_raw_fn, raw)
+            # raw = gaussian_filter(im.astype(np.float32), 3)
+            # imsave(out_raw_fn, raw)
 
             if args.costmap:
                 costmap = np.ones_like(raw)
@@ -126,6 +137,7 @@ def main():
     try:
         args = Args()
         dbg = args.debug
+
 
         generate_data(args)
 
