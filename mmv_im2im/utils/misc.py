@@ -5,18 +5,16 @@ import importlib
 import yaml
 import numpy as np
 from munch import Munch
-
+import torch.nn as nn
+import torch
+import torch.nn.functional as F
 from aicsimageio import AICSImage
 import torchio as tio
-
-import torch
 
 
 def aicsimageio_reader(fn, **kwargs):
     img = AICSImage(fn).reader.get_image_dask_data(**kwargs)
     img_data = tio.data.io.check_uint_to_int(img.compute())
-    print(img_data.shape)
-    print(img.shape)
     return img_data, np.eye(4)
 
 
@@ -37,6 +35,7 @@ def get_max_shape(subjects):
 
 
 def parse_config(info):
+    print(info)
     my_module = importlib.import_module(info["module_name"])
     my_func = getattr(my_module, info["func_name"])
     if "params" in info:
@@ -207,3 +206,17 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     assert len(dataset_list) > 0, "empty dataset"
 
     return dataset_list
+
+def flatten(tensor):
+    """Flattens a given tensor such that the channel axis is first.
+    The shapes are transformed as follows:
+       (N, C, D, H, W) -> (C, N * D * H * W)
+    """
+    C = tensor.size(1)
+    # new axis order
+    axis_order = (1, 0) + tuple(range(2, tensor.dim()))
+    # Transpose: (N, C, D, H, W) -> (C, N, D, H, W)
+    transposed = tensor.permute(axis_order)
+    # Flatten: (C, N, D, H, W) -> (C, N * D * H * W)
+    return transposed.contiguous().view(C, -1)
+

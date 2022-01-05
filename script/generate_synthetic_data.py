@@ -14,6 +14,7 @@ import matplotlib
 from skimage.morphology import dilation, ball
 from skimage.util import random_noise
 from scipy.ndimage import gaussian_filter
+from PIL import Image, ImageDraw, ImageFilter
 from tifffile import imsave
 from randimage import get_random_image
 from randimage import SaltPepperMask, EPWTPath, ProbabilisticPath, ColoredPath, show_array
@@ -99,9 +100,7 @@ def generate_data(args):
             if args.large:
                 im = np.zeros((64, 512, 512))
             else:
-                im = random.randint(1,256, (128,128))
-                im[im<255] = 0
-                im[im==255] = 1
+                im = np.zeros((1,128,128))
 
             # for obj in range(num_obj):
             #     py = randint(15, im.shape[-2]-15)
@@ -110,24 +109,44 @@ def generate_data(args):
             # im = dilation(im > 0, ball(10))
 
             if args.type == "im" and args.unpair:
-                gt = im.astype(np.float32)
-                imsave(out_gt_fn, gt)
+                x,y=(128,128)
+                eX, eY = 60, 60
+                im_a = Image.new("L", (128,128), 0)
+                draw = ImageDraw.Draw(im_a)
+                draw.ellipse((x/2 - eX/2, y/2 - eY/2, x/2 + eX/2, y/2 + eY/2), fill=255)
+                im_a_blur = im_a.filter(ImageFilter.GaussianBlur(15))
+                im_GT = np.zeros((32,128,128))
+                im_raw = np.zeros((32,128,128))
+                c,_,_=im_GT.shape
+                for channel in range(c):
+                    im_GT[channel,:,:]=im_a
+                    im_raw[channel,:,:]=im_a_blur
+                imsave(out_gt_fn, im_GT)
+                imsave(out_raw_fn, im_raw)
             elif args.type == "mask" and (not args.unpair):
-               img_size = (128,128)
-               mask = SaltPepperMask(img_size).get_mask()
-               ppath = ProbabilisticPath(mask).get_path()
-               epwtpath = EPWTPath(mask).get_path()
-               cmap = 'Spectral'
-               pimg = ColoredPath(ppath, mask.shape).get_colored_path(cmap)
-               matplotlib.image.imsave(out_gt_fn, pimg)
-               matplotlib.image.imsave(out_raw_fn, mask, cmap='gray')
+                w, h = (8,8)
+                img = Image.new("L", (w,h),0)
+                pixels = img.load()
+                for i in range(w):
+                    for j in range(h):
+                        if (i+j)%2==0:
+                            pixels[i,j] = 255
+                img=img.resize((128,128), Image.NEAREST)
+                im_GT = np.zeros((32,128,128))
+                im_raw = np.zeros((32,128,128))
+                c,w,h=im_GT.shape
+                for channel in range(c):
+                    im_GT[channel,:,:]=np.array(img)
+                    im_raw[channel,:,:] = np.array(img.filter(ImageFilter.FIND_EDGES))
+                imsave(out_gt_fn, im_GT.astype(np.uint8))
+                imsave(out_raw_fn, im_raw.astype(np.uint8))
 
             # raw = gaussian_filter(im.astype(np.float32), 3)
             # imsave(out_raw_fn, raw)
 
-            if args.costmap:
-                costmap = np.ones_like(raw)
-                imsave(out_cm_fn, costmap)
+            # if args.costmap:
+            #     costmap = np.ones_like(raw)
+            #     imsave(out_cm_fn, costmap)
         else:
             print("Not impletemented yet")
             exit(0)

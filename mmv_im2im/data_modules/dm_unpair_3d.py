@@ -84,10 +84,12 @@ class Im2ImDataModule(pl.LightningDataModule):
 
         self.subjects = []
         for ds in dataset_list:
+            print(ds)
             subject = tio.Subject(
                 source=source_image_class(ds["source_fn"], reader=source_reader),
                 target=target_image_class(ds["target_fn"], reader=target_reader),
             )
+            print(subject)
             self.subjects.append(subject)
 
     def setup(self, stage=None):
@@ -114,7 +116,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             self.train_set = train_set
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])
+        return DataLoader(self.train_set,shuffle=True, **self.loader_params["train"])
 
     def val_dataloader(self):
         return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])

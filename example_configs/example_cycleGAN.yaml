@@ -1,0 +1,122 @@
+# everything about data
+
+data:
+  category: "unpair_3d"
+  target_type: "Image" 
+  target_reader_params:
+    dimension_order_out: "ZYX"
+    C: 1
+    T: 1
+  source_type: "Image" 
+  source_reader_params:
+    dimension_order_out: "ZYX"
+    C: 1
+    T: 1
+  data_path: "~/ambiomgroupdrive/Sai/data/unpaired_dataset/training_data"
+  train_val_ratio: 0.20
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+  augmentation:
+    - module_name: torchio
+      func_name: RandomAffine
+      params:
+        p: 0.5
+    - module_name: torchio
+      func_name: RandomAffine
+      params:
+        degrees: [0, 0, 0, 90, 0, 90]
+        p: 0.5
+  dataloader_patch_queue:  # where to use IO queue in
+    sampler:
+      name: UniformSampler
+      func_name: RescaleIntensity
+      params:
+        patch_size: [32, 128, 128]
+    params:
+      num_workers: 4
+      max_length: 360
+      samples_per_volume: 8
+  dataloader_params:
+    train:
+      batch_size: 2
+      pin_memory: True
+      num_workers: 0  # if dataload_path_queue is used, num_workers must be 0 here
+    val:
+      batch_size: 1
+      num_workers: 1
+
+# model  
+
+model:
+  category: cycleGAN
+  generator_net :
+    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    func_name: Generator
+    params: 
+      input_nc: 1
+      output_nc: 1
+      n_blocks: 6
+
+  discriminator_net:
+    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    func_name: Discriminator
+    params:
+      input_nc: 1
+      n_layers: 3
+
+  sliding_window_params:
+    dims_max: [1, 32, 128, 128]
+    overlaps: [0, 6, 12, 12]
+
+  
+  L1_criterion:
+    module_name: torch.nn
+    func_name: L1Loss
+  MSE_criterion: 
+    module_name: torch.nn
+    func_name: MSELoss
+  optimizer: 
+    module_name: torch.optim
+    func_name: Adam
+    params: 
+      lr: 0.0002
+      betas: [0.5,0.999]
+
+
+
+training:
+  params:
+    max_epochs: 100
+    gpus: 1
+    auto_lr_find: True
+    precision: 16
+    
+# checkpoint:  ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_49/checkpoints/epoch=4-step=669.ckpt
+
+
+
+
+
+  
+
+
+
+# 
+
+
+
+
+
+
+
+
+
+    
+
+
+         
+
+
+
+

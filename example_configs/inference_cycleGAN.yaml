@@ -1,0 +1,52 @@
+
+
+
+# everything about data
+data:
+  # data_path: "/mnt/data/xyz.csv"
+  # data_column: "raw_path"
+  input: 
+    dir: "~/ambiomgroupdrive/Sai/data/unpaired_dataset/test_data"
+    params:
+      data_type: "tiff"
+    reader_params:
+      dimension_order_out: "CZYX"
+      C: [1]
+      T: 1
+  output:
+    path: "~/ambiomgroupdrive/Sai/data/unpaired_dataset/test_data_prediction"
+    suffix: "pred_LMNB1"
+  dataloader_params:
+    batch_size: 1
+    num_workers: 1
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+
+model:
+  category: cycleGAN
+  generator_net :
+    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    func_name: Generator
+    params: 
+      input_nc: 1
+      output_nc: 1
+      n_blocks: 6
+
+  discriminator_net:
+    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    func_name: Discriminator
+    params:
+      input_nc: 1
+      n_layers: 3
+
+  sliding_window_params:
+    dims_max: [1, 32, 128, 128]
+    overlaps: [0, 6, 12, 12]
+  ckpt:
+    checkpoint_path: ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_224/checkpoints/epoch=24-step=3999.ckpt
+    hparams_file: ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_224/hparams.yaml
+
+run:
+  gpus: 1
+  precision: 16
