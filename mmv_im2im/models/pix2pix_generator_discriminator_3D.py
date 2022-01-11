@@ -1,5 +1,3 @@
-
-
 # Adapted from https://github.com/enochkan/vox2vox/blob/master/models.py
 
 # https://towardsdatascience.com/volumetric-medical-image-segmentation-with-vox2vox-f5350ed2094f
@@ -33,7 +31,7 @@ class UNetMid(nn.Module):
         layers = [
             nn.Conv3d(in_size, out_size, 4, 1, 1, bias=False),
             nn.BatchNorm3d(out_size),
-            nn.LeakyReLU(0.2)
+            nn.LeakyReLU(0.2),
         ]
         if dropout:
             layers.append(nn.Dropout(dropout))
@@ -52,7 +50,7 @@ class UNetUpward(nn.Module):
         layers = [
             nn.ConvTranspose3d(in_size, out_size, 4, 2, 1, bias=False),
             nn.BatchNorm3d(out_size),
-            nn.ReLU(inplace=True)
+            nn.ReLU(inplace=True),
         ]
         if dropout:
             layers.append(nn.Dropout(dropout))
@@ -62,6 +60,7 @@ class UNetUpward(nn.Module):
         x = self.model(x)
         x = torch.cat((x, skip_input), 1)
         return x
+
 
 # TO DO: Modify the net to load dynamically
 
@@ -82,8 +81,7 @@ class UNetGenerator(nn.Module):
         self.up2 = UNetUpward(512, 128)
         self.up3 = UNetUpward(256, 64)
         self.final = nn.Sequential(
-            nn.ConvTranspose3d(128, out_channels, 4, 2, 1),
-            nn.Tanh()
+            nn.ConvTranspose3d(128, out_channels, 4, 2, 1), nn.Tanh()
         )
 
     def forward(self, x):
@@ -107,11 +105,8 @@ class Discriminator(nn.Module):
 
         def discriminator_block(in_filters, out_filters, normalization=True):
             layers = [
-                nn.Conv3d(
-                    in_filters, out_filters, 4,
-                    stride=1, padding=1, bias=False
-                    )
-                ]
+                nn.Conv3d(in_filters, out_filters, 4, stride=1, padding=1, bias=False)
+            ]
             if normalization:
                 layers.append(nn.BatchNorm3d(out_filters))
             layers.append(nn.LeakyReLU(0.2, inplace=True))
@@ -130,6 +125,7 @@ class Discriminator(nn.Module):
         intermediate = self.model(img_input)
         pad = nn.functional.pad(intermediate, pad=(1, 0, 1, 0, 1, 0))
         return self.final(pad)
+
 
 # def test():
 
