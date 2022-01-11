@@ -1,7 +1,6 @@
 from typing import Dict
 import pytorch_lightning as pl
 import torchio as tio
-
 from mmv_im2im.utils.misc import parse_config, parse_config_func
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
 

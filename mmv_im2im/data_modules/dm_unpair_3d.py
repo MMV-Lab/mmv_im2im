@@ -12,15 +12,11 @@
 # segmentation) or images (e.g., for labelfree)
 ########################################################
 
-
-
 from importlib import import_module
 from functools import partial
 from torch.utils.data import random_split, DataLoader
 import torchio as tio
 import pytorch_lightning as pl
-
-
 from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 
@@ -70,7 +66,6 @@ class Im2ImDataModule(pl.LightningDataModule):
 
         # parse source and target type
         tio_image_module = import_module("torchio")
-        
         if self.target_type.lower() == "image":
             target_image_class = getattr(tio_image_module, "ScalarImage")
         else:
@@ -86,10 +81,12 @@ class Im2ImDataModule(pl.LightningDataModule):
         for ds in dataset_list:
             print(ds)
             subject = tio.Subject(
-                source=source_image_class(ds["source_fn"], reader=source_reader),
-                target=target_image_class(ds["target_fn"], reader=target_reader),
-            )
-            print(subject)
+                source=source_image_class(
+                    ds["source_fn"], reader=source_reader
+                    ),
+                target=target_image_class(
+                    ds["target_fn"], reader=target_reader),
+                    )
             self.subjects.append(subject)
 
     def setup(self, stage=None):
@@ -98,10 +95,12 @@ class Im2ImDataModule(pl.LightningDataModule):
         num_train_subjects = num_subjects - num_val_subjects
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
-
-        self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
-
-        train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
+        self.val_set = tio.SubjectsDataset(
+                        val_subjects, transform=self.preproc
+                        )
+        train_set = tio.SubjectsDataset(
+                        train_subjects, transform=self.transform
+                        )
         if self.patch_loader:
             # define sampler
             sampler_module = import_module("torchio.data")
@@ -116,10 +115,14 @@ class Im2ImDataModule(pl.LightningDataModule):
             self.train_set = train_set
 
     def train_dataloader(self):
-        return DataLoader(self.train_set,shuffle=True, **self.loader_params["train"])
+        return DataLoader(
+                self.train_set, shuffle=True, **self.loader_params["train"]
+                )
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
+        return DataLoader(
+                self.val_set, shuffle=False, **self.loader_params["val"]
+                )
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case

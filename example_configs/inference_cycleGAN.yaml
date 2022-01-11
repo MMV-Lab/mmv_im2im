@@ -1,10 +1,4 @@
-
-
-
-# everything about data
 data:
-  # data_path: "/mnt/data/xyz.csv"
-  # data_column: "raw_path"
   input: 
     dir: "~/ambiomgroupdrive/Sai/data/unpaired_dataset/test_data"
     params:
@@ -22,31 +16,27 @@ data:
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
-
 model:
-  category: cycleGAN
+  category: GAN
   generator_net :
-    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    module_name: mmv_im2im.models.cyclegan_generator_discriminator
     func_name: Generator
     params: 
       input_nc: 1
       output_nc: 1
       n_blocks: 6
-
   discriminator_net:
-    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    module_name: mmv_im2im.models.cyclegan_generator_discriminator
     func_name: Discriminator
     params:
       input_nc: 1
       n_layers: 3
-
   sliding_window_params:
     dims_max: [1, 32, 128, 128]
     overlaps: [0, 6, 12, 12]
   ckpt:
-    checkpoint_path: ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_224/checkpoints/epoch=24-step=3999.ckpt
+    checkpoint_path: ~/ambiomgroupdrive/Sai/mmv_im2im_fork/cyclegan_model_98_state.ckpt
     hparams_file: ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_224/hparams.yaml
-
 run:
   gpus: 1
   precision: 16

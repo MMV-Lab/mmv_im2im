@@ -41,7 +41,7 @@ data:
     val:
       batch_size: 1
       num_workers: 1
-  train_val_ratio: 0.2
+  train_val_ratio: 0.3
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
@@ -98,17 +98,12 @@ model:
   sliding_window_params:
     dims_max: [1, 32, 128, 128]
     overlaps: [0, 6, 12, 12]
-
-
   L1_criterion:
     module_name: torch.nn
     func_name: L1Loss
   BCE_criterion:
     module_name: torch.nn
     func_name: BCEWithLogitsLoss
-
-    
-
   optimizer: 
     module_name: torch.optim
     func_name: Adam
@@ -116,14 +111,16 @@ model:
       lr: 0.0002
       betas: [0.5,0.999]
 
-
 # training
 training:
   params:
     gpus: 1
     precision: 16
-    max_epochs: 100
+    max_epochs: 100000
     auto_lr_find: True
+  callbacks:
+    module_name: pl_bolts.callbacks
+    func_name: PrintTableMetricsCallback
     
   # callbacks: 
   #   module_name: pl_bolts.callbacks
@@ -148,4 +145,13 @@ training:
 #    - module_name: pytorch_lightning.callbacks.early_stopping
 #      func_name: EarlyStopping
 #        monitor: 'val_loss'
-    
+# training:
+#   params:
+#     gpus: 1
+#     precision: 16
+#     stochastic_weight_avg: True
+#  callbacks:
+#    - module_name: pytorch_lightning.callbacks.early_stopping
+#      func_name: EarlyStopping
+#      params:
+#        monitor: 'val_loss'

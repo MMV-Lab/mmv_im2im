@@ -43,7 +43,9 @@ class ProjectTester(object):
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(f"mmv_im2im.models.{model_category}_basic")
+        model_module = import_module(
+                        f"mmv_im2im.models.{model_category}_basic"
+                        )
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func.load_from_checkpoint(
             model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
@@ -61,7 +63,6 @@ class ProjectTester(object):
                 **self.data_cfg["input"]["reader_params"]
             )
             x = check_uint_to_int(img.compute())
-            print(x.shape)
             y_hat = predict_piecewise(
                 self.model,
                 torch.from_numpy(x).float().cuda(),
@@ -70,7 +71,9 @@ class ProjectTester(object):
             # prepare output
             fn_core = Path(ds).stem
             suffix = self.data_cfg["output"]["suffix"]
-            out_fn = Path(self.data_cfg["output"]["path"]) / f"{fn_core}_{suffix}.tiff"
+            out_fn = Path(
+                self.data_cfg["output"]["path"]
+                ) / f"{fn_core}_{suffix}.tiff"
 
             pred = y_hat.cpu().detach().numpy()
             if len(pred.shape) == 4:

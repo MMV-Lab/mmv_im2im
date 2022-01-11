@@ -1,5 +1,4 @@
-# everything about data
-
+#  data
 data:
   category: "unpair_3d"
   target_type: "Image" 
@@ -13,7 +12,7 @@ data:
     C: 1
     T: 1
   data_path: "~/ambiomgroupdrive/Sai/data/unpaired_dataset/training_data"
-  train_val_ratio: 0.20
+  train_val_ratio: 0.30
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
@@ -45,31 +44,25 @@ data:
     val:
       batch_size: 1
       num_workers: 1
-
 # model  
-
 model:
-  category: cycleGAN
+  category: GAN
   generator_net :
-    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    module_name: mmv_im2im.models.cyclegan_generator_discriminator
     func_name: Generator
     params: 
       input_nc: 1
       output_nc: 1
       n_blocks: 6
-
   discriminator_net:
-    module_name: mmv_im2im.models.cycleGAN_generator_discriminator_3D
+    module_name: mmv_im2im.models.cyclegan_generator_discriminator
     func_name: Discriminator
     params:
       input_nc: 1
       n_layers: 3
-
   sliding_window_params:
     dims_max: [1, 32, 128, 128]
     overlaps: [0, 6, 12, 12]
-
-  
   L1_criterion:
     module_name: torch.nn
     func_name: L1Loss
@@ -82,41 +75,13 @@ model:
     params: 
       lr: 0.0002
       betas: [0.5,0.999]
-
-
-
+# training
 training:
   params:
-    max_epochs: 100
+    max_epochs: 100000
     gpus: 1
     auto_lr_find: True
     precision: 16
-    
-# checkpoint:  ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_49/checkpoints/epoch=4-step=669.ckpt
-
-
-
-
-
-  
-
-
-
-# 
-
-
-
-
-
-
-
-
-
-    
-
-
-         
-
-
-
-
+  callbacks:
+    module_name: pl_bolts.callbacks
+    func_name: PrintTableMetricsCallback

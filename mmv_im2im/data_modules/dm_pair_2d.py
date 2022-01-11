@@ -39,7 +39,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         # transformation
         self.preproc = parse_tio_ops(data_cfg["preprocess"])
         self.augment = parse_tio_ops(data_cfg["augmentation"])
-        self.transform = A.Compose([self.preproc, self.augment])
+        self.transform = tio.Compose([self.preproc, self.augment])
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]

@@ -75,7 +75,8 @@ def _predict_piecewise_recurse(
         slices = tuple(slices)
         ar_in_sub = ar_in[slices]
         pred_sub, pred_weight_sub = _predict_piecewise_recurse(
-            predictor, ar_in_sub, dims_max, overlaps, mode=mode, **predict_kwargs
+            predictor, ar_in_sub, dims_max,
+            overlaps, mode=mode, **predict_kwargs
         )
         if ar_out is None or ar_weight is None:
             shape_out[0] = pred_sub.shape[0]  # Set channel dim for output
@@ -83,7 +84,8 @@ def _predict_piecewise_recurse(
                 shape_out, dtype=pred_sub.dtype, device=pred_sub.device
             )
             ar_weight = torch.zeros(
-                shape_out[1:], dtype=pred_weight_sub.dtype, device=pred_sub.device
+                shape_out[1:], dtype=pred_weight_sub.dtype,
+                device=pred_sub.device
             )
         ar_out[slices] += pred_sub
         ar_weight[slices[1:]] += pred_weight_sub
