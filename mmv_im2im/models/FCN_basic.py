@@ -36,13 +36,7 @@ class Model(pl.LightningModule):
         y = batch["target"][tio.DATA]
 
         if validation_stage:
-            y_hat = predict_piecewise(
-                self,
-                x[
-                    0,
-                ],
-                **self.sliding_window
-            )
+            y_hat = predict_piecewise(self, x[0,], **self.sliding_window)
         else:
             y_hat = self(x)
 

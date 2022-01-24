@@ -21,8 +21,7 @@ data:
   #   image_type: "tiff"
   dataloader_patch_queue:  # where to use IO queue in
     sampler:
-      name: UniformSampler
-      func_name: RescaleIntensity
+      name: UniformSamplers
       params:
         patch_size: [32, 256, 256]
     params:

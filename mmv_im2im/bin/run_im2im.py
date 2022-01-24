@@ -37,10 +37,7 @@ class Args(argparse.Namespace):
         self.__parse()
 
     def __parse(self):
-        p = argparse.ArgumentParser(
-            prog="run_im2im",
-            description="running im2im",
-        )
+        p = argparse.ArgumentParser(prog="run_im2im", description="running im2im",)
 
         p.add_argument(
             "-v",
@@ -55,15 +52,10 @@ class Args(argparse.Namespace):
             help="path to configuration file",
         )
         p.add_argument(
-            "--mode",
-            required=True,
-            help="the type of operation: train or inference",
+            "--mode", required=True, help="the type of operation: train or inference",
         )
         p.add_argument(
-            "--debug",
-            action="store_true",
-            dest="debug",
-            help=argparse.SUPPRESS,
+            "--debug", action="store_true", dest="debug", help=argparse.SUPPRESS,
         )
         p.parse_args(namespace=self)
 
