@@ -10,6 +10,7 @@ import torch
 from torchio.data.io import check_uint_to_int
 
 from mmv_im2im.utils.misc import generate_test_dataset_dict
+from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
 # https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction_guide.html#predicting
@@ -55,12 +56,16 @@ class ProjectTester(object):
             self.data_cfg["input"]["dir"], **self.data_cfg["input"]["params"]
         )
 
+        # load preprocessing transformation
+        pre_process = parse_tio_ops(self.data_cfg["preprocess"])
+
         # loop through all images and apply the model
         for ds in dataset_list:
             img = AICSImage(ds).reader.get_image_dask_data(
                 **self.data_cfg["input"]["reader_params"]
             )
             x = check_uint_to_int(img.compute())
+            x = pre_process(x)
             y_hat = predict_piecewise(
                 self.model,
                 torch.from_numpy(x).float().cuda(),
