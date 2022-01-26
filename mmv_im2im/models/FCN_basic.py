@@ -36,9 +36,15 @@ class Model(pl.LightningModule):
         y = batch["target"][tio.DATA]
 
         if validation_stage:
-            y_hat = predict_piecewise(self, x[0,], **self.sliding_window)
+            y_hat = predict_piecewise(
+                self,
+                x[0,:,:,:,0],
+                **self.sliding_window
+            ) # TODO HACK for now
         else:
             y_hat = self(x)
+
+        y = y[:, :, :, :, 0]
 
         if costmap is None:
             loss = self.criterion(y_hat, y)

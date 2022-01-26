@@ -3,7 +3,7 @@
 # ####   (mostly for FCN or CGAN-like models)     ######
 #
 # About transformation:
-# We use TorchIO, which can handle 2D data in a more
+# We use albumentations, which can handle 2D data in a more
 # efficient way than torchvision
 #
 # About data in a batch:
@@ -16,6 +16,7 @@ from importlib import import_module
 from torch.utils.data import random_split, DataLoader
 import torchio as tio
 import pytorch_lightning as pl
+import albumentations as A
 
 from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.misc import generate_dataset_dict
