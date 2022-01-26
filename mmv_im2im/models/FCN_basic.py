@@ -65,7 +65,7 @@ class Model(pl.LightningModule):
                 self,
                 x[0, ],
                 **self.sliding_window
-            ) # TODO HACK for now
+            )
         else:
             y_hat = self(x)
 
