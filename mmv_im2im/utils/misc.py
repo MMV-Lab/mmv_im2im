@@ -3,7 +3,6 @@ from pathlib import Path
 from functools import partial
 import importlib
 import yaml
-import sys
 import numpy as np
 from munch import Munch
 
