@@ -21,7 +21,7 @@ data:
   #   image_type: "tiff"
   dataloader_patch_queue:  # where to use IO queue in
     sampler:
-      name: UniformSamplers
+      name: UniformSampler
       params:
         patch_size: [32, 256, 256]
     params:
@@ -42,9 +42,10 @@ data:
       func_name: ZNormalization
   augmentation:
     - module_name: torchio
-      func_name: RandomAffine
+      func_name: RandomFlip
       params:
-        p: 0.5
+        axes: [1, 2]
+        flip_probability: 0.5
     - module_name: torchio
       func_name: RandomAffine
       params:
