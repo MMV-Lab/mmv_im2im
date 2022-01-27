@@ -42,9 +42,24 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.val_set = None
 
         # transformation
-        self.preproc = parse_tio_ops(data_cfg["preprocess"])
-        self.augment = parse_tio_ops(data_cfg["augmentation"])
-        self.transform = tio.Compose([self.preproc, self.augment])
+        if "preprocess" in data_cfg:
+            self.preproc = parse_tio_ops(data_cfg["preprocess"])
+        else:
+            self.preproc = None
+
+        if "augmentation" in data_cfg:
+            self.augment = parse_tio_ops(data_cfg["augmentation"])
+        else:
+            self.augment = None
+
+        if self.preproc is None and self.augment is not None:
+            self.transform = self.augment
+        elif self.preproc is not None and self.augment is None:
+            self.transform = self.preproc
+        elif self.preproc is None and self.augment is None:
+            self.transform is None
+        else:
+            self.transform = tio.Compose([self.preproc, self.augment])
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]
