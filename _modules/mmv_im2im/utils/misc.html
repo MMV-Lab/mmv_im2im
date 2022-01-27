@@ -109,7 +109,16 @@
 <div class="viewcode-block" id="aicsimageio_reader"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.aicsimageio_reader">[docs]</a><span class="k">def</span> <span class="nf">aicsimageio_reader</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">img_data</span> <span class="o">=</span> <span class="n">tio</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">check_uint_to_int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">img_data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">img_data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    if len(img_data.shape) == 3:</span>
+<span class="sd">        return img_data, np.eye(4)</span>
+<span class="sd">    elif len(img_data.shape) == 2:</span>
+<span class="sd">        return img_data, np.eye(3)</span>
+<span class="sd">    else:</span>
+<span class="sd">        print(&quot;error in aicsimage loader&quot;)</span>
+<span class="sd">        sys.exit(0)</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="load_yaml_cfg"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.load_yaml_cfg">[docs]</a><span class="k">def</span> <span class="nf">load_yaml_cfg</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">):</span>
@@ -128,9 +137,14 @@
     <span class="k">return</span> <span class="n">shapes</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="parse_config"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config">[docs]</a><span class="k">def</span> <span class="nf">parse_config</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_config_func_without_params"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func_without_params">[docs]</a><span class="k">def</span> <span class="nf">parse_config_func_without_params</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
     <span class="n">my_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">])</span>
     <span class="n">my_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">my_module</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">my_func</span></div>
+
+
+<div class="viewcode-block" id="parse_config"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config">[docs]</a><span class="k">def</span> <span class="nf">parse_config</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+    <span class="n">my_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">my_func</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>

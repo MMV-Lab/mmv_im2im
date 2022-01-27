@@ -98,7 +98,7 @@
 <span class="c1"># This script was adapted from aics-ml-segmentation and pytorch-fnet</span>
 <span class="c1">#####################################################################</span>
 <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">triang</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
@@ -129,9 +129,9 @@
 
 <span class="k">def</span> <span class="nf">_predict_piecewise_recurse</span><span class="p">(</span>
     <span class="n">predictor</span><span class="p">,</span>
-    <span class="n">ar_in</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">dims_max</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
-    <span class="n">overlaps</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">ar_in</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span>
+    <span class="n">dims_max</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">overlaps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fast&quot;</span><span class="p">,</span>
     <span class="o">**</span><span class="n">predict_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
@@ -194,24 +194,32 @@
 <div class="viewcode-block" id="predict_piecewise"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.piecewise_inference.predict_piecewise">[docs]</a><span class="k">def</span> <span class="nf">predict_piecewise</span><span class="p">(</span>
     <span class="n">predictor</span><span class="p">,</span>
     <span class="n">tensor_in</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">dims_max</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
-    <span class="n">overlaps</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">dims_max</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="n">overlaps</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fast&quot;</span><span class="p">,</span>
     <span class="o">**</span><span class="n">predict_kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Performs piecewise prediction and combines results.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    predictor</span>
+<span class="sd">    predictor: Callable Object</span>
 <span class="sd">        An object with a forward() method.</span>
-<span class="sd">    tensor_in</span>
+<span class="sd">    tensor_in: torch.Tensor</span>
 <span class="sd">        Tensor to be input into predictor piecewise. Should be 3d or 4d</span>
-<span class="sd">        with the first dimension representing channel dimension .</span>
-<span class="sd">    dims_max</span>
-<span class="sd">        Specifies dimensions of each sub prediction.</span>
-<span class="sd">    overlaps</span>
-<span class="sd">        Specifies overlap along each dimension for sub predictions.</span>
-<span class="sd">    mode</span>
+<span class="sd">        with the first dimension representing channel dimension. For 2D</span>
+<span class="sd">        images, the tensor_in should be of shape C x Y x X, and for 3D</span>
+<span class="sd">        images, the tensor_in should be of shape C x Z x Y x X.</span>
+<span class="sd">    dims_max: List[int]</span>
+<span class="sd">        Specifies dimensions of each sub prediction. No need to include</span>
+<span class="sd">        channel dimension. For 3D images, the dims_max should be of shape</span>
+<span class="sd">        [Z, Y, X], while for 2D images, the dims_max should be of shape</span>
+<span class="sd">        [Y, X]</span>
+<span class="sd">    overlaps: List[int]</span>
+<span class="sd">        Specifies overlap along each dimension for sub predictions. No need</span>
+<span class="sd">        to include channel dimension. For 3D images, the dims_max should be</span>
+<span class="sd">        of shape [Z, Y, X], while for 2D images, the dims_max should be of</span>
+<span class="sd">        shape [Y, X]</span>
+<span class="sd">    mode: strss</span>
 <span class="sd">        &quot;fast&quot; or &quot;efficient&quot;. &quot;fast&quot; mode will use more RAM</span>
 <span class="sd">    **predict_kwargs</span>
 <span class="sd">        Kwargs to pass to predict method.</span>
@@ -221,17 +229,20 @@
 <span class="sd">         Prediction with size tensor_in.size().</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor_in</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+
+    <span class="c1"># the input tensor needs to be 3D or 4D</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tensor_in</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">2</span>
     <span class="n">shape_in</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">tensor_in</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
     <span class="n">n_dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape_in</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dims_max</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">dims_max</span> <span class="o">=</span> <span class="p">[</span><span class="n">dims_max</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_dim</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_max</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_dim</span>
+
+    <span class="c1"># if the size of certain dimension of input tensor is smaller</span>
+    <span class="c1"># than the size of that dimension in sub prediction, then</span>
+    <span class="c1"># reduce the size of sub prediction</span>
     <span class="k">for</span> <span class="n">idx_d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_dim</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dims_max</span><span class="p">[</span><span class="n">idx_d</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">shape_in</span><span class="p">[</span><span class="n">idx_d</span><span class="p">]:</span>
             <span class="n">dims_max</span><span class="p">[</span><span class="n">idx_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape_in</span><span class="p">[</span><span class="n">idx_d</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">overlaps</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">overlaps</span> <span class="o">=</span> <span class="p">[</span><span class="n">overlaps</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_dim</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_max</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_dim</span>
+
     <span class="c1"># Remove restrictions on channel dimension.</span>
     <span class="n">dims_max</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">overlaps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
