@@ -2,7 +2,7 @@
 # This script was adapted from aics-ml-segmentation and pytorch-fnet
 #####################################################################
 from scipy.signal import triang
-from typing import Union, List
+from typing import List
 import numpy as np
 import torch
 from typing import Sequence, Tuple
@@ -33,9 +33,9 @@ def _get_weights(shape: Sequence[int]) -> Tuple[np.ndarray, Tuple[int]]:
 
 def _predict_piecewise_recurse(
     predictor,
-    ar_in: np.ndarray,
-    dims_max: Union[int, List[int]],
-    overlaps: Union[int, List[int]],
+    ar_in: torch.tensor,
+    dims_max: List[int],
+    overlaps: List[int],
     mode: str = "fast",
     **predict_kwargs,
 ):
@@ -98,24 +98,32 @@ def _predict_piecewise_recurse(
 def predict_piecewise(
     predictor,
     tensor_in: torch.Tensor,
-    dims_max: Union[int, List[int]] = 64,
-    overlaps: Union[int, List[int]] = 0,
+    dims_max: List[int] = 64,
+    overlaps: List[int] = 0,
     mode: str = "fast",
     **predict_kwargs,
 ) -> torch.Tensor:
     """Performs piecewise prediction and combines results.
     Parameters
     ----------
-    predictor
+    predictor: Callable Object
         An object with a forward() method.
-    tensor_in
+    tensor_in: torch.Tensor
         Tensor to be input into predictor piecewise. Should be 3d or 4d
-        with the first dimension representing channel dimension .
-    dims_max
-        Specifies dimensions of each sub prediction.
-    overlaps
-        Specifies overlap along each dimension for sub predictions.
-    mode
+        with the first dimension representing channel dimension. For 2D
+        images, the tensor_in should be of shape C x Y x X, and for 3D
+        images, the tensor_in should be of shape C x Z x Y x X.
+    dims_max: List[int]
+        Specifies dimensions of each sub prediction. No need to include
+        channel dimension. For 3D images, the dims_max should be of shape
+        [Z, Y, X], while for 2D images, the dims_max should be of shape
+        [Y, X]
+    overlaps: List[int]
+        Specifies overlap along each dimension for sub predictions. No need
+        to include channel dimension. For 3D images, the dims_max should be
+        of shape [Z, Y, X], while for 2D images, the dims_max should be of
+        shape [Y, X]
+    mode: strss
         "fast" or "efficient". "fast" mode will use more RAM
     **predict_kwargs
         Kwargs to pass to predict method.
@@ -125,17 +133,20 @@ def predict_piecewise(
          Prediction with size tensor_in.size().
     """
     assert isinstance(tensor_in, torch.Tensor)
+
+    # the input tensor needs to be 3D or 4D
     assert len(tensor_in.size()) > 2
     shape_in = tuple(tensor_in.size())
     n_dim = len(shape_in)
-    if isinstance(dims_max, int):
-        dims_max = [dims_max] * n_dim
+    assert len(dims_max) == len(overlaps) == n_dim
+
+    # if the size of certain dimension of input tensor is smaller
+    # than the size of that dimension in sub prediction, then
+    # reduce the size of sub prediction
     for idx_d in range(1, n_dim):
         if dims_max[idx_d] > shape_in[idx_d]:
             dims_max[idx_d] = shape_in[idx_d]
-    if isinstance(overlaps, int):
-        overlaps = [overlaps] * n_dim
-    assert len(dims_max) == len(overlaps) == n_dim
+
     # Remove restrictions on channel dimension.
     dims_max[0] = None
     overlaps[0] = None

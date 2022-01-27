@@ -22,16 +22,15 @@ data:
   dataloader_patch_queue:  # where to use IO queue in
     sampler:
       name: UniformSampler
-      func_name: RescaleIntensity
       params:
         patch_size: [32, 256, 256]
     params:
       num_workers: 4
-      max_length: 360
+      max_length: 800
       samples_per_volume: 8
   dataloader_params:
     train:
-      batch_size: 4
+      batch_size: 8
       pin_memory: True
       num_workers: 0  # if dataload_path_queue is used, num_workers must be 0 here
     val:
@@ -43,14 +42,15 @@ data:
       func_name: ZNormalization
   augmentation:
     - module_name: torchio
-      func_name: RandomAffine
+      func_name: RandomFlip
       params:
-        p: 0.5
-    - module_name: torchio
-      func_name: RandomAffine
-      params:
-        degrees: [0, 0, 0, 90, 0, 90]
-        p: 0.5
+        axes: [1, 2]
+        flip_probability: 0.5
+#    - module_name: torchio
+#      func_name: RandomAffine
+#      params:
+#        degrees: [0, 0, 0, 90, 0, 90]
+#        p: 0.5
 # model
 model:
   category: FCN
@@ -73,6 +73,12 @@ model:
     func_name: Adam  # AdamW
     params:
       lr: 0.001
+      weight_decay: 0.0005
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    func_name: ExponentialLR
+    params:
+      gamma: 0.98
   sliding_window_params:
     dims_max: [1, 32, 256, 256]
     overlaps: [0, 6, 12, 12]

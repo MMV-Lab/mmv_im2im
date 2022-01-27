@@ -14,6 +14,15 @@ def aicsimageio_reader(fn, **kwargs):
     img = AICSImage(fn).reader.get_image_dask_data(**kwargs)
     img_data = tio.data.io.check_uint_to_int(img.compute())
     return img_data, np.eye(4)
+    """
+    if len(img_data.shape) == 3:
+        return img_data, np.eye(4)
+    elif len(img_data.shape) == 2:
+        return img_data, np.eye(3)
+    else:
+        print("error in aicsimage loader")
+        sys.exit(0)
+    """
 
 
 def load_yaml_cfg(yaml_path):
@@ -32,9 +41,14 @@ def get_max_shape(subjects):
     return shapes.max(axis=0)
 
 
-def parse_config(info):
+def parse_config_func_without_params(info):
     my_module = importlib.import_module(info["module_name"])
     my_func = getattr(my_module, info["func_name"])
+    return my_func
+
+
+def parse_config(info):
+    my_func = parse_config_func_without_params(info)
     if "params" in info:
         return my_func(**info["params"])
     else:

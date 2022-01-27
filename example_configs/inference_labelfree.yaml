@@ -36,8 +36,8 @@ model:
     dims_max: [1, 32, 128, 128]
     overlaps: [0, 6, 12, 12]
   ckpt:
-    checkpoint_path: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_0/checkpoints/epoch=294-step=53099.ckpt
-    hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_0/hparams.yaml
+    checkpoint_path: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/checkpoints/epoch=60-step=10979.ckpt
+    hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/hparams.yaml
 # inference
 run:
   gpus: 1

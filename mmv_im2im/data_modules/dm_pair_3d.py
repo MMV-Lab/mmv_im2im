@@ -12,6 +12,7 @@
 # can be optional. Note that image_target could be masks
 # (e.g. for segmentation) or images (e.g. for labelfree)
 ########################################################
+import sys
 from importlib import import_module
 from functools import partial
 from torch.utils.data import random_split, DataLoader
@@ -73,6 +74,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             target_image_class = getattr(tio_image_module, "ScalarImage")
         else:
             print("unsupported target type")
+            sys.exit(0)
         target_reader = partial(aicsimageio_reader, **self.target_reader_param)
 
         if self.source_type.lower() == "label":
@@ -81,6 +83,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             source_image_class = getattr(tio_image_module, "ScalarImage")
         else:
             print("unsupported source type")
+            sys.exit(0)
         source_reader = partial(aicsimageio_reader, **self.source_reader_param)
 
         self.subjects = []
