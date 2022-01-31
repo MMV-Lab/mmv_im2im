@@ -1,25 +1,26 @@
 
 # data
 data:
+  category: "pair_3d"
   # data_path: "/mnt/data/xyz.csv"
   # data_column: "raw_path"
   input: 
-    dir: "~/ambiomgroupdrive/Sai/data/paired_dataset/test_data"
+    dir: "/mnt/eternus/users/Sai/paired_dataset/segmentation_test_data_sample"
     params:
-      data_type: "tiff"
+      data_type: "tif"
     reader_params:
       dimension_order_out: "CZYX"
-      C: [1]
-      T: 1
+      C: [0]
+      T: 0
   output:
-    path: "~/ambiomgroupdrive/Sai/data/paired_dataset/test_data_prediction"
+    path: "/mnt/eternus/users/Sai/paired_dataset/segmetation_prediction_data"
     suffix: "pred_LMNB1"
   dataloader_params:
     batch_size: 1
     num_workers: 1
   preprocess:
-    - module_name: torchio
-      func_name: ZNormalization
+  - module_name: torchio
+    func_name: ZNormalization
 # model
 model:
   category: FCN
@@ -29,34 +30,18 @@ model:
     params:
       spatial_dims: 3
       in_channels: 1
-      out_channels: 1
-      channels: [8, 16, 32, 64]
+      out_channels: 2
+      channels: [16, 32, 64, 128]
       strides: [2, 2, 2]
+      num_res_units: 2
+
   sliding_window_params:
-    dims_max: [1, 6, 128, 128]
-    overlaps: [0, 6, 12, 12]
+    dims_max: [1, 32, 256, 256]
+    overlaps: [0, 8, 16, 16]
   ckpt:
-    checkpoint_path: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_0/checkpoints/epoch=294-step=53099.ckpt
-    hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_0/hparams.yaml  
-  category: pix2pixGAN
-  generator_net :
-    module_name: mmv_im2im.models.pix2pix_generator_discriminator_3D
-    func_name: UNetGenerator
-    params: 
-      in_channels: 1
-      out_channels: 1
-  discriminator_net:
-    module_name: mmv_im2im.models.pix2pix_generator_discriminator_3D
-    func_name: Discriminator
-    params:
-      in_channels: 1
-  sliding_window_params:
-    dims_max: [1, 32, 128, 128]
-    overlaps: [0, 6, 12, 12]
-  ckpt:
-    checkpoint_path: ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_236/checkpoints/epoch=48-step=6859.ckpt
-    hparams_file: ~/ambiomgroupdrive/Sai/mmv_im2im_fork/lightning_logs/version_236/hparams.yaml
-# inference
+    checkpoint_path: /mnt/eternus/users/mmv_im2im_dev/unet_model_patch_32_256_256_400_with_val_loss_0.3130553364753723_state.ckpt
+    hparams_file: /mnt/eternus/users/Sai/mmv_im2im_dev/lightning_logs/version_524/hparams.yaml
+# # inference
 run:
   gpus: 1
   precision: 16

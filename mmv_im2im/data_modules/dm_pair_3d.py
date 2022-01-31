@@ -16,8 +16,8 @@ from importlib import import_module
 from functools import partial
 from torch.utils.data import random_split, DataLoader
 import torchio as tio
+import sys
 import pytorch_lightning as pl
-
 from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 
@@ -73,6 +73,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             target_image_class = getattr(tio_image_module, "ScalarImage")
         else:
             print("unsupported target type")
+            sys.exit(0)
         target_reader = partial(aicsimageio_reader, **self.target_reader_param)
 
         if self.source_type.lower() == "label":
@@ -81,6 +82,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             source_image_class = getattr(tio_image_module, "ScalarImage")
         else:
             print("unsupported source type")
+            sys.exit(0)
         source_reader = partial(aicsimageio_reader, **self.source_reader_param)
 
         self.subjects = []

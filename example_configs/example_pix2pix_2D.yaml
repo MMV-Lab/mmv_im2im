@@ -1,0 +1,74 @@
+# everything about data
+data:
+  category: "pair_2d"
+  target_type: "Image" # "Label" or "Image
+  params:
+      data_type: "tiff"
+  target_reader_params:
+    dimension_order_out: "YX"
+    Z: 0
+    C: 0
+    T: 0
+  source_type: "Image" # "Label" or "Image
+  params:
+      data_type: "tiff"
+  source_reader_params:
+    dimension_order_out: "YX"
+    Z: 0
+    C: 0
+    T: 0
+  data_path: "/mnt/eternus/users/Sai/paired_data/pix2pix_sample_data"
+  dataloader_params:
+    train:
+      batch_size: 8
+      pin_memory: True
+      num_workers: 1 # if dataload_path_queue is used, num_workers must be 0 here
+    val:
+      batch_size: 2
+      pin_memory: True
+      num_workers: 2   
+  train_val_ratio: 0.2
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+    - module_name: torchio
+      func_name: CropOrPad
+      params:
+        target_shape: [1024, 1024, 1]
+  augmentation:
+    - module_name: torchio
+      func_name: RandomFlip
+
+model:
+  category: pix2pix2D
+  device_id: [0, 1, 2]
+  generator_net :
+    module_name: mmv_im2im.models.pix2pix_generator_discriminator_2D
+    func_name: Generator
+    params: 
+      in_channels: 1
+  discriminator_net:
+    module_name: mmv_im2im.models.pix2pix_generator_discriminator_2D
+    func_name: Discriminator
+    params:
+      in_channels: 1
+  L1_criterion:
+    module_name: torch.nn
+    func_name: L1Loss
+  BCE_criterion:
+    module_name: torch.nn
+    func_name: BCEWithLogitsLoss
+  optimizer: 
+    module_name: torch.optim
+    func_name: AdamW
+    params: 
+      lr: 0.0001
+      betas: [0.5,0.999]
+
+training:
+  params:
+    gpus: 1
+    precision: 16
+    max_epochs: 1000
+
+# checkpoint_path: None

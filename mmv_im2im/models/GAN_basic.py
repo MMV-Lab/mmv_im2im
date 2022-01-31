@@ -165,4 +165,4 @@ class Model(pl.LightningModule):
             .item()
         )
         self.log("val_loss_generator", validation_generator_loss)
-        self.log("val?loss_discriminator", validation_discriminator_loss)
+        self.log("val_loss_discriminator", validation_discriminator_loss)

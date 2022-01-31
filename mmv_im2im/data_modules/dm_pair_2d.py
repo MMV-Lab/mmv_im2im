@@ -12,13 +12,15 @@
 # can be optional. Note that image_target could be masks
 # (e.g. for segmentation) or images (e.g. for labelfree)
 ########################################################
+
+
 from importlib import import_module
 from torch.utils.data import random_split, DataLoader
 import torchio as tio
 import pytorch_lightning as pl
-
+from functools import partial
 from mmv_im2im.utils.for_transform import parse_tio_ops
-from mmv_im2im.utils.misc import generate_dataset_dict
+from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 
 
 class Im2ImDataModule(pl.LightningDataModule):
@@ -27,6 +29,8 @@ class Im2ImDataModule(pl.LightningDataModule):
 
         self.target_type = data_cfg["target_type"]
         self.data_path = data_cfg["data_path"]
+        self.target_reader_param = data_cfg["target_reader_params"]
+        self.source_reader_param = data_cfg["source_reader_params"]
 
         # all subjects
         self.subjects = None
@@ -50,7 +54,7 @@ class Im2ImDataModule(pl.LightningDataModule):
 
     def prepare_data(self):
         dataset_list = generate_dataset_dict(self.data_path)
-
+        
         tio_image_module = import_module("torchio")
         if self.target_type.lower() == "label":
             target_image_class = getattr(tio_image_module, "LabelMap")
@@ -58,6 +62,8 @@ class Im2ImDataModule(pl.LightningDataModule):
             target_image_class = getattr(tio_image_module, "ScalarImage")
         else:
             print("unsupported target type")
+        source_reader = partial(aicsimageio_reader, **self.source_reader_param)
+        target_reader = partial(aicsimageio_reader, **self.target_reader_param)
         self.subjects = []
         for ds in dataset_list:
             if "costmap_fn" in ds:
@@ -68,15 +74,15 @@ class Im2ImDataModule(pl.LightningDataModule):
                 )
             else:
                 subject = tio.Subject(
-                    source=tio.ScalarImage(ds["source_fn"]),
-                    target=target_image_class(ds["target_fn"]),
+                    source=tio.ScalarImage(ds["source_fn"], reader=source_reader),
+                    target=target_image_class(ds["target_fn"], reader=target_reader),
                 )
             self.subjects.append(subject)
 
     def setup(self, stage=None):
         num_subjects = len(self.subjects)
-        num_train_subjects = int(round(num_subjects * self.train_val_ratio))
-        num_val_subjects = num_subjects - num_train_subjects
+        num_val_subjects = int(round(num_subjects * self.train_val_ratio))
+        num_train_subjects = num_subjects - num_val_subjects
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
 
@@ -88,10 +94,10 @@ class Im2ImDataModule(pl.LightningDataModule):
         )  # noqa E501
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, shuffle=True, **self.loader_params)
+        return DataLoader(self.train_set, shuffle=True,  **self.loader_params["train"])
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, shuffle=False, **self.loader_params)
+        return DataLoader(self.val_set, shuffle=False,  **self.loader_params["val"])
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case

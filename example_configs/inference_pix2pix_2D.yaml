@@ -1,0 +1,48 @@
+data:
+  category: "pair_2d"
+  input: 
+    dir: "/mnt/eternus/users/Sai/paired_data/pix2pix_small_dataset_test"
+    params:
+      data_type: "tiff"
+    reader_params:
+      dimension_order_out: "ZYX"
+      Z: [0]
+      C: 0
+      T: 0
+  output:
+    path: "/mnt/eternus/users/Sai/paired_data/pix2pix_small_dataset_pred"
+    suffix: "pred_LMNB1"
+  dataloader_params:
+    batch_size: 8
+    num_workers: 1
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+    - module_name: torchio
+      func_name: CropOrPad
+      params:
+        target_shape: [1024, 1024, 1]
+  augmentation:
+    - module_name: torchio
+      func_name: RandomFlip
+
+model:
+  category: pix2pix2D
+  generator_net :
+    module_name: mmv_im2im.models.pix2pix_generator_discriminator_2D
+    func_name: Generator
+    params: 
+      in_channels: 1
+  discriminator_net:
+    module_name: mmv_im2im.models.pix2pix_generator_discriminator_2D
+    func_name: Discriminator
+    params:
+      in_channels: 1
+  ckpt:
+    checkpoint_path: "/mnt/eternus/users/Sai/mmv_im2im_dev/lightning_logs/version_654/checkpoints/epoch=549-step=85249.ckpt"
+    hparams_file: "/mnt/eternus/users/Sai/mmv_im2im_dev/lightning_logs/version_654/hparams.yaml"
+
+run:
+  gpus: 1
+  precision: 16
+
