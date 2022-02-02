@@ -1,7 +1,8 @@
 
 # everything about data
 data:
-  category: "pair_3d"
+  category: "pair"
+  spatial_dims: 3
   target_type: "Image" # "Label" or "Image
   target_reader_params:
     dimension_order_out: "ZYX"
@@ -37,6 +38,7 @@ data:
       batch_size: 1
       num_workers: 1
   train_val_ratio: 0.1
+  shuffle: False
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
