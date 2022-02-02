@@ -1,20 +1,22 @@
 
 # data
 data:
-  category: "pair_3d"
+  category: "pair"
+  spatial_dims: 3
   # data_path: "/mnt/data/xyz.csv"
   # data_column: "raw_path"
   input: 
-    dir: "/mnt/eternus/users/Sai/paired_dataset/segmentation_test_data_sample"
+    dir: "/mnt/eternus/users/Sai/paired_data/segmentation_data_full_resolution_test_data"
     params:
-      data_type: "tif"
+      data_type: "tiff"
     reader_params:
       dimension_order_out: "CZYX"
       C: [0]
       T: 0
   output:
-    path: "/mnt/eternus/users/Sai/paired_dataset/segmetation_prediction_data"
-    suffix: "pred_LMNB1"
+    path: "/mnt/eternus/users/Sai/paired_data/segmentation_data_full_resolution_predicted_data"
+    suffix_original: "pred_original"
+    suffix_prediction: "pred_binary"
   dataloader_params:
     batch_size: 1
     num_workers: 1
@@ -36,11 +38,11 @@ model:
       num_res_units: 2
 
   sliding_window_params:
-    dims_max: [1, 32, 256, 256]
+    dims_max: [1, 64, 256, 256]
     overlaps: [0, 8, 16, 16]
   ckpt:
-    checkpoint_path: /mnt/eternus/users/mmv_im2im_dev/unet_model_patch_32_256_256_400_with_val_loss_0.3130553364753723_state.ckpt
-    hparams_file: /mnt/eternus/users/Sai/mmv_im2im_dev/lightning_logs/version_524/hparams.yaml
+    checkpoint_path: "/mnt/eternus/users/Sai/mmv_im2im_dev/unet_model_patch_64_256_256_500_with_val_loss_0.3997230529785156_state.ckpt"
+    hparams_file: "/mnt/eternus/users/Sai/mmv_im2im_dev/lightning_logs/version_675/hparams.yaml"
 # # inference
 run:
   gpus: 1
