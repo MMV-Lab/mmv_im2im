@@ -144,7 +144,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             sampler_module = import_module("torchio.data")
             sampler_func = getattr(
                         sampler_module, self.patch_loader_sampler["name"]
-            )
+                    )
             train_sampler = sampler_func(**self.patch_loader_sampler["params"])
             self.train_set = tio.Queue(
                 train_set, sampler=train_sampler, **self.patch_loader_params
