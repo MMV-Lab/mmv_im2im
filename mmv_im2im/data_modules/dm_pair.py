@@ -66,8 +66,7 @@ class Im2ImDataModule(pl.LightningDataModule):
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]
-        if ("dataloader_patch_queue" in data_cfg) \
-                and (self.spatial_dims == "3"):
+        if ("dataloader_patch_queue" in data_cfg) and (self.spatial_dims == "3"):
             print("The dimensions of the data is 3D")
             self.patch_loader = True
             self.patch_loader_params = data_cfg["dataloader_patch_queue"][
@@ -76,8 +75,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             self.patch_loader_sampler = data_cfg["dataloader_patch_queue"][
                 "sampler"
             ]  # noqa E501
-        elif ("dataloader_patch_queue" not in data_cfg) \
-                and (self.spatial_dims == "2"):
+        elif ("dataloader_patch_queue" not in data_cfg) and (self.spatial_dims == "2"):
             print("The dimensions of the data is 2D")
             self.patch_loader = False
         else:
@@ -120,14 +118,22 @@ class Im2ImDataModule(pl.LightningDataModule):
         for ds in dataset_list:
             if "costmap_fn" in ds:
                 subject = tio.Subject(
-                    source=source_image_class(ds["source_fn"], reader=source_reader),  # noqa: E501
-                    target=target_image_class(ds["target_fn"], reader=target_reader),  # noqa: E501
+                    source=source_image_class(
+                        ds["source_fn"], reader=source_reader
+                    ),  # noqa: E501
+                    target=target_image_class(
+                        ds["target_fn"], reader=target_reader
+                    ),  # noqa: E501
                     costmap=tio.ScalarImage(ds["costmap_fn"]),
                 )
             else:
                 subject = tio.Subject(
-                    source=source_image_class(ds["source_fn"], reader=source_reader),  # noqa: E501
-                    target=target_image_class(ds["target_fn"], reader=target_reader),  # noqa: E501
+                    source=source_image_class(
+                        ds["source_fn"], reader=source_reader
+                    ),  # noqa: E501
+                    target=target_image_class(
+                        ds["target_fn"], reader=target_reader
+                    ),  # noqa: E501
                 )
             self.subjects.append(subject)
 
@@ -137,26 +143,34 @@ class Im2ImDataModule(pl.LightningDataModule):
         num_train_subjects = num_subjects - num_val_subjects
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
-        self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)  # noqa: E501
-        train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)  # noqa: E501
+        self.val_set = tio.SubjectsDataset(
+            val_subjects, transform=self.preproc
+        )  # noqa: E501
+        train_set = tio.SubjectsDataset(
+            train_subjects, transform=self.transform
+        )  # noqa: E501
         if self.patch_loader:
             # define sampler
             sampler_module = import_module("torchio.data")
             sampler_func = getattr(
                 sampler_module, self.patch_loader_sampler["name"]
-            )   # noqa: E501
+            )  # noqa: E501
             train_sampler = sampler_func(**self.patch_loader_sampler["params"])
             self.train_set = tio.Queue(
                 train_set, sampler=train_sampler, **self.patch_loader_params
-            )   # noqa: E501
+            )  # noqa: E501
         else:
             self.train_set = train_set
 
     def train_dataloader(self):
-        return DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])  # noqa: E501
+        return DataLoader(
+            self.train_set, shuffle=True, **self.loader_params["train"]
+        )  # noqa: E501
 
     def val_dataloader(self):
-        return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])   # noqa: E501
+        return DataLoader(
+            self.val_set, shuffle=False, **self.loader_params["val"]
+        )  # noqa: E501
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case
