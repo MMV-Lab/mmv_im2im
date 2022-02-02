@@ -91,13 +91,11 @@ class Im2ImDataModule(pl.LightningDataModule):
         dataset_list = generate_dataset_dict(self.data_path)
         dataset_list = generate_dataset_dict(self.data_path)
         shuffled_dataset_list = dataset_list.copy()
-        print(dataset_list[:5])
         if self.shuffle_data:
             print("Printing shuffled datalist")
             random.shuffle(shuffled_dataset_list)
             for i, shuffled_ds in enumerate(shuffled_dataset_list):
                 dataset_list[i]["target_fn"] = shuffled_ds["target_fn"]
-        print(dataset_list[:5])
         # parse source and target type
         tio_image_module = import_module("torchio")
         if self.target_type.lower() == "label":
@@ -149,16 +147,16 @@ class Im2ImDataModule(pl.LightningDataModule):
         train_subjects, val_subjects = random_split(self.subjects, splits)
         self.val_set = tio.SubjectsDataset(
                         val_subjects, transform=self.preproc
-                    )
+        )
         train_set = tio.SubjectsDataset(
                         train_subjects, transform=self.transform
-                    )
+        )
         if self.patch_loader:
             # define sampler
             sampler_module = import_module("torchio.data")
             sampler_func = getattr(
                         sampler_module, self.patch_loader_sampler["name"]
-                    )
+            )
             train_sampler = sampler_func(**self.patch_loader_sampler["params"])
             self.train_set = tio.Queue(
                 train_set, sampler=train_sampler, **self.patch_loader_params
@@ -168,8 +166,8 @@ class Im2ImDataModule(pl.LightningDataModule):
 
     def train_dataloader(self):
         return DataLoader(
-                self.train_set, shuffle=True, **self.loader_params["train"]
-            )
+            self.train_set, shuffle=True, **self.loader_params["train"]
+        )
 
     def val_dataloader(self):
         return DataLoader(
