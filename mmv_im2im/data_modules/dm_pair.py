@@ -1,6 +1,7 @@
 ########################################################
-# #### general data module for paired 3D images ########
-# ####   (mostly for FCN or CGAN-like models)     ######
+# ####       general data module for          ########
+# ####   paired and unpaired 3D images         #######
+# ###  (mostly for FCN or CGAN-like models)     ######
 #
 # About transformation:
 # We use TorchIO, which can handle 3D data in a more
