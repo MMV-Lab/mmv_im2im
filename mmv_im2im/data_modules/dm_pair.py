@@ -122,20 +122,20 @@ class Im2ImDataModule(pl.LightningDataModule):
                 subject = tio.Subject(
                     source=source_image_class(
                         ds["source_fn"], reader=source_reader
-                    ),
+                        ),
                     target=target_image_class(
                         ds["target_fn"], reader=target_reader
-                    ),
+                        ),
                     costmap=tio.ScalarImage(ds["costmap_fn"]),
                 )
             else:
                 subject = tio.Subject(
                     source=source_image_class(
                         ds["source_fn"], reader=source_reader
-                    ),
+                        ),
                     target=target_image_class(
                         ds["target_fn"], reader=target_reader
-                    ),
+                        ),
                 )
             self.subjects.append(subject)
 
@@ -147,20 +147,20 @@ class Im2ImDataModule(pl.LightningDataModule):
         train_subjects, val_subjects = random_split(self.subjects, splits)
         self.val_set = tio.SubjectsDataset(
                         val_subjects, transform=self.preproc
-        )
+            )
         train_set = tio.SubjectsDataset(
                         train_subjects, transform=self.transform
-        )
+            )
         if self.patch_loader:
             # define sampler
             sampler_module = import_module("torchio.data")
             sampler_func = getattr(
                         sampler_module, self.patch_loader_sampler["name"]
-            )
+                )
             train_sampler = sampler_func(**self.patch_loader_sampler["params"])
             self.train_set = tio.Queue(
                 train_set, sampler=train_sampler, **self.patch_loader_params
-            )
+                )
         else:
             self.train_set = train_set
 
