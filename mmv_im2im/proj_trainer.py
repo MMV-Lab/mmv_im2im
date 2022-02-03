@@ -4,6 +4,7 @@ import logging
 from importlib import import_module
 from mmv_im2im.utils.misc import parse_ops_list
 import pytorch_lightning as pl
+import mmv_im2im.data_modules.data_loader as dl
 
 ###############################################################################
 
@@ -37,8 +38,7 @@ class ProjectTrainer(object):
 
     def run_training(self):
         # set up data
-        data_cls_module = import_module("mmv_im2im.data_modules.data_loader")
-        my_data_funcs = getattr(data_cls_module, "Im2ImDataModule")
+        my_data_funcs = getattr(dl, "Im2ImDataModule")
 
         self.data = my_data_funcs(self.data_cfg)
 
