@@ -1,10 +1,10 @@
 ########################################################
 # ####       general data module for          ########
-# ####   paired and unpaired 3D images         #######
+# ####   paired and unpaired 3D/2D images         #######
 # ###  (mostly for FCN or CGAN-like models)     ######
 #
 # About transformation:
-# We use TorchIO, which can handle 3D data in a more
+# We use TorchIO, which can handle 3D/2D data in a more
 # efficient way than torchvision
 #
 # About data in a batch:
@@ -22,6 +22,7 @@ import pytorch_lightning as pl
 from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 import random
+import logging
 
 
 class Im2ImDataModule(pl.LightningDataModule):
@@ -33,7 +34,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.target_reader_param = data_cfg["target_reader_params"]
         self.source_reader_param = data_cfg["source_reader_params"]
         self.data_path = data_cfg["data_path"]
-        self.shuffle_data = data_cfg["shuffle_data"]
+        self.category = data_cfg["category"]
 
         # all subjects
         self.subjects = None
@@ -69,17 +70,13 @@ class Im2ImDataModule(pl.LightningDataModule):
         if ("dataloader_patch_queue" in data_cfg) and (self.spatial_dims == "3"):
             print("The dimensions of the data is 3D")
             self.patch_loader = True
-            self.patch_loader_params = data_cfg["dataloader_patch_queue"][
-                "params"
-            ]  # noqa E501
-            self.patch_loader_sampler = data_cfg["dataloader_patch_queue"][
-                "sampler"
-            ]  # noqa E501
+            self.patch_loader_params = data_cfg["dataloader_patch_queue"]["params"]
+            self.patch_loader_sampler = data_cfg["dataloader_patch_queue"]["sampler"]
         elif ("dataloader_patch_queue" not in data_cfg) and (self.spatial_dims == "2"):
             print("The dimensions of the data is 2D")
             self.patch_loader = False
         else:
-            print("The dimensions of the data are invalid")
+            logging.error("Unsupported data dimensions")
 
         # reserved for test data
         self.test_subjects = None
@@ -89,8 +86,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         dataset_list = generate_dataset_dict(self.data_path)
         dataset_list = generate_dataset_dict(self.data_path)
         shuffled_dataset_list = dataset_list.copy()
-        if self.shuffle_data:
-            print("Printing shuffled datalist")
+        if self.category == "unpair":
             random.shuffle(shuffled_dataset_list)
             for i, shuffled_ds in enumerate(shuffled_dataset_list):
                 dataset_list[i]["target_fn"] = shuffled_ds["target_fn"]
@@ -118,22 +114,14 @@ class Im2ImDataModule(pl.LightningDataModule):
         for ds in dataset_list:
             if "costmap_fn" in ds:
                 subject = tio.Subject(
-                    source=source_image_class(
-                        ds["source_fn"], reader=source_reader
-                    ),  # noqa: E501
-                    target=target_image_class(
-                        ds["target_fn"], reader=target_reader
-                    ),  # noqa: E501
+                    source=source_image_class(ds["source_fn"], reader=source_reader),
+                    target=target_image_class(ds["target_fn"], reader=target_reader),
                     costmap=tio.ScalarImage(ds["costmap_fn"]),
                 )
             else:
                 subject = tio.Subject(
-                    source=source_image_class(
-                        ds["source_fn"], reader=source_reader
-                    ),  # noqa: E501
-                    target=target_image_class(
-                        ds["target_fn"], reader=target_reader
-                    ),  # noqa: E501
+                    source=source_image_class(ds["source_fn"], reader=source_reader),
+                    target=target_image_class(ds["target_fn"], reader=target_reader),
                 )
             self.subjects.append(subject)
 
@@ -143,34 +131,24 @@ class Im2ImDataModule(pl.LightningDataModule):
         num_train_subjects = num_subjects - num_val_subjects
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
-        self.val_set = tio.SubjectsDataset(
-            val_subjects, transform=self.preproc
-        )  # noqa: E501
-        train_set = tio.SubjectsDataset(
-            train_subjects, transform=self.transform
-        )  # noqa: E501
+        self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
+        train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
         if self.patch_loader:
             # define sampler
             sampler_module = import_module("torchio.data")
-            sampler_func = getattr(
-                sampler_module, self.patch_loader_sampler["name"]
-            )  # noqa: E501
+            sampler_func = getattr(sampler_module, self.patch_loader_sampler["name"])
             train_sampler = sampler_func(**self.patch_loader_sampler["params"])
             self.train_set = tio.Queue(
                 train_set, sampler=train_sampler, **self.patch_loader_params
-            )  # noqa: E501
+            )
         else:
             self.train_set = train_set
 
     def train_dataloader(self):
-        return DataLoader(
-            self.train_set, shuffle=True, **self.loader_params["train"]
-        )  # noqa: E501
+        return DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])
 
     def val_dataloader(self):
-        return DataLoader(
-            self.val_set, shuffle=False, **self.loader_params["val"]
-        )  # noqa: E501
+        return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
 
     def test_dataloader(self):
         # need to be overwritten in a test script for specific test case
