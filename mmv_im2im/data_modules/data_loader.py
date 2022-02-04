@@ -24,6 +24,7 @@ from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 import random
 import logging
 
+
 class Im2ImDataModule(pl.LightningDataModule):
     def __init__(self, data_cfg):
         super().__init__()
@@ -65,7 +66,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.spatial_dims = str(data_cfg["spatial_dims"])
 
         # parameters for dataloader
-        self.loader_params = data_cfg["dataloader_params"] 
+        self.loader_params = data_cfg["dataloader_params"]
         if ("dataloader_patch_queue" in data_cfg) and (self.spatial_dims == "3"):
             print("The dimensions of the data is 3D")
             self.patch_loader = True
