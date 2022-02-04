@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from importlib import import_module
-import mmv_im2im.data_modules.data_loader as dl
+from mmv_im2im.data_modules.data_loader import Im2ImDataModule
 from mmv_im2im.utils.misc import parse_ops_list
 import pytorch_lightning as pl
 
@@ -38,8 +38,7 @@ class ProjectTrainer(object):
 
     def run_training(self):
         # set up data
-        my_data_funcs = getattr(dl, "Im2ImDataModule")
-        self.data = my_data_funcs(self.data_cfg)
+        self.data = Im2ImDataModule(self.data_cfg)
 
         # set up model
         model_category = self.model_cfg.pop("category")

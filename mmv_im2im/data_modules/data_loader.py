@@ -83,7 +83,6 @@ class Im2ImDataModule(pl.LightningDataModule):
 
     def prepare_data(self):
         dataset_list = generate_dataset_dict(self.data_path)
-        dataset_list = generate_dataset_dict(self.data_path)
         shuffled_dataset_list = dataset_list.copy()
         if self.category == "unpair":
             random.shuffle(shuffled_dataset_list)
