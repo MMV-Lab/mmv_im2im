@@ -1,7 +1,8 @@
 
 # everything about data
 data:
-  category: "pair_3d"
+  category: "pair"
+  spatial_dims: 3
   target_type: "Image" # "Label" or "Image
   target_reader_params:
     dimension_order_out: "ZYX"
