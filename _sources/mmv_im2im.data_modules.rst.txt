@@ -1,0 +1,29 @@
+mmv\_im2im.data\_modules package
+================================
+
+Submodules
+----------
+
+mmv\_im2im.data\_modules.data\_loader module
+--------------------------------------------
+
+.. automodule:: mmv_im2im.data_modules.data_loader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.data\_modules.dm\_pair\_3d module
+--------------------------------------------
+
+.. automodule:: mmv_im2im.data_modules.dm_pair_3d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mmv_im2im.data_modules
+   :members:
+   :undoc-members:
+   :show-inheritance:

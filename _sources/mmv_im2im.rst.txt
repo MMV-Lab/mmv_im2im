@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    mmv_im2im.bin
+   mmv_im2im.data_modules
    mmv_im2im.models
    mmv_im2im.utils
 
