@@ -1,15 +1,10 @@
+# The following file was adapted from https://github.com/AllenCellModeling/pytorch_fnet
+
 import torch
 
 
 class Net(torch.nn.Module):
-
-    def __init__(
-            self,
-            depth=4,
-            mult_chan=32,
-            in_channels=1,
-            out_channels=1,
-    ):
+    def __init__(self, depth=4, mult_chan=32, in_channels=1, out_channels=1):
         super().__init__()
         self.depth = depth
         self.mult_chan = mult_chan
@@ -19,6 +14,7 @@ class Net(torch.nn.Module):
         self.net_recurse = _Net_recurse(
             n_in_channels=self.in_channels,
             mult_chan=self.mult_chan,
+            depth_parent=self.depth,
             depth=self.depth,
         )
         self.conv_out = torch.nn.Conv3d(
@@ -31,9 +27,8 @@ class Net(torch.nn.Module):
 
 
 class _Net_recurse(torch.nn.Module):
-    def __init__(self, n_in_channels, mult_chan=2, depth=0):
+    def __init__(self, n_in_channels, mult_chan=2, depth_parent=0, depth=0):
         """Class for recursive definition of U-network.p
-
         Parameters
         ----------
         in_channels
@@ -43,16 +38,19 @@ class _Net_recurse(torch.nn.Module):
         depth
             If 0, this subnet will only be convolutions that double the channel
             count.
-
         """
         super().__init__()
+
         self.depth = depth
-        n_out_channels = n_in_channels * mult_chan
+
+        if self.depth == depth_parent:
+            n_out_channels = mult_chan
+        else:
+            n_out_channels = n_in_channels * mult_chan
+
         self.sub_2conv_more = SubNet2Conv(n_in_channels, n_out_channels)
         if depth > 0:
-            self.sub_2conv_less = SubNet2Conv(
-                2 * n_out_channels, n_out_channels
-            )
+            self.sub_2conv_less = SubNet2Conv(2 * n_out_channels, n_out_channels)
             self.conv_down = torch.nn.Conv3d(
                 n_out_channels, n_out_channels, 2, stride=2
             )
@@ -64,7 +62,10 @@ class _Net_recurse(torch.nn.Module):
             self.bn1 = torch.nn.BatchNorm3d(n_out_channels)
             self.relu1 = torch.nn.ReLU()
             self.sub_u = _Net_recurse(
-                n_out_channels, mult_chan=2, depth=(depth - 1)
+                n_out_channels,
+                mult_chan=2,
+                depth_parent=depth_parent,
+                depth=(depth - 1),
             )
 
     def forward(self, x):
