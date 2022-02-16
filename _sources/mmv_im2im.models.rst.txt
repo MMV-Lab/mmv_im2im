@@ -20,6 +20,14 @@ mmv\_im2im.models.GAN\_basic module
    :undoc-members:
    :show-inheritance:
 
+mmv\_im2im.models.fnet\_nn\_3d\_params module
+---------------------------------------------
+
+.. automodule:: mmv_im2im.models.fnet_nn_3d_params
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mmv\_im2im.models.layers\_and\_blocks module
 --------------------------------------------
 
