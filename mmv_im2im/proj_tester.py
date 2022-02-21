@@ -93,7 +93,7 @@ class ProjectTester(object):
                         torch.from_numpy(x).float().cuda(),
                         **self.model_cfg["sliding_window_params"],
                     )
-                    if model_category == 'FCN':
+                    if model_category == "FCN":
                         log_softmax_layer = torch.nn.LogSoftmax(dim=1)
                         y_hat = log_softmax_layer(y_hat)
                         y_hat = y_hat[:, 1, :, :, :]
