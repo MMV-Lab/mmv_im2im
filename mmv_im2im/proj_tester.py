@@ -3,13 +3,12 @@
 import logging
 from importlib import import_module
 from pathlib import Path
-
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 import torch
+import numpy as np
 from torchio.data.io import check_uint_to_int
-
-from mmv_im2im.utils.misc import generate_test_dataset_dict
+from mmv_im2im.utils.misc import generate_test_dataset_dict, get_binary_map
 from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
@@ -56,31 +55,64 @@ class ProjectTester(object):
             self.data_cfg["input"]["dir"], **self.data_cfg["input"]["params"]
         )
 
+        dataset_length = len(dataset_list)
+
         # load preprocessing transformation
         pre_process = parse_tio_ops(self.data_cfg["preprocess"])
 
         # loop through all images and apply the model
-        for ds in dataset_list:
+        for i, ds in enumerate(dataset_list):
+            # Read the image
+            print(f"Reading the image {i}/{dataset_length}")
             img = AICSImage(ds).reader.get_image_dask_data(
                 **self.data_cfg["input"]["reader_params"]
             )
             x = check_uint_to_int(img.compute())
-            x = pre_process(x)
-            y_hat = predict_piecewise(
-                self.model,
-                torch.from_numpy(x).float().cuda(),
-                **self.model_cfg["sliding_window_params"],
-            )
+            # Perform the prediction
+            print("Predicting the image")
+            if "sliding_window_params" not in self.model_cfg:
+                # Initial shape (1, W, H)
+                x = torch.tensor(x)
+                x = torch.unsqueeze(x, dim=-1)
+                # Adding dimension for torchio to handle 2D data
+                # to become (1, W, H, 1)
+                x = pre_process(x)
+                # preprocessed shape (1, resized_W, resized_H, 1)
+                # The below operations are needed to reshape the data
+                # for the model
+                x = torch.unsqueeze(x, dim=0)
+                x = torch.squeeze(x, dim=-1)
+                with torch.no_grad():
+                    y_hat = self.model(x.float().cuda())
+                    pred = y_hat.cpu().detach().numpy()
+            else:
+                x = pre_process(x)
+                with torch.no_grad():
+                    y_hat = predict_piecewise(
+                        self.model,
+                        torch.from_numpy(x).float().cuda(),
+                        **self.model_cfg["sliding_window_params"],
+                    )
+                    if model_category == 'FCN':
+                        log_softmax_layer = torch.nn.LogSoftmax(dim=1)
+                        y_hat = log_softmax_layer(y_hat)
+                        y_hat = y_hat[:, 1, :, :, :]
+                        y_hat_array = y_hat.detach().cpu().numpy()
+                        pred = get_binary_map(y_hat_array, 0.1, smooth_filter_size=3)
+                    else:
+                        pred = y_hat.cpu().detach().numpy()
+
             # prepare output
             fn_core = Path(ds).stem
             suffix = self.data_cfg["output"]["suffix"]
             out_fn = (
-                Path(self.data_cfg["output"]["path"]) / f"{fn_core}_{suffix}.tiff"
+                Path(self.data_cfg["output"]["path"]) / f"{fn_core}_{suffix}.tif"
             )  # noqa E501
 
-            pred = y_hat.cpu().detach().numpy()
             if len(pred.shape) == 4:
                 OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
+                print("Saved segmented binary map !!:) ")
+
             elif len(pred.shape) == 3:
                 OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
             elif len(pred.shape) == 5:
