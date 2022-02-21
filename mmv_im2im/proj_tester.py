@@ -6,7 +6,6 @@ from pathlib import Path
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 import torch
-import numpy as np
 from torchio.data.io import check_uint_to_int
 from mmv_im2im.utils.misc import generate_test_dataset_dict, get_binary_map
 from mmv_im2im.utils.for_transform import parse_tio_ops
