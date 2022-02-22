@@ -5,7 +5,6 @@ import importlib
 import yaml
 import numpy as np
 from munch import Munch
-from scipy.ndimage import median_filter
 from aicsimageio import AICSImage
 import torchio as tio
 
@@ -217,12 +216,3 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     assert len(dataset_list) > 0, "empty dataset"
 
     return dataset_list
-
-
-def get_binary_map(data, threshold=0.1, smooth_filter_size=3):
-    assert isinstance(threshold, float), "The threshold must be of float type"
-    data[data >= -threshold] = 1.0
-    data[data < -threshold] = 0.0
-    data = median_filter(data, size=smooth_filter_size)
-    data = data.astype(float)
-    return data
