@@ -43,7 +43,7 @@ class Args(argparse.Namespace):
             action="store_true",
             help="whether to generate costmap",
         )
-        p.add_argument("--type", default="mask", help="tyep of target: mask or im")
+        p.add_argument("--type", default="mask", help="type of target: mask or im")
         p.add_argument(
             "--large", action="store_true", help="whether to generate large image"
         )
