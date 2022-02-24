@@ -3,6 +3,7 @@
 data:
   # data_path: "/mnt/data/xyz.csv"
   # data_column: "raw_path"
+  spatial_dims: 3
   input: 
     dir: "~/ambiomgroupdrive/Jianxu/data/labelfree_lamin/test_data"
     params:

@@ -5,7 +5,6 @@ import importlib
 import yaml
 import numpy as np
 from munch import Munch
-
 from aicsimageio import AICSImage
 import torchio as tio
 
