@@ -1,0 +1,83 @@
+# everything about data
+data:
+  category: "pair"
+  spatial_dims: 2
+  target_type: "Image" # "Label" or "Image
+  params:
+      data_type: "tiff"
+  target_reader_params:
+    dimension_order_out: "YX"
+    Z: 0
+    C: 0
+    T: 0
+  source_type: "Image" # "Label" or "Image
+  params:
+      data_type: "tiff"
+  source_reader_params:
+    dimension_order_out: "YX"
+    Z: 0
+    C: 0
+    T: 0
+  data_path: "/mnt/eternus/users/Sai/paired_data/pix2pix_small_dataset"
+  dataloader_params:
+    train:
+      batch_size: 4
+      pin_memory: True
+      num_workers: 1 # if dataload_path_queue is used, num_workers must be 0 here
+    val:
+      batch_size: 1
+      pin_memory: True
+      num_workers: 2   
+  train_val_ratio: 0.2
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+    # - module_name: torchio
+    #   func_name: CropOrPad
+    #   params:
+    #     target_shape: [1024, 1024, 1]
+  augmentation:
+    - module_name: torchio
+      func_name: RandomFlip
+      params:
+        axes: [1, 2]
+        flip_probability: 0.5
+  shuffle: False
+
+
+model:
+  category: pix2pixHD
+  generator_net :
+    module_name: mmv_im2im.models.pix2pixHD_generator_discriminator_2D
+    func_name: Generator
+    params: 
+      input_ch: 1
+      output_ch: 1
+      n_downsample: 4
+      n_residual: 9
+  discriminator_net:
+    module_name: mmv_im2im.models.pix2pixHD_generator_discriminator_2D
+    func_name: Discriminator
+    params:
+      input_ch: 1
+      output_ch: 1
+      n_D: 2
+  MSE_criterion:
+    module_name: torch.nn
+    func_name: MSELoss
+  FM_criterion:
+    module_name: torch.nn
+    func_name: L1Loss
+  optimizer: 
+    module_name: torch.optim
+    func_name: AdamW
+    params: 
+      lr: 0.0002
+      betas: [0.5,0.999]
+
+training:
+  params:
+    gpus: 1
+    precision: 16
+    max_epochs: 10000
+
