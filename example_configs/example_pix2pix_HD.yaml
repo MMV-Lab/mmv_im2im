@@ -18,16 +18,16 @@ data:
     Z: 0
     C: 0
     T: 0
-  data_path: "/mnt/eternus/users/Sai/paired_data/pix2pix_small_dataset"
+  data_path: "/mnt/eternus/users/Sai/paired_data/pix2pix_training_data"
   dataloader_params:
     train:
-      batch_size: 4
+      batch_size: 8
       pin_memory: True
       num_workers: 1 # if dataload_path_queue is used, num_workers must be 0 here
     val:
-      batch_size: 1
+      batch_size: 4
       pin_memory: True
-      num_workers: 2   
+      num_workers: 1   
   train_val_ratio: 0.2
   preprocess:
     - module_name: torchio
