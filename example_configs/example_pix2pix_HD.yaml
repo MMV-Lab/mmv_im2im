@@ -79,5 +79,5 @@ training:
   params:
     gpus: 1
     precision: 16
-    max_epochs: 10000
+    max_epochs: 1
 
