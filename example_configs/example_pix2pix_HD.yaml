@@ -76,6 +76,10 @@ model:
       betas: [0.5,0.999]
   sliding_window_params: None
   Lamda: 100
+  loss_function:
+    module_name: mmv_im2im.utils.pix2pix_losses
+    func_name: Pix2PixHD_loss 
+
 
 training:
   params:
