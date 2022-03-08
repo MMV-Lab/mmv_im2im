@@ -46,7 +46,7 @@ data:
 
 
 model:
-  category: pix2pixHD
+  category: pix2pix
   generator_net :
     module_name: mmv_im2im.models.pix2pixHD_generator_discriminator_2D
     func_name: Generator
@@ -74,6 +74,8 @@ model:
     params: 
       lr: 0.0002
       betas: [0.5,0.999]
+  sliding_window_params: None
+  Lamda: 100
 
 training:
   params:
