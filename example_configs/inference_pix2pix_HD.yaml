@@ -2,7 +2,7 @@ data:
   category: "pair"
   spatial_dims: 2
   input: 
-    dir: "/mnt/eternus/users/Sai/paired_data/pix2pix_small_dataset_test"
+    dir: "/mnt/eternus/users/Sai/paired_data/pix2pix_test/pix2pix_test_images"
     params:
       data_type: "tiff"
     reader_params:
@@ -11,7 +11,7 @@ data:
       C: 0
       T: 0
   output:
-    path: "/mnt/eternus/users/Sai/paired_data/pix2pix_small_dataset_pred"
+    path: "/mnt/eternus/users/Sai/paired_data/pix2pix_pred/pix2pix_test_pred"
     suffix: "pred_LMNB1"
   dataloader_params:
     batch_size: 8
@@ -45,7 +45,8 @@ model:
       output_ch: 1
       n_D: 2
   ckpt:
-    checkpoint_path: "/mnt/eternus/users/Sai/mmv_im2im_original/pix2pixHD_model_2d_600_state.ckpt"
+    checkpoint_path:  /mnt/eternus/users/Sai/mmv_im2im_original/epoch=100-step=79688.ckpt
+    # checkpoint_path: "/mnt/eternus/users/Sai/mmv_im2im_original/lightning_logs/version_82/checkpoints/epoch=98-step=78110.ckpt"
     hparams_file: "/mnt/eternus/users/Sai/mmv_im2im_original/lightning_logs/version_79/hparams.yaml"
 
 run:
