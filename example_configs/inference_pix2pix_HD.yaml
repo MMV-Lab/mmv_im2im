@@ -44,6 +44,11 @@ model:
       input_ch: 1
       output_ch: 1
       n_D: 2
+  sliding_window_params: None
+  Lamda: 100
+  loss_function:
+    module_name: mmv_im2im.utils.pix2pix_losses
+    func_name: Pix2PixHD_loss
   ckpt:
     checkpoint_path:  /mnt/eternus/users/Sai/mmv_im2im_original/epoch=100-step=79688.ckpt
     # checkpoint_path: "/mnt/eternus/users/Sai/mmv_im2im_original/lightning_logs/version_82/checkpoints/epoch=98-step=78110.ckpt"
