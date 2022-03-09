@@ -28,7 +28,7 @@ data:
       func_name: RandomFlip
 
 model:
-  category: pix2pixHD
+  category: pix2pix
   generator_net :
     module_name: mmv_im2im.models.pix2pixHD_generator_discriminator_2D
     func_name: Generator
