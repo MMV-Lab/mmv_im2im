@@ -45,7 +45,7 @@ model:
       output_ch: 1
       n_D: 2
   sliding_window_params: None
-  Lamda: 100
+  Lambda: 100
   loss_function:
     module_name: mmv_im2im.utils.pix2pix_losses
     func_name: Pix2PixHD_loss
