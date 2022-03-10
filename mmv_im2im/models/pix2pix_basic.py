@@ -1,4 +1,3 @@
-from numpy import dtype
 import torch
 from typing import Dict
 import pytorch_lightning as pl
