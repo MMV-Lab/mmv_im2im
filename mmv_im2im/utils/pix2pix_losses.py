@@ -8,7 +8,7 @@ class Pix2PixHD_loss:
         print(model_info_xx)
         self.model_dict = model_info_xx
         self.sliding_window = self.model_dict["sliding_window_params"]
-        self.Lambda = self.model_dict["Lamda"]
+        self.Lambda = self.model_dict["Lambda"]
         self.d_accuracy = 0
         self.n_D = model_info_xx["discriminator_net"]["params"]["n_D"]
         self.device = torch.device("cuda:0")
