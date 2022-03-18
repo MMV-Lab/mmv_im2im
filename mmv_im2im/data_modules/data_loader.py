@@ -19,7 +19,7 @@ from torch.utils.data import random_split, DataLoader
 import torchio as tio
 import sys
 import pytorch_lightning as pl
-from mmv_im2im.utils.for_transform import parse_tio_ops
+from mmv_im2im.utils.for_transform import parse_tio_ops #, custom_preproc_to_tio
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 import random
 import logging
@@ -43,9 +43,40 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.train_val_ratio = data_cfg["train_val_ratio"] or 0.2
         self.train_set = None
         self.val_set = None
+        
         # transformation
+        ######## This approach works only for <=1 custom preproc steps
+        for idx in range(len(data_cfg["preprocess"])): # To ensure that all custom preprocessing steps are available for torchio.Lambda  
+            if "Lambda" in data_cfg["preprocess"][idx]["func_name"]: 
+                name_function = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[1]
+                name_module = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[0]
+                self.custom_preproc = import_module(name_module)
+                print("Apply custom preprocessing " + data_cfg["preprocess"][idx]["params"]["function"])
+                data_cfg["preprocess"][idx]["params"]["function"] = eval("self.custom_preproc." + name_function)     
+
+
+
+        ###### Here I am not sure how to modify that every element in custom_func list is callable from data_cfg["preprocess"][idx]["params"]["function"] in line 80
+        '''
+        import pdb
+        pdb.set_trace()
+        custom_func = []
+        for idx in range(len(data_cfg["preprocess"])):
+            if "Lambda" in data_cfg["preprocess"][idx]["func_name"]:
+                name_function = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[1]
+                name_module = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[0]
+                custom_preproc = import_module(name_module)
+                custom_func.append(getattr(custom_preproc, name_function))
+                print("Apply custom preprocessing " + data_cfg["preprocess"][idx]["params"]["function"])
+                #data_cfg["preprocess"][idx]["params"]["function"] = eval("custom_preproc." + name_function)   #### sth. in the sense of data_cfg[]... = custom_func[idx]  is required here 
+        pdb.set_trace()
+        '''
+
         if "preprocess" in data_cfg:
+            #data_cfg["preprocess"], self.custom_preproc = custom_preproc_to_tio(data_cfg["preprocess"])
             self.preproc = parse_tio_ops(data_cfg["preprocess"])
+            #if len(custom_func > 0):
+            #    self.preproc = tio.Compose([self.preproc), ## loop custom_func )
         else:
             self.preproc = None
 
@@ -130,6 +161,8 @@ class Im2ImDataModule(pl.LightningDataModule):
         num_train_subjects = num_subjects - num_val_subjects
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
+        import pdb
+        pdb.set_trace()
         self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
         train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
         if self.patch_loader:
