@@ -56,7 +56,7 @@ class Im2ImDataModule(pl.LightningDataModule):
 
 
 
-        ###### Here I am not sure how to modify that every element in custom_func list is callable from data_cfg["preprocess"][idx]["params"]["function"] in line 80
+        ###### Here I am not sure how to modify that every element in custom_func list is callable from data_cfg["preprocess"][idx]["params"]["function"] in line 71
         '''
         import pdb
         pdb.set_trace()
