@@ -46,7 +46,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         
         # transformation
         ######## This approach works only for <=1 custom preproc steps
-        for idx in range(len(data_cfg["preprocess"])): # To ensure that all custom preprocessing steps are available for torchio.Lambda  
+        for idx in range(len(data_cfg["preprocess"])): # To ensure that all custom preprocessing steps are imported and available for torchio.Lambda  
             if "Lambda" in data_cfg["preprocess"][idx]["func_name"]: 
                 name_function = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[1]
                 name_module = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[0]
