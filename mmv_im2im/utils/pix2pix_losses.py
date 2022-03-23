@@ -5,7 +5,6 @@ from mmv_im2im.models.pix2pixHD_generator_discriminator_2D import _get_grid
 
 class Pix2PixHD_loss:
     def __init__(self, model_info_xx):
-        print(model_info_xx)
         self.model_dict = model_info_xx
         self.sliding_window = self.model_dict["sliding_window_params"]
         self.Lambda = self.model_dict["Lambda"]
@@ -16,13 +15,11 @@ class Pix2PixHD_loss:
     def _get_generator_loss(self, discriminator_model, image_A, image_B, fake_image):
         assert image_A.size() == image_B.size()
         self.dtype = image_A.dtype
-        print("Estimating the loss for 2D images with pix2pixHD model")
         MSE_criterion = parse_config(self.model_dict["MSE_criterion"])
         FMcriterion = parse_config(self.model_dict["FM_criterion"])
         self.n_D = self.model_dict["discriminator_net"]["params"]["n_D"]
         loss_G = 0
         loss_G_FM = 0
-        print(next(discriminator_model.parameters()).is_cuda)
         real_features = discriminator_model(torch.cat((image_A, image_B), dim=1))
         fake_features = discriminator_model(torch.cat((image_A, fake_image), dim=1))
         for i in range(self.n_D):

@@ -18,12 +18,11 @@ class Model(pl.LightningModule):
         self.generator_model = parse_config(model_info_xx["generator_net"])
         self.discriminator_model = parse_config(model_info_xx["discriminator_net"])
         self.sliding_window = model_info_xx["sliding_window_params"]
-        self.loss_func = parse_config_func_without_params(
-            model_info_xx["loss_function"]
-        )
-        self.loss_evaluator = self.loss_func(model_info_xx)
         if train:
             self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
+            self.loss_func = parse_config_func_without_params(model_info_xx["loss_function"])
+            self.loss_evaluator = self.loss_func(model_info_xx)
+            # self.save_checkpoint_n_epochs = 25
 
     def forward(self, x):
         x = self.generator_model(x)
@@ -91,7 +90,6 @@ class Model(pl.LightningModule):
         image_A = batch["source"][tio.DATA]
         image_B = batch["target"][tio.DATA]
         if image_A.size()[-1] == 1:
-            print("The image is 2D")
             image_A = torch.squeeze(image_A, dim=-1)
             image_B = torch.squeeze(image_B, dim=-1)
             fake_image = self(image_A)
@@ -163,6 +161,10 @@ class Model(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         loss_dictionary = self.run_step(batch, batch_idx)
+        # if self.current_epoch % (self.save_checkpoint_n_epochs) == 0:
+        #     self.trainer.save_checkpoint(
+        #         f"pix2pixHD_model_batch_size_2_1_Lambda_10_{self.current_epoch}_with_gen_loss_{loss_dictionary['generator_loss']}_state.ckpt"
+        #     )
         return loss_dictionary
 
     def validation_epoch_end(self, val_step_outputs):
