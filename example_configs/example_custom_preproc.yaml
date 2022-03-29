@@ -40,10 +40,9 @@ data:
       num_workers: 1
   train_val_ratio: 0.1
   preprocess:
-    - module_name: torchio
-      func_name: Lambda   # custom preprocessing needs to be applicable to torchio.Lambda : https://torchio.readthedocs.io/transforms/others.html
-      params: 
-        function: mmv_im2im.preprocessing.transforms.norm_around_center
+    - module_name:  mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
+      types_to_apply: [torchio.INTENSITY]  # or torchio.LABEL or skip this
     - module_name: torchio
       func_name: ZNormalization      
   augmentation:

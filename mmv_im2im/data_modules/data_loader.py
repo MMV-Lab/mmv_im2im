@@ -44,6 +44,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.train_set = None
         self.val_set = None
         
+        """
         # transformation
         ######## This approach works only for <=1 custom preproc steps
         for idx in range(len(data_cfg["preprocess"])): # To ensure that all custom preprocessing steps are imported and available for torchio.Lambda  
@@ -53,7 +54,7 @@ class Im2ImDataModule(pl.LightningDataModule):
                 self.custom_preproc = import_module(name_module)
                 print("Apply custom preprocessing " + data_cfg["preprocess"][idx]["params"]["function"])
                 data_cfg["preprocess"][idx]["params"]["function"] = eval("self.custom_preproc." + name_function)     
-
+        """
 
 
         ###### Here I am not sure how to modify that every element in custom_func list is callable from data_cfg["preprocess"][idx]["params"]["function"] in line 71
