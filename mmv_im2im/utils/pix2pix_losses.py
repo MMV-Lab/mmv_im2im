@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import torch
-from torch.nn import MSELoss, L1Loss
 from mmv_im2im.utils.misc import parse_config
 from mmv_im2im.models.pix2pixHD_generator_discriminator_2D import _get_grid
 
