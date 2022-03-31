@@ -11,13 +11,15 @@ import torch
 import torch.nn as nn
 
 """
-Pix2PixHD is a popular deep learning methods that has proven to be effective 
+Pix2PixHD is a popular deep learning methods that has proven to be effective
 for translating high resolution images. It consists of two major networks.
-They are generator network and discriminator network. The generator tries to produce 
-realistic output from input. The discriminator tries to distingush the more realistic pair
-between the real pair and generated pair. It consistes of multiscale discriminator architecture
-which have identical structure but operate at different scales and different image sizes. The real
-pair consists of real input and a real target. The generated pair consists of real input and 
+They are generator network and discriminator network. The generator tries to
+produce realistic output from input. The discriminator tries to distingush
+the more realistic pair between the real pair and generated pair.
+It consistes of multiscale discriminator architecture which have
+identical structure but operate at different scales and different
+image sizes. The real pair consists of real input and a real target.
+The generated pair consists of real input and
 generated output.
 """
 
@@ -70,11 +72,13 @@ def _get_pad_layer(type):
 
 
 """
-The generator consists of encoder, decoder along with residual block. The encoder block extracts the 
-required features from the input image, downsamples the feature maps to half
-and increase the number of weights to almost twice. The decoder aims at restoring the reduced dimension to the original
-image. To ensure that there are enough number of learnable parameters, residual blocks are used 
-between encoder and decoder. 
+The generator consists of encoder, decoder along with residual block.
+The encoder block extracts the required features from the input image,
+downsamples the feature maps to half and increase the number of
+weights to almost twice. The decoder aims at restoring the reduced
+dimension to the original image. To ensure that there are
+enough number of learnable parameters, residual blocks are used
+between encoder and decoder.
 Description of paramaters:
 
 input_ch: Number of input channels
