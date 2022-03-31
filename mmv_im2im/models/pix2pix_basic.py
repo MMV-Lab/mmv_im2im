@@ -24,7 +24,6 @@ class Model(pl.LightningModule):
                 model_info_xx["loss_function"]
             )
             self.loss_evaluator = self.loss_func(model_info_xx)
-            self.save_checkpoint_n_epochs = 50
 
     def forward(self, x):
         x = self.generator_model(x)
@@ -178,7 +177,3 @@ class Model(pl.LightningModule):
         )
         self.log("val_loss_generator", val_gen_loss)
         self.log("val_loss_discriminator", val_disc_loss)
-        if self.current_epoch % (self.save_checkpoint_n_epochs) == 0:
-            self.trainer.save_checkpoint(
-                f"pix2pix_HD_Lambda_10_batch_8_4_epoch_{self.current_epoch}_with_val_gen_loss{val_gen_loss}.ckpt"
-            )
