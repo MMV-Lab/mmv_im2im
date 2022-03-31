@@ -25,8 +25,12 @@ class Pix2PixHD_loss:
     def _get_generator_loss(self, discriminator_model, image_A, image_B, fake_image):
         assert image_A.size() == image_B.size()
         self.dtype = image_A.dtype
-        MSE_criterion = parse_config(self.model_dict["loss_function"]["params"]["MSE_criterion"])
-        L1_criterion = parse_config(self.model_dict["loss_function"]["params"]["L1_criterion"])
+        MSE_criterion = parse_config(
+            self.model_dict["loss_function"]["params"]["MSE_criterion"]
+        )
+        L1_criterion = parse_config(
+            self.model_dict["loss_function"]["params"]["L1_criterion"]
+        )
         self.n_D = self.model_dict["discriminator_net"]["params"]["n_D"]
         loss_G = 0
         loss_G_FM = 0
@@ -47,7 +51,9 @@ class Pix2PixHD_loss:
     ):
         assert image_A.size() == image_B.size()
         self.dtype = image_A.dtype
-        MSE_criterion = parse_config(self.model_dict["loss_function"]["params"]["MSE_criterion"])
+        MSE_criterion = parse_config(
+            self.model_dict["loss_function"]["params"]["MSE_criterion"]
+        )
         loss_D = 0
         real_features = discriminator_model(torch.cat((image_A, image_B), dim=1))
         fake_features = discriminator_model(
