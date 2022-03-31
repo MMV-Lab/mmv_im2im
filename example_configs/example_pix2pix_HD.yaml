@@ -18,7 +18,7 @@ data:
     Z: 0
     C: 0
     T: 0
-  data_path: "/mnt/eternus/users/Sai/paired_data/pix2pix_small_dataset"
+  data_path: "/mnt/eternus/users/Sai/paired_data/pix2pix_training_data"
   dataloader_params:
     train:
       batch_size: 8
@@ -32,10 +32,6 @@ data:
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
-    # - module_name: torchio
-    #   func_name: CropOrPad
-    #   params:
-    #     target_shape: [1024, 1024, 1]
   augmentation:
     - module_name: torchio
       func_name: RandomFlip
@@ -65,7 +61,7 @@ model:
   MSE_criterion:
     module_name: torch.nn
     func_name: MSELoss
-  FM_criterion:
+  L1_criterion:
     module_name: torch.nn
     func_name: L1Loss
   optimizer: 
@@ -85,16 +81,5 @@ training:
   params:
     gpus: 1
     precision: 16
-    max_epochs: 4
-callbacks: 
-  - module_name: pytorch_lightning.callbacks.model_checkpoint
-    func_name: ModelCheckpoint
-    params:
-      monitor: 'val_loss_generator'
-      filename: '{epoch}-{val_loss_generator:.4f}'
-      period: 2
-      save_top_k: -1
-      # save_weights_only: True 
-
-
+    max_epochs: 200
 

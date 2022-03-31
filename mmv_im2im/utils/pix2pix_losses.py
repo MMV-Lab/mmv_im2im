@@ -1,6 +1,15 @@
+# -*- coding: utf-8 -*-
+
 import torch
 from mmv_im2im.utils.misc import parse_config
 from mmv_im2im.models.pix2pixHD_generator_discriminator_2D import _get_grid
+
+# Objective (Loss) functions
+
+
+# The loss configuration of the objective functions
+
+# Total loss = ( LSGAN loss ) + ( lambda_FM ) * ( Feature Matching loss )
 
 
 class Pix2PixHD_loss:
@@ -16,7 +25,7 @@ class Pix2PixHD_loss:
         assert image_A.size() == image_B.size()
         self.dtype = image_A.dtype
         MSE_criterion = parse_config(self.model_dict["MSE_criterion"])
-        FMcriterion = parse_config(self.model_dict["FM_criterion"])
+        FMcriterion = parse_config(self.model_dict["L1_criterion"])
         self.n_D = self.model_dict["discriminator_net"]["params"]["n_D"]
         loss_G = 0
         loss_G_FM = 0

@@ -11,7 +11,7 @@ data:
       C: 0
       T: 0
   output:
-    path: "/mnt/eternus/users/Sai/paired_data/pix2pix_pred/pix2pixHD_results_Lambda_100_batch_size_8_4_317_epochs/pix2pix_test_pred"
+    path: "/mnt/eternus/users/Sai/paired_data/pix2pix_pred/pix2pixHD_results_116_hard_example_mining/pix2pix_test_pred"
     suffix: "pred_p2p_DCE"
   dataloader_params:
     batch_size: 8
@@ -19,10 +19,6 @@ data:
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
-    # - module_name: torchio
-    #   func_name: CropOrPad
-    #   params:
-    #     target_shape: [1024, 1024, 1]
   augmentation:
     - module_name: torchio
       func_name: RandomFlip
@@ -44,14 +40,9 @@ model:
       input_ch: 1
       output_ch: 1
       n_D: 2
-  # sliding_window_params: None
-  # Lambda: 10
-  # loss_function:
-  #   module_name: mmv_im2im.utils.pix2pix_losses
-  #   func_name: Pix2PixHD_loss
+  sliding_window_params: None
   ckpt:
-    checkpoint_path:  /mnt/eternus/users/Sai/mmv_im2im_original/pix2pixHD_model_batch_size_8_4_Lambda_100_epoch_317.ckpt
-    # checkpoint_path: "/mnt/eternus/users/Sai/mmv_im2im_original/lightning_logs/version_82/checkpoints/epoch=199-step=157799.ckpt"
+    checkpoint_path:  /mnt/eternus/users/Sai/mmv_im2im_original/pix2pix_HD_instance_norm_hard_example_mining_epoch_116.ckpt
     hparams_file: "/mnt/eternus/users/Sai/mmv_im2im_original/lightning_logs/version_79/hparams.yaml"
 
 run:

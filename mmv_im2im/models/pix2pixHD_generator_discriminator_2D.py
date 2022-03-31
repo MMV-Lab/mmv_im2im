@@ -1,6 +1,25 @@
+# -*- coding: utf-8 -*-
+# Adapted from https://github.com/JeongHyunJin/Pix2PixHD/blob/main/Pix2PixHD_Networks.py
+# References:
+# 1) https://github.com/JeongHyunJin/Jeong2020_SolarFarsideMagnetograms
+# 2) https://iopscience.iop.org/article/10.3847/2041-8213/abc255
+# 3) https://iopscience.iop.org/article/10.3847/2041-8213/ab9085
+
+
 from functools import partial
 import torch
 import torch.nn as nn
+
+"""
+Pix2PixHD is a popular deep learning methods that has proven to be effective 
+for translating high resolution images. It consists of two major networks.
+They are generator network and discriminator network. The generator tries to produce 
+realistic output from input. The discriminator tries to distingush the more realistic pair
+between the real pair and generated pair. It consistes of multiscale discriminator architecture
+which have identical structure but operate at different scales and different image sizes. The real
+pair consists of real input and a real target. The generated pair consists of real input and 
+generated output.
+"""
 
 # [1] True or False grid
 
@@ -48,6 +67,22 @@ def _get_pad_layer(type):
         )
 
     return layer
+
+
+"""
+The generator consists of encoder, decoder along with residual block. The encoder block extracts the 
+required features from the input image, downsamples the feature maps to half
+and increase the number of weights to almost twice. The decoder aims at restoring the reduced dimension to the original
+image. To ensure that there are enough number of learnable parameters, residual blocks are used 
+between encoder and decoder. 
+Description of paramaters:
+
+input_ch: Number of input channels
+output_ch: Number of output channels
+n_downsample: Number of down samples in the encoder block
+n_residual: Number of residual blocks
+n_gf: number of layers in the first layer of generator
+"""
 
 
 class Generator(nn.Module):
@@ -183,6 +218,17 @@ class PatchDiscriminator(nn.Module):
         return result[1:]  # except for the input
 
 
+"""
+Discriminator consists of several convolutional layers and pix2pixHD uses more than 
+one discriminator. In discriminator features are passed through convolutional layers
+derived as a probability between 0 and 1.
+Description of parameters:
+
+n_D: number of discriminators
+n_df: number of channels in the first layer of discriminator
+"""
+
+
 class Discriminator(nn.Module):
     def __init__(self, input_ch, output_ch, n_D=2, n_df=64):
         super(Discriminator, self).__init__()
@@ -204,20 +250,3 @@ class Discriminator(nn.Module):
                     kernel_size=3, padding=1, stride=2, count_include_pad=False
                 )(x)
         return result
-
-
-# def test():
-
-#     input_nc = 1
-#     output_nc = 1
-#     image_size = 1024
-#     input1 = torch.randn(1, input_nc, image_size, image_size)
-#     generator_model = Generator(input_ch=1, output_ch=1)
-#     discriminator_model = Discriminator(input_ch=1, output_ch=1)
-#     preds = generator_model(input1)
-#     discriminator_preds = discriminator_model(preds)
-#     print(preds.shape)
-#     print(discriminator_preds))
-
-# if __name__ == "__main__":
-#     test()
