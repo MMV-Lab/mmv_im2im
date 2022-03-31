@@ -58,12 +58,6 @@ model:
       input_ch: 1
       output_ch: 1
       n_D: 2
-  MSE_criterion:
-    module_name: torch.nn
-    func_name: MSELoss
-  L1_criterion:
-    module_name: torch.nn
-    func_name: L1Loss
   optimizer: 
     module_name: torch.optim
     func_name: AdamW
@@ -74,7 +68,14 @@ model:
   Lambda: 10
   loss_function:
     module_name: mmv_im2im.utils.pix2pix_losses
-    func_name: Pix2PixHD_loss 
+    func_name: Pix2PixHD_loss
+    params:
+      MSE_criterion:
+        module_name: torch.nn
+        func_name: MSELoss
+      L1_criterion:
+        module_name: torch.nn
+        func_name: L1Loss
 
 
 training:

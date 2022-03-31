@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import torch
+from torch.nn import MSELoss, L1Loss
 from mmv_im2im.utils.misc import parse_config
 from mmv_im2im.models.pix2pixHD_generator_discriminator_2D import _get_grid
 
@@ -24,8 +25,8 @@ class Pix2PixHD_loss:
     def _get_generator_loss(self, discriminator_model, image_A, image_B, fake_image):
         assert image_A.size() == image_B.size()
         self.dtype = image_A.dtype
-        MSE_criterion = parse_config(self.model_dict["MSE_criterion"])
-        FMcriterion = parse_config(self.model_dict["L1_criterion"])
+        MSE_criterion = parse_config(self.model_dict["loss_function"]["params"]["MSE_criterion"])
+        L1_criterion = parse_config(self.model_dict["loss_function"]["params"]["L1_criterion"])
         self.n_D = self.model_dict["discriminator_net"]["params"]["n_D"]
         loss_G = 0
         loss_G_FM = 0
@@ -37,7 +38,7 @@ class Pix2PixHD_loss:
             )
         loss_G += MSE_criterion(fake_features[i][-1], real_grid)
         for j in range(len(fake_features[0])):
-            loss_G_FM += FMcriterion(fake_features[i][j], real_features[i][j].detach())
+            loss_G_FM += L1_criterion(fake_features[i][j], real_features[i][j].detach())
         loss_G += loss_G_FM * (1.0 / self.n_D) * self.Lambda
         return loss_G
 
@@ -46,7 +47,7 @@ class Pix2PixHD_loss:
     ):
         assert image_A.size() == image_B.size()
         self.dtype = image_A.dtype
-        MSE_criterion = parse_config(self.model_dict["MSE_criterion"])
+        MSE_criterion = parse_config(self.model_dict["loss_function"]["params"]["MSE_criterion"])
         loss_D = 0
         real_features = discriminator_model(torch.cat((image_A, image_B), dim=1))
         fake_features = discriminator_model(
