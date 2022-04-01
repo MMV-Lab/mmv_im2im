@@ -36,6 +36,22 @@ mmv\_im2im.models.layers\_and\_blocks module
    :undoc-members:
    :show-inheritance:
 
+mmv\_im2im.models.pix2pixHD\_generator\_discriminator\_2D module
+----------------------------------------------------------------
+
+.. automodule:: mmv_im2im.models.pix2pixHD_generator_discriminator_2D
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.pix2pix\_basic module
+---------------------------------------
+
+.. automodule:: mmv_im2im.models.pix2pix_basic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

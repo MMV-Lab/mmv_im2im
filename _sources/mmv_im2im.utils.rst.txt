@@ -28,6 +28,14 @@ mmv\_im2im.utils.piecewise\_inference module
    :undoc-members:
    :show-inheritance:
 
+mmv\_im2im.utils.pix2pix\_losses module
+---------------------------------------
+
+.. automodule:: mmv_im2im.utils.pix2pix_losses
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
