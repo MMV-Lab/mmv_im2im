@@ -9,31 +9,22 @@ from mmv_im2im.utils.misc import (
     parse_config_func_without_params,
 )
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
+from mmv_im2im.models.basic_FCN import Model as basicModel 
 
 
-class Model(pl.LightningModule):
+class Model(basicModel):
     def __init__(self, model_info_xx: Dict, train: bool = True):
         super().__init__()
         self.net = parse_config(model_info_xx["net"])
-        self.sliding_window = model_info_xx["sliding_window_params"]
+
+        if "sliding_window_params" in model_info_xx:
+            print("sliding window parameters are detected, but not needed for embedseg")
         self.model_info = model_info_xx
         if train:
             self.criterion = parse_config(model_info_xx["criterion"])
             self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
 
-    def configure_optimizers(self):
-        # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
-        optimizer = self.optimizer_func(self.parameters())
-        if "scheduler" in self.model_info:
-            scheduler_func = parse_config_func_without_params(
-                self.model_info["scheduler"]
-            )
-            lr_scheduler = scheduler_func(
-                optimizer, **self.model_info["scheduler"]["params"]
-            )
-            return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
-        else:
-            return optimizer
+    # configure_optimizers, inherent from basicModel
 
     def prepare_batch(self, batch):
         return
