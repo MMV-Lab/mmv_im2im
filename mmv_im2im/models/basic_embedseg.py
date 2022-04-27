@@ -9,7 +9,7 @@ from mmv_im2im.utils.misc import (
     parse_config_func_without_params,
 )
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
-from mmv_im2im.models.basic_FCN import Model as basicModel 
+from mmv_im2im.models.basic_FCN import Model as basicModel
 
 
 class Model(basicModel):
@@ -61,17 +61,34 @@ class Model(basicModel):
             x = torch.squeeze(x, dim=-1)
             y = torch.squeeze(y, dim=-1)
 
-        im = batch["source"][tio.DATA] # BCZYX
-        instances = batch["target"][tio.DATA]  #.squeeze(1)? # BZYX
+        im = batch["source"][tio.DATA]  # BCZYX
+        instances = batch["target"][tio.DATA]  # .squeeze(1)? # BZYX
         class_labels = batch["class_image"][tio.DATA]  # squeeze(1) # BZYX
         center_images = batch["center_image"][tio.DATA]  # squeeze(1) # BZYX
         output = self(im)
 
         if costmap is None:
-            #loss = self.criterion(y_hat, y)
-            loss = self.criterion(output, instances, class_labels, center_images, **args, iou=True, iou_meter=iou_meter)
+            # loss = self.criterion(y_hat, y)
+            loss = self.criterion(
+                output,
+                instances,
+                class_labels,
+                center_images,
+                **args,
+                iou=True,
+                iou_meter=iou_meter
+            )
         else:
-            loss = self.criterion(output, instances, class_labels, center_images, costmap, **args, iou=True, iou_meter=iou_meter)
+            loss = self.criterion(
+                output,
+                instances,
+                class_labels,
+                center_images,
+                costmap,
+                **args,
+                iou=True,
+                iou_meter=iou_meter
+            )
         # loss = loss.mean()  #TODO
 
         return loss, output

@@ -9,17 +9,16 @@ import mmv_im2im.models.erfnet as erfnet
 
 
 class BranchedERFNet(nn.Module):
-    def __init__(self, num_classes, input_channels = 1, encoder=None):
+    def __init__(self, num_classes, input_channels=1, encoder=None):
         super().__init__()
 
-        print('Creating branched erfnet with {} classes'.format(num_classes))
-        
-        if (encoder is None):
+        print("Creating branched erfnet with {} classes".format(num_classes))
+
+        if encoder is None:
             self.encoder = erfnet.Encoder(sum(num_classes), input_channels)
-            
+
         else:
             self.encoder = encoder
-            
 
         self.decoders = nn.ModuleList()
         for n in num_classes:
@@ -28,14 +27,13 @@ class BranchedERFNet(nn.Module):
     def init_output(self, n_sigma=1):
         with torch.no_grad():
             output_conv = self.decoders[0].output_conv
-            print('Initialize last layer with size: ',
-                  output_conv.weight.size())
-            print('*************************')
+            print("Initialize last layer with size: ", output_conv.weight.size())
+            print("*************************")
             output_conv.weight[:, 0:2, :, :].fill_(0)
             output_conv.bias[0:2].fill_(0)
 
-            output_conv.weight[:, 2:2+n_sigma, :, :].fill_(0)
-            output_conv.bias[2:2+n_sigma].fill_(1)
+            output_conv.weight[:, 2 : 2 + n_sigma, :, :].fill_(0)
+            output_conv.bias[2 : 2 + n_sigma].fill_(1)
 
     def forward(self, input, only_encode=False):
         if only_encode:
