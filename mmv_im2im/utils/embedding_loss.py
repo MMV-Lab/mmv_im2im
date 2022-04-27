@@ -57,8 +57,6 @@ class SpatialEmbLoss_3d(nn.Module):
         w_inst=1,
         w_var=10,
         w_seed=1,
-        iou=False,
-        iou_meter=None,
     ):
 
         # instances B 1 Z Y X
@@ -136,8 +134,7 @@ class SpatialEmbLoss_3d(nn.Module):
                 )
 
                 # calculate instance iou
-                if iou:
-                    iou_meter.update(calculate_iou(dist > 0.5, in_mask))
+                # iou_instance = calculate_iou(dist > 0.5, in_mask)
 
                 obj_count += 1
 
@@ -193,8 +190,6 @@ class SpatialEmbLoss_2D(nn.Module):
         w_inst=1,
         w_var=10,
         w_seed=1,
-        iou=False,
-        iou_meter=None,
     ):
 
         # instances B 1 Y X
@@ -276,8 +271,7 @@ class SpatialEmbLoss_2D(nn.Module):
                 )
 
                 # calculate instance iou
-                if iou:
-                    iou_meter.update(calculate_iou(dist > 0.5, in_mask))
+                # iou_instance = calculate_iou(dist > 0.5, in_mask)
 
                 obj_count += 1
 

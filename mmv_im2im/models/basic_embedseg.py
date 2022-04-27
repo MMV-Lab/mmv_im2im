@@ -67,6 +67,7 @@ class Model(basicModel):
         center_images = batch["center_image"][tio.DATA]  # squeeze(1) # BZYX
         output = self(im)
 
+        # TODO: need to handle args, try to receive the args in the definition step
         if costmap is None:
             # loss = self.criterion(y_hat, y)
             loss = self.criterion(
@@ -74,9 +75,7 @@ class Model(basicModel):
                 instances,
                 class_labels,
                 center_images,
-                **args,
-                iou=True,
-                iou_meter=iou_meter
+                **args
             )
         else:
             loss = self.criterion(
@@ -85,46 +84,21 @@ class Model(basicModel):
                 class_labels,
                 center_images,
                 costmap,
-                **args,
-                iou=True,
-                iou_meter=iou_meter
+                **args
             )
-        # loss = loss.mean()  #TODO
+        
+        loss = loss.mean()
 
-        return loss, output
+        return loss
 
     def training_step(self, batch, batch_idx):
-        loss, y_hat = self.run_step(batch, validation_stage=False)
+        loss = self.run_step(batch, validation_stage=False)
         self.log("train_loss", loss, prog_bar=True)
-        """
-        src = batch["source"][tio.DATA]
-        tar = batch["target"][tio.DATA]
-        from tifffile import imsave
-        from random import randint
-        fn_rand = randint(100,900)
-        imsave("./train_src_"+str(fn_rand)+".tiff", src[0,0,].cpu().numpy())
-        imsave("./train_tar_"+str(fn_rand)+".tiff", tar[0,0,].cpu().numpy())
-        # tensorboard = self.logger.experiment
-        # tensorboard.add_image("train_source", src)
-        # tensorboard.add_image("train_target", tar)
-        # tensorboard.add_image("train_predict", y_hat)
-        """
+
         return loss
 
     def validation_step(self, batch, batch_idx):
-        loss, y_hat = self.run_step(batch, validation_stage=True)
+        loss = self.run_step(batch, validation_stage=True)
         self.log("val_loss", loss)
-        """
-        src = batch["source"][tio.DATA]
-        tar = batch["target"][tio.DATA]
-        from tifffile import imsave
-        from random import randint
-        fn_rand = randint(100,900)
-        imsave("./val_src_"+str(fn_rand)+".tiff", src[0,0,].cpu().numpy())
-        imsave("./val_tar_"+str(fn_rand)+".tiff", tar[0,0,].cpu().numpy())
-        # tensorboard = self.logger.experiment
-        # tensorboard.add_image("val_source", src)
-        # tensorboard.add_image("val_target", tar)
-        # tensorboard.add_image("val_predict", y_hat)
-        """
+
         return loss
