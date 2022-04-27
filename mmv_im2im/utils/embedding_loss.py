@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from EmbedSeg.criterions.lovasz_losses import lovasz_hinge
+from mmv_im2im.utils.lovasz_losses import lovasz_hinge
 
 
 class SpatialEmbLoss_3d(nn.Module):
@@ -289,6 +289,7 @@ class SpatialEmbLoss_2D(nn.Module):
 
             loss += w_inst * instance_loss + w_var * var_loss + w_seed * seed_loss
 
+        # The sum of the losses of all the instances in the batch.
         loss = loss / (b + 1)
 
         return loss + prediction.sum() * 0
