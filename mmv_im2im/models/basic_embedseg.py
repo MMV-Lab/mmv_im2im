@@ -61,23 +61,20 @@ class Model(basicModel):
             x = torch.squeeze(x, dim=-1)
             y = torch.squeeze(y, dim=-1)
 
-        if validation_stage:
-            y_hat = predict_piecewise(
-                self,
-                x[
-                    0,
-                ],
-                **self.sliding_window
-            )
-        else:
-            y_hat = self(x)
+        im = batch["source"][tio.DATA] # BCZYX
+        instances = batch["target"][tio.DATA]  #.squeeze(1)? # BZYX
+        class_labels = batch["class_image"][tio.DATA]  # squeeze(1) # BZYX
+        center_images = batch["center_image"][tio.DATA]  # squeeze(1) # BZYX
+        output = self(im)
 
         if costmap is None:
-            loss = self.criterion(y_hat, y)
+            #loss = self.criterion(y_hat, y)
+            loss = self.criterion(output, instances, class_labels, center_images, **args, iou=True, iou_meter=iou_meter)
         else:
-            loss = self.criterion(y_hat, y, costmap)
+            loss = self.criterion(output, instances, class_labels, center_images, costmap, **args, iou=True, iou_meter=iou_meter)
+        # loss = loss.mean()  #TODO
 
-        return loss, y_hat
+        return loss, output
 
     def training_step(self, batch, batch_idx):
         loss, y_hat = self.run_step(batch, validation_stage=False)
