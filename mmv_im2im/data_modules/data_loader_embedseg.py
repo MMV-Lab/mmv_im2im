@@ -16,6 +16,7 @@ import sys
 import pytorch_lightning as pl
 from mmv_im2im.utils.for_transform import parse_tio_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
+
 import random
 import logging
 
@@ -28,7 +29,6 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.source_type = data_cfg["source_type"]
         self.target_reader_param = data_cfg["target_reader_params"]
         self.source_reader_param = data_cfg["source_reader_params"]
-        self.center_reader_param = data_cfg["center_reader_params"]
         self.data_path = data_cfg["data_path"]
         self.category = data_cfg["category"]
 
@@ -85,16 +85,33 @@ class Im2ImDataModule(pl.LightningDataModule):
 
         target_reader = partial(aicsimageio_reader, **self.target_reader_param)
         source_reader = partial(aicsimageio_reader, **self.source_reader_param)
-        center_reader = partial(aicsimageio_reader, **self.center_reader_param)
 
         self.subjects = []
         for ds in dataset_list:
             subject = tio.Subject(
                 source=tio.ScalarImage(ds["source_fn"], reader=source_reader),
                 target=tio.LabelMap(ds["target_fn"], reader=target_reader),
-                center=tio.LabelMap(ds["center_fn"], reader=center_reader),
             )
             # TODO: costmap support?
+
+            # generate center image
+            # TODO: add center image to subject
+            instance = subject["target"][tio.DATA]
+
+            instance = fill_label_holes(instance)
+
+            object_mask = instance_np > 0
+
+            ids = np.unique(instance_np[object_mask])
+            ids = ids[ids != 0]
+            center_image = generate_center_image_3d(
+                instance_label,
+                "Centroid",
+                ids,
+                one_hot=one_hot,
+                anisotropy_factor=anisotropy_factor,
+                speed_up=speed_up,
+            )
 
             # generate label image
             # TODO: convert target into bindary label and add the subject
@@ -110,4 +127,6 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
         self.train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
         if self.patch_loader:
-            raise NotImplementedError("patch sampler is not implemented for embedseg yet")
+            raise NotImplementedError(
+                "patch sampler is not implemented for embedseg yet"
+            )

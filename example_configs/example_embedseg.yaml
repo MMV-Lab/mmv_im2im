@@ -1,0 +1,82 @@
+
+# everything about data
+data:
+  category: "embedseg"
+  target_type: "Label"
+  target_reader_params:
+    dimension_order_out: "ZYX"
+    C: 0
+    T: 0
+  source_type: "Image"
+  source_reader_params:
+    dimension_order_out: "ZYX"
+    C: 0
+    T: 0
+  # data_path: "/mnt/data/xyz.csv"
+  data_path: "~/ambiomgroupdrive/Jianxu/data/cells/training"
+  # data_path:
+  #   source_path:
+  #   target_path:
+  #   costmap_path: optional
+  #   image_type: "tiff"
+  dataloader_params:
+    train:
+      batch_size: 4
+      pin_memory: True
+      num_workers: 4
+    val:
+      batch_size: 1
+      num_workers: 1
+  train_val_ratio: 0.1
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+  augmentation:
+    - module_name: torchio
+      func_name: RandomFlip
+      params:
+        axes: (1, 2)
+        flip_probability: 0.5
+    - module_name: torchio
+      func_name: RandomAffine
+      params:
+        degrees: [0, 0, 0, 90, 0, 90]
+        p: 0.5
+# model
+model:
+  category: FCN
+  net:
+    module_name: mmv_im2im.models.BranchedERFNet_3d
+    func_name: BranchedERFNet_3d
+    params:
+      num_classes: 1 
+      input_channels: 1
+  criterion:
+    module_name: mmv_im2im.utils.embedding_loss
+    func_name: SpatialEmbLoss_2D
+    params:
+      grid_z: 32
+      grid_y: 1024
+      grid_x: 1024
+      pixel_z: 1
+      pixel_y: 1
+      pixel_x: 1
+      n_sigma: 3
+      foreground_weight: 1
+  optimizer:
+    module_name: torch.optim
+    func_name: Adam  # AdamW
+    params:
+      lr: 0.001
+# training
+training:
+  params:
+    gpus: 1
+    precision: 16
+    stochastic_weight_avg: True
+#  callbacks:
+#    - module_name: pytorch_lightning.callbacks.early_stopping
+#      func_name: EarlyStopping
+#      params:
+#        monitor: 'val_loss'
+    

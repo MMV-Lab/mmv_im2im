@@ -71,22 +71,13 @@ class Model(basicModel):
         if costmap is None:
             # loss = self.criterion(y_hat, y)
             loss = self.criterion(
-                output,
-                instances,
-                class_labels,
-                center_images,
-                **args
+                output, instances, class_labels, center_images, **args
             )
         else:
             loss = self.criterion(
-                output,
-                instances,
-                class_labels,
-                center_images,
-                costmap,
-                **args
+                output, instances, class_labels, center_images, costmap, **args
             )
-        
+
         loss = loss.mean()
 
         return loss
