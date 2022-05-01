@@ -4,16 +4,19 @@ data:
   category: "embedseg"
   target_type: "Label"
   target_reader_params:
-    dimension_order_out: "ZYX"
+    dimension_order_out: "YX"
     C: 0
     T: 0
+    Z: 0
   source_type: "Image"
   source_reader_params:
-    dimension_order_out: "ZYX"
+    dimension_order_out: "YX"
     C: 0
     T: 0
+    Z: 0
+  data_path:  "/mnt/eternus/users/Jianxu/data/embedseg/train/"
   # data_path: "/mnt/data/xyz.csv"
-  data_path: "~/ambiomgroupdrive/Jianxu/data/cells/training"
+  # data_path: "~/ambiomgroupdrive/Jianxu/data/cells/training"
   # data_path:
   #   source_path:
   #   target_path:
@@ -35,19 +38,19 @@ data:
     - module_name: torchio
       func_name: RandomFlip
       params:
-        axes: (1, 2)
+        axes: (1)
         flip_probability: 0.5
-    - module_name: torchio
-      func_name: RandomAffine
-      params:
-        degrees: [0, 0, 0, 90, 0, 90]
-        p: 0.5
+#    - module_name: torchio
+#      func_name: RandomAffine
+#      params:
+#        degrees: [0, 90, 0, 90]
+#        p: 0.5
 # model
 model:
   category: FCN
   net:
-    module_name: mmv_im2im.models.BranchedERFNet_3d
-    func_name: BranchedERFNet_3d
+    module_name: mmv_im2im.models.BranchedERFNet_2d
+    func_name: BranchedERFNet_2d
     params:
       num_classes: 1 
       input_channels: 1
@@ -55,13 +58,11 @@ model:
     module_name: mmv_im2im.utils.embedding_loss
     func_name: SpatialEmbLoss_2D
     params:
-      grid_z: 32
-      grid_y: 1024
-      grid_x: 1024
-      pixel_z: 1
+      grid_y: 512
+      grid_x: 512
       pixel_y: 1
       pixel_x: 1
-      n_sigma: 3
+      n_sigma: 2
       foreground_weight: 1
   optimizer:
     module_name: torch.optim
@@ -74,9 +75,5 @@ training:
     gpus: 1
     precision: 16
     stochastic_weight_avg: True
-#  callbacks:
-#    - module_name: pytorch_lightning.callbacks.early_stopping
-#      func_name: EarlyStopping
-#      params:
-#        monitor: 'val_loss'
+
     

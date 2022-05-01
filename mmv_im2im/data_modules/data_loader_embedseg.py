@@ -61,7 +61,10 @@ class Im2ImDataModule(pl.LightningDataModule):
         else:
             self.transform = tio.Compose([self.preproc, self.augment])
 
-        self.spatial_dims = str(data_cfg["spatial_dims"])
+        if "Z" in data_cfg["source_reader_params"]["dimension_order_out"]:
+            self.spatial_dim = 3
+        else:
+            self.spatial_dim = 2
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]

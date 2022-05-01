@@ -63,20 +63,19 @@ class Im2ImDataModule(pl.LightningDataModule):
         else:
             self.transform = tio.Compose([self.preproc, self.augment])
 
-        self.spatial_dims = str(data_cfg["spatial_dims"])
+        if "Z" in data_cfg["source_reader_params"]["dimension_order_out"]:
+            self.spatial_dim = 3
+        else:
+            self.spatial_dim = 2
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]
-        if ("dataloader_patch_queue" in data_cfg) and (self.spatial_dims == "3"):
-            print("The dimensions of the data is 3D")
+        if "dataloader_patch_queue" in data_cfg:
             self.patch_loader = True
             self.patch_loader_params = data_cfg["dataloader_patch_queue"]["params"]
             self.patch_loader_sampler = data_cfg["dataloader_patch_queue"]["sampler"]
-        elif ("dataloader_patch_queue" not in data_cfg) and (self.spatial_dims == "2"):
-            print("The dimensions of the data is 2D")
-            self.patch_loader = False
         else:
-            logging.error("Unsupported data dimensions")
+            self.patch_loader = False
 
         # reserved for test data
         self.test_subjects = None
