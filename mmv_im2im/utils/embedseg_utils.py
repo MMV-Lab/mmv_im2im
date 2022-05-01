@@ -43,7 +43,7 @@ def fill_label_holes(lbl_img, **kwargs):
     return lbl_img_filled
 
 
-def generate_center_image(instance, center, ids, one_hot):
+def generate_center_image_2d(instance, center, ids):
     """
     Generates a `center_image` which is one (True) for all center locations and zero (False) otherwise.
     Parameters
@@ -59,15 +59,9 @@ def generate_center_image(instance, center, ids, one_hot):
         True (in this case, `instance` has shape DYX) or False (in this case, `instance` has shape YX).
     """
 
-    if not one_hot:
-        center_image = np.zeros(instance.shape, dtype=bool)
-    else:
-        center_image = np.zeros((instance.shape[-2], instance.shape[-1]), dtype=bool)
+    center_image = np.zeros(instance.shape, dtype=bool)
     for j, id in enumerate(ids):
-        if not one_hot:
-            y, x = np.where(instance == id)
-        else:
-            y, x = np.where(instance[id] == 1)
+        y, x = np.where(instance == id)
         if len(y) != 0 and len(x) != 0:
             if center == "centroid":
                 ym, xm = np.mean(y), np.mean(x)
@@ -85,7 +79,7 @@ def generate_center_image(instance, center, ids, one_hot):
 
 
 def generate_center_image_3d(
-    instance, center, ids, one_hot, anisotropy_factor=1, speed_up=1
+    instance, center, ids, anisotropy_factor, speed_up
 ):
     center_image = np.zeros(instance.shape, dtype=bool)
     instance_downsampled = instance[
@@ -118,3 +112,15 @@ def generate_center_image_3d(
                 int(np.round(speed_up * xm)),
             ] = True
     return center_image
+
+
+def generate_center_image(
+    instance, center, ids, anisotropy_factor=1, speed_up=1
+):
+
+    if len(instance.shape) == 3:
+        return generate_center_image_3d(instance, center, ids, anisotropy_factor, speed_up)
+    elif len(instance.shape) == 2:
+        return generate_center_image_2d(instance, center, ids,)
+    else:
+        raise ValueError("instance image must be either 2D or 3D")

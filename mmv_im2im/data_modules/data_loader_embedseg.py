@@ -8,16 +8,14 @@
 # About data in a batch:
 # We woudl expect 3 parts, image_source, instance, center
 ########################################################
-from importlib import import_module
 from functools import partial
-from torch.utils.data import random_split, DataLoader
+import numpy as np
+from torch.utils.data import random_split
 import torchio as tio
-import sys
 import pytorch_lightning as pl
 from mmv_im2im.utils.for_transform import parse_tio_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
-
-import random
+from mmv_im2im.utils.embedseg_utils import generate_center_image
 import logging
 
 
@@ -30,7 +28,11 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.target_reader_param = data_cfg["target_reader_params"]
         self.source_reader_param = data_cfg["source_reader_params"]
         self.data_path = data_cfg["data_path"]
-        self.category = data_cfg["category"]
+
+        # check category
+        category = data_cfg["category"]
+        if not category == "embedseg":
+            raise NotImplementedError("only catergory=embedsegXD is supported")
 
         # all subjects
         self.subjects = None
@@ -80,8 +82,6 @@ class Im2ImDataModule(pl.LightningDataModule):
 
     def prepare_data(self):
         dataset_list = generate_dataset_dict(self.data_path)
-        if not self.category == "embedseg":
-            raise NotImplementedError("only catergory=embedseg is supported")
 
         target_reader = partial(aicsimageio_reader, **self.target_reader_param)
         source_reader = partial(aicsimageio_reader, **self.source_reader_param)
@@ -92,29 +92,24 @@ class Im2ImDataModule(pl.LightningDataModule):
                 source=tio.ScalarImage(ds["source_fn"], reader=source_reader),
                 target=tio.LabelMap(ds["target_fn"], reader=target_reader),
             )
-            # TODO: costmap support?
+            # TODO: add costmap support?
 
-            # generate center image
-            # TODO: add center image to subject
+            # generate center image and label image
             instance = subject["target"][tio.DATA]
-
-            instance = fill_label_holes(instance)
-
+            instance_np = np.array(instance, copy=False)  #  TODO: why resave?
             object_mask = instance_np > 0
 
             ids = np.unique(instance_np[object_mask])
             ids = ids[ids != 0]
-            center_image = generate_center_image_3d(
-                instance_label,
+            center_image = generate_center_image(
+                instance,
                 "Centroid",
                 ids,
-                one_hot=one_hot,
-                anisotropy_factor=anisotropy_factor,
-                speed_up=speed_up,
+                anisotropy_factor=1,
+                speed_up=1,
             )
-
-            # generate label image
-            # TODO: convert target into bindary label and add the subject
+            subject.add_image(tio.LabelMap(center_image), "center_image")
+            subject.add_image(tio.LabelMap(object_mask), "class_image")
 
             self.subjects.append(subject)
 
