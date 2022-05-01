@@ -66,19 +66,6 @@ class Im2ImDataModule(pl.LightningDataModule):
         else:
             self.spatial_dim = 2
 
-        # parameters for dataloader
-        self.loader_params = data_cfg["dataloader_params"]
-        if ("dataloader_patch_queue" in data_cfg) and (self.spatial_dims == "3"):
-            print("The dimensions of the data is 3D")
-            self.patch_loader = True
-            self.patch_loader_params = data_cfg["dataloader_patch_queue"]["params"]
-            self.patch_loader_sampler = data_cfg["dataloader_patch_queue"]["sampler"]
-        elif ("dataloader_patch_queue" not in data_cfg) and (self.spatial_dims == "2"):
-            print("The dimensions of the data is 2D")
-            self.patch_loader = False
-        else:
-            logging.error("Unsupported data dimensions")
-
         # reserved for test data
         self.test_subjects = None
         self.test_set = None

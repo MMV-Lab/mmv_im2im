@@ -47,12 +47,12 @@ data:
 #        p: 0.5
 # model
 model:
-  category: FCN
+  category: embedseg
   net:
     module_name: mmv_im2im.models.BranchedERFNet_2d
     func_name: BranchedERFNet_2d
     params:
-      num_classes: 1 
+      num_classes: [4, 1]
       input_channels: 1
   criterion:
     module_name: mmv_im2im.utils.embedding_loss
