@@ -13,7 +13,6 @@ class SpatialEmbLoss_3d(nn.Module):
         pixel_z=1,
         pixel_y=1,
         pixel_x=1,
-        one_hot=False,
         n_sigma=3,
         foreground_weight=1,
     ):
@@ -46,7 +45,6 @@ class SpatialEmbLoss_3d(nn.Module):
         xyzm = torch.cat((xm, ym, zm), 0)
 
         self.register_buffer("xyzm", xyzm)
-        self.one_hot = one_hot
 
     def forward(
         self,
@@ -158,7 +156,6 @@ class SpatialEmbLoss_2D(nn.Module):
         grid_x=1024,
         pixel_y=1,
         pixel_x=1,
-        one_hot=False,
         n_sigma=2,
         foreground_weight=1,
     ):
@@ -177,9 +174,7 @@ class SpatialEmbLoss_2D(nn.Module):
         xm = torch.linspace(0, pixel_x, grid_x).view(1, 1, -1).expand(1, grid_y, grid_x)
         ym = torch.linspace(0, pixel_y, grid_y).view(1, -1, 1).expand(1, grid_y, grid_x)
         xym = torch.cat((xm, ym), 0)
-
         self.register_buffer("xym", xym)
-        self.one_hot = one_hot
 
     def forward(
         self,

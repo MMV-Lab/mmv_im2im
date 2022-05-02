@@ -74,13 +74,13 @@ def generate_center_image_2d(instance, center, ids):
                 dist_matrix = pairwise_python(np.vstack((x, y)).transpose())
                 imin = np.argmin(np.sum(dist_matrix, axis=0))
                 ym, xm = y[imin], x[imin]
+            else:
+                raise NotImplemented("error in center method")
             center_image[int(np.round(ym)), int(np.round(xm))] = True
     return center_image
 
 
-def generate_center_image_3d(
-    instance, center, ids, anisotropy_factor, speed_up
-):
+def generate_center_image_3d(instance, center, ids, anisotropy_factor, speed_up):
     center_image = np.zeros(instance.shape, dtype=bool)
     instance_downsampled = instance[
         :, :: int(speed_up), :: int(speed_up)
@@ -114,12 +114,16 @@ def generate_center_image_3d(
     return center_image
 
 
-def generate_center_image(
-    instance, center, ids, anisotropy_factor=1, speed_up=1
-):
+def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1):
     if len(instance.shape) == 3:
-        return generate_center_image_3d(instance, center, ids, anisotropy_factor, speed_up)
+        return generate_center_image_3d(
+            instance, center, ids, anisotropy_factor, speed_up
+        )
     elif len(instance.shape) == 2:
-        return generate_center_image_2d(instance, center, ids,)
+        return generate_center_image_2d(
+            instance,
+            center,
+            ids,
+        )
     else:
         raise ValueError("instance image must be either 2D or 3D")

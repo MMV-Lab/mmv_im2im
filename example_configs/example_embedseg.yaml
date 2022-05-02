@@ -24,22 +24,22 @@ data:
   #   image_type: "tiff"
   dataloader_params:
     train:
-      batch_size: 4
+      batch_size: 1
       pin_memory: True
       num_workers: 4
     val:
       batch_size: 1
-      num_workers: 1
+      num_workers: 4
   train_val_ratio: 0.1
-  preprocess:
-    - module_name: torchio
-      func_name: ZNormalization
-  augmentation:
-    - module_name: torchio
-      func_name: RandomFlip
-      params:
-        axes: (1)
-        flip_probability: 0.5
+  #preprocess:
+  #  - module_name: torchio
+  #    func_name: ZNormalization
+  #augmentation:
+  #  - module_name: torchio
+  #    func_name: RandomFlip
+  #    params:
+  #      axes: (1)
+  #      flip_probability: 0.5
 #    - module_name: torchio
 #      func_name: RandomAffine
 #      params:
@@ -74,6 +74,6 @@ training:
   params:
     gpus: 1
     precision: 16
-    stochastic_weight_avg: True
+    #stochastic_weight_avg: True
 
     

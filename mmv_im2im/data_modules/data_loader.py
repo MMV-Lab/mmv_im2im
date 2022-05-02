@@ -22,7 +22,6 @@ import pytorch_lightning as pl
 from mmv_im2im.utils.for_transform import parse_tio_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 import random
-import logging
 
 
 class Im2ImDataModule(pl.LightningDataModule):
@@ -59,7 +58,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         elif self.preproc is not None and self.augment is None:
             self.transform = self.preproc
         elif self.preproc is None and self.augment is None:
-            self.transform is None
+            self.transform = None
         else:
             self.transform = tio.Compose([self.preproc, self.augment])
 

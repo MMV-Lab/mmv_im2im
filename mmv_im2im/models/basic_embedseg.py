@@ -8,8 +8,6 @@ from mmv_im2im.utils.misc import (
     parse_config_func,
     parse_config_func_without_params,
 )
-from mmv_im2im.utils.piecewise_inference import predict_piecewise
-import pytorch_lightning as pl
 
 
 class Model(pl.LightningModule):
@@ -23,10 +21,13 @@ class Model(pl.LightningModule):
         if train:
             self.criterion = parse_config(model_info_xx["criterion"])
             self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
+        print("I am here init !!!!!!!!!")
 
     def configure_optimizers(self):
+        print("I am here optim !!!!!!!!!")
         # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
         optimizer = self.optimizer_func(self.parameters())
+        print("optim done")
         if "scheduler" in self.model_info:
             scheduler_func = parse_config_func_without_params(
                 self.model_info["scheduler"]
@@ -39,12 +40,15 @@ class Model(pl.LightningModule):
             return optimizer
 
     def prepare_batch(self, batch):
+        print("I am here prepare !!!!!!!!!")
         return
 
     def forward(self, x):
+        print("I am here forward !!!!!!!!!")
         return self.net(x)
 
     def run_step(self, batch, validation_stage):
+        print("run ...... run ......s")
         if "costmap" in batch:
             costmap = batch.pop("costmap")
             costmap = costmap[tio.DATA]
@@ -77,17 +81,19 @@ class Model(pl.LightningModule):
         instances = batch["target"][tio.DATA]  # .squeeze(1)? # BZYX
         class_labels = batch["class_image"][tio.DATA]  # squeeze(1) # BZYX
         center_images = batch["center_image"][tio.DATA]  # squeeze(1) # BZYX
+        print(instances.size())
+        print(im.size())
+        print(center_images.size())
+        print(class_labels.size())
         output = self(im)
 
         # TODO: need to handle args, try to receive the args in the definition step
         if costmap is None:
             # loss = self.criterion(y_hat, y)
-            loss = self.criterion(
-                output, instances, class_labels, center_images, **args
-            )
+            loss = self.criterion(output, instances, class_labels, center_images)
         else:
             loss = self.criterion(
-                output, instances, class_labels, center_images, costmap, **args
+                output, instances, class_labels, center_images, costmap
             )
 
         loss = loss.mean()
@@ -95,12 +101,15 @@ class Model(pl.LightningModule):
         return loss
 
     def training_step(self, batch, batch_idx):
+        print("I am here training !!!!!!!!!")
         loss = self.run_step(batch, validation_stage=False)
         self.log("train_loss", loss, prog_bar=True)
 
         return loss
 
     def validation_step(self, batch, batch_idx):
+        print("I am here !!!!!!!!!")
+        print(batch)
         loss = self.run_step(batch, validation_stage=True)
         self.log("val_loss", loss)
 
