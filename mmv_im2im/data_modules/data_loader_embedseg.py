@@ -13,10 +13,9 @@ import numpy as np
 from torch.utils.data import random_split
 import torchio as tio
 import pytorch_lightning as pl
-from mmv_im2im.utils.for_transform import parse_tio_ops  # , custom_preproc_to_tio
+from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 from mmv_im2im.utils.embedseg_utils import generate_center_image
-import logging
 
 
 class Im2ImDataModule(pl.LightningDataModule):
@@ -115,3 +114,13 @@ class Im2ImDataModule(pl.LightningDataModule):
             raise NotImplementedError(
                 "patch sampler is not implemented for embedseg yet"
             )
+
+    def train_dataloader(self):
+        return DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])
+
+    def val_dataloader(self):
+        return DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
+
+    def test_dataloader(self):
+        # need to be overwritten in a test script for specific test case
+        pass

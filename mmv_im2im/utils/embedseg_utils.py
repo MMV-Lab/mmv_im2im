@@ -117,7 +117,6 @@ def generate_center_image_3d(
 def generate_center_image(
     instance, center, ids, anisotropy_factor=1, speed_up=1
 ):
-
     if len(instance.shape) == 3:
         return generate_center_image_3d(instance, center, ids, anisotropy_factor, speed_up)
     elif len(instance.shape) == 2:
