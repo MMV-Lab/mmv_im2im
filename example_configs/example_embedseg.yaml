@@ -24,11 +24,11 @@ data:
   #   image_type: "tiff"
   dataloader_params:
     train:
-      batch_size: 1
+      batch_size: 4
       pin_memory: True
       num_workers: 4
     val:
-      batch_size: 1
+      batch_size: 4
       num_workers: 4
   train_val_ratio: 0.1
   preprocess:

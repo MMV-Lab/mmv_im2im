@@ -219,7 +219,8 @@ class SpatialEmbLoss_2D(nn.Module):
 
             # regress bg to zero
             bg_mask = label == 0
-
+            print(bg_mask.size())
+            print(seed_map.size())
             if bg_mask.sum() > 0:
                 seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 

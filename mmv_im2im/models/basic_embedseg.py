@@ -21,7 +21,6 @@ class Model(pl.LightningModule):
         if train:
             self.criterion = parse_config(model_info_xx["criterion"])
             self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
-        print("I am here init !!!!!!!!!")
 
     def configure_optimizers(self):
         # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
