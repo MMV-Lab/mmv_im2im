@@ -24,13 +24,13 @@ data:
   #   image_type: "tiff"
   dataloader_params:
     train:
-      batch_size: 4
+      batch_size: 8
       pin_memory: True
       num_workers: 4
     val:
-      batch_size: 4
+      batch_size: 8
       num_workers: 4
-  train_val_ratio: 0.1
+  train_val_ratio: 0.2
   preprocess:
     - module_name: torchio
       func_name: ZNormalization

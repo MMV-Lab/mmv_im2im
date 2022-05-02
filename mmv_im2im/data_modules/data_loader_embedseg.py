@@ -132,18 +132,13 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
 
     def train_dataloader(self):
-        print(" ... dm train loader ....")
         dl = DataLoader(self.train_set, shuffle=True, **self.loader_params["train"])
-        print("train loader done")
         return dl
 
     def val_dataloader(self):
-        print(" ... dm val loader ....")
         dl= DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
-        print("val loader done ..")
         return dl
 
     def test_dataloader(self):
-        print(" ... dm test loader ....")
         # need to be overwritten in a test script for specific test case
         pass

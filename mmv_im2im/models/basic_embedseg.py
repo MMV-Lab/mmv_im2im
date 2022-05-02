@@ -75,10 +75,6 @@ class Model(pl.LightningModule):
             instances = torch.squeeze(instances, dim=-1)
             class_labels = torch.squeeze(class_labels, dim=-1)
             center_images = torch.squeeze(center_images, dim=-1)
-        print(instances.size())
-        print(im.size())
-        print(center_images.size())
-        print(class_labels.size())
         output = self(im)
 
         # TODO: need to handle args, try to receive the args in the definition step

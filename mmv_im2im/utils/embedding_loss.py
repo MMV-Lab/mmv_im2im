@@ -187,12 +187,18 @@ class SpatialEmbLoss_2D(nn.Module):
         w_seed=1,
     ):
 
-        # instances B 1 Y X
+        # instances B C Y X
         batch_size, height, width = (
             prediction.size(0),
             prediction.size(2),
             prediction.size(3),
         )
+
+        print(f"prediction size: {prediction.size()}")
+        print(f"xym size: {self.xym.shape}")
+        print(f"instance shape: {instances.size()}")
+        print(f"center shape: {center_images.size()}")
+        print(f"label shape: {labels.size()}")
 
         xym_s = self.xym[:, 0:height, 0:width].contiguous()  # 2 x h x w
 
@@ -205,22 +211,21 @@ class SpatialEmbLoss_2D(nn.Module):
             seed_map = torch.sigmoid(
                 prediction[b, 2 + self.n_sigma : 2 + self.n_sigma + 1]
             )  # 1 x h x w
+
             # loss accumulators
             var_loss = 0
             instance_loss = 0
             seed_loss = 0
             obj_count = 0
 
-            instance = instances[b].unsqueeze(0)  # 1 x h x w or 1 x d x h x w (one_hot)
-            label = labels[b].unsqueeze(0)  # 1 x h x w
-            center_image = center_images[b].unsqueeze(0)  # 1 x h x w
+            instance = instances[b]  # 1 x h x w or 1 x d x h x w (one_hot)
+            label = labels[b]  # 1 x h x w
+            center_image = center_images[b] > 0  # 1 x h x w
             instance_ids = instance.unique()
             instance_ids = instance_ids[instance_ids != 0]
 
             # regress bg to zero
             bg_mask = label == 0
-            print(bg_mask.size())
-            print(seed_map.size())
             if bg_mask.sum() > 0:
                 seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 
