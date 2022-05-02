@@ -89,8 +89,12 @@ class Im2ImDataModule(pl.LightningDataModule):
             subject = tio.Subject(
                 source=tio.ScalarImage(ds["source_fn"], reader=source_reader),
                 target=tio.LabelMap(ds["target_fn"], reader=target_reader),
-                center_image=tio.LabelMap(str(ds["target_fn"])[:-7] + "CE.tiff", reader=target_reader),
-                class_image=tio.LabelMap(str(ds["target_fn"])[:-7] + "CL.tiff", reader=target_reader),
+                center_image=tio.LabelMap(
+                    str(ds["target_fn"])[:-7] + "CE.tiff", reader=target_reader
+                ),
+                class_image=tio.LabelMap(
+                    str(ds["target_fn"])[:-7] + "CL.tiff", reader=target_reader
+                ),
             )
             # TODO: add costmap support?
 
@@ -136,7 +140,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         return dl
 
     def val_dataloader(self):
-        dl= DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
+        dl = DataLoader(self.val_set, shuffle=False, **self.loader_params["val"])
         return dl
 
     def test_dataloader(self):
