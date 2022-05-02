@@ -89,17 +89,11 @@ class Im2ImDataModule(pl.LightningDataModule):
             subject = tio.Subject(
                 source=tio.ScalarImage(ds["source_fn"], reader=source_reader),
                 target=tio.LabelMap(ds["target_fn"], reader=target_reader),
-                #center_image=tio.LabelMap(ds["target_fn"], reader=target_reader),
-                #class_image=tio.LabelMap(ds["target_fn"], reader=target_reader),
+                center_image=tio.LabelMap(str(ds["target_fn"])[:-7] + "CE.tiff", reader=target_reader),
+                class_image=tio.LabelMap(str(ds["target_fn"])[:-7] + "CL.tiff", reader=target_reader),
             )
             # TODO: add costmap support?
 
-            # try a simple version to test torchio subjects
-            instance = subject["target"][tio.DATA]
-            center_image = instance
-            object_mask = instance
-            subject.add_image(tio.LabelMap(tensor=center_image), "center_image")
-            subject.add_image(tio.LabelMap(tensor=object_mask), "class_image")
             """
             # generate center image and label image
             instance = np.squeeze(subject["target"][tio.DATA])

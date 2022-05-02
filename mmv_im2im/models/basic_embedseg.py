@@ -24,7 +24,6 @@ class Model(pl.LightningModule):
         print("I am here init !!!!!!!!!")
 
     def configure_optimizers(self):
-        print("I am here optim !!!!!!!!!")
         # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
         optimizer = self.optimizer_func(self.parameters())
         print("optim done")
@@ -40,23 +39,17 @@ class Model(pl.LightningModule):
             return optimizer
 
     def prepare_batch(self, batch):
-        print("I am here prepare !!!!!!!!!")
         return
 
     def forward(self, x):
-        print("I am here forward !!!!!!!!!")
         return self.net(x)
 
     def run_step(self, batch, validation_stage):
-        print("run ...... run ......s")
         if "costmap" in batch:
             costmap = batch.pop("costmap")
             costmap = costmap[tio.DATA]
         else:
             costmap = None
-
-        x = batch["source"][tio.DATA]
-        y = batch["target"][tio.DATA]
 
         ##########################################
         # check if the data is 2D or 3D
@@ -73,14 +66,16 @@ class Model(pl.LightningModule):
         # with the syntax for fliping along Y in 1 x Y x X x 1.
         # But, the FCN models do not like this. We just need to remove the
         # dummy dimension
-        if x.size()[-1] == 1:
-            x = torch.squeeze(x, dim=-1)
-            y = torch.squeeze(y, dim=-1)
 
         im = batch["source"][tio.DATA]  # BCZYX
         instances = batch["target"][tio.DATA]  # .squeeze(1)? # BZYX
         class_labels = batch["class_image"][tio.DATA]  # squeeze(1) # BZYX
         center_images = batch["center_image"][tio.DATA]  # squeeze(1) # BZYX
+        if im.size()[-1] == 1:
+            im = torch.squeeze(im, dim=-1).float()
+            instances = torch.squeeze(instances, dim=-1)
+            class_labels = torch.squeeze(class_labels, dim=-1)
+            center_images = torch.squeeze(center_images, dim=-1)
         print(instances.size())
         print(im.size())
         print(center_images.size())
@@ -101,15 +96,12 @@ class Model(pl.LightningModule):
         return loss
 
     def training_step(self, batch, batch_idx):
-        print("I am here training !!!!!!!!!")
         loss = self.run_step(batch, validation_stage=False)
         self.log("train_loss", loss, prog_bar=True)
 
         return loss
 
     def validation_step(self, batch, batch_idx):
-        print("I am here !!!!!!!!!")
-        print(batch)
         loss = self.run_step(batch, validation_stage=True)
         self.log("val_loss", loss)
 

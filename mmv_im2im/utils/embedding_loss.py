@@ -214,11 +214,8 @@ class SpatialEmbLoss_2D(nn.Module):
             instance = instances[b].unsqueeze(0)  # 1 x h x w or 1 x d x h x w (one_hot)
             label = labels[b].unsqueeze(0)  # 1 x h x w
             center_image = center_images[b].unsqueeze(0)  # 1 x h x w
-            if self.one_hot:
-                instance_ids = np.arange(instances.size(1))
-            else:
-                instance_ids = instance.unique()
-                instance_ids = instance_ids[instance_ids != 0]
+            instance_ids = instance.unique()
+            instance_ids = instance_ids[instance_ids != 0]
 
             # regress bg to zero
             bg_mask = label == 0
@@ -227,10 +224,7 @@ class SpatialEmbLoss_2D(nn.Module):
                 seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 
             for id in instance_ids:
-                if self.one_hot:
-                    in_mask = instance[:, id, ...].eq(1)
-                else:
-                    in_mask = instance.eq(id)  # 1 x h x w
+                in_mask = instance.eq(id)  # 1 x h x w
 
                 center_mask = in_mask & center_image
                 if center_mask.sum().eq(1):
