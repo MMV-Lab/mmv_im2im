@@ -72,19 +72,10 @@ class Model(pl.LightningModule):
             class_labels = torch.squeeze(class_labels, dim=-1)
             center_images = torch.squeeze(center_images, dim=-1)
         output = self(im)
-       
+
         # TODO: need to handle args, try to receive the args in the definition step
         loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()
-
-        # from aicsimageio.writers import OmeTiffWriter
-        # from random import randint
-        # fn_rand = randint(100,900)
-        # OmeTiffWriter.save(im.cpu().float().numpy(), "./tmp/val_src_"+str(fn_rand)+".tiff", dims_order="TCZYX")
-        # OmeTiffWriter.save(instances.cpu().numpy(), "./tmp/val_tar_"+str(fn_rand)+".tiff", dims_order="TCZYX")
-        # OmeTiffWriter.save(class_labels.cpu().numpy(), "./tmp/val_cl_"+str(fn_rand)+".tiff", dims_order="TCZYX")
-        # OmeTiffWriter.save(center_images.cpu().numpy(), "./tmp/val_ce_"+str(fn_rand)+".tiff", dims_order="TCZYX")
-        # OmeTiffWriter.save(output.cpu().float().detach().numpy(), "./tmp/val_out_"+str(fn_rand)+".tiff", dims_order="TCZYX")
 
         return loss
 

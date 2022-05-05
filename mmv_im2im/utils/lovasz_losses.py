@@ -10,10 +10,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import numpy as np
 
-try:
-    from itertools import ifilterfalse
-except ImportError:  # py3k
-    from itertools import filterfalse
+from itertools import ifilterfalse
 
 
 def lovasz_grad(gt_sorted):
@@ -81,7 +78,7 @@ def iou(preds, labels, C, EMPTY=1.0, ignore=None, per_image=False):
 def lovasz_hinge(logits, labels, per_image=True, ignore=None):
     """
     Binary Lovasz hinge loss
-      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)
+      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)  # noqa W605
       labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
       per_image: compute the loss per image instead of per batch
       ignore: void class id
@@ -101,7 +98,7 @@ def lovasz_hinge(logits, labels, per_image=True, ignore=None):
 def lovasz_hinge_flat(logits, labels):
     """
     Binary Lovasz hinge loss
-      logits: [P] Variable, logits at each prediction (between -\infty and +\infty)
+      logits: [P] Variable, logits at each prediction (between -\infty and +\infty)  # noqa W605
       labels: [P] Tensor, binary ground truth labels (0 or 1)
       ignore: label to ignore
     """
@@ -146,7 +143,7 @@ class StableBCELoss(torch.nn.modules.Module):
 def binary_xloss(logits, labels, ignore=None):
     """
     Binary Cross entropy loss
-      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)
+      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)  # noqa W605
       labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
       ignore: void class id
     """
@@ -228,13 +225,13 @@ def xloss(logits, labels, ignore=None):
 # --------------------------- HELPER FUNCTIONS ---------------------------
 
 
-def mean(l, ignore_nan=False, empty=0):
+def mean(l, ignore_nan=False, empty=0):  # noqa E741
     """
     nanmean compatible with generators.
     """
-    l = iter(l)
+    l = iter(l)  # noqa E741
     if ignore_nan:
-        l = ifilterfalse(np.isnan, l)
+        l = ifilterfalse(np.isnan, l)  # noqa E741
     try:
         n = 1
         acc = next(l)

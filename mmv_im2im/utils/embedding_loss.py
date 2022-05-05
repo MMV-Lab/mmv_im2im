@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 import torch.nn as nn
 from mmv_im2im.utils.lovasz_losses import lovasz_hinge
@@ -19,9 +18,8 @@ class SpatialEmbLoss_3d(nn.Module):
         super().__init__()
 
         print(
-            "Created spatial emb loss function with: n_sigma: {}, foreground_weight: {}".format(
-                n_sigma, foreground_weight
-            )
+            f"Created spatial emb loss function with: n_sigma: {n_sigma},"
+            f"foreground_weight: {foreground_weight}"
         )
         print("*************************")
         self.n_sigma = n_sigma
@@ -162,9 +160,8 @@ class SpatialEmbLoss_2D(nn.Module):
         super().__init__()
 
         print(
-            "Created spatial emb loss function with: n_sigma: {}, foreground_weight: {}".format(
-                n_sigma, foreground_weight
-            )
+            f"Created spatial emb loss function with: n_sigma: {n_sigma},"
+            f"foreground_weight: {foreground_weight}"
         )
         print("*************************")
         self.n_sigma = n_sigma

@@ -1,6 +1,7 @@
 """
 Author: Davy Neven
-Licensed under the CC BY-NC 4.0 license (https://creativecommons.org/licenses/by-nc/4.0/)
+Licensed under the CC BY-NC 4.0 license 
+(https://creativecommons.org/licenses/by-nc/4.0/)
 https://github.com/davyneven/SpatialEmbeddings
 """
 import torch

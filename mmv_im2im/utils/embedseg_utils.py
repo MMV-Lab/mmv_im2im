@@ -45,18 +45,22 @@ def fill_label_holes(lbl_img, **kwargs):
 
 def generate_center_image_2d(instance, center, ids):
     """
-    Generates a `center_image` which is one (True) for all center locations and zero (False) otherwise.
+    Generates a `center_image` which is one (True) for all center locations and
+    zero (False) otherwise.
+
     Parameters
     ----------
     instance: numpy array
         `instance` image containing unique `ids` for each object (YX)
-         or present in a one-hot encoded style where each object is one in it own slice and zero elsewhere.
+         or present in a one-hot encoded style where each object is one in it
+         own slice and zero elsewhere.
     center: string
         One of 'centroid', 'approximate-medoid' or 'medoid'.
     ids: list
         Unique ids corresponding to the objects present in the instance image.
     one_hot: boolean
-        True (in this case, `instance` has shape DYX) or False (in this case, `instance` has shape YX).
+        True (in this case, `instance` has shape DYX) or False (in this case,
+        `instance` has shape YX).
     """
 
     center_image = np.zeros(instance.shape, dtype=bool)
