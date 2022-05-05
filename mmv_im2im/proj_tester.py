@@ -55,7 +55,10 @@ class ProjectTester(object):
         )
 
         dataset_length = len(dataset_list)
-        self.spatial_dims = str(self.data_cfg["spatial_dims"])
+        if "Z" in self.data_cfg["input"]["reader_params"]["dimension_order_out"]:
+            self.spatial_dim = 3
+        else:
+            self.spatial_dim = 2
 
         # load preprocessing transformation
         pre_process = parse_tio_ops(self.data_cfg["preprocess"])
@@ -70,7 +73,7 @@ class ProjectTester(object):
             x = check_uint_to_int(img.compute())
             # Perform the prediction
             print("Predicting the image")
-            if self.spatial_dims == "2":
+            if self.spatial_dims == 2:
                 # if data is 2D
                 # Initial shape (1, W, H)
                 x = torch.tensor(x)
@@ -86,7 +89,7 @@ class ProjectTester(object):
                 with torch.no_grad():
                     y_hat = self.model(x.float().cuda())
                     pred = y_hat.cpu().detach().numpy()
-            elif self.spatial_dims == "3":
+            elif self.spatial_dims == 3:
                 # if data is 3D
                 x = pre_process(x)
                 with torch.no_grad():
