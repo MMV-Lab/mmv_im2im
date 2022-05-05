@@ -14,7 +14,7 @@ class SpatialEmbLoss_3d(nn.Module):
         pixel_y=1,
         pixel_x=1,
         n_sigma=3,
-        foreground_weight=1,
+        foreground_weight=10,
     ):
         super().__init__()
 
@@ -157,7 +157,7 @@ class SpatialEmbLoss_2D(nn.Module):
         pixel_y=1,
         pixel_x=1,
         n_sigma=2,
-        foreground_weight=1,
+        foreground_weight=10,
     ):
         super().__init__()
 
@@ -193,13 +193,6 @@ class SpatialEmbLoss_2D(nn.Module):
             prediction.size(2),
             prediction.size(3),
         )
-
-        print(f"prediction size: {prediction.size()}")
-        print(f"xym size: {self.xym.shape}")
-        print(f"instance shape: {instances.size()}")
-        print(f"center shape: {center_images.size()}")
-        print(f"label shape: {labels.size()}")
-
         xym_s = self.xym[:, 0:height, 0:width].contiguous()  # 2 x h x w
 
         loss = 0

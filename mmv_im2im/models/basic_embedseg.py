@@ -44,11 +44,6 @@ class Model(pl.LightningModule):
         return self.net(x)
 
     def run_step(self, batch, validation_stage):
-        if "costmap" in batch:
-            costmap = batch.pop("costmap")
-            costmap = costmap[tio.DATA]
-        else:
-            costmap = None
 
         ##########################################
         # check if the data is 2D or 3D
@@ -66,27 +61,30 @@ class Model(pl.LightningModule):
         # But, the FCN models do not like this. We just need to remove the
         # dummy dimension
 
-        im = batch["source"][tio.DATA]  # BCZYX
-        instances = batch["target"][tio.DATA]  # .squeeze(1)? # BZYX
-        class_labels = batch["class_image"][tio.DATA]  # squeeze(1) # BZYX
-        center_images = batch["center_image"][tio.DATA]  # squeeze(1) # BZYX
+        im = batch["source"][tio.DATA]
+        instances = batch["target"][tio.DATA]
+        class_labels = batch["class_image"][tio.DATA]
+        center_images = batch["center_image"][tio.DATA]
+
         if im.size()[-1] == 1:
             im = torch.squeeze(im, dim=-1).float()
             instances = torch.squeeze(instances, dim=-1)
             class_labels = torch.squeeze(class_labels, dim=-1)
             center_images = torch.squeeze(center_images, dim=-1)
         output = self(im)
-
+       
         # TODO: need to handle args, try to receive the args in the definition step
-        if costmap is None:
-            # loss = self.criterion(y_hat, y)
-            loss = self.criterion(output, instances, class_labels, center_images)
-        else:
-            loss = self.criterion(
-                output, instances, class_labels, center_images, costmap
-            )
-
+        loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()
+
+        # from aicsimageio.writers import OmeTiffWriter
+        # from random import randint
+        # fn_rand = randint(100,900)
+        # OmeTiffWriter.save(im.cpu().float().numpy(), "./tmp/val_src_"+str(fn_rand)+".tiff", dims_order="TCZYX")
+        # OmeTiffWriter.save(instances.cpu().numpy(), "./tmp/val_tar_"+str(fn_rand)+".tiff", dims_order="TCZYX")
+        # OmeTiffWriter.save(class_labels.cpu().numpy(), "./tmp/val_cl_"+str(fn_rand)+".tiff", dims_order="TCZYX")
+        # OmeTiffWriter.save(center_images.cpu().numpy(), "./tmp/val_ce_"+str(fn_rand)+".tiff", dims_order="TCZYX")
+        # OmeTiffWriter.save(output.cpu().float().detach().numpy(), "./tmp/val_out_"+str(fn_rand)+".tiff", dims_order="TCZYX")
 
         return loss
 

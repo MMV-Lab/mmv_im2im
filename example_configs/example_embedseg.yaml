@@ -15,6 +15,7 @@ data:
     T: 0
     Z: 0
   data_path:  "/mnt/eternus/users/Jianxu/data/embedseg/train/"
+  cache_path: "/mnt/eternus/users/Jianxu/data/embedseg/train_cache/"
   # data_path: "/mnt/data/xyz.csv"
   # data_path: "~/ambiomgroupdrive/Jianxu/data/cells/training"
   # data_path:
@@ -24,31 +25,27 @@ data:
   #   image_type: "tiff"
   dataloader_params:
     train:
-      batch_size: 8
+      batch_size: 4
       pin_memory: True
       num_workers: 4
     val:
-      batch_size: 8
+      batch_size: 4
       num_workers: 4
   train_val_ratio: 0.2
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
+  augmentation:
     - module_name: torchio
-      func_name: CropOrPad
+      func_name: RandomFlip
       params:
-        target_shape: [512, 512, 1]
-  #augmentation:
-  #  - module_name: torchio
-  #    func_name: RandomFlip
-  #    params:
-  #      axes: (1)
-  #      flip_probability: 0.5
-#    - module_name: torchio
-#      func_name: RandomAffine
-#      params:
-#        degrees: [0, 90, 0, 90]
-#        p: 0.5
+        axes: [0, 1]
+        flip_probability: 0.5
+    #- module_name: torchio
+    #  func_name: RandomAffine
+    #  params:
+    #    degrees: [0, 90, 0, 90, 0, 0]
+    #    p: 0.5
 # model
 model:
   category: embedseg
@@ -62,8 +59,8 @@ model:
     module_name: mmv_im2im.utils.embedding_loss
     func_name: SpatialEmbLoss_2D
     params:
-      grid_y: 512
-      grid_x: 512
+      grid_y: 768
+      grid_x: 768
       pixel_y: 1
       pixel_x: 1
       n_sigma: 2
