@@ -41,10 +41,22 @@ data:
   train_val_ratio: 0.1
   preprocess:
     - module_name:  mmv_im2im.preprocessing.transforms
+      func_name: to_float
+      extra_kwargs:
+        include: ["source"]
+        #types_to_apply: [torchio.INTENSITY]  # or torchio.LABEL or skip this
+    - module_name:  mmv_im2im.preprocessing.transforms
       func_name: norm_around_center
-      types_to_apply: [torchio.INTENSITY]  # or torchio.LABEL or skip this
+      params:
+        min_z: 32
+      extra_kwargs:
+        include: ["source"]
+        #types_to_apply: [torchio.INTENSITY]  # or torchio.LABEL or skip this
     - module_name: torchio
-      func_name: ZNormalization      
+      func_name: ZNormalization
+      params:
+        include: ["target"]  
+     
   augmentation:
     - module_name: torchio
       func_name: RandomFlip
