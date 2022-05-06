@@ -23,9 +23,7 @@ def parse_tio_ops(trans_func: List[Dict]):
 
             if "extra_kwargs" in func_info:
                 trans_list.append(
-                    torchio.Lambda(
-                        callable_func, **func_info["extra_kwargs"]
-                    )
+                    torchio.Lambda(callable_func, **func_info["extra_kwargs"])
                 )
             else:
                 trans_list.append(torchio.Lambda(my_func))

@@ -158,7 +158,7 @@ def binary_xloss(logits, labels, ignore=None):
 def lovasz_softmax(probas, labels, only_present=False, per_image=False, ignore=None):
     """
     Multi-class Lovasz-Softmax loss
-      probas: [B, C, H, W] Variable, class probabilities at each prediction 
+      probas: [B, C, H, W] Variable, class probabilities at each prediction
             (between 0 and 1)
       labels: [B, H, W] Tensor, ground truth labels (between 0 and C - 1)
       only_present: average only on classes present in ground truth

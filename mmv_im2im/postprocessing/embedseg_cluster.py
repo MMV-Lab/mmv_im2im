@@ -258,11 +258,9 @@ class Cluster_3d:
 
         count = 1
         mask = seed_map > 0.5
-        if (
-            mask.sum() > min_mask_sum
-        ):  
-        # top level decision: only start creating instances, if there are atleast 
-        # 128 pixels in foreground!
+        if mask.sum() > min_mask_sum:
+            # top level decision: only start creating instances, if there are atleast
+            # 128 pixels in foreground!
 
             spatial_emb_masked = spatial_emb[mask.expand_as(spatial_emb)].view(
                 n_sigma, -1
@@ -317,7 +315,7 @@ def generate_instance_clusters(
     min_unclustered_sum: int = 10,
     min_object_size: int = 10,
     grid_z: int = 32,
-    pixel_z: int = 1
+    pixel_z: int = 1,
 ):
     if not torch.is_tensor(pred):
         pred = torch.from_numpy(pred)
@@ -325,7 +323,7 @@ def generate_instance_clusters(
     if len(pred.shape) == 4:  # B x C x W x H
         cluster = Cluster_2d(grid_y, grid_x, pixel_y, pixel_x)
     elif len(pred.shape) == 5:  # B x C x Z x Y x X
-        cluster = Cluster_3d(grid_z, grid_y, grid_x, pixel_z, pixel_y, pixel_x) 
+        cluster = Cluster_3d(grid_z, grid_y, grid_x, pixel_z, pixel_y, pixel_x)
     else:
         raise ValueError("prediction needs to be 4D or 5D in cluster")
 
