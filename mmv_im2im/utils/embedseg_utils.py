@@ -138,7 +138,7 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
         raise ValueError("instance image must be either 2D or 3D")
 
 
-class Cluster:
+class Cluster_2d:
     def __init__(self, grid_y, grid_x, pixel_y, pixel_x):
 
         xm = torch.linspace(0, pixel_x, grid_x).view(1, 1, -1).expand(1, grid_y, grid_x)

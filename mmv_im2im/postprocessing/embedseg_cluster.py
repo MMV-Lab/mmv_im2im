@@ -2,7 +2,7 @@ import numpy as np
 from typing import Union
 import torch
 
-from mmv_im2im.utils.embedseg_utils import Cluster, Cluster_3d
+from mmv_im2im.utils.embedseg_utils import Cluster_2d, Cluster_3d
 
 
 def generate_instance_clusters(
@@ -20,5 +20,21 @@ def generate_instance_clusters(
     grid_z: int = 32,
     pixel_z: int = 1
 ):
-    if torch.is_tensor(pred):
-        pred = pred.cpu().numpy()
+    if not torch.is_tensor(pred):
+        pred = torch.from_numpy(pred)
+
+    if len(pred.shape) == 4:  # B x C x W x H
+        cluster = Cluster_2d(grid_y, grid_x, pixel_y, pixel_x)
+    elif len(pred.shape) == 5:  # B x C x Z x Y x X
+        cluster = Cluster_3d(grid_z, grid_y, grid_x, pixel_z, pixel_y, pixel_x)
+
+    instance_map, _ = cluster.cluster(
+        pred[0],
+        n_sigma=n_sigma,
+        seed_thresh=seed_thresh,
+        min_mask_sum=min_mask_sum,
+        min_unclustered_sum=min_unclustered_sum,
+        min_object_size=min_object_size,
+    )
+
+    return instance_map.cpu().numpy()
