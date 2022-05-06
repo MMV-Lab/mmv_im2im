@@ -41,12 +41,14 @@ def get_max_shape(subjects):
 
 
 def parse_config_func_without_params(info):
+    # TODO add docstring
     my_module = importlib.import_module(info["module_name"])
     my_func = getattr(my_module, info["func_name"])
     return my_func
 
 
 def parse_config(info):
+    # TODO add docstring
     my_func = parse_config_func_without_params(info)
     if "params" in info:
         return my_func(**info["params"])
@@ -55,6 +57,7 @@ def parse_config(info):
 
 
 def parse_config_func(info):
+    # TODO add docstring
     my_module = importlib.import_module(info["module_name"])
     my_func = getattr(my_module, info["func_name"])
     child_func = partial(my_func, **info["params"])
