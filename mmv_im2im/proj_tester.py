@@ -44,9 +44,16 @@ class ProjectTester(object):
         model_category = self.model_cfg.pop("category")
         model_module = import_module(f"mmv_im2im.models.basic_{model_category}")
         my_model_func = getattr(model_module, "Model")
-        self.model = my_model_func.load_from_checkpoint(
-            model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
-        ).cuda()
+        self.model = my_model_func(self.model_cfg, train=False)
+        pre_train = torch.load(self.model_cfg["ckpt"]["checkpoint_path"])
+        # TODO: hacky solution to remove a wrongly registered key
+        pre_train["state_dict"].pop("criterion.xym", None)
+        self.model.load_state_dict(pre_train["state_dict"])
+        self.model.cuda()
+
+        # self.model = my_model_func.load_from_checkpoint(
+        #    model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
+        # ).cuda()
         self.model.eval()
 
         # set up data

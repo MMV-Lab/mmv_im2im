@@ -11,7 +11,6 @@ def generate_instance_clusters(
     grid_y: int = 1024,
     pixel_x: int = 1,
     pixel_y: int = 1,
-    avg_bg: int = 0,
     n_sigma: int = 2,
     seed_thresh: float = 0.5,
     min_mask_sum: int = 100,
