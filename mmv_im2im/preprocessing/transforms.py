@@ -5,7 +5,8 @@ import logging
 import torch
 import numpy as np
 
-logger = logging.getLogger(__name__) #?
+logger = logging.getLogger(__name__)  # ?
+
 
 def norm_around_center(img, z_center: Optional[int] = None):
     """Returns normalized version of input img.
@@ -26,7 +27,7 @@ def norm_around_center(img, z_center: Optional[int] = None):
 
     img = img.numpy()
     img = np.squeeze(img, axis=0)
-    img = np.asarray(img, dtype="float32")  
+    img = np.asarray(img, dtype="float32")
 
     if img.shape[0] < 32:
         raise ValueError("Input array must be at least length 32 in first dimension")
@@ -45,6 +46,6 @@ def norm_around_center(img, z_center: Optional[int] = None):
     img = img / chunk.std()
 
     img = np.expand_dims(img, axis=0)
-    img = torch.from_numpy(img) 
+    img = torch.from_numpy(img)
 
     return img

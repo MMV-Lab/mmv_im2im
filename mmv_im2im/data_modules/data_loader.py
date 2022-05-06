@@ -19,10 +19,9 @@ from torch.utils.data import random_split, DataLoader
 import torchio as tio
 import sys
 import pytorch_lightning as pl
-from mmv_im2im.utils.for_transform import parse_tio_ops #, custom_preproc_to_tio
+from mmv_im2im.utils.for_transform import parse_tio_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 import random
-import logging
 
 
 class Im2ImDataModule(pl.LightningDataModule):
@@ -43,41 +42,9 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.train_val_ratio = data_cfg["train_val_ratio"] or 0.2
         self.train_set = None
         self.val_set = None
-        
-        """
-        # transformation
-        ######## This approach works only for <=1 custom preproc steps
-        for idx in range(len(data_cfg["preprocess"])): # To ensure that all custom preprocessing steps are imported and available for torchio.Lambda  
-            if "Lambda" in data_cfg["preprocess"][idx]["func_name"]: 
-                name_function = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[1]
-                name_module = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[0]
-                self.custom_preproc = import_module(name_module)
-                print("Apply custom preprocessing " + data_cfg["preprocess"][idx]["params"]["function"])
-                data_cfg["preprocess"][idx]["params"]["function"] = eval("self.custom_preproc." + name_function)     
-        """
-
-
-        ###### Here I am not sure how to modify that every element in custom_func list is callable from data_cfg["preprocess"][idx]["params"]["function"] in line 71
-        '''
-        import pdb
-        pdb.set_trace()
-        custom_func = []
-        for idx in range(len(data_cfg["preprocess"])):
-            if "Lambda" in data_cfg["preprocess"][idx]["func_name"]:
-                name_function = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[1]
-                name_module = data_cfg["preprocess"][idx]["params"]["function"].rsplit('.',1)[0]
-                custom_preproc = import_module(name_module)
-                custom_func.append(getattr(custom_preproc, name_function))
-                print("Apply custom preprocessing " + data_cfg["preprocess"][idx]["params"]["function"])
-                #data_cfg["preprocess"][idx]["params"]["function"] = eval("custom_preproc." + name_function)   #### sth. in the sense of data_cfg[]... = custom_func[idx]  is required here 
-        pdb.set_trace()
-        '''
 
         if "preprocess" in data_cfg:
-            #data_cfg["preprocess"], self.custom_preproc = custom_preproc_to_tio(data_cfg["preprocess"])
             self.preproc = parse_tio_ops(data_cfg["preprocess"])
-            #if len(custom_func > 0):
-            #    self.preproc = tio.Compose([self.preproc), ## loop custom_func )
         else:
             self.preproc = None
 
@@ -91,24 +58,23 @@ class Im2ImDataModule(pl.LightningDataModule):
         elif self.preproc is not None and self.augment is None:
             self.transform = self.preproc
         elif self.preproc is None and self.augment is None:
-            self.transform is None
+            self.transform = None
         else:
             self.transform = tio.Compose([self.preproc, self.augment])
 
-        self.spatial_dims = str(data_cfg["spatial_dims"])
+        if "Z" in data_cfg["source_reader_params"]["dimension_order_out"]:
+            self.spatial_dim = 3
+        else:
+            self.spatial_dim = 2
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]
-        if ("dataloader_patch_queue" in data_cfg) and (self.spatial_dims == "3"):
-            print("The dimensions of the data is 3D")
+        if "dataloader_patch_queue" in data_cfg:
             self.patch_loader = True
             self.patch_loader_params = data_cfg["dataloader_patch_queue"]["params"]
             self.patch_loader_sampler = data_cfg["dataloader_patch_queue"]["sampler"]
-        elif ("dataloader_patch_queue" not in data_cfg) and (self.spatial_dims == "2"):
-            print("The dimensions of the data is 2D")
-            self.patch_loader = False
         else:
-            logging.error("Unsupported data dimensions")
+            self.patch_loader = False
 
         # reserved for test data
         self.test_subjects = None
@@ -162,8 +128,6 @@ class Im2ImDataModule(pl.LightningDataModule):
         num_train_subjects = num_subjects - num_val_subjects
         splits = num_train_subjects, num_val_subjects
         train_subjects, val_subjects = random_split(self.subjects, splits)
-        import pdb
-        pdb.set_trace()
         self.val_set = tio.SubjectsDataset(val_subjects, transform=self.preproc)
         train_set = tio.SubjectsDataset(train_subjects, transform=self.transform)
         if self.patch_loader:

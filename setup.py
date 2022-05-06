@@ -47,7 +47,7 @@ requirements = [
     "scikit-image",
     "quilt3",
     "einops",
-    "albumentations",
+    "numba",
 ]
 
 extra_requirements = {
