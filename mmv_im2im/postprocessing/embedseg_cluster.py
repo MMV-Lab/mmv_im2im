@@ -36,4 +36,7 @@ def generate_instance_clusters(
         min_object_size=min_object_size,
     )
 
+    from aicsimageio.writers import OmeTiffWriter
+    OmeTiffWriter.save("test_pred.tiff", pred)
+
     return instance_map.cpu().numpy()
