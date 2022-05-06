@@ -54,6 +54,8 @@
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
 </ul>
 </li>
@@ -135,7 +137,7 @@
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.dm_pair_3d"><code class="xref">mmv_im2im.data_modules.dm_pair_3d</code></a></td><td>
+       <a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_embedseg"><code class="xref">mmv_im2im.data_modules.data_loader_embedseg</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -145,7 +147,42 @@
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="mmv_im2im.models.html#module-mmv_im2im.models.FCN_basic"><code class="xref">mmv_im2im.models.FCN_basic</code></a></td><td>
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_embedseg"><code class="xref">mmv_im2im.models.basic_embedseg</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_FCN"><code class="xref">mmv_im2im.models.basic_FCN</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_GAN"><code class="xref">mmv_im2im.models.basic_GAN</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_pix2pix"><code class="xref">mmv_im2im.models.basic_pix2pix</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.BranchedERFNet_2d"><code class="xref">mmv_im2im.models.BranchedERFNet_2d</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.BranchedERFNet_3d"><code class="xref">mmv_im2im.models.BranchedERFNet_3d</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.erfnet"><code class="xref">mmv_im2im.models.erfnet</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.erfnet_3d"><code class="xref">mmv_im2im.models.erfnet_3d</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -155,22 +192,37 @@
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="mmv_im2im.models.html#module-mmv_im2im.models.GAN_basic"><code class="xref">mmv_im2im.models.GAN_basic</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="cg-1">
-       <td></td>
-       <td>&#160;&#160;&#160;
        <a href="mmv_im2im.models.html#module-mmv_im2im.models.layers_and_blocks"><code class="xref">mmv_im2im.models.layers_and_blocks</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="mmv_im2im.models.html#module-mmv_im2im.models.pix2pix_basic"><code class="xref">mmv_im2im.models.pix2pix_basic</code></a></td><td>
+       <a href="mmv_im2im.models.html#module-mmv_im2im.models.pix2pixHD_generator_discriminator_2D"><code class="xref">mmv_im2im.models.pix2pixHD_generator_discriminator_2D</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
-       <a href="mmv_im2im.models.html#module-mmv_im2im.models.pix2pixHD_generator_discriminator_2D"><code class="xref">mmv_im2im.models.pix2pixHD_generator_discriminator_2D</code></a></td><td>
+       <a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing"><code class="xref">mmv_im2im.postprocessing</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.basic_collection"><code class="xref">mmv_im2im.postprocessing.basic_collection</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.embedseg_cluster"><code class="xref">mmv_im2im.postprocessing.embedseg_cluster</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing"><code class="xref">mmv_im2im.preprocessing</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing.transforms"><code class="xref">mmv_im2im.preprocessing.transforms</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>
@@ -190,7 +242,22 @@
      <tr class="cg-1">
        <td></td>
        <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedding_loss"><code class="xref">mmv_im2im.utils.embedding_loss</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedseg_utils"><code class="xref">mmv_im2im.utils.embedseg_utils</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
        <a href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform"><code class="xref">mmv_im2im.utils.for_transform</code></a></td><td>
+       <em></em></td></tr>
+     <tr class="cg-1">
+       <td></td>
+       <td>&#160;&#160;&#160;
+       <a href="mmv_im2im.utils.html#module-mmv_im2im.utils.lovasz_losses"><code class="xref">mmv_im2im.utils.lovasz_losses</code></a></td><td>
        <em></em></td></tr>
      <tr class="cg-1">
        <td></td>

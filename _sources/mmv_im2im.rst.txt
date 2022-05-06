@@ -10,6 +10,8 @@ Subpackages
    mmv_im2im.bin
    mmv_im2im.data_modules
    mmv_im2im.models
+   mmv_im2im.postprocessing
+   mmv_im2im.preprocessing
    mmv_im2im.utils
 
 Submodules

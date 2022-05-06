@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mmv_im2im.bin package &mdash; MMV Im2Im Transformation 0.1.3 documentation</title>
+  <title>mmv_im2im.preprocessing package &mdash; MMV Im2Im Transformation 0.1.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,8 +18,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="mmv_im2im.data_modules package" href="mmv_im2im.data_modules.html" />
-    <link rel="prev" title="mmv_im2im package" href="mmv_im2im.html" /> 
+    <link rel="next" title="mmv_im2im.utils package" href="mmv_im2im.utils.html" />
+    <link rel="prev" title="mmv_im2im.postprocessing package" href="mmv_im2im.postprocessing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -51,11 +51,11 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="mmv_im2im.html">mmv_im2im package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="mmv_im2im.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">mmv_im2im.preprocessing package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
 </ul>
 </li>
@@ -90,43 +90,62 @@
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="modules.html">mmv_im2im</a> &raquo;</li>
           <li><a href="mmv_im2im.html">mmv_im2im package</a> &raquo;</li>
-      <li>mmv_im2im.bin package</li>
+      <li>mmv_im2im.preprocessing package</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/mmv_im2im.bin.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/mmv_im2im.preprocessing.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
-        <a href="mmv_im2im.html" class="btn btn-neutral float-left" title="mmv_im2im package" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="mmv_im2im.data_modules.html" class="btn btn-neutral float-right" title="mmv_im2im.data_modules package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="mmv_im2im.postprocessing.html" class="btn btn-neutral float-left" title="mmv_im2im.postprocessing package" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mmv_im2im.utils.html" class="btn btn-neutral float-right" title="mmv_im2im.utils package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
   </div>
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mmv-im2im-bin-package">
-<h1>mmv_im2im.bin package<a class="headerlink" href="#mmv-im2im-bin-package" title="Permalink to this headline"></a></h1>
+  <section id="mmv-im2im-preprocessing-package">
+<h1>mmv_im2im.preprocessing package<a class="headerlink" href="#mmv-im2im-preprocessing-package" title="Permalink to this headline"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
 </section>
-<section id="module-mmv_im2im.bin.run_im2im">
-<span id="mmv-im2im-bin-run-im2im-module"></span><h2>mmv_im2im.bin.run_im2im module<a class="headerlink" href="#module-mmv_im2im.bin.run_im2im" title="Permalink to this headline"></a></h2>
-<p>This sample script will get deployed in the bin directory of the
-users’ virtualenv when the parent module is installed using pip.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="mmv_im2im.bin.run_im2im.Args">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.bin.run_im2im.</span></span><span class="sig-name descname"><span class="pre">Args</span></span><a class="reference internal" href="_modules/mmv_im2im/bin/run_im2im.html#Args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.bin.run_im2im.Args" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.Namespace</span></code></p>
+<section id="module-mmv_im2im.preprocessing.transforms">
+<span id="mmv-im2im-preprocessing-transforms-module"></span><h2>mmv_im2im.preprocessing.transforms module<a class="headerlink" href="#module-mmv_im2im.preprocessing.transforms" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.dummy_to_ones">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">dummy_to_ones</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#dummy_to_ones"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.dummy_to_ones" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.norm_around_center">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">norm_around_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#norm_around_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.norm_around_center" title="Permalink to this definition"></a></dt>
+<dd><p>Returns normalized version of input img.
+img will be normalized with respect to the mean, std pixel intensity
+of the sub-array of length 32 in the z-dimension centered around the
+img’s “z_center”.
+:Parameters: * <strong>img</strong> – Input 4D torch.Tensor to be normalized.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>z_center</strong> – Z-index of cell centers.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Normalized img</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>4D torch.Tensor</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="mmv_im2im.bin.run_im2im.main">
-<span class="sig-prename descclassname"><span class="pre">mmv_im2im.bin.run_im2im.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/bin/run_im2im.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.bin.run_im2im.main" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.to_float">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">to_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#to_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.to_float" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
-<section id="module-mmv_im2im.bin">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.bin" title="Permalink to this headline"></a></h2>
-<p>Bin scripts package for mmv_im2im.</p>
+<section id="module-mmv_im2im.preprocessing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.preprocessing" title="Permalink to this headline"></a></h2>
 </section>
 </section>
 

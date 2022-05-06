@@ -51,6 +51,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
 </ul>
 </li>
@@ -96,13 +98,36 @@
              
   <h1>Source code for mmv_im2im.utils.for_transform</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
-<span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">parse_ops_list</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">parse_config</span><span class="p">,</span> <span class="n">parse_config_func_without_params</span>
+<span class="kn">import</span> <span class="nn">torchio</span>
 
 
 <div class="viewcode-block" id="parse_tio_ops"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_tio_ops">[docs]</a><span class="k">def</span> <span class="nf">parse_tio_ops</span><span class="p">(</span><span class="n">trans_func</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
     <span class="kn">import</span> <span class="nn">torchio</span> <span class="k">as</span> <span class="nn">tio</span>
 
-    <span class="k">return</span> <span class="n">tio</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span><span class="n">parse_ops_list</span><span class="p">(</span><span class="n">trans_func</span><span class="p">))</span></div>
+    <span class="c1"># Here, we will use the Compose function in torchio to merge</span>
+    <span class="c1"># all transformations. If any trnasformation not from torchio,</span>
+    <span class="c1"># a torchio Lambda function will be used to wrap around it.</span>
+    <span class="n">trans_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">func_info</span> <span class="ow">in</span> <span class="n">trans_func</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;torchio&quot;</span><span class="p">:</span>
+            <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_config</span><span class="p">(</span><span class="n">func_info</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">func_info</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">func_info</span><span class="p">:</span>
+                <span class="n">callable_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">callable_func</span> <span class="o">=</span> <span class="n">my_func</span>
+
+            <span class="k">if</span> <span class="s2">&quot;extra_kwargs&quot;</span> <span class="ow">in</span> <span class="n">func_info</span><span class="p">:</span>
+                <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">torchio</span><span class="o">.</span><span class="n">Lambda</span><span class="p">(</span><span class="n">callable_func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;extra_kwargs&quot;</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torchio</span><span class="o">.</span><span class="n">Lambda</span><span class="p">(</span><span class="n">my_func</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">tio</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span><span class="n">trans_list</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

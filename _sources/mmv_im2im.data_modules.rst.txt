@@ -12,10 +12,10 @@ mmv\_im2im.data\_modules.data\_loader module
    :undoc-members:
    :show-inheritance:
 
-mmv\_im2im.data\_modules.dm\_pair\_3d module
---------------------------------------------
+mmv\_im2im.data\_modules.data\_loader\_embedseg module
+------------------------------------------------------
 
-.. automodule:: mmv_im2im.data_modules.dm_pair_3d
+.. automodule:: mmv_im2im.data_modules.data_loader_embedseg
    :members:
    :undoc-members:
    :show-inheritance:

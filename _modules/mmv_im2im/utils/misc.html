@@ -51,6 +51,8 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
 </ul>
 </li>
@@ -138,12 +140,14 @@
 
 
 <div class="viewcode-block" id="parse_config_func_without_params"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func_without_params">[docs]</a><span class="k">def</span> <span class="nf">parse_config_func_without_params</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+    <span class="c1"># TODO add docstring</span>
     <span class="n">my_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">])</span>
     <span class="n">my_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">my_module</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">my_func</span></div>
 
 
 <div class="viewcode-block" id="parse_config"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config">[docs]</a><span class="k">def</span> <span class="nf">parse_config</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+    <span class="c1"># TODO add docstring</span>
     <span class="n">my_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">my_func</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
@@ -152,6 +156,7 @@
 
 
 <div class="viewcode-block" id="parse_config_func"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func">[docs]</a><span class="k">def</span> <span class="nf">parse_config_func</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+    <span class="c1"># TODO add docstring</span>
     <span class="n">my_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">])</span>
     <span class="n">my_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">my_module</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">])</span>
     <span class="n">child_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mmv_im2im.utils.embedseg_utils &mdash; MMV Im2Im Transformation 0.1.3 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> MMV Im2Im Transformation
+          </a>
+              <div class="version">
+                0.1.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../mmv_im2im.html">mmv_im2im package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMV Im2Im Transformation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../mmv_im2im.html">mmv_im2im</a> &raquo;</li>
+      <li>mmv_im2im.utils.embedseg_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for mmv_im2im.utils.embedseg_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage.measurements</span> <span class="kn">import</span> <span class="n">find_objects</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage.morphology</span> <span class="kn">import</span> <span class="n">binary_fill_holes</span>
+
+
+<div class="viewcode-block" id="pairwise_python"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.pairwise_python">[docs]</a><span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pairwise_python</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">M</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                <span class="n">d</span> <span class="o">+=</span> <span class="n">tmp</span> <span class="o">*</span> <span class="n">tmp</span>
+            <span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">D</span></div>
+
+
+<div class="viewcode-block" id="fill_label_holes"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.fill_label_holes">[docs]</a><span class="k">def</span> <span class="nf">fill_label_holes</span><span class="p">(</span><span class="n">lbl_img</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fill small holes in label image.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">grow</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">interior</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">slice</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">s</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">interior</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">shrink</span><span class="p">(</span><span class="n">interior</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">interior</span><span class="p">)</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">find_objects</span><span class="p">(</span><span class="n">lbl_img</span><span class="p">)</span>
+    <span class="n">lbl_img_filled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lbl_img</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">interior</span> <span class="o">=</span> <span class="p">[(</span><span class="n">s</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">stop</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">sz</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">lbl_img</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span>
+        <span class="n">shrink_slice</span> <span class="o">=</span> <span class="n">shrink</span><span class="p">(</span><span class="n">interior</span><span class="p">)</span>
+        <span class="n">grown_mask</span> <span class="o">=</span> <span class="n">lbl_img</span><span class="p">[</span><span class="n">grow</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">interior</span><span class="p">)]</span> <span class="o">==</span> <span class="n">i</span>
+        <span class="n">mask_filled</span> <span class="o">=</span> <span class="n">binary_fill_holes</span><span class="p">(</span><span class="n">grown_mask</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="n">shrink_slice</span><span class="p">]</span>
+        <span class="n">lbl_img_filled</span><span class="p">[</span><span class="n">sl</span><span class="p">][</span><span class="n">mask_filled</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">lbl_img_filled</span></div>
+
+
+<div class="viewcode-block" id="generate_center_image_2d"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image_2d">[docs]</a><span class="k">def</span> <span class="nf">generate_center_image_2d</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a `center_image` which is one (True) for all center locations and</span>
+<span class="sd">    zero (False) otherwise.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    instance: numpy array</span>
+<span class="sd">        `instance` image containing unique `ids` for each object (YX)</span>
+<span class="sd">         or present in a one-hot encoded style where each object is one in it</span>
+<span class="sd">         own slice and zero elsewhere.</span>
+<span class="sd">    center: string</span>
+<span class="sd">        One of &#39;centroid&#39;, &#39;approximate-medoid&#39; or &#39;medoid&#39;.</span>
+<span class="sd">    ids: list</span>
+<span class="sd">        Unique ids corresponding to the objects present in the instance image.</span>
+<span class="sd">    one_hot: boolean</span>
+<span class="sd">        True (in this case, `instance` has shape DYX) or False (in this case,</span>
+<span class="sd">        `instance` has shape YX).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">center_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="nb">id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">instance</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">center</span> <span class="o">==</span> <span class="s2">&quot;centroid&quot;</span><span class="p">:</span>
+                <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">center</span> <span class="o">==</span> <span class="s2">&quot;approximate-medoid&quot;</span><span class="p">:</span>
+                <span class="n">ym_temp</span><span class="p">,</span> <span class="n">xm_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">imin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">xm_temp</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">ym_temp</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">imin</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">imin</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">center</span> <span class="o">==</span> <span class="s2">&quot;medoid&quot;</span><span class="p">:</span>
+                <span class="n">dist_matrix</span> <span class="o">=</span> <span class="n">pairwise_python</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+                <span class="n">imin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dist_matrix</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">imin</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">imin</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;error in center method&quot;</span><span class="p">)</span>
+            <span class="n">center_image</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">ym</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">xm</span><span class="p">))]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">center_image</span></div>
+
+
+<div class="viewcode-block" id="generate_center_image_3d"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image_3d">[docs]</a><span class="k">def</span> <span class="nf">generate_center_image_3d</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">anisotropy_factor</span><span class="p">,</span> <span class="n">speed_up</span><span class="p">):</span>
+    <span class="n">center_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">instance_downsampled</span> <span class="o">=</span> <span class="n">instance</span><span class="p">[</span>
+        <span class="p">:,</span> <span class="p">::</span> <span class="nb">int</span><span class="p">(</span><span class="n">speed_up</span><span class="p">),</span> <span class="p">::</span> <span class="nb">int</span><span class="p">(</span><span class="n">speed_up</span><span class="p">)</span>
+    <span class="p">]</span>  <span class="c1"># down sample in x and y</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="nb">id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+        <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">instance_downsampled</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">center</span> <span class="o">==</span> <span class="s2">&quot;centroid&quot;</span><span class="p">:</span>
+                <span class="n">zm</span><span class="p">,</span> <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">center</span> <span class="o">==</span> <span class="s2">&quot;approximate-medoid&quot;</span><span class="p">:</span>
+                <span class="n">zm_temp</span><span class="p">,</span> <span class="n">ym_temp</span><span class="p">,</span> <span class="n">xm_temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">imin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">xm_temp</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">ym_temp</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="n">anisotropy_factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">zm_temp</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="p">)</span>
+                <span class="n">zm</span><span class="p">,</span> <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">imin</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">imin</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">imin</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">center</span> <span class="o">==</span> <span class="s2">&quot;medoid&quot;</span><span class="p">:</span>
+                <span class="n">dist_matrix</span> <span class="o">=</span> <span class="n">pairwise_python</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">speed_up</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="n">speed_up</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">anisotropy_factor</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">imin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dist_matrix</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+                <span class="n">zm</span><span class="p">,</span> <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">imin</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">imin</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">imin</span><span class="p">]</span>
+            <span class="n">center_image</span><span class="p">[</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">zm</span><span class="p">)),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">speed_up</span> <span class="o">*</span> <span class="n">ym</span><span class="p">)),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">speed_up</span> <span class="o">*</span> <span class="n">xm</span><span class="p">)),</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">center_image</span></div>
+
+
+<div class="viewcode-block" id="generate_center_image"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image">[docs]</a><span class="k">def</span> <span class="nf">generate_center_image</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">anisotropy_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">speed_up</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_center_image_3d</span><span class="p">(</span>
+            <span class="n">instance</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">anisotropy_factor</span><span class="p">,</span> <span class="n">speed_up</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_center_image_2d</span><span class="p">(</span>
+            <span class="n">instance</span><span class="p">,</span>
+            <span class="n">center</span><span class="p">,</span>
+            <span class="n">ids</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;instance image must be either 2D or 3D&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jianxu Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

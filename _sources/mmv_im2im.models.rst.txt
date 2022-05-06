@@ -4,18 +4,66 @@ mmv\_im2im.models package
 Submodules
 ----------
 
-mmv\_im2im.models.FCN\_basic module
------------------------------------
+mmv\_im2im.models.BranchedERFNet\_2d module
+-------------------------------------------
 
-.. automodule:: mmv_im2im.models.FCN_basic
+.. automodule:: mmv_im2im.models.BranchedERFNet_2d
    :members:
    :undoc-members:
    :show-inheritance:
 
-mmv\_im2im.models.GAN\_basic module
+mmv\_im2im.models.BranchedERFNet\_3d module
+-------------------------------------------
+
+.. automodule:: mmv_im2im.models.BranchedERFNet_3d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.basic\_FCN module
 -----------------------------------
 
-.. automodule:: mmv_im2im.models.GAN_basic
+.. automodule:: mmv_im2im.models.basic_FCN
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.basic\_GAN module
+-----------------------------------
+
+.. automodule:: mmv_im2im.models.basic_GAN
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.basic\_embedseg module
+----------------------------------------
+
+.. automodule:: mmv_im2im.models.basic_embedseg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.basic\_pix2pix module
+---------------------------------------
+
+.. automodule:: mmv_im2im.models.basic_pix2pix
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.erfnet module
+-------------------------------
+
+.. automodule:: mmv_im2im.models.erfnet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.erfnet\_3d module
+-----------------------------------
+
+.. automodule:: mmv_im2im.models.erfnet_3d
    :members:
    :undoc-members:
    :show-inheritance:
@@ -40,14 +88,6 @@ mmv\_im2im.models.pix2pixHD\_generator\_discriminator\_2D module
 ----------------------------------------------------------------
 
 .. automodule:: mmv_im2im.models.pix2pixHD_generator_discriminator_2D
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-mmv\_im2im.models.pix2pix\_basic module
----------------------------------------
-
-.. automodule:: mmv_im2im.models.pix2pix_basic
    :members:
    :undoc-members:
    :show-inheritance:

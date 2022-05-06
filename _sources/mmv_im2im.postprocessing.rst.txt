@@ -1,0 +1,29 @@
+mmv\_im2im.postprocessing package
+=================================
+
+Submodules
+----------
+
+mmv\_im2im.postprocessing.basic\_collection module
+--------------------------------------------------
+
+.. automodule:: mmv_im2im.postprocessing.basic_collection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.postprocessing.embedseg\_cluster module
+--------------------------------------------------
+
+.. automodule:: mmv_im2im.postprocessing.embedseg_cluster
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mmv_im2im.postprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -4,10 +4,34 @@ mmv\_im2im.utils package
 Submodules
 ----------
 
+mmv\_im2im.utils.embedding\_loss module
+---------------------------------------
+
+.. automodule:: mmv_im2im.utils.embedding_loss
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.utils.embedseg\_utils module
+---------------------------------------
+
+.. automodule:: mmv_im2im.utils.embedseg_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mmv\_im2im.utils.for\_transform module
 --------------------------------------
 
 .. automodule:: mmv_im2im.utils.for_transform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.utils.lovasz\_losses module
+--------------------------------------
+
+.. automodule:: mmv_im2im.utils.lovasz_losses
    :members:
    :undoc-members:
    :show-inheritance:

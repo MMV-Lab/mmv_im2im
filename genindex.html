@@ -51,6 +51,8 @@
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
 </ul>
 </li>
@@ -97,8 +99,10 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
@@ -109,7 +113,9 @@
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#X"><strong>X</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -124,13 +130,49 @@
   </ul></td>
 </tr></table>
 
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.binary_xloss">binary_xloss() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_2d.BranchedERFNet_2d">BranchedERFNet_2d (class in mmv_im2im.models.BranchedERFNet_2d)</a>
+</li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_3d.BranchedERFNet_3d">BranchedERFNet_3d (class in mmv_im2im.models.BranchedERFNet_3d)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.configure_optimizers">configure_optimizers() (mmv_im2im.models.FCN_basic.Model method)</a>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.calculate_iou">calculate_iou() (in module mmv_im2im.utils.embedding_loss)</a>
+</li>
+      <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d.cluster">cluster() (mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.configure_optimizers">(mmv_im2im.models.pix2pix_basic.Model method)</a>
+        <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d.cluster">(mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d method)</a>
+</li>
+      </ul></li>
+      <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d">Cluster_2d (class in mmv_im2im.postprocessing.embedseg_cluster)</a>
+</li>
+      <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d">Cluster_3d (class in mmv_im2im.postprocessing.embedseg_cluster)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d.cluster_with_gt">cluster_with_gt() (mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d method)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d.cluster_with_gt">(mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d method)</a>
+</li>
+      </ul></li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model.configure_optimizers">configure_optimizers() (mmv_im2im.models.basic_embedseg.Model method)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.configure_optimizers">(mmv_im2im.models.basic_FCN.Model method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.configure_optimizers">(mmv_im2im.models.basic_pix2pix.Model method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -139,7 +181,41 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Decoder">Decoder (class in mmv_im2im.models.erfnet)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Decoder">(class in mmv_im2im.models.erfnet_3d)</a>
+</li>
+      </ul></li>
+      <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.degrid">degrid() (in module mmv_im2im.postprocessing.embedseg_cluster)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pixHD_generator_discriminator_2D.Discriminator">Discriminator (class in mmv_im2im.models.pix2pixHD_generator_discriminator_2D)</a>
+</li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.DownsamplerBlock">DownsamplerBlock (class in mmv_im2im.models.erfnet)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.DownsamplerBlock">(class in mmv_im2im.models.erfnet_3d)</a>
+</li>
+      </ul></li>
+      <li><a href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.dummy_to_ones">dummy_to_ones() (in module mmv_im2im.preprocessing.transforms)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Encoder">Encoder (class in mmv_im2im.models.erfnet)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Encoder">(class in mmv_im2im.models.erfnet_3d)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.basic_collection.extract_segmentation">extract_segmentation() (in module mmv_im2im.postprocessing.basic_collection)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -147,14 +223,50 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.forward">forward() (mmv_im2im.models.FCN_basic.Model method)</a>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.fill_label_holes">fill_label_holes() (in module mmv_im2im.utils.embedseg_utils)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.flatten_binary_scores">flatten_binary_scores() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.flatten_probas">flatten_probas() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model.forward">forward() (mmv_im2im.models.basic_embedseg.Model method)</a>
 
       <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.forward">(mmv_im2im.models.basic_FCN.Model method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.forward">(mmv_im2im.models.basic_pix2pix.Model method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_2d.BranchedERFNet_2d.forward">(mmv_im2im.models.BranchedERFNet_2d.BranchedERFNet_2d method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_3d.BranchedERFNet_3d.forward">(mmv_im2im.models.BranchedERFNet_3d.BranchedERFNet_3d method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Decoder.forward">(mmv_im2im.models.erfnet.Decoder method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.DownsamplerBlock.forward">(mmv_im2im.models.erfnet.DownsamplerBlock method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Encoder.forward">(mmv_im2im.models.erfnet.Encoder method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Net.forward">(mmv_im2im.models.erfnet.Net method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.non_bottleneck_1d.forward">(mmv_im2im.models.erfnet.non_bottleneck_1d method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.UpsamplerBlock.forward">(mmv_im2im.models.erfnet.UpsamplerBlock method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Decoder.forward">(mmv_im2im.models.erfnet_3d.Decoder method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.DownsamplerBlock.forward">(mmv_im2im.models.erfnet_3d.DownsamplerBlock method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Encoder.forward">(mmv_im2im.models.erfnet_3d.Encoder method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Net.forward">(mmv_im2im.models.erfnet_3d.Net method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.non_bottleneck_1d.forward">(mmv_im2im.models.erfnet_3d.non_bottleneck_1d method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.UpsamplerBlock.forward">(mmv_im2im.models.erfnet_3d.UpsamplerBlock method)</a>
+</li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.fnet_nn_3d_params.Net.forward">(mmv_im2im.models.fnet_nn_3d_params.Net method)</a>
 </li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.fnet_nn_3d_params.SubNet2Conv.forward">(mmv_im2im.models.fnet_nn_3d_params.SubNet2Conv method)</a>
-</li>
-        <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.forward">(mmv_im2im.models.pix2pix_basic.Model method)</a>
 </li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pixHD_generator_discriminator_2D.Discriminator.forward">(mmv_im2im.models.pix2pixHD_generator_discriminator_2D.Discriminator method)</a>
 </li>
@@ -164,6 +276,12 @@
 </li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pixHD_generator_discriminator_2D.ResidualBlock.forward">(mmv_im2im.models.pix2pixHD_generator_discriminator_2D.ResidualBlock method)</a>
 </li>
+        <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D.forward">(mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D method)</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.forward">(mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d method)</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.StableBCELoss.forward">(mmv_im2im.utils.lovasz_losses.StableBCELoss method)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -171,13 +289,23 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image">generate_center_image() (in module mmv_im2im.utils.embedseg_utils)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image_2d">generate_center_image_2d() (in module mmv_im2im.utils.embedseg_utils)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image_3d">generate_center_image_3d() (in module mmv_im2im.utils.embedseg_utils)</a>
+</li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict">generate_dataset_dict() (in module mmv_im2im.utils.misc)</a>
 </li>
-      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_test_dataset_dict">generate_test_dataset_dict() (in module mmv_im2im.utils.misc)</a>
+      <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.generate_instance_clusters">generate_instance_clusters() (in module mmv_im2im.postprocessing.embedseg_cluster)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_test_dataset_dict">generate_test_dataset_dict() (in module mmv_im2im.utils.misc)</a>
+</li>
       <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pixHD_generator_discriminator_2D.Generator">Generator (class in mmv_im2im.models.pix2pixHD_generator_discriminator_2D)</a>
+</li>
+      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.get_data_module">get_data_module() (in module mmv_im2im.data_modules)</a>
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.get_max_shape">get_max_shape() (in module mmv_im2im.utils.misc)</a>
 </li>
@@ -192,9 +320,21 @@
       <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule">Im2ImDataModule (class in mmv_im2im.data_modules.data_loader)</a>
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule">(class in mmv_im2im.data_modules.dm_pair_3d)</a>
+        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule">(class in mmv_im2im.data_modules.data_loader_embedseg)</a>
 </li>
       </ul></li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_2d.BranchedERFNet_2d.init_output">init_output() (mmv_im2im.models.BranchedERFNet_2d.BranchedERFNet_2d method)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_3d.BranchedERFNet_3d.init_output">(mmv_im2im.models.BranchedERFNet_3d.BranchedERFNet_3d method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou">iou() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou_binary">iou_binary() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -203,6 +343,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.load_yaml_cfg">load_yaml_cfg() (in module mmv_im2im.utils.misc)</a>
 </li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_grad">lovasz_grad() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_hinge">lovasz_hinge() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_hinge_flat">lovasz_hinge_flat() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_softmax">lovasz_softmax() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_softmax_flat">lovasz_softmax_flat() (in module mmv_im2im.utils.lovasz_losses)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -210,6 +362,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.bin.html#mmv_im2im.bin.run_im2im.main">main() (in module mmv_im2im.bin.run_im2im)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.mean">mean() (in module mmv_im2im.utils.lovasz_losses)</a>
 </li>
       <li>
     mmv_im2im
@@ -247,10 +401,10 @@
 </li>
       </ul></li>
       <li>
-    mmv_im2im.data_modules.dm_pair_3d
+    mmv_im2im.data_modules.data_loader_embedseg
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.dm_pair_3d">module</a>
+        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_embedseg">module</a>
 </li>
       </ul></li>
       <li>
@@ -261,10 +415,59 @@
 </li>
       </ul></li>
       <li>
-    mmv_im2im.models.FCN_basic
+    mmv_im2im.models.basic_embedseg
 
       <ul>
-        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.FCN_basic">module</a>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_embedseg">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.basic_FCN
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_FCN">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.basic_GAN
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_GAN">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.basic_pix2pix
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_pix2pix">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.BranchedERFNet_2d
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.BranchedERFNet_2d">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.BranchedERFNet_3d
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.BranchedERFNet_3d">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.erfnet
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.erfnet">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.models.erfnet_3d
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.erfnet_3d">module</a>
 </li>
       </ul></li>
       <li>
@@ -275,13 +478,6 @@
 </li>
       </ul></li>
       <li>
-    mmv_im2im.models.GAN_basic
-
-      <ul>
-        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.GAN_basic">module</a>
-</li>
-      </ul></li>
-      <li>
     mmv_im2im.models.layers_and_blocks
 
       <ul>
@@ -289,17 +485,45 @@
 </li>
       </ul></li>
       <li>
-    mmv_im2im.models.pix2pix_basic
-
-      <ul>
-        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.pix2pix_basic">module</a>
-</li>
-      </ul></li>
-      <li>
     mmv_im2im.models.pix2pixHD_generator_discriminator_2D
 
       <ul>
         <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.pix2pixHD_generator_discriminator_2D">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.postprocessing
+
+      <ul>
+        <li><a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.postprocessing.basic_collection
+
+      <ul>
+        <li><a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.basic_collection">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.postprocessing.embedseg_cluster
+
+      <ul>
+        <li><a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.embedseg_cluster">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.preprocessing
+
+      <ul>
+        <li><a href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.preprocessing.transforms
+
+      <ul>
+        <li><a href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing.transforms">module</a>
 </li>
       </ul></li>
       <li>
@@ -316,6 +540,8 @@
         <li><a href="mmv_im2im.html#module-mmv_im2im.proj_trainer">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     mmv_im2im.utils
 
@@ -323,13 +549,32 @@
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    mmv_im2im.utils.embedding_loss
+
+      <ul>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedding_loss">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.utils.embedseg_utils
+
+      <ul>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedseg_utils">module</a>
+</li>
+      </ul></li>
       <li>
     mmv_im2im.utils.for_transform
 
       <ul>
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform">module</a>
+</li>
+      </ul></li>
+      <li>
+    mmv_im2im.utils.lovasz_losses
+
+      <ul>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.lovasz_losses">module</a>
 </li>
       </ul></li>
       <li>
@@ -353,10 +598,12 @@
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.pix2pix_losses">module</a>
 </li>
       </ul></li>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model">Model (class in mmv_im2im.models.FCN_basic)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model">Model (class in mmv_im2im.models.basic_embedseg)</a>
 
       <ul>
-        <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model">(class in mmv_im2im.models.pix2pix_basic)</a>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model">(class in mmv_im2im.models.basic_FCN)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model">(class in mmv_im2im.models.basic_pix2pix)</a>
 </li>
       </ul></li>
       <li>
@@ -373,21 +620,41 @@
 </li>
         <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader">mmv_im2im.data_modules.data_loader</a>
 </li>
-        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.dm_pair_3d">mmv_im2im.data_modules.dm_pair_3d</a>
+        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_embedseg">mmv_im2im.data_modules.data_loader_embedseg</a>
 </li>
         <li><a href="mmv_im2im.models.html#module-mmv_im2im.models">mmv_im2im.models</a>
 </li>
-        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.FCN_basic">mmv_im2im.models.FCN_basic</a>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_embedseg">mmv_im2im.models.basic_embedseg</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_FCN">mmv_im2im.models.basic_FCN</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_GAN">mmv_im2im.models.basic_GAN</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.basic_pix2pix">mmv_im2im.models.basic_pix2pix</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.BranchedERFNet_2d">mmv_im2im.models.BranchedERFNet_2d</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.BranchedERFNet_3d">mmv_im2im.models.BranchedERFNet_3d</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.erfnet">mmv_im2im.models.erfnet</a>
+</li>
+        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.erfnet_3d">mmv_im2im.models.erfnet_3d</a>
 </li>
         <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.fnet_nn_3d_params">mmv_im2im.models.fnet_nn_3d_params</a>
 </li>
-        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.GAN_basic">mmv_im2im.models.GAN_basic</a>
-</li>
         <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.layers_and_blocks">mmv_im2im.models.layers_and_blocks</a>
 </li>
-        <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.pix2pix_basic">mmv_im2im.models.pix2pix_basic</a>
-</li>
         <li><a href="mmv_im2im.models.html#module-mmv_im2im.models.pix2pixHD_generator_discriminator_2D">mmv_im2im.models.pix2pixHD_generator_discriminator_2D</a>
+</li>
+        <li><a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing">mmv_im2im.postprocessing</a>
+</li>
+        <li><a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.basic_collection">mmv_im2im.postprocessing.basic_collection</a>
+</li>
+        <li><a href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.embedseg_cluster">mmv_im2im.postprocessing.embedseg_cluster</a>
+</li>
+        <li><a href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing">mmv_im2im.preprocessing</a>
+</li>
+        <li><a href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing.transforms">mmv_im2im.preprocessing.transforms</a>
 </li>
         <li><a href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester</a>
 </li>
@@ -395,7 +662,13 @@
 </li>
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils">mmv_im2im.utils</a>
 </li>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedding_loss">mmv_im2im.utils.embedding_loss</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedseg_utils">mmv_im2im.utils.embedseg_utils</a>
+</li>
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform">mmv_im2im.utils.for_transform</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.lovasz_losses">mmv_im2im.utils.lovasz_losses</a>
 </li>
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.misc">mmv_im2im.utils.misc</a>
 </li>
@@ -410,7 +683,23 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.fnet_nn_3d_params.Net">Net (class in mmv_im2im.models.fnet_nn_3d_params)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Net">Net (class in mmv_im2im.models.erfnet)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Net">(class in mmv_im2im.models.erfnet_3d)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.fnet_nn_3d_params.Net">(class in mmv_im2im.models.fnet_nn_3d_params)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.non_bottleneck_1d">non_bottleneck_1d (class in mmv_im2im.models.erfnet)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.non_bottleneck_1d">(class in mmv_im2im.models.erfnet_3d)</a>
+</li>
+      </ul></li>
+      <li><a href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.norm_around_center">norm_around_center() (in module mmv_im2im.preprocessing.transforms)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -418,6 +707,8 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.pairwise_python">pairwise_python() (in module mmv_im2im.utils.embedseg_utils)</a>
+</li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config">parse_config() (in module mmv_im2im.utils.misc)</a>
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func">parse_config_func() (in module mmv_im2im.utils.misc)</a>
@@ -436,12 +727,16 @@
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.piecewise_inference.predict_piecewise">predict_piecewise() (in module mmv_im2im.utils.piecewise_inference)</a>
 </li>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.prepare_batch">prepare_batch() (mmv_im2im.models.FCN_basic.Model method)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model.prepare_batch">prepare_batch() (mmv_im2im.models.basic_embedseg.Model method)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.prepare_batch">(mmv_im2im.models.basic_FCN.Model method)</a>
 </li>
+      </ul></li>
       <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data">prepare_data() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule.prepare_data">(mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule method)</a>
+        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
 </li>
       </ul></li>
       <li><a href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester">ProjectTester (class in mmv_im2im.proj_tester)</a>
@@ -458,14 +753,16 @@
 </li>
       <li><a href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.run_inference">run_inference() (mmv_im2im.proj_tester.ProjectTester method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.run_step">run_step() (mmv_im2im.models.FCN_basic.Model method)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model.run_step">run_step() (mmv_im2im.models.basic_embedseg.Model method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.run_step">(mmv_im2im.models.pix2pix_basic.Model method)</a>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.run_step">(mmv_im2im.models.basic_FCN.Model method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.run_step">(mmv_im2im.models.basic_pix2pix.Model method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer.run_training">run_training() (mmv_im2im.proj_trainer.ProjectTrainer method)</a>
 </li>
   </ul></td>
@@ -477,11 +774,17 @@
       <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup">setup() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule.setup">(mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule method)</a>
+        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
 </li>
       </ul></li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D">SpatialEmbLoss_2D (class in mmv_im2im.utils.embedding_loss)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d">SpatialEmbLoss_3d (class in mmv_im2im.utils.embedding_loss)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.StableBCELoss">StableBCELoss (class in mmv_im2im.utils.lovasz_losses)</a>
+</li>
       <li><a href="mmv_im2im.models.html#mmv_im2im.models.fnet_nn_3d_params.SubNet2Conv">SubNet2Conv (class in mmv_im2im.models.fnet_nn_3d_params)</a>
 </li>
   </ul></td>
@@ -493,23 +796,55 @@
       <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.test_dataloader">test_dataloader() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule.test_dataloader">(mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule method)</a>
+        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.test_dataloader">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
 </li>
       </ul></li>
+      <li><a href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.to_float">to_float() (in module mmv_im2im.preprocessing.transforms)</a>
+</li>
       <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.train_dataloader">train_dataloader() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule.train_dataloader">(mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule method)</a>
+        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.train_dataloader">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
 </li>
       </ul></li>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.training">training (mmv_im2im.models.FCN_basic.Model attribute)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model.training">training (mmv_im2im.models.basic_embedseg.Model attribute)</a>
 
       <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.training">(mmv_im2im.models.basic_FCN.Model attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.training">(mmv_im2im.models.basic_pix2pix.Model attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_2d.BranchedERFNet_2d.training">(mmv_im2im.models.BranchedERFNet_2d.BranchedERFNet_2d attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.BranchedERFNet_3d.BranchedERFNet_3d.training">(mmv_im2im.models.BranchedERFNet_3d.BranchedERFNet_3d attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Decoder.training">(mmv_im2im.models.erfnet.Decoder attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.DownsamplerBlock.training">(mmv_im2im.models.erfnet.DownsamplerBlock attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Encoder.training">(mmv_im2im.models.erfnet.Encoder attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.Net.training">(mmv_im2im.models.erfnet.Net attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.non_bottleneck_1d.training">(mmv_im2im.models.erfnet.non_bottleneck_1d attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.UpsamplerBlock.training">(mmv_im2im.models.erfnet.UpsamplerBlock attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Decoder.training">(mmv_im2im.models.erfnet_3d.Decoder attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.DownsamplerBlock.training">(mmv_im2im.models.erfnet_3d.DownsamplerBlock attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Encoder.training">(mmv_im2im.models.erfnet_3d.Encoder attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.Net.training">(mmv_im2im.models.erfnet_3d.Net attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.non_bottleneck_1d.training">(mmv_im2im.models.erfnet_3d.non_bottleneck_1d attribute)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.UpsamplerBlock.training">(mmv_im2im.models.erfnet_3d.UpsamplerBlock attribute)</a>
+</li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.fnet_nn_3d_params.Net.training">(mmv_im2im.models.fnet_nn_3d_params.Net attribute)</a>
 </li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.fnet_nn_3d_params.SubNet2Conv.training">(mmv_im2im.models.fnet_nn_3d_params.SubNet2Conv attribute)</a>
-</li>
-        <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.training">(mmv_im2im.models.pix2pix_basic.Model attribute)</a>
 </li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pixHD_generator_discriminator_2D.Discriminator.training">(mmv_im2im.models.pix2pixHD_generator_discriminator_2D.Discriminator attribute)</a>
 </li>
@@ -519,15 +854,35 @@
 </li>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pixHD_generator_discriminator_2D.ResidualBlock.training">(mmv_im2im.models.pix2pixHD_generator_discriminator_2D.ResidualBlock attribute)</a>
 </li>
+        <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D.training">(mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D attribute)</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.training">(mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d attribute)</a>
+</li>
+        <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.StableBCELoss.training">(mmv_im2im.utils.lovasz_losses.StableBCELoss attribute)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.training_epoch_end">training_epoch_end() (mmv_im2im.models.pix2pix_basic.Model method)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.training_epoch_end">training_epoch_end() (mmv_im2im.models.basic_pix2pix.Model method)</a>
 </li>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.training_step">training_step() (mmv_im2im.models.FCN_basic.Model method)</a>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model.training_step">training_step() (mmv_im2im.models.basic_embedseg.Model method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.training_step">(mmv_im2im.models.pix2pix_basic.Model method)</a>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.training_step">(mmv_im2im.models.basic_FCN.Model method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.training_step">(mmv_im2im.models.basic_pix2pix.Model method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet.UpsamplerBlock">UpsamplerBlock (class in mmv_im2im.models.erfnet)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.erfnet_3d.UpsamplerBlock">(class in mmv_im2im.models.erfnet_3d)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -539,19 +894,29 @@
       <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.val_dataloader">val_dataloader() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule.val_dataloader">(mmv_im2im.data_modules.dm_pair_3d.Im2ImDataModule method)</a>
+        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.val_dataloader">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
+</li>
+      </ul></li>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.validation_epoch_end">validation_epoch_end() (mmv_im2im.models.basic_pix2pix.Model method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_embedseg.Model.validation_step">validation_step() (mmv_im2im.models.basic_embedseg.Model method)</a>
+
+      <ul>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.validation_step">(mmv_im2im.models.basic_FCN.Model method)</a>
+</li>
+        <li><a href="mmv_im2im.models.html#mmv_im2im.models.basic_pix2pix.Model.validation_step">(mmv_im2im.models.basic_pix2pix.Model method)</a>
 </li>
       </ul></li>
   </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.validation_epoch_end">validation_epoch_end() (mmv_im2im.models.pix2pix_basic.Model method)</a>
-</li>
-      <li><a href="mmv_im2im.models.html#mmv_im2im.models.FCN_basic.Model.validation_step">validation_step() (mmv_im2im.models.FCN_basic.Model method)</a>
+</tr></table>
 
-      <ul>
-        <li><a href="mmv_im2im.models.html#mmv_im2im.models.pix2pix_basic.Model.validation_step">(mmv_im2im.models.pix2pix_basic.Model method)</a>
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.xloss">xloss() (in module mmv_im2im.utils.lovasz_losses)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 

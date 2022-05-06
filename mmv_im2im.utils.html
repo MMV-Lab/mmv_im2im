@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Contributing" href="contributing.html" />
-    <link rel="prev" title="mmv_im2im.models package" href="mmv_im2im.models.html" /> 
+    <link rel="prev" title="mmv_im2im.preprocessing package" href="mmv_im2im.preprocessing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -54,6 +54,8 @@
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">mmv_im2im.utils package</a></li>
 </ul>
 </li>
@@ -93,7 +95,7 @@
             <a href="_sources/mmv_im2im.utils.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
-        <a href="mmv_im2im.models.html" class="btn btn-neutral float-left" title="mmv_im2im.models package" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mmv_im2im.preprocessing.html" class="btn btn-neutral float-left" title="mmv_im2im.preprocessing package" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
   </div>
   <hr/>
@@ -106,12 +108,257 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
 </section>
+<section id="module-mmv_im2im.utils.embedding_loss">
+<span id="mmv-im2im-utils-embedding-loss-module"></span><h2>mmv_im2im.utils.embedding_loss module<a class="headerlink" href="#module-mmv_im2im.utils.embedding_loss" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedding_loss.</span></span><span class="sig-name descname"><span class="pre">SpatialEmbLoss_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foreground_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedding_loss.html#SpatialEmbLoss_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instances</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_inst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedding_loss.html#SpatialEmbLoss_2D.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedding_loss.</span></span><span class="sig-name descname"><span class="pre">SpatialEmbLoss_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixel_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foreground_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedding_loss.html#SpatialEmbLoss_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instances</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_inst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedding_loss.html#SpatialEmbLoss_3d.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedding_loss.calculate_iou">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedding_loss.</span></span><span class="sig-name descname"><span class="pre">calculate_iou</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedding_loss.html#calculate_iou"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedding_loss.calculate_iou" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-mmv_im2im.utils.embedseg_utils">
+<span id="mmv-im2im-utils-embedseg-utils-module"></span><h2>mmv_im2im.utils.embedseg_utils module<a class="headerlink" href="#module-mmv_im2im.utils.embedseg_utils" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedseg_utils.fill_label_holes">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedseg_utils.</span></span><span class="sig-name descname"><span class="pre">fill_label_holes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lbl_img</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedseg_utils.html#fill_label_holes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedseg_utils.fill_label_holes" title="Permalink to this definition"></a></dt>
+<dd><p>Fill small holes in label image.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedseg_utils.generate_center_image">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedseg_utils.</span></span><span class="sig-name descname"><span class="pre">generate_center_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed_up</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedseg_utils.html#generate_center_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedseg_utils.generate_center_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedseg_utils.generate_center_image_2d">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedseg_utils.</span></span><span class="sig-name descname"><span class="pre">generate_center_image_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedseg_utils.html#generate_center_image_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedseg_utils.generate_center_image_2d" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a <cite>center_image</cite> which is one (True) for all center locations and
+zero (False) otherwise.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>instance</strong> (<em>numpy array</em>) –</p>
+<dl class="simple">
+<dt><cite>instance</cite> image containing unique <cite>ids</cite> for each object (YX)</dt><dd><p>or present in a one-hot encoded style where each object is one in it
+own slice and zero elsewhere.</p>
+</dd>
+</dl>
+</li>
+<li><p><strong>center</strong> (<em>string</em>) – One of ‘centroid’, ‘approximate-medoid’ or ‘medoid’.</p></li>
+<li><p><strong>ids</strong> (<em>list</em>) – Unique ids corresponding to the objects present in the instance image.</p></li>
+<li><p><strong>one_hot</strong> (<em>boolean</em>) – True (in this case, <cite>instance</cite> has shape DYX) or False (in this case,
+<cite>instance</cite> has shape YX).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedseg_utils.generate_center_image_3d">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedseg_utils.</span></span><span class="sig-name descname"><span class="pre">generate_center_image_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anisotropy_factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed_up</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedseg_utils.html#generate_center_image_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedseg_utils.generate_center_image_3d" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedseg_utils.pairwise_python">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedseg_utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedseg_utils.html#pairwise_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedseg_utils.pairwise_python" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-mmv_im2im.utils.for_transform">
 <span id="mmv-im2im-utils-for-transform-module"></span><h2>mmv_im2im.utils.for_transform module<a class="headerlink" href="#module-mmv_im2im.utils.for_transform" title="Permalink to this headline"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.utils.for_transform.parse_tio_ops">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.for_transform.</span></span><span class="sig-name descname"><span class="pre">parse_tio_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trans_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/for_transform.html#parse_tio_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.for_transform.parse_tio_ops" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-mmv_im2im.utils.lovasz_losses">
+<span id="mmv-im2im-utils-lovasz-losses-module"></span><h2>mmv_im2im.utils.lovasz_losses module<a class="headerlink" href="#module-mmv_im2im.utils.lovasz_losses" title="Permalink to this headline"></a></h2>
+<p>Lovasz-Softmax and Jaccard hinge loss in PyTorch
+Maxim Berman 2018 ESAT-PSI KU Leuven (MIT License)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.StableBCELoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">StableBCELoss</span></span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#StableBCELoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.StableBCELoss" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.StableBCELoss.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#StableBCELoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.StableBCELoss.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.StableBCELoss.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.StableBCELoss.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.binary_xloss">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">binary_xloss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#binary_xloss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.binary_xloss" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Binary Cross entropy loss</dt><dd><p>logits: [B, H, W] Variable, logits at each pixel (between -infty and +infty)  # noqa W605
+labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
+ignore: void class id</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.flatten_binary_scores">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">flatten_binary_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#flatten_binary_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.flatten_binary_scores" title="Permalink to this definition"></a></dt>
+<dd><p>Flattens predictions in the batch (binary case)
+Remove labels equal to ‘ignore’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.flatten_probas">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">flatten_probas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#flatten_probas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.flatten_probas" title="Permalink to this definition"></a></dt>
+<dd><p>Flattens predictions in the batch</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.iou">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">iou</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EMPTY</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#iou"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.iou" title="Permalink to this definition"></a></dt>
+<dd><p>Array of IoU for each (non ignored) class</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.iou_binary">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">iou_binary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">EMPTY</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#iou_binary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.iou_binary" title="Permalink to this definition"></a></dt>
+<dd><p>IoU for foreground class
+binary: 1 foreground, 0 background</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.lovasz_grad">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">lovasz_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gt_sorted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#lovasz_grad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.lovasz_grad" title="Permalink to this definition"></a></dt>
+<dd><p>Computes gradient of the Lovasz extension w.r.t sorted errors
+See Alg. 1 in paper</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.lovasz_hinge">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">lovasz_hinge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#lovasz_hinge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.lovasz_hinge" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Binary Lovasz hinge loss</dt><dd><p>logits: [B, H, W] Variable, logits at each pixel (between -infty and +infty)  # noqa W605
+labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
+per_image: compute the loss per image instead of per batch
+ignore: void class id</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.lovasz_hinge_flat">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">lovasz_hinge_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#lovasz_hinge_flat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.lovasz_hinge_flat" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Binary Lovasz hinge loss</dt><dd><p>logits: [P] Variable, logits at each prediction (between -infty and +infty)  # noqa W605
+labels: [P] Tensor, binary ground truth labels (0 or 1)
+ignore: label to ignore</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.lovasz_softmax">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">lovasz_softmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_present</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#lovasz_softmax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.lovasz_softmax" title="Permalink to this definition"></a></dt>
+<dd><dl>
+<dt>Multi-class Lovasz-Softmax loss</dt><dd><dl class="simple">
+<dt>probas: [B, C, H, W] Variable, class probabilities at each prediction</dt><dd><p>(between 0 and 1)</p>
+</dd>
+</dl>
+<p>labels: [B, H, W] Tensor, ground truth labels (between 0 and C - 1)
+only_present: average only on classes present in ground truth
+per_image: compute the loss per image instead of per batch
+ignore: void class labels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.lovasz_softmax_flat">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">lovasz_softmax_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_present</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#lovasz_softmax_flat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.lovasz_softmax_flat" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Multi-class Lovasz-Softmax loss</dt><dd><p>probas: [P, C] Variable, class probabilities at each prediction (between 0 and 1)
+labels: [P] Tensor, ground truth labels (between 0 and C - 1)
+only_present: average only on classes present in ground truth</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.mean">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.mean" title="Permalink to this definition"></a></dt>
+<dd><p>nanmean compatible with generators.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.lovasz_losses.xloss">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.lovasz_losses.</span></span><span class="sig-name descname"><span class="pre">xloss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/lovasz_losses.html#xloss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.lovasz_losses.xloss" title="Permalink to this definition"></a></dt>
+<dd><p>Cross entropy loss</p>
+</dd></dl>
 
 </section>
 <section id="module-mmv_im2im.utils.misc">

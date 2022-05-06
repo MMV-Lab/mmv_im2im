@@ -53,6 +53,8 @@
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
 </ul>
 </li>
@@ -137,6 +139,22 @@
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline"></a></h2>
 <p>For full package documentation please visit <a class="reference external" href="https://MMV-Lab.github.io/mmv_im2im">MMV-Lab.github.io/mmv_im2im</a>.</p>
+</section>
+<section id="notes-on-the-package-design">
+<h2>Notes on the package design<a class="headerlink" href="#notes-on-the-package-design" title="Permalink to this headline"></a></h2>
+<p>There are three levels of abstraction:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">proj_trainer.py</span></code> (main entry point to define data module, pytorch-lightning module, and trainer)</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">./data_modules/data_loaders.py</span></code> (Currently, all 2D/3D paired/unpaired data loader can share the same universal dataloader. We may add other generic dataloaders when really needed, otherwise, the current one is general enough to cover current applications)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">./models/basic_XYZ.py</span></code> (the middle level wrapper for different categories of models: FCN, pix2pix, GAN, embedseg. We can add more when needed, e.g., for denoising. This is the pytorch-lightning module specific for this category of models. The specific model backbone, loss function, etc. can be easily specified via parameters in yaml config)</p>
+<ul>
+<li><p>Other scripts under <code class="docutils literal notranslate"><span class="pre">./models/</span></code> and <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code>, as well as <code class="docutils literal notranslate"><span class="pre">utils</span></code>, are low level functions to instantiate the pytorch-lightining module defined in <code class="docutils literal notranslate"><span class="pre">basic_XYZ.py</span></code> or <code class="docutils literal notranslate"><span class="pre">data_loader.py</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline"></a></h2>
