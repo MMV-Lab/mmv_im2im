@@ -260,7 +260,9 @@ class Cluster_3d:
         mask = seed_map > 0.5
         if (
             mask.sum() > min_mask_sum
-        ):  # top level decision: only start creating instances, if there are atleast 128 pixels in foreground!
+        ):  
+        # top level decision: only start creating instances, if there are atleast 
+        # 128 pixels in foreground!
 
             spatial_emb_masked = spatial_emb[mask.expand_as(spatial_emb)].view(
                 n_sigma, -1

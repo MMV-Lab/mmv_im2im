@@ -9,7 +9,6 @@ from mmv_im2im.utils.misc import (
     parse_config_func_without_params,
 )
 
-from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 
 class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True):

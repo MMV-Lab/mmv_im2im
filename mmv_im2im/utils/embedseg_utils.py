@@ -74,12 +74,11 @@ def generate_center_image_2d(instance, center, ids):
                 imin = np.argmin((x - xm_temp) ** 2 + (y - ym_temp) ** 2)
                 ym, xm = y[imin], x[imin]
             elif center == "medoid":
-                ### option - 3 (`numba`)
                 dist_matrix = pairwise_python(np.vstack((x, y)).transpose())
                 imin = np.argmin(np.sum(dist_matrix, axis=0))
                 ym, xm = y[imin], x[imin]
             else:
-                raise NotImplemented("error in center method")
+                raise NotImplementedError("error in center method")
             center_image[int(np.round(ym)), int(np.round(xm))] = True
     return center_image
 
@@ -131,4 +130,3 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
         )
     else:
         raise ValueError("instance image must be either 2D or 3D")
-
