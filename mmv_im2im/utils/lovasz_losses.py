@@ -10,7 +10,7 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 import numpy as np
 
-from itertools import ifilterfalse
+from itertools import filterfalse  # noqa F401
 
 
 def lovasz_grad(gt_sorted):
