@@ -19,10 +19,10 @@ data:
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
-    - module_name: torchio
-      func_name: CropOrPad
-      params:
-        target_shape: [1, 768, 768]
+    #- module_name: torchio
+    #  func_name: CropOrPad
+    #  params:
+    #    target_shape: [1, 768, 768]
 # model
 model:
   category: embedseg
@@ -42,11 +42,11 @@ model:
         pixel_y: 1
         n_sigma: 2
         seed_thresh: 0.5
-        min_mask_sum: 100
-        min_unclustered_sum: 100
-        min_object_size: 100
+        min_mask_sum: 10
+        min_unclustered_sum: 10
+        min_object_size: 10
   ckpt:
-    checkpoint_path: /mnt/data/ISAS.DE/jianxu.chen/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_2/checkpoints/epoch=43-step=28204.ckpt
+    checkpoint_path: /mnt/data/ISAS.DE/jianxu.chen/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_3/checkpoints/epoch=0-step=721.ckpt
     #hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_2/hparams.yaml
 # inference
 run:

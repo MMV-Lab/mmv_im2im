@@ -89,16 +89,17 @@ class ProjectTester(object):
                 x = pre_process(x)  # (1, resized_W, resized_H, 1)
 
                 # TODO: some model requires (1, W, H), some requires (1, 1, W, H)
-                # solution: update all 2D models to accept (1, W, H)
-                # x = torch.unsqueeze(x, dim=0)
+                # solution: update all 2D models to accept (1, 1, W, H)
                 x = torch.squeeze(x, dim=-1)
+                if len(x.size()) == 3:
+                    x = torch.unsqueeze(x, dim=0)
 
             # choose different inference function for different types of models
             with torch.no_grad():
                 if "sliding_window_params" in self.model_cfg:
                     y_hat = predict_piecewise(
                         self.model,
-                        x.float().cuda(),
+                        x[0].float().cuda(),
                         **self.model_cfg["sliding_window_params"],
                     )
                 else:

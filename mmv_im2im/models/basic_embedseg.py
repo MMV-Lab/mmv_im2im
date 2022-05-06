@@ -9,6 +9,7 @@ from mmv_im2im.utils.misc import (
     parse_config_func_without_params,
 )
 
+from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 
 class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True):
@@ -76,6 +77,14 @@ class Model(pl.LightningModule):
         # TODO: need to handle args, try to receive the args in the definition step
         loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()
+
+        if validation_stage:
+            pass
+            # instances_map = generate_instance_clusters(output)
+            # from aicsimageio.writers import OmeTiffWriter
+            # import random
+            # val_idx = random.randint(10000, 99999)
+            # OmeTiffWriter.save(instances_map, "./tmp/val_"+ str(val_idx)+".tiff")
 
         return loss
 

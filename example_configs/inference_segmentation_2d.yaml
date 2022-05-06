@@ -47,8 +47,8 @@ model:
         channel: 1
         cutoff: 0.5
   ckpt:
-    checkpoint_path: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/checkpoints/epoch=569-step=1140.ckpt
-    hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/hparams.yaml
+    checkpoint_path: /mnt/data/ISAS.DE/jianxu.chen/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/checkpoints/epoch=569-step=1140.ckpt
+    # hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/hparams.yaml
 # inference
 run:
   gpus: 1
