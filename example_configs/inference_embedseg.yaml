@@ -1,0 +1,54 @@
+
+# everything about data
+data:
+  input: 
+    dir: "/mnt/eternus/users/Jianxu/data/embedseg/test/"
+    params:
+      data_type: "tiff"
+    reader_params:
+      dimension_order_out: "CYX"
+      C: [0]
+      T: 0
+      Z: 0
+  output:
+    path: "/mnt/eternus/users/Jianxu/data/embedseg/"
+    suffix: "seg"
+  dataloader_params:
+    batch_size: 1
+    num_workers: 1
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+    - module_name: torchio
+      func_name: CropOrPad
+      params:
+        target_shape: [1, 768, 768]
+# model
+model:
+  category: embedseg
+  net:
+    module_name: mmv_im2im.models.BranchedERFNet_2d
+    func_name: BranchedERFNet_2d
+    params:
+      num_classes: [4, 1]
+      input_channels: 1
+  post_processing:
+    - module_name: mmv_im2im.postprocessing.embedseg_cluster
+      func_name: generate_instance_clusters
+      params:
+        grid_x: 768
+        grid_y: 768
+        pixel_x: 1
+        pixel_y: 1
+        n_sigma: 2
+        seed_thresh: 0.5
+        min_mask_sum: 100
+        min_unclustered_sum: 100
+        min_object_size: 100
+  ckpt:
+    checkpoint_path: /mnt/data/ISAS.DE/jianxu.chen/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_2/checkpoints/epoch=43-step=28204.ckpt
+    #hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_2/hparams.yaml
+# inference
+run:
+  gpus: 1
+  precision: 16
