@@ -7,7 +7,7 @@ from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 import torch
 from torchio.data.io import check_uint_to_int
-from mmv_im2im.utils.misc import generate_test_dataset_dict
+from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config_func
 from mmv_im2im.utils.for_transform import parse_tio_ops
 from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
@@ -42,11 +42,18 @@ class ProjectTester(object):
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(f"mmv_im2im.models.{model_category}_basic")
+        model_module = import_module(f"mmv_im2im.models.basic_{model_category}")
         my_model_func = getattr(model_module, "Model")
-        self.model = my_model_func.load_from_checkpoint(
-            model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
-        ).cuda()
+        self.model = my_model_func(self.model_cfg, train=False)
+        pre_train = torch.load(self.model_cfg["ckpt"]["checkpoint_path"])
+        # TODO: hacky solution to remove a wrongly registered key
+        pre_train["state_dict"].pop("criterion.xym", None)
+        self.model.load_state_dict(pre_train["state_dict"])
+        self.model.cuda()
+
+        # self.model = my_model_func.load_from_checkpoint(
+        #    model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
+        # ).cuda()
         self.model.eval()
 
         # set up data
@@ -55,7 +62,10 @@ class ProjectTester(object):
         )
 
         dataset_length = len(dataset_list)
-        self.spatial_dims = str(self.data_cfg["spatial_dims"])
+        if "Z" in self.data_cfg["input"]["reader_params"]["dimension_order_out"]:
+            self.spatial_dims = 3
+        else:
+            self.spatial_dims = 2
 
         # load preprocessing transformation
         pre_process = parse_tio_ops(self.data_cfg["preprocess"])
@@ -67,50 +77,65 @@ class ProjectTester(object):
             img = AICSImage(ds).reader.get_image_dask_data(
                 **self.data_cfg["input"]["reader_params"]
             )
-            x = check_uint_to_int(img.compute())
+            x = torch.tensor(check_uint_to_int(img.compute()))
             # Perform the prediction
             print("Predicting the image")
-            if self.spatial_dims == "2":
+            if self.spatial_dims == 2:
                 # if data is 2D
                 # Initial shape (1, W, H)
-                x = torch.tensor(x)
                 x = torch.unsqueeze(x, dim=-1)
                 # Adding dimension for torchio to handle 2D data
                 # to become (1, W, H, 1)
-                x = pre_process(x)
-                # preprocessed shape (1, resized_W, resized_H, 1)
-                # The below operations are needed to reshape the data
-                # for the model
-                x = torch.unsqueeze(x, dim=0)
+                x = pre_process(x)  # (1, resized_W, resized_H, 1)
+
+                # TODO: some model requires (1, W, H), some requires (1, 1, W, H)
+                # solution: update all 2D models to accept (1, 1, W, H)
                 x = torch.squeeze(x, dim=-1)
-                with torch.no_grad():
-                    y_hat = self.model(x.float().cuda())
-                    pred = y_hat.cpu().detach().numpy()
-            elif self.spatial_dims == "3":
-                # if data is 3D
-                x = pre_process(x)
-                with torch.no_grad():
+                if len(x.size()) == 3:
+                    x = torch.unsqueeze(x, dim=0)
+
+            # choose different inference function for different types of models
+            with torch.no_grad():
+                if "sliding_window_params" in self.model_cfg:
                     y_hat = predict_piecewise(
                         self.model,
-                        torch.from_numpy(x).float().cuda(),
+                        x[0].float().cuda(),
                         **self.model_cfg["sliding_window_params"],
                     )
-                    pred = y_hat.cpu().detach().numpy()
-            else:
-                print("Data must be either 2D or 3D")
-                # TO DO
+                else:
+                    y_hat = self.model(x.float().cuda())
 
-            # prepare output
+            # do post-processing on the prediction
+            if "post_processing" in self.model_cfg:
+                pp_data = y_hat
+                for pp_info in self.model_cfg["post_processing"]:
+                    pp = parse_config_func(pp_info)
+                    pp_data = pp(pp_data)
+                if torch.is_tensor(pp_data):
+                    pred = pp_data.cpu().numpy()
+                else:
+                    pred = pp_data
+            else:
+                pred = y_hat.cpu().numpy()
+
+            # prepare output filename
             fn_core = Path(ds).stem
             suffix = self.data_cfg["output"]["suffix"]
-            out_fn = (
-                Path(self.data_cfg["output"]["path"]) / f"{fn_core}_{suffix}.tiff"
-            )  # noqa E501
+            out_fn = Path(self.data_cfg["output"]["path"]) / f"{fn_core}_{suffix}.tiff"
 
-            if len(pred.shape) == 4:
-                OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
+            # determine output dimension orders
+            if len(pred.shape) == 2:
+                OmeTiffWriter.save(pred, out_fn, dim_order="YX")
             elif len(pred.shape) == 3:
-                OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
+                if self.spatial_dims == 2:
+                    OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
+                else:
+                    OmeTiffWriter.save(pred, out_fn, dim_order="ZYX")
+            elif len(pred.shape) == 4:
+                if self.spatial_dims == 3:
+                    OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
+                else:
+                    raise ValueError("4D output detected for 2d problem")
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "find non-trivial batch dimension"
                 OmeTiffWriter.save(
@@ -121,4 +146,4 @@ class ProjectTester(object):
                     dim_order="CZYX",
                 )
             else:
-                print("error in prediction")
+                raise ValueError("error in prediction output shape")

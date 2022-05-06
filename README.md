@@ -38,6 +38,15 @@ Make sure you double check all the file paths in the yaml file.
 
 For full package documentation please visit [MMV-Lab.github.io/mmv_im2im](https://MMV-Lab.github.io/mmv_im2im).
 
+## Notes on the package design
+
+There are three levels of abstraction: 
+- `proj_trainer.py` (main entry point to define data module, pytorch-lightning module, and trainer)
+    -  `./data_modules/data_loaders.py` (Currently, all 2D/3D paired/unpaired data loader can share the same universal dataloader. We may add other generic dataloaders when really needed, otherwise, the current one is general enough to cover current applications)
+    -  `./models/basic_XYZ.py` (the middle level wrapper for different categories of models: FCN, pix2pix, GAN, embedseg. We can add more when needed, e.g., for denoising. This is the pytorch-lightning module specific for this category of models. The specific model backbone, loss function, etc. can be easily specified via parameters in yaml config)
+        -  Other scripts under `./models/` and `preprocessing`, as well as `utils`, are low level functions to instantiate the pytorch-lightining module defined in `basic_XYZ.py` or `data_loader.py`
+
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.

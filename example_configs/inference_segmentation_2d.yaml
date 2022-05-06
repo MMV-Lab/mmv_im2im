@@ -1,0 +1,55 @@
+
+# everything about data
+data:
+  # data_path: "/mnt/data/xyz.csv"
+  # data_column: "raw_path"
+  input: 
+    dir: "~/ambiomgroupdrive/MicroscopyData/tmp/tcell_test"
+    params:
+      data_type: "tiff"
+    reader_params:
+      dimension_order_out: "CYX"
+      C: [0]
+      T: 0
+      Z: 0
+  output:
+    path: "~/ambiomgroupdrive/MicroscopyData/tmp/"
+    suffix: "seg"
+  dataloader_params:
+    batch_size: 1
+    num_workers: 1
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+# model
+model:
+  category: FCN
+  net:
+    module_name: monai.networks.nets
+    func_name: UNet
+    params:
+      spatial_dims: 2
+      in_channels: 1
+      out_channels: 2
+      channels: [8, 16, 32, 64]
+      strides: [2, 2, 2]
+  sliding_window_params:
+    dims_max: [1, 512, 512]
+    overlaps: [0, 12, 12]
+  post_processing:
+    - module_name: torch.nn.functional
+      func_name: softmax
+      params:
+        dim: 1
+    - module_name: mmv_im2im.postprocessing.basic_collection
+      func_name: extract_segmentation
+      params:
+        channel: 1
+        cutoff: 0.5
+  ckpt:
+    checkpoint_path: /mnt/data/ISAS.DE/jianxu.chen/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/checkpoints/epoch=569-step=1140.ckpt
+    # hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_1/hparams.yaml
+# inference
+run:
+  gpus: 1
+  precision: 16

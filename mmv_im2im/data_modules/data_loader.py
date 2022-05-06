@@ -19,10 +19,9 @@ from torch.utils.data import random_split, DataLoader
 import torchio as tio
 import sys
 import pytorch_lightning as pl
-from mmv_im2im.utils.for_transform import parse_tio_ops
+from mmv_im2im.utils.for_transform import parse_tio_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import generate_dataset_dict, aicsimageio_reader
 import random
-import logging
 
 
 class Im2ImDataModule(pl.LightningDataModule):
@@ -43,7 +42,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.train_val_ratio = data_cfg["train_val_ratio"] or 0.2
         self.train_set = None
         self.val_set = None
-        # transformation
+
         if "preprocess" in data_cfg:
             self.preproc = parse_tio_ops(data_cfg["preprocess"])
         else:
@@ -59,24 +58,23 @@ class Im2ImDataModule(pl.LightningDataModule):
         elif self.preproc is not None and self.augment is None:
             self.transform = self.preproc
         elif self.preproc is None and self.augment is None:
-            self.transform is None
+            self.transform = None
         else:
             self.transform = tio.Compose([self.preproc, self.augment])
 
-        self.spatial_dims = str(data_cfg["spatial_dims"])
+        if "Z" in data_cfg["source_reader_params"]["dimension_order_out"]:
+            self.spatial_dim = 3
+        else:
+            self.spatial_dim = 2
 
         # parameters for dataloader
         self.loader_params = data_cfg["dataloader_params"]
-        if ("dataloader_patch_queue" in data_cfg) and (self.spatial_dims == "3"):
-            print("The dimensions of the data is 3D")
+        if "dataloader_patch_queue" in data_cfg:
             self.patch_loader = True
             self.patch_loader_params = data_cfg["dataloader_patch_queue"]["params"]
             self.patch_loader_sampler = data_cfg["dataloader_patch_queue"]["sampler"]
-        elif ("dataloader_patch_queue" not in data_cfg) and (self.spatial_dims == "2"):
-            print("The dimensions of the data is 2D")
-            self.patch_loader = False
         else:
-            logging.error("Unsupported data dimensions")
+            self.patch_loader = False
 
         # reserved for test data
         self.test_subjects = None

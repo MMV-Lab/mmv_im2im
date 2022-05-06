@@ -15,7 +15,10 @@ class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True):
         super().__init__()
         self.net = parse_config(model_info_xx["net"])
-        self.sliding_window = model_info_xx["sliding_window_params"]
+        if "sliding_window_params" in model_info_xx:
+            self.sliding_window = model_info_xx["sliding_window_params"]
+        else:
+            self.sliding_window = None
         self.model_info = model_info_xx
         if train:
             self.criterion = parse_config(model_info_xx["criterion"])
@@ -70,7 +73,7 @@ class Model(pl.LightningModule):
             x = torch.squeeze(x, dim=-1)
             y = torch.squeeze(y, dim=-1)
 
-        if validation_stage:
+        if validation_stage and self.sliding_window is not None:
             y_hat = predict_piecewise(
                 self,
                 x[
