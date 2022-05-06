@@ -29,9 +29,9 @@ data:
       pin_memory: True
       num_workers: 4
     val:
-      batch_size: 4
-      num_workers: 4
-  train_val_ratio: 0.2
+      batch_size: 1
+      num_workers: 2
+  train_val_ratio: 0.1
   preprocess:
     - module_name: torchio
       func_name: ZNormalization

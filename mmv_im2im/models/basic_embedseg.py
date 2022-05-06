@@ -77,6 +77,14 @@ class Model(pl.LightningModule):
         loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()
 
+        if validation_stage:
+            pass
+            # instances_map = generate_instance_clusters(output)
+            # from aicsimageio.writers import OmeTiffWriter
+            # import random
+            # val_idx = random.randint(10000, 99999)
+            # OmeTiffWriter.save(instances_map, "./tmp/val_"+ str(val_idx)+".tiff")
+
         return loss
 
     def training_step(self, batch, batch_idx):

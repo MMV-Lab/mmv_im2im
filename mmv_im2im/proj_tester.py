@@ -44,9 +44,16 @@ class ProjectTester(object):
         model_category = self.model_cfg.pop("category")
         model_module = import_module(f"mmv_im2im.models.basic_{model_category}")
         my_model_func = getattr(model_module, "Model")
-        self.model = my_model_func.load_from_checkpoint(
-            model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
-        ).cuda()
+        self.model = my_model_func(self.model_cfg, train=False)
+        pre_train = torch.load(self.model_cfg["ckpt"]["checkpoint_path"])
+        # TODO: hacky solution to remove a wrongly registered key
+        pre_train["state_dict"].pop("criterion.xym", None)
+        self.model.load_state_dict(pre_train["state_dict"])
+        self.model.cuda()
+
+        # self.model = my_model_func.load_from_checkpoint(
+        #    model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
+        # ).cuda()
         self.model.eval()
 
         # set up data
@@ -82,16 +89,17 @@ class ProjectTester(object):
                 x = pre_process(x)  # (1, resized_W, resized_H, 1)
 
                 # TODO: some model requires (1, W, H), some requires (1, 1, W, H)
-                # solution: update all 2D models to accept (1, W, H)
-                # x = torch.unsqueeze(x, dim=0)
+                # solution: update all 2D models to accept (1, 1, W, H)
                 x = torch.squeeze(x, dim=-1)
+                if len(x.size()) == 3:
+                    x = torch.unsqueeze(x, dim=0)
 
             # choose different inference function for different types of models
             with torch.no_grad():
                 if "sliding_window_params" in self.model_cfg:
                     y_hat = predict_piecewise(
                         self.model,
-                        x.float().cuda(),
+                        x[0].float().cuda(),
                         **self.model_cfg["sliding_window_params"],
                     )
                 else:

@@ -182,7 +182,7 @@ class Net(nn.Module):
     ):  # use encoder to pass pretrained encoder
         super().__init__()
 
-        if encoder == None:
+        if encoder is None:
             self.encoder = Encoder(num_classes, input_channels)
         else:
             self.encoder = encoder
