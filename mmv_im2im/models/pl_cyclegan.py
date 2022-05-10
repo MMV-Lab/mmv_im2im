@@ -44,24 +44,14 @@ class Model(pl.LightningModule):
             # get info of optimizer and scheduler
             self.optimizer_info = model_info_xx["optimizer"]
             self.scheduler_info = model_info_xx["scheduler"]
+        else:
+            self.direction = model_info_xx["direction"]
 
     def forward(self, x):
-        x = self.generator_model_image_AtoB(x)
-        return x
-
-    """
-    def configure_optimizers(self):
-        self.optim_gen = self.optimizer_func(
-            list(self.generator_model_image_A.parameters())
-            + list(self.generator_model_image_B.parameters())
-        )
-        self.optim_disc = self.optimizer_func(
-            list(self.discriminator_model_image_A.parameters())
-            + list(self.discriminator_model_image_B.parameters())
-        )
-        optimizers = [self.optim_gen, self.optim_disc]
-        return optimizers
-    """
+        if self.direction == "AtoB":
+            return self.generator_model_image_AtoB(x)
+        elif self.direction == "BtoA":
+            return self.generator_model_image_BtoA(x)
 
     def configure_optimizers(self):
         generator_optimizer_func = parse_config_func(self.optimizer_info["generator"])

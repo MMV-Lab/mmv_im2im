@@ -42,7 +42,7 @@ class ProjectTester(object):
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(f"mmv_im2im.models.basic_{model_category}")
+        model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg, train=False)
         pre_train = torch.load(self.model_cfg["ckpt"]["checkpoint_path"])
