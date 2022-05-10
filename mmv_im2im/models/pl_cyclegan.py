@@ -8,6 +8,7 @@ import torch
 import pytorch_lightning as pl
 from mmv_im2im.utils.misc import parse_config, parse_config_func
 from mmv_im2im.utils.gan_utils import ReplayBuffer
+from mmv_im2im.models.nets.gans import define_generator, define_discriminator
 from typing import Dict
 from collections import OrderedDict
 import itertools
@@ -16,10 +17,10 @@ import itertools
 class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True):
         super(Model, self).__init__()
-        self.generator_model_image_AtoB = parse_config(model_info_xx["generator"])
-        self.generator_model_image_BtoA = parse_config(model_info_xx["generator"])
-        self.discriminator_model_image_A = parse_config(model_info_xx["discriminator"])
-        self.discriminator_model_image_B = parse_config(model_info_xx["discriminator"])
+        self.generator_model_image_AtoB = define_generator(model_info_xx["generator"])
+        self.generator_model_image_BtoA = define_generator(model_info_xx["generator"])
+        self.discriminator_model_image_A = define_discriminator(model_info_xx["discriminator"])
+        self.discriminator_model_image_B = define_discriminator(model_info_xx["discriminator"])
         if train:
             # buffer for fake images
             if "fake_pool_size" in model_info_xx["criterion"]:
