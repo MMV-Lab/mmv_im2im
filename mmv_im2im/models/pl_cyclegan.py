@@ -50,7 +50,7 @@ class Model(pl.LightningModule):
             self.optimizer_info = model_info_xx["optimizer"]
             self.scheduler_info = model_info_xx["scheduler"]
         else:
-            self.direction = model_info_xx["direction"]
+            self.direction = model_info_xx["inference_direction"]
 
     def forward(self, x):
         #  ##########################################

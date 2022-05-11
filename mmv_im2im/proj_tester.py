@@ -135,7 +135,12 @@ class ProjectTester(object):
                 if self.spatial_dims == 3:
                     OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
                 else:
-                    raise ValueError("4D output detected for 2d problem")
+                    if pred.shape[0] == 1 and pred.shape[1] == 1:
+                        OmeTiffWriter.save(pred[0, 0], out_fn, dim_order="YX")
+                    else:
+                        raise ValueError(
+                            "4D output detected for 2d problem with non-trivil dims"
+                        )
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "find non-trivial batch dimension"
                 OmeTiffWriter.save(
