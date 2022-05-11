@@ -2,45 +2,42 @@
 # everything about data
 data:
   category: "unpair"
-  spatial_dims: 3
+  spatial_dims: 2
   target_type: "Image" # "Label" or "Image
   target_reader_params:
-    dimension_order_out: "ZYX"
+    dimension_order_out: "YX"
     C: 0
     T: 0
+    Z: 0
   source_type: "Image" # "Label" or "Image
   source_reader_params:
-    dimension_order_out: "ZYX"
+    dimension_order_out: "YX"
     C: 0
     T: 0
+    Z: 0
   # data_path: "/mnt/data/xyz.csv"
-  data_path: "~/ambiomgroupdrive/Jianxu/data/labelfree_lamin/training_data"
+  data_path: "/mnt/eternus/sample_data/im2im/cyclegan_2d/train"
   # data_path:
   #   source_path:
   #   target_path:
   #   costmap_path: optional
   #   image_type: "tiff"
-  dataloader_patch_queue:  # where to use IO queue in
-    sampler:
-      name: UniformSampler
-      params:
-        patch_size: [32, 256, 256]
-    params:
-      num_workers: 4
-      max_length: 800
-      samples_per_volume: 8
   dataloader_params:
     train:
-      batch_size: 8
+      batch_size: 4
       pin_memory: True
-      num_workers: 0  # if dataload_path_queue is used, num_workers must be 0 here
+      num_workers: 4  # if dataload_path_queue is used, num_workers must be 0 here
     val:
-      batch_size: 1
-      num_workers: 1
+      batch_size: 4
+      num_workers: 4
   train_val_ratio: 0.1
   preprocess:
     - module_name: torchio
       func_name: ZNormalization
+    - module_name: torchio
+      func_name: CropOrPad
+      params:
+        target_shape: [512, 512, 1]
   augmentation:
     - module_name: torchio
       func_name: RandomFlip
@@ -55,25 +52,23 @@ data:
 # model
 model:
   category: cyclegan
-  net:
-    generator:
-      module_name: monai.networks.nets
-      func_name: UNet
-      params:
-        spatial_dims: 2
-        in_channels: 1
-        out_channels: 1
-        channels: [8, 16, 32, 64]
-        strides: [2, 2]
-    discriminator:
-      module_name: monai.networks.nets
-      func_name: UNet
-      params:
-        spatial_dims: 3
-        in_channels: 1
-        out_channels: 1
-        channels: [8, 16, 32, 64]
-        strides: [2, 2, 2]
+  generator:
+    type: predefined_resnet
+    params:
+      spatial_dims: 2
+      in_channels: 1
+      out_channels: 1
+      n_blocks: 6
+      nf: 64
+      norm_layer: "INSTANCE"
+  discriminator:
+    type: predefined
+    params:
+      spatial_dims: 2
+      in_channels: 1
+      n_layers: 4
+      nf: 64
+      norm_layer: "INSTANCE"
   criterion:
     gan_loss:
       module_name: torch.nn
@@ -124,7 +119,7 @@ training:
   params:
     gpus: 1
     precision: 16
-    stochastic_weight_avg: True
+    # stochastic_weight_avg: True  # only work with 1 optimizer
 #  callbacks:
 #    - module_name: pytorch_lightning.callbacks.early_stopping
 #      func_name: EarlyStopping
