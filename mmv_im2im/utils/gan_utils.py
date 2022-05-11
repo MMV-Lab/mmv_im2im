@@ -6,7 +6,9 @@ import random
 # https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/cyclegan/utils.py#L13
 class ReplayBuffer:
     def __init__(self, max_size=50):
-        assert max_size > 0, "Empty buffer or trying to create a black hole. Be careful."
+        assert (
+            max_size > 0
+        ), "Empty buffer or trying to create a black hole. Be careful."
         self.max_size = max_size
         self.data = []
 

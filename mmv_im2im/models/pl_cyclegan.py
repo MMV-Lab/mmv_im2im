@@ -126,12 +126,8 @@ class Model(pl.LightningModule):
         pred_fake = torch.zeros_like(predFakeA, requires_grad=False)
 
         # GAN loss
-        gan_loss_B = self.gan_loss(
-            predFakeB, pred_real
-        )
-        gan_loss_A = self.gan_loss(
-            predFakeA, pred_real
-        )
+        gan_loss_B = self.gan_loss(predFakeB, pred_real)
+        gan_loss_A = self.gan_loss(predFakeA, pred_real)
         gan_loss = (gan_loss_A + gan_loss_B) / 2
 
         # cycle loss
@@ -224,12 +220,8 @@ class Model(pl.LightningModule):
 
             pred_real = torch.ones_like(predFakeA, requires_grad=False)
 
-            gan_loss_B = self.gan_loss(
-                predFakeB, pred_real
-            )
-            gan_loss_A = self.gan_loss(
-                predFakeA, pred_real
-            )
+            gan_loss_B = self.gan_loss(predFakeB, pred_real)
+            gan_loss_A = self.gan_loss(predFakeA, pred_real)
             gan_loss = (gan_loss_A + gan_loss_B) / 2
 
             # cycle loss
@@ -277,7 +269,7 @@ class Model(pl.LightningModule):
 
             pred_real = torch.ones_like(predFakeA, requires_grad=False)
             pred_fake = torch.zeros_like(predFakeA, requires_grad=False)
-            
+
             # discriminator on domain A
             predRealA = self.discriminator_model_image_A(image_A)
             dis_loss_A_real = self.gan_loss(predRealA, pred_real)
