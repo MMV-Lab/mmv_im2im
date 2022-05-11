@@ -88,7 +88,7 @@ model:
     weights:
       gan_loss: 1
       cycle_loss: 10
-      identify_loss: 2
+      identity_loss: 2
     fake_pool_size: 50
   optimizer:
     generator:
