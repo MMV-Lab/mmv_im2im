@@ -141,7 +141,7 @@
 
         <span class="c1"># set up model</span>
         <span class="n">model_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
-        <span class="n">model_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mmv_im2im.models.basic_</span><span class="si">{</span><span class="n">model_category</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">model_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mmv_im2im.models.pl_</span><span class="si">{</span><span class="n">model_category</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">my_model_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_module</span><span class="p">,</span> <span class="s2">&quot;Model&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">my_model_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">)</span>
 

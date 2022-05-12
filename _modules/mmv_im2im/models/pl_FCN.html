@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mmv_im2im.models.basic_FCN &mdash; MMV Im2Im Transformation 0.1.3 documentation</title>
+  <title>mmv_im2im.models.pl_FCN &mdash; MMV Im2Im Transformation 0.1.3 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -87,7 +87,7 @@
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
           <li><a href="../../mmv_im2im.html">mmv_im2im</a> &raquo;</li>
-      <li>mmv_im2im.models.basic_FCN</li>
+      <li>mmv_im2im.models.pl_FCN</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -96,7 +96,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for mmv_im2im.models.basic_FCN</h1><div class="highlight"><pre>
+  <h1>Source code for mmv_im2im.models.pl_FCN</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="kn">import</span> <span class="nn">torchio</span> <span class="k">as</span> <span class="nn">tio</span>
@@ -110,7 +110,7 @@
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.piecewise_inference</span> <span class="kn">import</span> <span class="n">predict_piecewise</span>
 
 
-<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_info_xx</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">])</span>
@@ -123,7 +123,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info_xx</span><span class="p">[</span><span class="s2">&quot;optimizer&quot;</span><span class="p">])</span>
 
-<div class="viewcode-block" id="Model.configure_optimizers"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.configure_optimizers"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501</span>
         <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
         <span class="k">if</span> <span class="s2">&quot;scheduler&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="p">:</span>
@@ -137,13 +137,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">optimizer</span></div>
 
-<div class="viewcode-block" id="Model.prepare_batch"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.prepare_batch">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.prepare_batch"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.prepare_batch">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="Model.forward"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.forward"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Model.run_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.run_step">[docs]</a>    <span class="k">def</span> <span class="nf">run_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">validation_stage</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.run_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.run_step">[docs]</a>    <span class="k">def</span> <span class="nf">run_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">validation_stage</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;costmap&quot;</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
             <span class="n">costmap</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;costmap&quot;</span><span class="p">)</span>
             <span class="n">costmap</span> <span class="o">=</span> <span class="n">costmap</span><span class="p">[</span><span class="n">tio</span><span class="o">.</span><span class="n">DATA</span><span class="p">]</span>
@@ -190,7 +190,7 @@
 
         <span class="k">return</span> <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span></div>
 
-<div class="viewcode-block" id="Model.training_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.training_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
         <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">validation_stage</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -208,7 +208,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">loss</span></div>
 
-<div class="viewcode-block" id="Model.validation_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.basic_FCN.Model.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+<div class="viewcode-block" id="Model.validation_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
         <span class="n">loss</span><span class="p">,</span> <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">validation_stage</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">)</span>
         <span class="sd">&quot;&quot;&quot;</span>
