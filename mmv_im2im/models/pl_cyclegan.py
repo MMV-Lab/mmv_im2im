@@ -1,6 +1,5 @@
 """
 This module provides lighting module for cycleGAN
-# adapted from https://github.com/Adi-iitd/AI-Art/blob/master/src/CycleGAN/CycleGAN-PL.py
 """
 
 import torchio as tio
@@ -192,7 +191,8 @@ class Model(pl.LightningModule):
         identity_loss = (identity_A_loss + identity_B_loss) / 2
 
         # combine the loss
-        G_loss = validity_loss * self.gan_w + cycle_loss * self.cycle_w + identity_loss * self.identity_w
+        G_loss = validity_loss * self.gan_w + cycle_loss * self.cycle_w \
+            + identity_loss * self.identity_w
         """
         output = OrderedDict({"generator_loss": G_loss, "discriminator_loss": D_loss})
         return output
