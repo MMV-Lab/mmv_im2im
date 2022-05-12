@@ -42,7 +42,7 @@ class ProjectTester(object):
 
         # set up model
         model_category = self.model_cfg.pop("category")
-        model_module = import_module(f"mmv_im2im.models.basic_{model_category}")
+        model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg, train=False)
         pre_train = torch.load(self.model_cfg["ckpt"]["checkpoint_path"])
@@ -135,7 +135,12 @@ class ProjectTester(object):
                 if self.spatial_dims == 3:
                     OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
                 else:
-                    raise ValueError("4D output detected for 2d problem")
+                    if pred.shape[0] == 1 and pred.shape[1] == 1:
+                        OmeTiffWriter.save(pred[0, 0], out_fn, dim_order="YX")
+                    else:
+                        raise ValueError(
+                            "4D output detected for 2d problem with non-trivil dims"
+                        )
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "find non-trivial batch dimension"
                 OmeTiffWriter.save(

@@ -2,7 +2,7 @@
 
 import torch
 from mmv_im2im.utils.misc import parse_config
-from mmv_im2im.models.pix2pixHD_generator_discriminator_2D import _get_grid
+from mmv_im2im.models.nets.pix2pixHD_generator_discriminator_2D import _get_grid
 
 # Objective (Loss) functions
 

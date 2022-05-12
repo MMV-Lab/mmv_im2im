@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import mmv_im2im.models.erfnet_3d as erfnet
+import mmv_im2im.models.nets.erfnet_3d as erfnet
 
 
 class BranchedERFNet_3d(nn.Module):

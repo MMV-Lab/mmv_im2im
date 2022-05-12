@@ -6,7 +6,7 @@ https://github.com/davyneven/SpatialEmbeddings
 """
 import torch
 import torch.nn as nn
-import mmv_im2im.models.erfnet as erfnet
+import mmv_im2im.models.nets.erfnet as erfnet
 
 
 class BranchedERFNet_2d(nn.Module):

@@ -1,0 +1,54 @@
+
+# everything about data
+data:
+  input: 
+    dir: "/mnt/eternus/sample_data/im2im/cyclegan_2d/test_AtoB"
+    params:
+      data_type: "tiff"
+    reader_params:
+      dimension_order_out: "CYX"
+      C: [0]
+      T: 0
+      Z: 0
+  output:
+    path: "/mnt/eternus/sample_data/im2im/cyclegan_2d/test_AtoB_out"
+    suffix: "AtoB"
+  dataloader_params:
+    batch_size: 1
+    num_workers: 1
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+    - module_name: torchio
+      func_name: CropOrPad
+      params:
+        target_shape: [512, 512, 1]
+# model
+model:
+  model:
+  category: cyclegan
+  generator:
+    type: predefined_resnet
+    params:
+      spatial_dims: 2
+      in_channels: 1
+      out_channels: 1
+      n_blocks: 6
+      nf: 64
+      norm_layer: "INSTANCE"
+  discriminator:
+    type: predefined
+    params:
+      spatial_dims: 2
+      in_channels: 1
+      n_layers: 4
+      nf: 64
+      norm_layer: "INSTANCE"
+  inference_direction: AtoB
+  ckpt:
+    checkpoint_path: /mnt/data/ISAS.DE/jianxu.chen/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_4/checkpoints/epoch=615-step=14784.ckpt
+    #hparams_file: ~/ambiomgroupdrive/Jianxu/projects/mmv_im2im/lightning_logs/version_2/hparams.yaml
+# inference
+run:
+  gpus: 1
+  precision: 16
