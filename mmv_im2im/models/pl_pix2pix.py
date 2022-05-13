@@ -6,6 +6,7 @@ from mmv_im2im.utils.misc import (
     parse_config,
     parse_config_func
 )
+from mmv_im2im.utils.model_utils import init_weights
 from mmv_im2im.models.nets.gans import define_generator, define_discriminator
 from collections import OrderedDict
 
@@ -18,6 +19,10 @@ class Model(pl.LightningModule):
         self.discriminator = define_discriminator(model_info_xx["discriminator"])
         # self.sliding_window = model_info_xx["sliding_window_params"]
         if train:
+            # initialize model weights
+            init_weights(self.generator)
+            init_weights(self.discriminator)
+
             # get loss functions
             self.gan_loss = parse_config(model_info_xx["criterion"]["gan_loss"])
             self.recon_loss = parse_config(model_info_xx["criterion"]["reconstruction_loss"])
@@ -90,41 +95,6 @@ class Model(pl.LightningModule):
 
         output = OrderedDict({"generator_loss": G_loss, "discriminator_loss": D_loss})
         return output
-
-        """
-        if image_A.size()[-1] == 1:
-            image_A = torch.squeeze(image_A, dim=-1)
-            image_B = torch.squeeze(image_B, dim=-1)
-            fake_image = self.generator_model(image_A)
-            D_loss = self.loss_evaluator._get_discriminator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            G_loss = self.loss_evaluator._get_generator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            output = OrderedDict(
-                {"generator_loss": G_loss, "discriminator_loss": D_loss}
-            )
-            return output
-        else:
-            fake_image = predict_piecewise(
-                self,
-                image_A[
-                    0,
-                ],
-                **self.sliding_window,
-            )
-            D_loss = self.loss_evaluator._get_discriminator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            G_loss = self.loss_evaluator._get_generator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            output = OrderedDict(
-                {"generator_loss": G_loss, "discriminator_loss": D_loss}
-            )
-            return output
-        """
 
     def training_step(self, batch, batch_idx, optimizer_idx):
 
