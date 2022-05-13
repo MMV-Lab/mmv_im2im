@@ -4,56 +4,94 @@ import pytorch_lightning as pl
 import torchio as tio
 from mmv_im2im.utils.misc import (
     parse_config,
-    parse_config_func,
-    parse_config_func_without_params,
+    parse_config_func
 )
-from mmv_im2im.utils.piecewise_inference import predict_piecewise
+from mmv_im2im.models.nets.gans import define_generator, define_discriminator
 from collections import OrderedDict
 
 
 class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True):
         super(Model, self).__init__()
-        print(model_info_xx)
-        self.generator_model = parse_config(model_info_xx["generator_net"])
-        self.discriminator_model = parse_config(model_info_xx["discriminator_net"])
-        self.sliding_window = model_info_xx["sliding_window_params"]
+        # print(model_info_xx)
+        self.generator = define_generator(model_info_xx["generator"])
+        self.discriminator = define_discriminator(model_info_xx["discriminator"])
+        # self.sliding_window = model_info_xx["sliding_window_params"]
         if train:
-            self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
-            self.loss_func = parse_config_func_without_params(
-                model_info_xx["loss_function"]
-            )
-            self.loss_evaluator = self.loss_func(model_info_xx)
+            # get loss functions
+            self.gan_loss = parse_config(model_info_xx["criterion"]["gan_loss"])
+            self.recon_loss = parse_config(model_info_xx["criterion"]["reconstruction_loss"])
+
+            # get weights of recon loss
+            self.lamda = model_info_xx["criterion"]["lamda"]
+
+            # get info of optimizer and scheduler
+            self.optimizer_info = model_info_xx["optimizer"]
+            self.scheduler_info = model_info_xx["scheduler"]
 
     def forward(self, x):
-        x = self.generator_model(x)
-        return x
+        if x.size()[-1] == 1:
+            x = torch.squeeze(x, dim=-1)
+        return self.generator(x)
 
     def configure_optimizers(self):
-        self.optim_gen = self.optimizer_func(self.generator_model.parameters())
-        self.optim_disc = self.optimizer_func(self.discriminator_model.parameters())
-        optimizers = [self.optim_gen, self.optim_disc]
-        return optimizers
+        discriminator_optimizer_func = parse_config_func(
+            self.optimizer_info["discriminator"]
+        )
+        discriminator_scheduler_func = parse_config_func(
+            self.scheduler_info["discriminator"]
+        )
+        discriminator_optimizer = discriminator_optimizer_func(
+            self.discriminator.parameters()
+        )
+        discriminator_scheduler = discriminator_scheduler_func(discriminator_optimizer)
+
+        generator_optimizer_func = parse_config_func(self.optimizer_info["generator"])
+        generator_scheduler_func = parse_config_func(self.scheduler_info["generator"])
+        generator_optimizer = generator_optimizer_func(
+            self.generator.parameters(),
+        )
+        generator_scheduler = generator_scheduler_func(generator_optimizer)
+
+        return [discriminator_optimizer, generator_optimizer], [
+            discriminator_scheduler,
+            generator_scheduler
+        ]
 
     def run_step(self, batch, batch_idx):
+        # get the data
         image_A = batch["source"][tio.DATA]
         image_B = batch["target"][tio.DATA]
-        ##########################################
-        # check if the data is 2D or 3D
-        ##########################################
-        # torchio will add dummy dimension to 2D images to ensure 4D tensor
-        # see: https://github.com/fepegar/torchio/blob/1c217d8716bf42051e91487ece82f0372b59d903/torchio/data/io.py#L402  # noqa E501
-        # but in PyTorch, we usually follow the convention as C x D x H x W
-        # or C x Z x Y x X, where the Z dimension of depth dimension is before
-        # HW or YX. Padding the dummy dimmension at the end is okay and
-        # actually makes data augmentation easier to implement. For example,
-        # you have 2D image of Y x X, then becomes 1 x Y x X x 1. If you want
-        # to apply a flip on the first dimension of your image, i.e. Y, you
-        # can simply specify axes as [0], which is compatable
-        # with the syntax for fliping along Y in 1 x Y x X x 1.
-        # But, the FCN models do not like this. We just need to remove the
-        # dummy dimension
 
+        if image_A.size()[-1] == 1:
+            image_A = torch.squeeze(image_A, dim=-1)
+            image_B = torch.squeeze(image_B, dim=-1)
+
+        # run generators and discriminators
+        fake_B = self.generator(image_A)
+
+        # discriminator loss
+        predFakeB = self.discriminator(torch.cat((fake_B, image_A), axis=1))
+        predRealB = self.discriminator(torch.cat((image_B, image_A), axis=1))
+        pred_real = torch.ones_like(predFakeB, requires_grad=False)
+        pred_fake = torch.zeros_like(predFakeB, requires_grad=False)
+
+        fake_loss = self.gan_loss(predFakeB, pred_fake)
+        real_loss = self.gan_loss(predRealB, pred_real)
+        D_loss = (real_loss + fake_loss) / 2
+
+        # GAN loss
+        gan_loss = self.gan_loss(predFakeB, pred_real)
+
+        # reconstruction loss
+        recon_loss = self.recon_loss(fake_B, image_B)
+
+        G_loss = gan_loss + self.lamda * recon_loss
+
+        output = OrderedDict({"generator_loss": G_loss, "discriminator_loss": D_loss})
+        return output
+
+        """
         if image_A.size()[-1] == 1:
             image_A = torch.squeeze(image_A, dim=-1)
             image_B = torch.squeeze(image_B, dim=-1)
@@ -86,79 +124,90 @@ class Model(pl.LightningModule):
                 {"generator_loss": G_loss, "discriminator_loss": D_loss}
             )
             return output
+        """
 
     def training_step(self, batch, batch_idx, optimizer_idx):
+
+        # imageB : real image
+        # imageA : condition image
+        # conditional GAN refers generating a realistic image (image B as ground truth),
+        # conditioned on image A
         image_A = batch["source"][tio.DATA]
         image_B = batch["target"][tio.DATA]
+
+        ##########################################
+        # check if the data is 2D or 3D
+        ##########################################
+        # torchio will add dummy dimension to 2D images to ensure 4D tensor
+        # see: https://github.com/fepegar/torchio/blob/1c217d8716bf42051e91487ece82f0372b59d903/torchio/data/io.py#L402  # noqa E501
+        # but in PyTorch, we usually follow the convention as C x D x H x W
+        # or C x Z x Y x X, where the Z dimension of depth dimension is before
+        # HW or YX. Padding the dummy dimmension at the end is okay and
+        # actually makes data augmentation easier to implement. For example,
+        # you have 2D image of Y x X, then becomes 1 x Y x X x 1. If you want
+        # to apply a flip on the first dimension of your image, i.e. Y, you
+        # can simply specify axes as [0], which is compatable
+        # with the syntax for fliping along Y in 1 x Y x X x 1.
+        # But, the FCN models do not like this. We just need to remove the
+        # dummy dimension
         if image_A.size()[-1] == 1:
             image_A = torch.squeeze(image_A, dim=-1)
             image_B = torch.squeeze(image_B, dim=-1)
-            fake_image = self(image_A)
-            if optimizer_idx == 0:
-                G_loss = self.loss_evaluator._get_generator_loss(
-                    self.discriminator_model, image_A, image_B, fake_image
-                )
-                tqdm_dict = {"g_loss": G_loss}
-                output = OrderedDict(
-                    {"loss": G_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
-                )
-                return output
 
-            elif optimizer_idx == 1:
-                D_loss = self.loss_evaluator._get_discriminator_loss(
-                    self.discriminator_model, image_A, image_B, fake_image
-                )
-                D_accuracy = self.loss_evaluator._get_discriminator_accuracy()
-                tqdm_dict = {"d_loss": D_loss}
-                output = OrderedDict(
-                    {
-                        "loss": D_loss,
-                        "progress_bar": tqdm_dict,
-                        "log": tqdm_dict,
-                        "accuracy": D_accuracy,
-                    }
-                )
-                return output
-        fake_image = predict_piecewise(
-            self,
-            image_A[
-                0,
-            ],
-            **self.sliding_window,
-        )
+        # generate fake image
+        fake_B = self.generator(image_A)
+
         if optimizer_idx == 0:
-            G_loss = self.loss_evaluator._get_generator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
+            ############################
+            # train discriminators
+            ############################
+            predFakeB = self.discriminator(torch.cat((fake_B, image_A), axis=1))
+            predRealB = self.discriminator(torch.cat((image_B, image_A), axis=1))
+            pred_real = torch.ones_like(predFakeB, requires_grad=False)
+            pred_fake = torch.zeros_like(predFakeB, requires_grad=False)
+
+            fake_loss = self.gan_loss(predFakeB, pred_fake)
+            real_loss = self.gan_loss(predRealB, pred_real)
+            D_loss = (real_loss + fake_loss) / 2
+
+            tqdm_dict = {"D_loss": D_loss}
+            output = OrderedDict(
+                {"loss": D_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
             )
-            tqdm_dict = {"g_loss": G_loss}
+            self.log(
+                "Discriminator Loss", tqdm_dict["D_loss"]
+            )  # on_step=True, on_epoch=True, prog_bar=True, logger=True)
+            return output
+        elif optimizer_idx == 1:
+            ############################
+            # train generators
+            ############################
+            # GAN loss
+            predFakeB = self.discriminator(torch.cat((fake_B, image_A), axis=1))
+            pred_real = torch.ones_like(predFakeB, requires_grad=False)
+            gan_loss = self.gan_loss(predFakeB, pred_real)
+
+            # reconstruction loss
+            recon_loss = self.recon_loss(fake_B, image_B)
+
+            G_loss = gan_loss + self.lamda * recon_loss
+
+            tqdm_dict = {
+                "g_loss": G_loss,
+                "validity": gan_loss,
+                "reconstr": recon_loss,
+            }
             output = OrderedDict(
                 {"loss": G_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
             )
-            return output
-
-        elif optimizer_idx == 1:
-            D_loss = self.loss_evaluator._get_discriminator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            D_accuracy = self.loss_evaluator._get_discriminator_accuracy()
-            tqdm_dict = {"d_loss": D_loss}
-            output = OrderedDict(
-                {
-                    "loss": D_loss,
-                    "progress_bar": tqdm_dict,
-                    "log": tqdm_dict,
-                    "accuracy": D_accuracy,
-                }
-            )
+            self.log("Generator Loss", tqdm_dict["g_loss"])
             return output
 
     def training_epoch_end(self, outputs):
         G_mean_loss = torch.stack([x["loss"] for x in outputs[0]]).mean().item()
         D_mean_loss = torch.stack([x["loss"] for x in outputs[1]]).mean().item()
-        D_mean_accuracy = torch.stack([x["accuracy"] for x in outputs[1]]).mean().item()
         self.log("Generator Loss", G_mean_loss)
         self.log("Discriminator Loss", D_mean_loss)
-        self.log("Discriminator Accuracy", D_mean_accuracy)
 
     def validation_step(self, batch, batch_idx):
         loss_dictionary = self.run_step(batch, batch_idx)
