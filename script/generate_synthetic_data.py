@@ -9,7 +9,7 @@ import numpy as np
 from random import randint
 from tqdm import tqdm
 from PIL import Image, ImageDraw, ImageFilter
-from skimage.morphology import dilation, ball
+from skimage.morphology import dilation, ball, disk
 from skimage.util import random_noise
 from scipy.ndimage import gaussian_filter
 from tifffile import imsave
@@ -132,6 +132,22 @@ def generate_data(args):
             if args.costmap:
                 costmap = np.ones_like(raw)
                 imsave(out_cm_fn, costmap)
+        elif args.dim == 2:
+            if args.large:
+                im = np.zeros((1024, 1024))
+            else:
+                im = np.zeros((256, 256))
+
+            for obj in range(num_obj):
+                py = randint(15, im.shape[-1] - 15)
+                px = randint(15, im.shape[-0] - 15)
+                im[py, px] = 1
+            im = dilation(im > 0, disk(5)).astype(np.float32)
+            imsave(out_raw_fn, im) 
+            raw = gaussian_filter(im, 5)
+            raw = random_noise(raw).astype(np.float32)
+            # raw = random_noise(raw, mode="salt").astype(np.float32)
+            imsave(out_gt_fn, raw)
         else:
             print("Not impletemented yet")
             exit(0)

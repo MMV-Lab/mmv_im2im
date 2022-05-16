@@ -1,3 +1,4 @@
+import os
 import torch
 from typing import Dict
 import pytorch_lightning as pl
@@ -164,8 +165,10 @@ class PatchGAN(nn.Module):
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_info_xx: Dict, train: bool = True):
+    def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super(Model, self).__init__()
+
+        self.verbose = verbose
         # print(model_info_xx)
         self.generator = Generator(1, 1)
         self.discriminator = PatchGAN(2)
@@ -327,13 +330,15 @@ class Model(pl.LightningModule):
             loss = self._gen_step(real, condition)
             self.log('Generator Loss', loss)
 
-        if batch_idx == 0 and optimizer_idx == 0:
+        if self.verbose and batch_idx == 0 and optimizer_idx == 0:
+            if not os.path.exists(self.trainer.log_dir):
+                os.mkdir(self.trainer.log_dir)
             fake_images = self.generator(condition).detach()
-            out_fn = "./tmp2/"+ str(self.current_epoch) +"_fake_B.tiff"
+            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) +"_fake_B.tiff"
             imsave(out_fn, fake_images[0].detach().cpu().numpy())
-            out_fn = "./tmp2/"+ str(self.current_epoch) +"_real_B.tiff"
+            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) +"_real_B.tiff"
             imsave(out_fn, real[0].detach().cpu().numpy())
-            out_fn = "./tmp2/"+ str(self.current_epoch) +"_real_A.tiff"
+            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) +"_real_A.tiff"
             imsave(out_fn, condition[0].detach().cpu().numpy())
 
         return loss

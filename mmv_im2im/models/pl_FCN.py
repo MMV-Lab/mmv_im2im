@@ -1,7 +1,9 @@
+import os
 from typing import Dict
 import pytorch_lightning as pl
 import torchio as tio
 import torch
+from tifffile import imsave
 
 from mmv_im2im.utils.misc import (
     parse_config,
@@ -12,7 +14,7 @@ from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_info_xx: Dict, train: bool = True):
+    def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super().__init__()
         self.net = parse_config(model_info_xx["net"])
         if "sliding_window_params" in model_info_xx:
@@ -20,6 +22,7 @@ class Model(pl.LightningModule):
         else:
             self.sliding_window = None
         self.model_info = model_info_xx
+        self.verbose = verbose
         if train:
             self.criterion = parse_config(model_info_xx["criterion"])
             self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
@@ -107,6 +110,19 @@ class Model(pl.LightningModule):
         # tensorboard.add_image("train_target", tar)
         # tensorboard.add_image("train_predict", y_hat)
         """
+
+        if self.verbose and batch_idx == 0:
+            src = batch["source"][tio.DATA]
+            tar = batch["target"][tio.DATA]
+            if not os.path.exists(self.trainer.log_dir):
+                os.mkdir(self.trainer.log_dir)
+            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) + "_src.tiff"
+            imsave(out_fn, src.detach().cpu().numpy())
+            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) + "_tar.tiff"
+            imsave(out_fn, tar.detach().cpu().numpy())
+            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) + "_prd.tiff"
+            imsave(out_fn, y_hat.detach().cpu().numpy())
+
         return loss
 
     def validation_step(self, batch, batch_idx):
