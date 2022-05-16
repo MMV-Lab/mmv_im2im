@@ -25,7 +25,6 @@ data:
         target_shape: [512, 512, 1]
 # model
 model:
-  model:
   category: cyclegan
   generator:
     type: predefined_resnet
