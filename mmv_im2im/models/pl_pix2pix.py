@@ -15,6 +15,7 @@ from tifffile import imsave
 from functools import partial
 
 
+"""
 def weights_init(module):
     if isinstance(module, nn.Conv2d):
         module.weight.detach().normal_(0.0, 0.02)
@@ -151,7 +152,7 @@ class Discriminator(nn.Module):
             if i != self.n_D - 1:
                 x = nn.AvgPool2d(kernel_size=3, padding=1, stride=2, count_include_pad=False)(x)
         return result
-
+"""
 # [3] Objective (Loss) functions
 
 
@@ -344,12 +345,12 @@ class Model(pl.LightningModule):
 
         self.verbose = verbose
         # print(model_info_xx)
-        self.generator = Generator().apply(weights_init)
-        self.discriminator = Discriminator().apply(weights_init)
+        # self.generator = Generator().apply(weights_init)
+        # self.discriminator = Discriminator().apply(weights_init)
         # self.generator = Generator(1, 1)
         # self.discriminator = PatchGAN(2)
-        # self.generator = define_generator(model_info_xx["generator"])
-        # self.discriminator = define_discriminator(model_info_xx["discriminator"])
+        self.generator = define_generator(model_info_xx["generator"])
+        self.discriminator = define_discriminator(model_info_xx["discriminator"])
         # self.sliding_window = model_info_xx["sliding_window_params"]
         if train:
             # initialize model weights
