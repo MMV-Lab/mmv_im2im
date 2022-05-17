@@ -124,12 +124,12 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.99
+        gamma: 0.97
     discriminator:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.99
+        gamma: 0.97
 # training
 training:
   verbose: True
