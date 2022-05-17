@@ -135,11 +135,17 @@ class Model(pl.LightningModule):
             elif len(prd_out.shape) == 4:
                 prd_order = "CZYX"
 
-            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) + "_src.tiff"
+            out_fn = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_src.tiff"
+            )
             OmeTiffWriter.save(src_out, out_fn, dim_order=src_order)
-            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) + "_tar.tiff"
+            out_fn = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_tar.tiff"
+            )
             OmeTiffWriter.save(tar_out, out_fn, dim_order=tar_order)
-            out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) + "_prd.tiff"
+            out_fn = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_prd.tiff"
+            )
             OmeTiffWriter.save(prd_out, out_fn, dim_order=prd_order)
 
         return loss
