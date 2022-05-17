@@ -12,16 +12,196 @@ from mmv_im2im.utils.model_utils import init_weights
 from mmv_im2im.models.nets.gans import define_generator, define_discriminator
 from collections import OrderedDict
 from tifffile import imsave
+from functools import partial
 
+
+def weights_init(module):
+    if isinstance(module, nn.Conv2d):
+        module.weight.detach().normal_(0.0, 0.02)
+
+    elif isinstance(module, nn.BatchNorm2d):
+        module.weight.detach().normal_(1.0, 0.02)
+        module.bias.detach().fill_(0.0)
+
+# [2] Set the Normalization method for the input layer
+
+
+def get_norm_layer(type):
+    if type == 'BatchNorm2d':
+        layer = partial(nn.BatchNorm2d, affine=True)
+
+    elif type == 'InstanceNorm2d':
+        layer = partial(nn.InstanceNorm2d, affine=False)
+
+    return layer
+
+# [3] Set the Padding method for the input layer
+
+
+def get_pad_layer(type):
+    if type == 'reflection':
+        layer = nn.ReflectionPad2d
+
+    elif type == 'replication':
+        layer = nn.ReplicationPad2d
+
+    elif type == 'zero':
+        layer = nn.ZeroPad2d
+
+    else:
+        raise NotImplementedError("Padding type {} is not valid."
+                                  " Please choose among ['reflection', 'replication', 'zero']".format(type))
+
+    return layer
+
+
+class Generator(nn.Module):
+    def __init__(self):
+        super(Generator, self).__init__()
+
+        act = nn.ReLU(inplace=True)
+        input_ch = 1  # opt.input_ch
+        n_gf = 64  # opt.n_gf
+        norm = get_norm_layer('InstanceNorm2d')  # opt.norm_type
+        output_ch = 1  # opt.target_ch
+        pad = get_pad_layer('reflection')  # opt.padding_type
+
+        model = []
+        model += [pad(3), nn.Conv2d(input_ch, n_gf, kernel_size=7, padding=0), norm(n_gf), act]
+
+        for _ in range(4):  # opt.n_downsample
+            model += [nn.Conv2d(n_gf, 2 * n_gf, kernel_size=3, padding=1, stride=2), norm(2 * n_gf), act]
+            n_gf *= 2
+
+        for _ in range(9):  # opt.n_residual
+            model += [ResidualBlock(n_gf, pad, norm, act)]
+
+        for _ in range(4):  # opt.n_downsample
+            model += [nn.ConvTranspose2d(n_gf, n_gf // 2, kernel_size=3, padding=1, stride=2, output_padding=1),
+                      norm(n_gf // 2), act]
+            n_gf //= 2
+
+        model += [pad(3), nn.Conv2d(n_gf, output_ch, kernel_size=7, padding=0)]
+        self.model = nn.Sequential(*model)
+
+        print(self)
+        print("the number of G parameters", sum(p.numel() for p in self.parameters() if p.requires_grad))
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class ResidualBlock(nn.Module):
+    def __init__(self, n_channels, pad, norm, act):
+        super(ResidualBlock, self).__init__()
+        block = [pad(1), nn.Conv2d(n_channels, n_channels, kernel_size=3, padding=0, stride=1), norm(n_channels), act]
+        block += [pad(1), nn.Conv2d(n_channels, n_channels, kernel_size=3, padding=0, stride=1), norm(n_channels)]
+        self.block = nn.Sequential(*block)
+
+    def forward(self, x):
+        return x + self.block(x)
+
+# [2] Discriminative Network
+
+
+class PatchDiscriminator(nn.Module):
+    def __init__(self):
+        super(PatchDiscriminator, self).__init__()
+
+        act = nn.LeakyReLU(0.2, inplace=True)
+        input_channel = 2  # opt.input_ch + opt.target_ch
+        n_df = 64   # opt.n_df
+        norm = nn.InstanceNorm2d
+
+        blocks = []
+        blocks += [[nn.Conv2d(input_channel, n_df, kernel_size=4, padding=1, stride=2), act]]
+        blocks += [[nn.Conv2d(n_df, 2 * n_df, kernel_size=4, padding=1, stride=2), norm(2 * n_df), act]]
+        blocks += [[nn.Conv2d(2 * n_df, 4 * n_df, kernel_size=4, padding=1, stride=2), norm(4 * n_df), act]]
+        blocks += [[nn.Conv2d(4 * n_df, 8 * n_df, kernel_size=4, padding=1, stride=1), norm(8 * n_df), act]]
+        blocks += [[nn.Conv2d(8 * n_df, 1, kernel_size=4, padding=1, stride=1)]]
+
+        self.n_blocks = len(blocks)
+        for i in range(self.n_blocks):
+            setattr(self, 'block_{}'.format(i), nn.Sequential(*blocks[i]))
+
+    def forward(self, x):
+        result = [x]
+        for i in range(self.n_blocks):
+            block = getattr(self, 'block_{}'.format(i))
+            result.append(block(result[-1]))
+
+        return result[1:]  # except for the input
+
+
+class Discriminator(nn.Module):
+    def __init__(self):
+        super(Discriminator, self).__init__()
+
+        for i in range(2):  # opt.n_D
+            setattr(self, 'Scale_{}'.format(str(i)), PatchDiscriminator())
+        self.n_D = 2  # opt.n_D
+
+        print(self)
+        print("the number of D parameters", sum(p.numel() for p in self.parameters() if p.requires_grad))
+
+    def forward(self, x):
+        result = []
+        for i in range(self.n_D):
+            result.append(getattr(self, 'Scale_{}'.format(i))(x))
+            if i != self.n_D - 1:
+                x = nn.AvgPool2d(kernel_size=3, padding=1, stride=2, count_include_pad=False)(x)
+        return result
+
+# [3] Objective (Loss) functions
+
+
+class Loss(object):
+    def __init__(self):
+        # self.device = torch.device('cuda:0')
+        # self.dtype = torch.float16 if opt.data_type == 16 else torch.float32
+
+        self.criterion = nn.MSELoss()
+        self.FMcriterion = nn.L1Loss()
+        self.n_D = 2  # opt.n_D
+
+    def __call__(self, D, G, input, target):
+        loss_D = 0
+        loss_G = 0
+        loss_G_FM = 0
+
+        fake = G(input)
+
+        real_features = D(torch.cat((input, target), dim=1))
+        fake_features = D(torch.cat((input, fake.detach()), dim=1))
+
+        for i in range(self.n_D):
+            real_grid = torch.ones_like(real_features[i][-1])
+            # get_grid(real_features[i][-1], is_real=True).to(self.device, self.dtype)
+            fake_grid = torch.zeros_like(real_features[i][-1])
+            # get_grid(fake_features[i][-1], is_real=False).to(self.device, self.dtype)
+
+            loss_D += (self.criterion(real_features[i][-1], real_grid)
+                       + self.criterion(fake_features[i][-1], fake_grid)) * 0.5
+
+        fake_features = D(torch.cat((input, fake), dim=1))
+
+        for i in range(self.n_D):
+            real_grid = torch.ones_like(fake_features[i][-1])
+            # get_grid(fake_features[i][-1], is_real=True).to(self.device, self.dtype)
+            loss_G += self.criterion(fake_features[i][-1], real_grid)
+
+            for j in range(len(fake_features[0])):
+                loss_G_FM += self.FMcriterion(fake_features[i][j], real_features[i][j].detach())
+
+            loss_G += loss_G_FM * 0.5 * 10  # loss_G_FM * (1.0 / self.opt.n_D) * self.opt.lambda_FM
+
+        return loss_D, loss_G, target, fake
+
+
+"""
 class DownSampleConv(nn.Module):
 
     def __init__(self, in_channels, out_channels, kernel=4, strides=2, padding=1, activation=True, batchnorm=True):
-        """
-        Paper details:
-        - C64-C128-C256-C512-C512-C512-C512-C512
-        - All convolutions are 4×4 spatial filters applied with stride 2
-        - Convolutions in the encoder downsample by a factor of 2
-        """
         super().__init__()
         self.activation = activation
         self.batchnorm = batchnorm
@@ -85,13 +265,6 @@ class UpSampleConv(nn.Module):
 class Generator(nn.Module):
 
     def __init__(self, in_channels, out_channels):
-        """
-        Paper details:
-        - Encoder: C64-C128-C256-C512-C512-C512-C512-C512
-        - All convolutions are 4×4 spatial filters applied with stride 2
-        - Convolutions in the encoder downsample by a factor of 2
-        - Decoder: CD512-CD1024-CD1024-C1024-C1024-C512 -C256-C128
-        """
         super().__init__()
 
         # encoder/donwsample convs
@@ -162,6 +335,7 @@ class PatchGAN(nn.Module):
         x3 = self.d4(x2)
         xn = self.final(x3)
         return xn
+"""
 
 
 class Model(pl.LightningModule):
@@ -170,19 +344,22 @@ class Model(pl.LightningModule):
 
         self.verbose = verbose
         # print(model_info_xx)
-        self.generator = Generator(1, 1)
-        self.discriminator = PatchGAN(2)
+        self.generator = Generator().apply(weights_init)
+        self.discriminator = Discriminator().apply(weights_init)
+        # self.generator = Generator(1, 1)
+        # self.discriminator = PatchGAN(2)
         # self.generator = define_generator(model_info_xx["generator"])
         # self.discriminator = define_discriminator(model_info_xx["discriminator"])
         # self.sliding_window = model_info_xx["sliding_window_params"]
         if train:
             # initialize model weights
-            init_weights(self.generator)
-            init_weights(self.discriminator)
+            # init_weights(self.generator)
+            # init_weights(self.discriminator)
 
             # get loss functions
-            self.gan_loss = parse_config(model_info_xx["criterion"]["gan_loss"])
-            self.recon_loss = parse_config(model_info_xx["criterion"]["reconstruction_loss"])
+            self.loss_func = Loss()
+            # self.gan_loss = parse_config(model_info_xx["criterion"]["gan_loss"])
+            # self.recon_loss = parse_config(model_info_xx["criterion"]["reconstruction_loss"])
 
             # get weights of recon loss
             self.lamda = model_info_xx["criterion"]["lamda"]
@@ -191,18 +368,15 @@ class Model(pl.LightningModule):
             self.optimizer_info = model_info_xx["optimizer"]
             self.scheduler_info = model_info_xx["scheduler"]
 
+    """
     def set_requires_grad(self, nets, requires_grad=False):
-        """Set requies_grad=Fasle for all the networks to avoid unnecessary computations
-        Parameters:
-            nets (network list)   -- a list of networks
-            requires_grad (bool)  -- whether the networks require gradients or not
-        """
         if not isinstance(nets, list):
             nets = [nets]
         for net in nets:
             if net is not None:
                 for param in net.parameters():
                     param.requires_grad = requires_grad
+    """
 
     def forward(self, x):
         if x.size()[-1] == 1:
@@ -233,6 +407,7 @@ class Model(pl.LightningModule):
             generator_scheduler
         ]
 
+    """
     def _gen_step(self, real_images, conditioned_images):
         # Pix2Pix has adversarial and a reconstruction loss
         # First calculate the adversarial loss
@@ -255,6 +430,7 @@ class Model(pl.LightningModule):
         fake_loss = self.gan_loss(fake_logits, torch.zeros_like(fake_logits))
         real_loss = self.gan_loss(real_logits, torch.ones_like(real_logits))
         return (real_loss + fake_loss) / 2
+    """
 
     """
     def run_step(self, batch, batch_idx):
@@ -319,6 +495,11 @@ class Model(pl.LightningModule):
             image_A = torch.squeeze(image_A, dim=-1)
             image_B = torch.squeeze(image_B, dim=-1)
 
+        self.generator.train()
+        D_loss, G_loss, target_tensor, generated_tensor = self.loss_func(self.discriminator, self.generator, image_A, image_B)
+        self.log('Generator Loss', G_loss)
+        self.log('Discriminator Loss', D_loss)
+        """
         real = image_B
         condition = image_A
 
@@ -329,19 +510,26 @@ class Model(pl.LightningModule):
         elif optimizer_idx == 1:
             loss = self._gen_step(real, condition)
             self.log('Generator Loss', loss)
+        """
 
         if self.verbose and batch_idx == 0 and optimizer_idx == 0:
             if not os.path.exists(self.trainer.log_dir):
                 os.mkdir(self.trainer.log_dir)
-            fake_images = self.generator(condition).detach()
+            fake_images = generated_tensor.detach()
             out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) +"_fake_B.tiff"
             imsave(out_fn, fake_images[0].detach().cpu().numpy())
             out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) +"_real_B.tiff"
-            imsave(out_fn, real[0].detach().cpu().numpy())
+            imsave(out_fn, image_B[0].detach().cpu().numpy())
             out_fn = self.trainer.log_dir + os.sep + str(self.current_epoch) +"_real_A.tiff"
-            imsave(out_fn, condition[0].detach().cpu().numpy())
+            imsave(out_fn, image_A[0].detach().cpu().numpy())
 
-        return loss
+        # return loss
+
+        if optimizer_idx == 0:
+            return D_loss
+        elif optimizer_idx == 1:
+            return G_loss
+
 
         """
 
