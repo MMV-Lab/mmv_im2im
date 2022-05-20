@@ -5,10 +5,11 @@ def init_weights(net, init_type="kaiming", init_gain=0.02):
     """Initialize network weights.
     Parameters:
         net (network)   -- network to be initialized
-        init_type (str) -- the name of an initialization method: normal | xavier | kaiming | orthogonal
+        init_type (str) -- the name of an initialization method:
+                           normal | xavier | kaiming | orthogonal
         init_gain (float)    -- scaling factor for normal, xavier and orthogonal.
-    We use 'normal' in the original pix2pix and CycleGAN paper. But xavier and kaiming might
-    work better for some applications. Feel free to try yourself.
+    We use 'normal' in the original pix2pix and CycleGAN paper. But xavier and kaiming
+    might work better for some applications. Feel free to try yourself.
     """
 
     def init_func(m):  # define the initialization function
@@ -32,7 +33,8 @@ def init_weights(net, init_type="kaiming", init_gain=0.02):
                 init.constant_(m.bias.data, 0.0)
         elif (
             classname.find("BatchNorm2d") != -1
-        ):  # BatchNorm Layer's weight is not a matrix; only normal distribution applies.
+        ):
+            # BatchNorm Layer's weight is not a matrix; only normal distribution.
             init.normal_(m.weight.data, 1.0, init_gain)
             init.constant_(m.bias.data, 0.0)
 

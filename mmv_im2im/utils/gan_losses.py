@@ -57,8 +57,9 @@ class pix2pix_HD_original:
         real_features = discriminator(torch.cat((image_A, image_B), dim=1))
         fake_features = discriminator(torch.cat((image_A, fake_B), dim=1))
 
-        # Note: real_features[i][j] refers to the j-th output from the i-th discriminator
-        # when j = -1, it refers to the final prediction, otherwise refers to intermediate features
+        # Note: real_features[i][j] refers to the j-th output from the
+        # i-th discriminator. When j = -1, it refers to the final prediction,
+        # otherwise refers to intermediate features
         for i in range(n_D):
             real_grid = torch.ones_like(real_features[i][-1], requires_grad=False)
             fake_grid = torch.zeros_like(real_features[i][-1], requires_grad=False)
