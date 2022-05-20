@@ -1,7 +1,11 @@
+import os
 from typing import Dict
+from aicsimageio.writers import OmeTiffWriter
+import random
 import pytorch_lightning as pl
 import torchio as tio
 import torch
+from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 
 from mmv_im2im.utils.misc import (
     parse_config,
@@ -11,8 +15,12 @@ from mmv_im2im.utils.misc import (
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_info_xx: Dict, train: bool = True):
+    def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super().__init__()
+        self.verbose = verbose
+        if verbose:
+            self.clustering_params = model_info_xx["criterion"]["params"]
+            self.clustering_params.pop("foreground_weight")
         self.net = parse_config(model_info_xx["net"])
 
         if "sliding_window_params" in model_info_xx:
@@ -43,7 +51,7 @@ class Model(pl.LightningModule):
     def forward(self, x):
         return self.net(x)
 
-    def run_step(self, batch, validation_stage):
+    def run_step(self, batch, validation_stage, save_path: str = None):
 
         ##########################################
         # check if the data is 2D or 3D
@@ -78,19 +86,41 @@ class Model(pl.LightningModule):
         loss = loss.mean()
 
         if validation_stage:
+            # TODO: add validation step
             pass
-            # instances_map = generate_instance_clusters(output)
-            # from aicsimageio.writers import OmeTiffWriter
-            # import random
-            # val_idx = random.randint(10000, 99999)
-            # OmeTiffWriter.save(instances_map, "./tmp/val_"+ str(val_idx)+".tiff")
+        if save_path is not None:
+            instances_map = generate_instance_clusters(output, **self.clustering_params)
+            if len(im.size()) == 4:
+                dim_order = "CYX"
+            elif len(im.size()) == 5:
+                dim_order = "CZYX"
+            out_fn = save_path + "_raw.tiff"
+            OmeTiffWriter.save(
+                im.detach().cpu().numpy()[0,], out_fn, dim_order=dim_order
+            )
+            out_fn = save_path + "_gt.tiff"
+            OmeTiffWriter.save(
+                instances.detach().cpu().numpy()[0,], out_fn, dim_order=dim_order
+            )
+            out_fn = save_path + "_pred.tiff"
+            OmeTiffWriter.save(
+                instances_map, out_fn, dim_order=dim_order[1:]
+            )
 
         return loss
 
     def training_step(self, batch, batch_idx):
-        loss = self.run_step(batch, validation_stage=False)
-        self.log("train_loss", loss, prog_bar=True)
+        if self.verbose and batch_idx == 0:
+            if not os.path.exists(self.trainer.log_dir):
+                os.mkdir(self.trainer.log_dir)
+            save_path_base = self.trainer.log_dir + os.sep + str(self.current_epoch)
+            loss = self.run_step(
+                batch, validation_stage=False, save_path=save_path_base
+            )
+        else:
+            loss = self.run_step(batch, validation_stage=False)
 
+        self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):

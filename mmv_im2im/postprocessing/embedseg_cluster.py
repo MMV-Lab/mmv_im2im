@@ -317,6 +317,10 @@ def generate_instance_clusters(
     grid_z: int = 32,
     pixel_z: int = 1,
 ):
+    ##########################################################
+    # Warninging: Even passing in a mini-batch, only the first
+    # one will be used.
+    ##########################################################
     if not torch.is_tensor(pred):
         pred = torch.from_numpy(pred)
 
