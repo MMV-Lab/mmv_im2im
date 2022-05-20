@@ -26,6 +26,6 @@ def parse_tio_ops(trans_func: List[Dict]):
                     torchio.Lambda(callable_func, **func_info["extra_kwargs"])
                 )
             else:
-                trans_list.append(torchio.Lambda(my_func))
+                trans_list.append(torchio.Lambda(callable_func))
 
     return tio.Compose(trans_list)
