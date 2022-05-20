@@ -31,9 +31,7 @@ def init_weights(net, init_type="kaiming", init_gain=0.02):
                 )
             if hasattr(m, "bias") and m.bias is not None:
                 init.constant_(m.bias.data, 0.0)
-        elif (
-            classname.find("BatchNorm2d") != -1
-        ):
+        elif classname.find("BatchNorm2d") != -1:
             # BatchNorm Layer's weight is not a matrix; only normal distribution.
             init.normal_(m.weight.data, 1.0, init_gain)
             init.constant_(m.bias.data, 0.0)
