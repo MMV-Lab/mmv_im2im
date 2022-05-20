@@ -45,7 +45,9 @@ class ProjectTrainer(object):
         model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
         my_model_func = getattr(model_module, "Model")
         if "verbose" in self.train_cfg:
-            self.model = my_model_func(self.model_cfg, verbose=self.train_cfg["verbose"])
+            self.model = my_model_func(
+                self.model_cfg, verbose=self.train_cfg["verbose"]
+            )
         else:
             self.model = my_model_func(self.model_cfg)
 

@@ -93,6 +93,7 @@ model:
       nf: 64
       norm_layer: "INSTANCE"
   criterion:
+    type: pix2pix_HD  # pix2pix_HD_original  |  pix2pix_basic
     gan_loss:
       module_name: torch.nn
       func_name: BCEWithLogitsLoss  # MSELoss
@@ -100,10 +101,18 @@ model:
         reduction: 'mean'
     reconstruction_loss:
       module_name: torch.nn
+      func_name: MSELoss
+      params:
+        reduction: 'mean'
+    fm_loss:  # feature matching loss
+      module_name: torch.nn
       func_name: L1Loss
       params:
         reduction: 'mean'
-    lamda: 10
+    weights:
+      gan_loss: 1
+      fm_loss: 10
+      reconstruction_loss: 1000
   optimizer:
     generator:
       module_name: torch.optim
@@ -124,12 +133,12 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.97
+        gamma: 0.999
     discriminator:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.97
+        gamma: 0.999
 # training
 training:
   verbose: True
