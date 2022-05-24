@@ -96,21 +96,36 @@ class Model(pl.LightningModule):
                 dim_order = "CZYX"
             out_fn = save_path + "_raw.tiff"
             OmeTiffWriter.save(
-                im.detach().cpu().numpy()[0, ], out_fn, dim_order=dim_order
+                im.detach()
+                .cpu()
+                .numpy()[
+                    0,
+                ],
+                out_fn,
+                dim_order=dim_order,
             )
             out_fn = save_path + "_gt.tiff"
             OmeTiffWriter.save(
-                instances.detach().cpu().numpy()[0, ], out_fn, dim_order=dim_order
+                instances.detach()
+                .cpu()
+                .numpy()[
+                    0,
+                ],
+                out_fn,
+                dim_order=dim_order,
             )
             out_fn = save_path + "_pred.tiff"
-            OmeTiffWriter.save(
-                instances_map, out_fn, dim_order=dim_order[1:]
-            )
+            OmeTiffWriter.save(instances_map, out_fn, dim_order=dim_order[1:])
             out_fn = save_path + "_out.tiff"
             OmeTiffWriter.save(
-                output.detach().cpu().numpy()[0, ].astype(float),
+                output.detach()
+                .cpu()
+                .numpy()[
+                    0,
+                ]
+                .astype(float),
                 out_fn,
-                dim_order=dim_order
+                dim_order=dim_order,
             )
 
         return loss
