@@ -126,7 +126,6 @@ def pad_to_multiple(
             diff_x - diff_x // 2,
         )
 
-    print(pad_value)
     if isinstance(pad_value, str) and pad_value == "mean":
         avg_bg = img_array.mean()
         return F.pad(img, pad_shape, "constant", avg_bg)
