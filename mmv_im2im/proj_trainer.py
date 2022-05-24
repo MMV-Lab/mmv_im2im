@@ -5,6 +5,7 @@ from importlib import import_module
 from mmv_im2im.data_modules import get_data_module
 from mmv_im2im.utils.misc import parse_ops_list
 import pytorch_lightning as pl
+import torch
 
 ###############################################################################
 
@@ -50,6 +51,14 @@ class ProjectTrainer(object):
             )
         else:
             self.model = my_model_func(self.model_cfg)
+
+        if "resume" in self.model_cfg:
+            self.model = self.model.load_from_checkpoint(self.model_cfg["resume"])
+        elif "pre-train" in self.model_cfg:
+            pre_train = torch.load(self.model_cfg["pre-train"])
+            # TODO: hacky solution to remove a wrongly registered key
+            pre_train["state_dict"].pop("criterion.xym", None)
+            self.model.load_state_dict(pre_train["state_dict"])
 
         # set up training
         if "callbacks" in self.train_cfg:

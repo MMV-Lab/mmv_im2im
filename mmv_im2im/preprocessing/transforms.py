@@ -131,3 +131,43 @@ def pad_to_multiple(
         return F.pad(img, pad_shape, "constant", avg_bg)
     else:
         return F.pad(img, pad_shape, pad_value)
+
+
+def pad_z(img, target_size: int = 64, pad_value: Union[str, float, int] = 0):
+    """Returns padded image.
+    img will be padded along z to the size of "target_size".
+
+    Parameters
+    ----------
+    img:
+        Input 4D torch.Tensor to be padded, C x Z x Y x X
+    target_size:
+        int
+
+    Returns
+    -------
+    4D torch.Tensor
+       padded img
+    """
+
+    img_array = img.numpy()
+    if img_array.shape[1] < target_size:
+        diff_z = target_size - img_array.shape[1]
+        pad_shape = (
+            0,
+            0,
+            0,
+            0,
+            diff_z // 2,
+            diff_z - diff_z // 2,
+        )
+        if isinstance(pad_value, str):
+            if pad_value == "mean":
+                avg_bg = img_array.mean()
+                return F.pad(img, pad_shape, "constant", avg_bg)
+            else:
+                return F.pad(img, pad_shape, pad_value)
+        else:
+            return F.pad(img, pad_shape, "constant", pad_value)
+    else:
+        return img
