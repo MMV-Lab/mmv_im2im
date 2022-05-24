@@ -127,7 +127,7 @@ class ProjectTester(object):
             else:
                 pred = y_hat.cpu().numpy()
 
-            if original_size != pred.shape[-1*len(original_size):]:
+            if original_size != pred.shape[-1 * len(original_size) :]:
                 pred = center_crop(pred, original_size)
 
             # prepare output filename

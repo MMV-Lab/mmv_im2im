@@ -49,6 +49,10 @@ def center_crop(img, target_shape):
         diff_z = img_z - target_z
         half_z = diff_z // 2
 
-        return img[half_z: -(diff_z - half_z), half_y: -(diff_y - half_y), half_x: -(diff_x - half_x)]
+        return img[
+            half_z : -(diff_z - half_z),
+            half_y : -(diff_y - half_y),
+            half_x : -(diff_x - half_x),
+        ]
     else:
-        return img[half_y: -(diff_y - half_y), half_x: -(diff_x - half_x)]
+        return img[half_y : -(diff_y - half_y), half_x : -(diff_x - half_x)]
