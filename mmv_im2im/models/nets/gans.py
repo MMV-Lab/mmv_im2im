@@ -171,85 +171,17 @@ class generator_encoder_decoder(nn.Module):
 
 def define_generator(model_info):
 
-    if model_info["type"] == "predefined_resnet":
-        net = preset_generator_resent(**model_info["params"])
-    elif model_info["type"] == "predefined_unet":
-        net = UNet(**model_info["params"])
-    elif model_info["type"] == "generic_encoder_decoder":
-        net = generator_encoder_decoder(**model_info)
-    elif model_info["type"] == "3rd_party":
-        net = parse_config(**model_info)
+    if "type" in model_info:
+        if model_info["type"] == "predefined_resnet":
+            net = preset_generator_resent(**model_info["params"])
+        elif model_info["type"] == "predefined_unet":
+            net = UNet(**model_info["params"])
+        elif model_info["type"] == "generic_encoder_decoder":
+            net = generator_encoder_decoder(**model_info)
     else:
-        raise NotImplementedError("only predefined or customized as type")
+        net = parse_config(model_info)
 
     return net
-
-
-"""
-class patch_discriminator(nn.Module):
-    def __init__(self, spatial_dims, in_channels, nf, n_layers, norm_layer):
-        super().__init__()
-
-        model = [
-            Convolution(
-                spatial_dims=spatial_dims,
-                in_channels=in_channels,
-                out_channels=nf,
-                kernel_size=4,
-                strides=2,
-                padding=1,
-                conv_only=True,
-            ),
-            nn.LeakyReLU(0.2, True),
-        ]
-
-        nf_mult = 1
-        nf_mult_prev = 1
-        for n in range(1, n_layers):  # gradually increase the number of filters
-            nf_mult_prev = nf_mult
-            nf_mult = min(2**n, 8)
-            model += [
-                Convolution(
-                    spatial_dims=spatial_dims,
-                    in_channels=nf * nf_mult_prev,
-                    out_channels=nf * nf_mult,
-                    kernel_size=4,
-                    strides=2,
-                    padding=1,
-                    norm=norm_layer,
-                    act=("leakyrelu", {"negative_slope": 0.2, "inplace": True}),
-                )
-            ]
-
-        nf_mult_prev = nf_mult
-        nf_mult = min(2**n_layers, 8)
-        model += [
-            Convolution(
-                spatial_dims=spatial_dims,
-                in_channels=nf * nf_mult_prev,
-                out_channels=nf * nf_mult,
-                kernel_size=4,
-                strides=1,
-                padding=1,
-                norm=norm_layer,
-                act=("leakyrelu", {"negative_slope": 0.2, "inplace": True}),
-            ),
-            Convolution(
-                spatial_dims=spatial_dims,
-                in_channels=nf * nf_mult,
-                out_channels=1,
-                kernel_size=4,
-                strides=1,
-                padding=1,
-                conv_only=True,
-            ),
-        ]
-
-        self.model = nn.Sequential(*model)
-
-    def forward(self, x):
-        return self.model(x)
-"""
 
 
 class patch_discriminator(nn.Module):
