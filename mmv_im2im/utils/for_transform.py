@@ -26,6 +26,29 @@ def parse_tio_ops(trans_func: List[Dict]):
                     torchio.Lambda(callable_func, **func_info["extra_kwargs"])
                 )
             else:
-                trans_list.append(torchio.Lambda(my_func))
+                trans_list.append(torchio.Lambda(callable_func))
 
     return tio.Compose(trans_list)
+
+
+def center_crop(img, target_shape):
+    # target_shape is smaller than img.shape
+    target_x = target_shape[-1]
+    img_x = img.shape[-1]
+    diff_x = img_x - target_x
+    half_x = diff_x // 2
+
+    target_y = target_shape[-2]
+    img_y = img.shape[-2]
+    diff_y = img_y - target_y
+    half_y = diff_y // 2
+
+    if len(target_shape) == 3:
+        target_z = target_shape[-3]
+        img_z = img.shape[-3]
+        diff_z = img_z - target_z
+        half_z = diff_z // 2
+
+        return img[half_z: -(diff_z - half_z), half_y: -(diff_y - half_y), half_x: -(diff_x - half_x)]
+    else:
+        return img[half_y: -(diff_y - half_y), half_x: -(diff_x - half_x)]
