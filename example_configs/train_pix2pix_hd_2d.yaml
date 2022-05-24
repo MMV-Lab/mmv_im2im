@@ -1,0 +1,164 @@
+
+# everything about data
+data:
+  category: "pair"
+  spatial_dims: 2
+  target_type: "Image" # "Label" or "Image
+  target_reader_params:
+    dimension_order_out: "YX"
+    C: 0
+    T: 0
+    Z: 0
+  source_type: "Image" # "Label" or "Image
+  source_reader_params:
+    dimension_order_out: "YX"
+    C: 0
+    T: 0
+    Z: 0
+  # data_path: "/mnt/data/xyz.csv"
+  data_path: "/mnt/eternus/sample_data/im2im/pix2pix_2d/train"
+  # data_path:
+  #   source_path:
+  #   target_path:
+  #   costmap_path: optional
+  #   image_type: "tiff"
+  dataloader_params:
+    train:
+      batch_size: 1
+      pin_memory: True
+      num_workers: 2  # if dataload_path_queue is used, num_workers must be 0 here
+    val:
+      batch_size: 1
+      num_workers: 2
+  train_val_ratio: 0.1
+  preprocess:
+    - module_name: torchio
+      func_name: RescaleIntensity
+      params:
+        out_min_max: 1
+        percentiles: [0.05, 99.5]
+        include: ["source"]
+    #- module_name: torchio
+    #  func_name: ZNormalization
+    #  params:
+    #    include: ["source"]
+    - module_name: torchio
+      func_name: RescaleIntensity
+      params:
+        out_min_max: 1
+        percentiles: [0.01, 99.99]
+        include: ["target"]
+    - module_name: torchio
+      func_name: CropOrPad
+      params:
+        target_shape: [1024, 1024, 1]
+  augmentation:
+    - module_name: torchio
+      func_name: RandomFlip
+      params:
+        axes: [1, 2]
+        flip_probability: 0.5
+#    - module_name: torchio
+#      func_name: RandomAffine
+#      params:
+#        degrees: [0, 0, 0, 90, 0, 90]
+#        p: 0.5
+# model
+model:
+  category: pix2pix
+  generator:
+    type: predefined_resnet
+    params:
+      spatial_dims: 2
+      in_channels: 1
+      out_channels: 1
+      n_down_blocks: 4
+      n_res_blocks: 9
+      nf: 64
+      norm_layer: "BATCH"
+    #type: predefined_unet
+    #params:
+    #  spatial_dims: 2
+    #  in_channels: 1
+    #  out_channels: 1
+    #  channels: [16, 32, 64, 128]
+    #  strides: [2, 2, 2]
+  discriminator:
+    type: predefined_multiscale
+    params:
+      num_discriminator: 2
+      spatial_dims: 2
+      in_channels: 2
+      n_layers: 4
+      nf: 64
+      norm_layer: "INSTANCE"
+  criterion:
+    type: pix2pix_HD  # pix2pix_HD_original  |  pix2pix_basic
+    gan_loss:
+      module_name: torch.nn
+      func_name: BCEWithLogitsLoss  # MSELoss
+      params:
+        reduction: 'mean'
+    reconstruction_loss:
+      module_name: torch.nn
+      func_name: MSELoss
+      params:
+        reduction: 'mean'
+    fm_loss:  # feature matching loss
+      module_name: torch.nn
+      func_name: L1Loss
+      params:
+        reduction: 'mean'
+    weights:
+      gan_loss: 1
+      fm_loss: 10
+      reconstruction_loss: 1000
+  optimizer:
+    generator:
+      module_name: torch.optim
+      func_name: Adam  # AdamW
+      params:
+        lr: 0.0002
+        betas: [0.5, 0.999]
+        #weight_decay: 0.0005
+    discriminator:
+      module_name: torch.optim
+      func_name: Adam  # AdamW
+      params:
+        lr: 0.0002
+        betas: [0.5, 0.999]
+        #weight_decay: 0.0005
+  scheduler:
+    generator:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.999
+    discriminator:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.999
+# training
+training:
+  verbose: True
+  params:
+    gpus: 1
+    # precision: 16
+    # auto_scale_batch_size: True
+    max_epochs: 10000
+    terminate_on_nan: True
+    # stochastic_weight_avg: True  # only work with 1 optimizer
+  callbacks:
+    #- module_name: pytorch_lightning.callbacks.early_stopping
+    #  func_name: EarlyStopping
+    #  params:
+    #    monitor: "generator_loss"
+    - module_name: pytorch_lightning.callbacks
+      func_name: ModelCheckpoint
+      params:
+        save_last: True
+        save_top_k: 5
+        save_weights_only: True
+        monitor: "generator_loss"
+    

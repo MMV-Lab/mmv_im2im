@@ -96,7 +96,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             raw_count = len(glob(self.cache_path + os.sep + "*_IM.tiff"))
             center_count = len(glob(self.cache_path + os.sep + "*_CE.tiff"))
             class_count = len(glob(self.cache_path + os.sep + "*_CL.tiff"))
-            if raw_count == center_count == class_count:
+            if raw_count == center_count == class_count > 0:
                 print("cache is found. Start running ...")
                 return
 
@@ -125,7 +125,11 @@ class Im2ImDataModule(pl.LightningDataModule):
         for ds in tqdm(dataset_list):
             instance, _ = self.target_reader(ds["target_fn"])
             image, _ = self.source_reader(ds["source_fn"])
-            fn_base = str(os.path.basename(ds["target_fn"]))[:-7]
+            fn_base = str(os.path.basename(ds["target_fn"]))
+            if fn_base.endswith("GT.tiff"):
+                fn_base = fn_base[:-7]
+            else:
+                fn_base = os.path.splitext(fn_base)[0]
 
             instance_np = np.array(instance, copy=False)
             object_mask = instance_np > 0
@@ -196,22 +200,22 @@ class Im2ImDataModule(pl.LightningDataModule):
 
                 OmeTiffWriter.save(
                     im_crop,
-                    self.cache_path + os.sep + fn_base + f"{j:04d}_IM.tiff",
+                    self.cache_path + os.sep + fn_base + f"_{j:04d}_IM.tiff",
                     dim_order=dim_order,
                 )
                 OmeTiffWriter.save(
                     instance_crop.astype(np.uint16),
-                    self.cache_path + os.sep + fn_base + f"{j:04d}_GT.tiff",
+                    self.cache_path + os.sep + fn_base + f"_{j:04d}_GT.tiff",
                     dim_order=dim_order,
                 )
                 OmeTiffWriter.save(
                     center_image_crop.astype(np.uint8),
-                    self.cache_path + os.sep + fn_base + f"{j:04d}_CE.tiff",
+                    self.cache_path + os.sep + fn_base + f"_{j:04d}_CE.tiff",
                     dim_order=dim_order,
                 )
                 OmeTiffWriter.save(
                     class_image_crop.astype(np.uint8),
-                    self.cache_path + os.sep + fn_base + f"{j:04d}_CL.tiff",
+                    self.cache_path + os.sep + fn_base + f"_{j:04d}_CL.tiff",
                     dim_order=dim_order,
                 )
 

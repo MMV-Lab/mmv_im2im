@@ -1,43 +1,76 @@
+import os
 import torch
 from typing import Dict
 import pytorch_lightning as pl
 import torchio as tio
-from mmv_im2im.utils.misc import (
-    parse_config,
-    parse_config_func,
-    parse_config_func_without_params,
-)
-from mmv_im2im.utils.piecewise_inference import predict_piecewise
-from collections import OrderedDict
+from mmv_im2im.utils.misc import parse_config_func
+from mmv_im2im.utils.model_utils import init_weights
+from mmv_im2im.models.nets.gans import define_generator, define_discriminator
+from tifffile import imsave
+from importlib import import_module
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_info_xx: Dict, train: bool = True):
+    def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super(Model, self).__init__()
-        print(model_info_xx)
-        self.generator_model = parse_config(model_info_xx["generator_net"])
-        self.discriminator_model = parse_config(model_info_xx["discriminator_net"])
-        self.sliding_window = model_info_xx["sliding_window_params"]
+
+        self.verbose = verbose
+        self.generator = define_generator(model_info_xx["generator"])
+        self.discriminator = define_discriminator(model_info_xx["discriminator"])
+        # self.sliding_window = model_info_xx["sliding_window_params"]
         if train:
-            self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
-            self.loss_func = parse_config_func_without_params(
-                model_info_xx["loss_function"]
-            )
-            self.loss_evaluator = self.loss_func(model_info_xx)
+            # initialize model weights
+            init_weights(self.generator, init_type="normal")
+            init_weights(self.discriminator, init_type="normal")
+
+            # get loss functions
+            loss_category = model_info_xx["criterion"].pop("type")
+            loss_module = import_module("mmv_im2im.utils.gan_losses")
+            loss_func = getattr(loss_module, loss_category)
+            self.loss = loss_func(**model_info_xx["criterion"])
+
+            # get info of optimizer and scheduler
+            self.optimizer_info = model_info_xx["optimizer"]
+            self.scheduler_info = model_info_xx["scheduler"]
 
     def forward(self, x):
-        x = self.generator_model(x)
-        return x
+        if x.size()[-1] == 1:
+            x = torch.squeeze(x, dim=-1)
+        return self.generator(x)
 
     def configure_optimizers(self):
-        self.optim_gen = self.optimizer_func(self.generator_model.parameters())
-        self.optim_disc = self.optimizer_func(self.discriminator_model.parameters())
-        optimizers = [self.optim_gen, self.optim_disc]
-        return optimizers
+        discriminator_optimizer_func = parse_config_func(
+            self.optimizer_info["discriminator"]
+        )
+        discriminator_scheduler_func = parse_config_func(
+            self.scheduler_info["discriminator"]
+        )
+        discriminator_optimizer = discriminator_optimizer_func(
+            self.discriminator.parameters()
+        )
+        discriminator_scheduler = discriminator_scheduler_func(discriminator_optimizer)
 
-    def run_step(self, batch, batch_idx):
+        generator_optimizer_func = parse_config_func(self.optimizer_info["generator"])
+        generator_scheduler_func = parse_config_func(self.scheduler_info["generator"])
+        generator_optimizer = generator_optimizer_func(
+            self.generator.parameters(),
+        )
+        generator_scheduler = generator_scheduler_func(generator_optimizer)
+
+        return [discriminator_optimizer, generator_optimizer], [
+            discriminator_scheduler,
+            generator_scheduler,
+        ]
+
+    def training_step(self, batch, batch_idx, optimizer_idx):
+
+        # imageB : real image
+        # imageA : condition image
+        # conditional GAN refers generating a realistic image (image B as ground truth),
+        # conditioned on image A
         image_A = batch["source"][tio.DATA]
         image_B = batch["target"][tio.DATA]
+
         ##########################################
         # check if the data is 2D or 3D
         ##########################################
@@ -53,113 +86,53 @@ class Model(pl.LightningModule):
         # with the syntax for fliping along Y in 1 x Y x X x 1.
         # But, the FCN models do not like this. We just need to remove the
         # dummy dimension
-
         if image_A.size()[-1] == 1:
             image_A = torch.squeeze(image_A, dim=-1)
             image_B = torch.squeeze(image_B, dim=-1)
-            fake_image = self.generator_model(image_A)
-            D_loss = self.loss_evaluator._get_discriminator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            G_loss = self.loss_evaluator._get_generator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            output = OrderedDict(
-                {"generator_loss": G_loss, "discriminator_loss": D_loss}
-            )
-            return output
-        else:
-            fake_image = predict_piecewise(
-                self,
-                image_A[
-                    0,
-                ],
-                **self.sliding_window,
-            )
-            D_loss = self.loss_evaluator._get_discriminator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            G_loss = self.loss_evaluator._get_generator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
-            )
-            output = OrderedDict(
-                {"generator_loss": G_loss, "discriminator_loss": D_loss}
-            )
-            return output
 
-    def training_step(self, batch, batch_idx, optimizer_idx):
-        image_A = batch["source"][tio.DATA]
-        image_B = batch["target"][tio.DATA]
-        if image_A.size()[-1] == 1:
-            image_A = torch.squeeze(image_A, dim=-1)
-            image_B = torch.squeeze(image_B, dim=-1)
-            fake_image = self(image_A)
-            if optimizer_idx == 0:
-                G_loss = self.loss_evaluator._get_generator_loss(
-                    self.discriminator_model, image_A, image_B, fake_image
-                )
-                tqdm_dict = {"g_loss": G_loss}
-                output = OrderedDict(
-                    {"loss": G_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
-                )
-                return output
+        self.generator.train()
 
-            elif optimizer_idx == 1:
-                D_loss = self.loss_evaluator._get_discriminator_loss(
-                    self.discriminator_model, image_A, image_B, fake_image
-                )
-                D_accuracy = self.loss_evaluator._get_discriminator_accuracy()
-                tqdm_dict = {"d_loss": D_loss}
-                output = OrderedDict(
-                    {
-                        "loss": D_loss,
-                        "progress_bar": tqdm_dict,
-                        "log": tqdm_dict,
-                        "accuracy": D_accuracy,
-                    }
-                )
-                return output
-        fake_image = predict_piecewise(
-            self,
-            image_A[
-                0,
-            ],
-            **self.sliding_window,
-        )
+        # calculate loss
+        loss = None
         if optimizer_idx == 0:
-            G_loss = self.loss_evaluator._get_generator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
+            fake_B = self.generator(image_A).detach()
+            loss = self.loss.discriminator_step(
+                self.discriminator, image_A, image_B, fake_B
             )
-            tqdm_dict = {"g_loss": G_loss}
-            output = OrderedDict(
-                {"loss": G_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
-            )
-            return output
-
+            self.log("D Loss", loss)
         elif optimizer_idx == 1:
-            D_loss = self.loss_evaluator._get_discriminator_loss(
-                self.discriminator_model, image_A, image_B, fake_image
+            fake_B = self.generator(image_A)
+            loss = self.loss.generator_step(
+                self.discriminator, image_A, image_B, fake_B
             )
-            D_accuracy = self.loss_evaluator._get_discriminator_accuracy()
-            tqdm_dict = {"d_loss": D_loss}
-            output = OrderedDict(
-                {
-                    "loss": D_loss,
-                    "progress_bar": tqdm_dict,
-                    "log": tqdm_dict,
-                    "accuracy": D_accuracy,
-                }
+            self.log("G Loss", loss)
+
+        if self.verbose and batch_idx == 0 and optimizer_idx == 0:
+            if not os.path.exists(self.trainer.log_dir):
+                os.mkdir(self.trainer.log_dir)
+            fake_images = fake_B.detach()
+            out_fn = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_fake_B.tiff"
             )
-            return output
+            imsave(out_fn, fake_images[0].detach().cpu().numpy())
+            out_fn = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_B.tiff"
+            )
+            imsave(out_fn, image_B[0].detach().cpu().numpy())
+            out_fn = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_A.tiff"
+            )
+            imsave(out_fn, image_A[0].detach().cpu().numpy())
+
+        return loss
 
     def training_epoch_end(self, outputs):
         G_mean_loss = torch.stack([x["loss"] for x in outputs[0]]).mean().item()
         D_mean_loss = torch.stack([x["loss"] for x in outputs[1]]).mean().item()
-        D_mean_accuracy = torch.stack([x["accuracy"] for x in outputs[1]]).mean().item()
-        self.log("Generator Loss", G_mean_loss)
-        self.log("Discriminator Loss", D_mean_loss)
-        self.log("Discriminator Accuracy", D_mean_accuracy)
+        self.log("generator_loss", G_mean_loss)
+        self.log("discriminator_loss", D_mean_loss)
 
+    """
     def validation_step(self, batch, batch_idx):
         loss_dictionary = self.run_step(batch, batch_idx)
         return loss_dictionary
@@ -177,3 +150,4 @@ class Model(pl.LightningModule):
         )
         self.log("val_loss_generator", val_gen_loss)
         self.log("val_loss_discriminator", val_disc_loss)
+    """

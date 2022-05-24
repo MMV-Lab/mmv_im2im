@@ -4,7 +4,11 @@ import torch.nn as nn
 from monai.networks.blocks import ResidualUnit, Convolution
 from monai.networks.nets import UNet
 
-from mmv_im2im.utils.misc import parse_config_func_without_params, parse_config_func
+from mmv_im2im.utils.misc import (
+    parse_config_func_without_params,
+    parse_config_func,
+    parse_config,
+)
 
 
 class preset_generator_resent(nn.Module):
@@ -13,7 +17,8 @@ class preset_generator_resent(nn.Module):
         spatial_dims,
         in_channels,
         out_channels,
-        n_blocks,
+        n_down_blocks,
+        n_res_blocks,
         nf=64,
         norm_layer="INSTANCE",
         use_dropout=None,
@@ -40,8 +45,7 @@ class preset_generator_resent(nn.Module):
         ]
 
         # add downsampling layers
-        n_downsampling = 2
-        for i in range(n_downsampling):
+        for i in range(n_down_blocks):
             mult = 2**i
             model += [
                 Convolution(
@@ -57,9 +61,8 @@ class preset_generator_resent(nn.Module):
             ]
 
         # add ResNet blocks
-        mult = 2**n_downsampling
-        for i in range(n_blocks):
-
+        mult = 2**n_down_blocks
+        for i in range(n_res_blocks):
             model += [
                 ResidualUnit(
                     spatial_dims=spatial_dims,
@@ -74,8 +77,8 @@ class preset_generator_resent(nn.Module):
             ]
 
         # add upsampling blocks
-        for i in range(n_downsampling):
-            mult = 2 ** (n_downsampling - i)
+        for i in range(n_down_blocks):
+            mult = 2 ** (n_down_blocks - i)
             model += [
                 Convolution(
                     spatial_dims=spatial_dims,
@@ -98,9 +101,8 @@ class preset_generator_resent(nn.Module):
                 spatial_dims=spatial_dims,
                 in_channels=nf,
                 out_channels=out_channels,
-                norm=norm_layer,
                 kernel_size=7,
-                act="TANH",
+                conv_only=True,
                 padding=0,
             ),
         ]
@@ -173,14 +175,17 @@ def define_generator(model_info):
         net = preset_generator_resent(**model_info["params"])
     elif model_info["type"] == "predefined_unet":
         net = UNet(**model_info["params"])
-    elif model_info["type"] == "customized":
+    elif model_info["type"] == "generic_encoder_decoder":
         net = generator_encoder_decoder(**model_info)
+    elif model_info["type"] == "3rd_party":
+        net = parse_config(**model_info)
     else:
         raise NotImplementedError("only predefined or customized as type")
 
     return net
 
 
+"""
 class patch_discriminator(nn.Module):
     def __init__(self, spatial_dims, in_channels, nf, n_layers, norm_layer):
         super().__init__()
@@ -244,11 +249,114 @@ class patch_discriminator(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+"""
+
+
+class patch_discriminator(nn.Module):
+    def __init__(
+        self,
+        spatial_dims,
+        in_channels,
+        nf,
+        n_layers,
+        norm_layer,
+        return_features: bool = False,
+    ):
+        super().__init__()
+
+        blocks = [
+            Convolution(
+                spatial_dims=spatial_dims,
+                in_channels=in_channels,
+                out_channels=nf,
+                kernel_size=4,
+                strides=2,
+                padding=1,
+                conv_only=True,
+            ),  # no norm for first layer
+            nn.LeakyReLU(0.2, True),
+        ]
+
+        nf_mult = 1
+        nf_mult_prev = 1
+        for n in range(1, n_layers):  # gradually increase the number of filters
+            nf_mult_prev = nf_mult
+            nf_mult = min(2**n, 8)
+            blocks += [
+                Convolution(
+                    spatial_dims=spatial_dims,
+                    in_channels=nf * nf_mult_prev,
+                    out_channels=nf * nf_mult,
+                    kernel_size=4,
+                    strides=2,
+                    padding=1,
+                    norm=norm_layer,
+                    act=("leakyrelu", {"negative_slope": 0.2, "inplace": True}),
+                )
+            ]
+
+        blocks += [
+            Convolution(
+                spatial_dims=spatial_dims,
+                in_channels=nf * nf_mult,
+                out_channels=1,
+                kernel_size=4,
+                strides=1,
+                padding=1,
+                conv_only=True,
+            )
+        ]
+
+        self.return_features = return_features
+        if return_features:
+            self.n_blocks = len(blocks)
+            for i in range(self.n_blocks):
+                setattr(self, "block_{}".format(i), nn.Sequential(*blocks[i]))
+        else:
+            self.model = nn.Sequential(*blocks)
+
+    def forward(self, x):
+        if self.return_features:
+            result = [x]
+            for i in range(self.n_blocks):
+                block = getattr(self, "block_{}".format(i))
+                result.append(block(result[-1]))
+
+            return result[1:]  # except for the input
+        else:
+            return self.model(x)
+
+
+class multiscale_discriminator(nn.Module):
+    def __init__(self, num_discriminator, **kwargs):
+        super().__init__()
+
+        for i in range(num_discriminator):
+            setattr(self, "Scale_{}".format(str(i)), patch_discriminator(**kwargs))
+        self.n_D = num_discriminator
+        self.spatial_dimenstion = kwargs["spatial_dims"]
+
+    def forward(self, x):
+        result = []
+        for i in range(self.n_D):
+            result.append(getattr(self, "Scale_{}".format(i))(x))
+            if i != self.n_D - 1:
+                if self.spatial_dimenstion == 2:
+                    x = nn.AvgPool2d(
+                        kernel_size=3, padding=1, stride=2, count_include_pad=False
+                    )(x)
+                elif self.spatial_dimenstion == 3:
+                    x = nn.AvgPool3d(
+                        kernel_size=3, padding=1, stride=2, count_include_pad=False
+                    )(x)
+        return result
 
 
 def define_discriminator(model_info):
-    if model_info["type"] == "predefined":
+    if model_info["type"] == "predefined_basic":
         net = patch_discriminator(**model_info["params"])
+    elif model_info["type"] == "predefined_multiscale":
+        net = multiscale_discriminator(**model_info["params"])
     else:
         raise NotImplementedError("only predefined discriminator is supported")
 
