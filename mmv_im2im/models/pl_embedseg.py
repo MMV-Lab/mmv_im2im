@@ -1,7 +1,6 @@
 import os
 from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
-import random
 import pytorch_lightning as pl
 import torchio as tio
 import torch
