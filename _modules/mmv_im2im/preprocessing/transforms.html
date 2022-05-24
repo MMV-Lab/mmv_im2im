@@ -99,8 +99,9 @@
   <h1>Source code for mmv_im2im.preprocessing.transforms</h1><div class="highlight"><pre>
 <span></span><span class="c1"># This file was adapted from https://github.com/AllenCellModeling/pytorch_fnet/</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 
 <div class="viewcode-block" id="to_float"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.to_float">[docs]</a><span class="k">def</span> <span class="nf">to_float</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
@@ -147,6 +148,88 @@
     <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">/</span> <span class="n">chunk</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="pad_to_multiple"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.pad_to_multiple">[docs]</a><span class="k">def</span> <span class="nf">pad_to_multiple</span><span class="p">(</span>
+    <span class="n">img</span><span class="p">,</span>
+    <span class="n">multiple_base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="n">pad_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns padded image.</span>
+<span class="sd">    img will be padded to the size of multiple of &quot;multiple_base&quot;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    img:</span>
+<span class="sd">        Input 4D torch.Tensor to be padded, C x X x Y x Z</span>
+<span class="sd">    multiple_base:</span>
+<span class="sd">        int or a sequence of int</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    4D torch.Tensor</span>
+<span class="sd">       padded img</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">multiple_base</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Z dim = 1, only pad XY</span>
+            <span class="n">pad_base</span> <span class="o">=</span> <span class="p">[</span><span class="n">multiple_base</span><span class="p">,</span> <span class="n">multiple_base</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 3D data, pad XYZ</span>
+            <span class="n">pad_base</span> <span class="o">=</span> <span class="p">[</span><span class="n">multiple_base</span><span class="p">,</span> <span class="n">multiple_base</span><span class="p">,</span> <span class="n">multiple_base</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Z dim = 1, only pad XY</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">multiple_base</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;multiple_base and image shape do not match&quot;</span>
+            <span class="n">pad_base</span> <span class="o">=</span> <span class="p">[</span><span class="n">multiple_base</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">multiple_base</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 3D data, pad XYZ</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">multiple_base</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;multiple_base and image shape do not match&quot;</span>
+            <span class="n">pad_base</span> <span class="o">=</span> <span class="p">[</span><span class="n">multiple_base</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">multiple_base</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">multiple_base</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+
+    <span class="n">multiple_x</span> <span class="o">=</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">diff_x</span> <span class="o">=</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">multiple_x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">diff_x</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">multiple_y</span> <span class="o">=</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">//</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">%</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">diff_y</span> <span class="o">=</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">multiple_y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">diff_y</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pad_base</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">multiple_z</span> <span class="o">=</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">//</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">%</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">diff_z</span> <span class="o">=</span> <span class="n">pad_base</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">multiple_z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">diff_z</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">pad_shape</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">diff_z</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_z</span> <span class="o">-</span> <span class="n">diff_z</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_y</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_y</span> <span class="o">-</span> <span class="n">diff_y</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_x</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_x</span> <span class="o">-</span> <span class="n">diff_x</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pad_shape</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">diff_y</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_y</span> <span class="o">-</span> <span class="n">diff_y</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_x</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">diff_x</span> <span class="o">-</span> <span class="n">diff_x</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pad_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pad_value</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+        <span class="n">avg_bg</span> <span class="o">=</span> <span class="n">img_array</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pad_shape</span><span class="p">,</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">avg_bg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pad_shape</span><span class="p">,</span> <span class="n">pad_value</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

@@ -219,9 +219,70 @@ own slice and zero elsewhere.</p>
 <section id="module-mmv_im2im.utils.for_transform">
 <span id="mmv-im2im-utils-for-transform-module"></span><h2>mmv_im2im.utils.for_transform module<a class="headerlink" href="#module-mmv_im2im.utils.for_transform" title="Permalink to this headline"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.for_transform.center_crop">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.for_transform.</span></span><span class="sig-name descname"><span class="pre">center_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/for_transform.html#center_crop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.for_transform.center_crop" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.utils.for_transform.parse_tio_ops">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.for_transform.</span></span><span class="sig-name descname"><span class="pre">parse_tio_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trans_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/for_transform.html#parse_tio_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.for_transform.parse_tio_ops" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-mmv_im2im.utils.gan_losses">
+<span id="mmv-im2im-utils-gan-losses-module"></span><h2>mmv_im2im.utils.gan_losses module<a class="headerlink" href="#module-mmv_im2im.utils.gan_losses" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_HD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.gan_losses.</span></span><span class="sig-name descname"><span class="pre">pix2pix_HD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gan_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fm_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_HD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_HD" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mmv_im2im.utils.gan_losses.pix2pix_HD_original" title="mmv_im2im.utils.gan_losses.pix2pix_HD_original"><code class="xref py py-class docutils literal notranslate"><span class="pre">mmv_im2im.utils.gan_losses.pix2pix_HD_original</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_HD.generator_step">
+<span class="sig-name descname"><span class="pre">generator_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discriminator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_HD.generator_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_HD.generator_step" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_HD_original">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.gan_losses.</span></span><span class="sig-name descname"><span class="pre">pix2pix_HD_original</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gan_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fm_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_HD_original"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_HD_original" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_HD_original.discriminator_step">
+<span class="sig-name descname"><span class="pre">discriminator_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discriminator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_HD_original.discriminator_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_HD_original.discriminator_step" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_HD_original.feature_matching">
+<span class="sig-name descname"><span class="pre">feature_matching</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">real_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_HD_original.feature_matching"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_HD_original.feature_matching" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_HD_original.generator_step">
+<span class="sig-name descname"><span class="pre">generator_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discriminator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_HD_original.generator_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_HD_original.generator_step" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_HD_original.multi_gan">
+<span class="sig-name descname"><span class="pre">multi_gan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">real_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_D</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_HD_original.multi_gan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_HD_original.multi_gan" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_basic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.gan_losses.</span></span><span class="sig-name descname"><span class="pre">pix2pix_basic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gan_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconstruction_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fm_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_basic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_basic" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_basic.discriminator_step">
+<span class="sig-name descname"><span class="pre">discriminator_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discriminator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_basic.discriminator_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_basic.discriminator_step" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.gan_losses.pix2pix_basic.generator_step">
+<span class="sig-name descname"><span class="pre">generator_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discriminator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/gan_losses.html#pix2pix_basic.generator_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.gan_losses.pix2pix_basic.generator_step" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
 
 </section>
 <section id="module-mmv_im2im.utils.gan_utils">
@@ -439,6 +500,26 @@ Return</p>
 <dd></dd></dl>
 
 </section>
+<section id="module-mmv_im2im.utils.model_utils">
+<span id="mmv-im2im-utils-model-utils-module"></span><h2>mmv_im2im.utils.model_utils module<a class="headerlink" href="#module-mmv_im2im.utils.model_utils" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.model_utils.init_weights">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">init_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kaiming'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/model_utils.html#init_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.model_utils.init_weights" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize network weights.
+Parameters:</p>
+<blockquote>
+<div><p>net (network)   – network to be initialized
+init_type (str) – the name of an initialization method:</p>
+<blockquote>
+<div><p>normal | xavier | kaiming | orthogonal</p>
+</div></blockquote>
+<p>init_gain (float)    – scaling factor for normal, xavier and orthogonal.</p>
+</div></blockquote>
+<p>We use ‘normal’ in the original pix2pix and CycleGAN paper. But xavier and kaiming
+might work better for some applications. Feel free to try yourself.</p>
+</dd></dl>
+
+</section>
 <section id="module-mmv_im2im.utils.piecewise_inference">
 <span id="mmv-im2im-utils-piecewise-inference-module"></span><h2>mmv_im2im.utils.piecewise_inference module<a class="headerlink" href="#module-mmv_im2im.utils.piecewise_inference" title="Permalink to this headline"></a></h2>
 <dl class="py function">
@@ -474,9 +555,6 @@ shape [Y, X]</p></li>
 </dl>
 </dd></dl>
 
-</section>
-<section id="mmv-im2im-utils-pix2pix-losses-module">
-<h2>mmv_im2im.utils.pix2pix_losses module<a class="headerlink" href="#mmv-im2im-utils-pix2pix-losses-module" title="Permalink to this headline"></a></h2>
 </section>
 <section id="module-mmv_im2im.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.utils" title="Permalink to this headline"></a></h2>

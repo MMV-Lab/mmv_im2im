@@ -416,6 +416,10 @@
     <span class="n">grid_z</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
     <span class="n">pixel_z</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">):</span>
+    <span class="c1">##########################################################</span>
+    <span class="c1"># Warninging: Even passing in a mini-batch, only the first</span>
+    <span class="c1"># one will be used.</span>
+    <span class="c1">##########################################################</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">pred</span><span class="p">):</span>
         <span class="n">pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span>
 

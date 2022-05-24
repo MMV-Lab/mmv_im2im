@@ -139,6 +139,27 @@ img’s “z_center”.
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.pad_to_multiple">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">pad_to_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#pad_to_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.pad_to_multiple" title="Permalink to this definition"></a></dt>
+<dd><p>Returns padded image.
+img will be padded to the size of multiple of “multiple_base”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> – Input 4D torch.Tensor to be padded, C x X x Y x Z</p></li>
+<li><p><strong>multiple_base</strong> – int or a sequence of int</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>padded img</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>4D torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.to_float">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">to_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#to_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.to_float" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>

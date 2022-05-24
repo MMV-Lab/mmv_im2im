@@ -107,7 +107,7 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchio.data.io</span> <span class="kn">import</span> <span class="n">check_uint_to_int</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">generate_test_dataset_dict</span><span class="p">,</span> <span class="n">parse_config_func</span>
-<span class="kn">from</span> <span class="nn">mmv_im2im.utils.for_transform</span> <span class="kn">import</span> <span class="n">parse_tio_ops</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.for_transform</span> <span class="kn">import</span> <span class="n">parse_tio_ops</span><span class="p">,</span> <span class="n">center_crop</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.piecewise_inference</span> <span class="kn">import</span> <span class="n">predict_piecewise</span>
 
 <span class="c1"># https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction_guide.html#predicting</span>
@@ -177,6 +177,13 @@
                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]</span>
             <span class="p">)</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">check_uint_to_int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">()))</span>
+
+            <span class="c1"># record the input dimension</span>
+            <span class="n">original_size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">original_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">original_size</span> <span class="o">=</span> <span class="n">original_size</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">original_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">original_size</span><span class="p">)</span>
+
             <span class="c1"># Perform the prediction</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicting the image&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -192,6 +199,8 @@
                 <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">pre_process</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
             <span class="c1"># choose different inference function for different types of models</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
@@ -216,6 +225,9 @@
                     <span class="n">pred</span> <span class="o">=</span> <span class="n">pp_data</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">pred</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">original_size</span> <span class="o">!=</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_size</span><span class="p">)</span> <span class="p">:]:</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">center_crop</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">original_size</span><span class="p">)</span>
 
             <span class="c1"># prepare output filename</span>
             <span class="n">fn_core</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>

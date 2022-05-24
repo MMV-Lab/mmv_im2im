@@ -28,6 +28,14 @@ mmv\_im2im.utils.for\_transform module
    :undoc-members:
    :show-inheritance:
 
+mmv\_im2im.utils.gan\_losses module
+-----------------------------------
+
+.. automodule:: mmv_im2im.utils.gan_losses
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mmv\_im2im.utils.gan\_utils module
 ----------------------------------
 
@@ -52,18 +60,18 @@ mmv\_im2im.utils.misc module
    :undoc-members:
    :show-inheritance:
 
-mmv\_im2im.utils.piecewise\_inference module
---------------------------------------------
+mmv\_im2im.utils.model\_utils module
+------------------------------------
 
-.. automodule:: mmv_im2im.utils.piecewise_inference
+.. automodule:: mmv_im2im.utils.model_utils
    :members:
    :undoc-members:
    :show-inheritance:
 
-mmv\_im2im.utils.pix2pix\_losses module
----------------------------------------
+mmv\_im2im.utils.piecewise\_inference module
+--------------------------------------------
 
-.. automodule:: mmv_im2im.utils.pix2pix_losses
+.. automodule:: mmv_im2im.utils.piecewise_inference
    :members:
    :undoc-members:
    :show-inheritance:
