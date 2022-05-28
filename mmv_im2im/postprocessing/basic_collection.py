@@ -46,3 +46,22 @@ def extract_segmentation(
         seg[seg > 0] = 255
 
         return seg
+
+
+def generate_classmap(im: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
+    """generate the segmentation classmap from model prediction
+
+    Parameters:
+    -------------
+    im: ndarray or torch.Tensor
+        the multi-class prediction (1, C, W, H) or (1, C, Z, Y, X)
+    """
+
+    # convert tensor to numpy
+    if torch.is_tensor(im):
+        im = im.cpu().numpy()
+    assert len(im.shape) == 4 or len(im.shape) == 5, "extract seg only accepts 4D/5D"
+    assert im.shape[0] == 1, "extract seg requires first dim to be 1"
+
+    classmap = np.argmax(im, axis=1).astype(np.uint8)
+    return classmap
