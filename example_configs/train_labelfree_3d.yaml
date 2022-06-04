@@ -3,7 +3,7 @@
 data:
   category: "pair"
   # data_path: "/mnt/data/xyz.csv"
-  data_path: "~/ambiomgroupdrive/Jianxu/data/labelfree_lamin/training_data"
+  data_path: "/mnt/eternus/sample_data/im2im/labelfree_3d/train"
   # data_path:
   #   source_path:
   #   target_path:
@@ -22,7 +22,6 @@ data:
         pin_memory: True
         num_workers: 4
       partial_loader:
-        reload_n_epoch: 10
         load_percentage: 0.5
     val:
       dataloader_type:
@@ -103,10 +102,11 @@ model:
 # training
 training:
   params:
-    gpus: 1
+    gpus: 2
     precision: 16
     stochastic_weight_avg: True
     max_epochs: 5
+    reload_dataloaders_every_n_epochs: 1
 #  callbacks:
 #    - module_name: pytorch_lightning.callbacks.early_stopping
 #      func_name: EarlyStopping

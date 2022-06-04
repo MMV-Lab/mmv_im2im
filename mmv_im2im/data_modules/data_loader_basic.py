@@ -80,7 +80,13 @@ class Im2ImDataModule(pl.LightningDataModule):
     def train_dataloader(self):
         train_loader_info = self.dataloader_info["train"]
         train_dataset_func = parse_config_func_without_params(train_loader_info["dataloader_type"])
-        train_dataset = train_dataset_func(data=self.train_data, transform=self.transform, **train_loader_info["dataset_params"])
+        train_data = self.train_data
+        if "partial_loader" in train_loader_info:
+            num_load = int(train_loader_info["partial_loader"]["load_percentage"] * len(self.train_data))
+            from sklearn.utils import shuffle
+            train_data = shuffle(train_data)
+            train_data = train_data[:num_load]
+        train_dataset = train_dataset_func(data=train_data, transform=self.transform, **train_loader_info["dataset_params"])
         train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=list_data_collate, **train_loader_info["dataloader_params"])
         return train_dataloader
 

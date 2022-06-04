@@ -75,9 +75,6 @@ class Model(pl.LightningModule):
         # with the syntax for fliping along Y in 1 x Y x X x 1.
         # But, the FCN models do not like this. We just need to remove the
         # dummy dimension
-        print("in FCN pl")
-        print(x.size())
-        print(y.size())
         if x.size()[-1] == 1:
             x = torch.squeeze(x, dim=-1)
             y = torch.squeeze(y, dim=-1)
