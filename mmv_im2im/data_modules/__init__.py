@@ -1,5 +1,5 @@
 from mmv_im2im.data_modules.data_loader_embedseg import Im2ImDataModule as dm_embedseg
-from mmv_im2im.data_modules.data_loader import Im2ImDataModule as dm_basic
+from mmv_im2im.data_modules.data_loader_basic import Im2ImDataModule as dm_basic
 
 
 def get_data_module(cfg):
