@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -100,26 +101,26 @@
            <div itemprop="articleBody">
              
   <section id="welcome-to-mmv-im2im-transformation-s-documentation">
-<h1>Welcome to MMV Im2Im Transformation’s documentation!<a class="headerlink" href="#welcome-to-mmv-im2im-transformation-s-documentation" title="Permalink to this headline"></a></h1>
+<h1>Welcome to MMV Im2Im Transformation’s documentation!<a class="headerlink" href="#welcome-to-mmv-im2im-transformation-s-documentation" title="Permalink to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 </section>
 <section id="mmv-im2im-transformation">
-<h1>MMV Im2Im Transformation<a class="headerlink" href="#mmv-im2im-transformation" title="Permalink to this headline"></a></h1>
+<h1>MMV Im2Im Transformation<a class="headerlink" href="#mmv-im2im-transformation" title="Permalink to this heading"></a></h1>
 <a class="reference external image-reference" href="https://github.com/MMV-Lab/mmv_im2im/actions"><img alt="Build Status" src="https://github.com/MMV-Lab/mmv_im2im/workflows/Build%20Main/badge.svg" /></a>
 <a class="reference external image-reference" href="https://MMV-Lab.github.io/mmv_im2im/"><img alt="Documentation" src="https://github.com/MMV-Lab/mmv_im2im/workflows/Documentation/badge.svg" /></a>
 <a class="reference external image-reference" href="https://codecov.io/gh/MMV-Lab/mmv_im2im"><img alt="Code Coverage" src="https://codecov.io/gh/MMV-Lab/mmv_im2im/branch/main/graph/badge.svg" /></a>
 <p>A python package for deep learing based image to image transformation</p>
 <hr class="docutils" />
 <section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline"></a></h2>
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Store values and retain the prior value in memory</p></li>
 <li><p>… some other functionality</p></li>
 </ul>
 </section>
 <section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline"></a></h2>
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
 <p>Here, we use a <a class="reference external" href="https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F">3D labelfree determination</a> as a test case.</p>
 <p>First, we pull 100 examples from the AllenCell quilt bucket by running the following. Make sure you change the <code class="docutils literal notranslate"><span class="pre">parent_path</span></code> before running.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python  scripts/generate_synthetic_data.py
@@ -132,16 +133,16 @@
 <p>Make sure you double check all the file paths in the yaml file.</p>
 </section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mmv_im2im</span></code><span class="raw-html-m2r"><br></span>
 <strong>Development Head:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/MMV-Lab/mmv_im2im.git</span></code></p>
 </section>
 <section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline"></a></h2>
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h2>
 <p>For full package documentation please visit <a class="reference external" href="https://MMV-Lab.github.io/mmv_im2im">MMV-Lab.github.io/mmv_im2im</a>.</p>
 </section>
 <section id="notes-on-the-package-design">
-<h2>Notes on the package design<a class="headerlink" href="#notes-on-the-package-design" title="Permalink to this headline"></a></h2>
+<h2>Notes on the package design<a class="headerlink" href="#notes-on-the-package-design" title="Permalink to this heading"></a></h2>
 <p>There are three levels of abstraction:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">proj_trainer.py</span></code> (main entry point to define data module, pytorch-lightning module, and trainer)</p>
@@ -157,11 +158,11 @@
 </ul>
 </section>
 <section id="development">
-<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline"></a></h2>
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this heading"></a></h2>
 <p>See <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a> for information related to developing the code.</p>
 </section>
 <section id="the-four-commands-you-need-to-know">
-<h2>The Four Commands You Need To Know<a class="headerlink" href="#the-four-commands-you-need-to-know" title="Permalink to this headline"></a></h2>
+<h2>The Four Commands You Need To Know<a class="headerlink" href="#the-four-commands-you-need-to-know" title="Permalink to this heading"></a></h2>
 <ol class="arabic">
 <li><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[dev]</span></code></p>
 <blockquote>
@@ -189,7 +190,7 @@ documentation for your Python package.</p>
 </li>
 </ol>
 <section id="additional-optional-setup-steps">
-<h3>Additional Optional Setup Steps:<a class="headerlink" href="#additional-optional-setup-steps" title="Permalink to this headline"></a></h3>
+<h3>Additional Optional Setup Steps:<a class="headerlink" href="#additional-optional-setup-steps" title="Permalink to this heading"></a></h3>
 <ul class="simple">
 <li><p>Turn your project into a GitHub repository:</p>
 <ul>
@@ -230,7 +231,7 @@ actions will build and deploy your Python package to PyPI.</p></li>
 </ul>
 </section>
 <section id="suggested-git-branch-strategy">
-<h3>Suggested Git Branch Strategy<a class="headerlink" href="#suggested-git-branch-strategy" title="Permalink to this headline"></a></h3>
+<h3>Suggested Git Branch Strategy<a class="headerlink" href="#suggested-git-branch-strategy" title="Permalink to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">main</span></code> is for the most up-to-date development, very rarely should you directly
 commit to this branch. GitHub Actions will run on every push and on a CRON to this
@@ -250,7 +251,7 @@ well defined PR’s.</p></li>
 </section>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline"></a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>

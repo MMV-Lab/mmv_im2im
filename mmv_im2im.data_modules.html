@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -104,16 +105,16 @@
            <div itemprop="articleBody">
              
   <section id="mmv-im2im-data-modules-package">
-<h1>mmv_im2im.data_modules package<a class="headerlink" href="#mmv-im2im-data-modules-package" title="Permalink to this headline"></a></h1>
+<h1>mmv_im2im.data_modules package<a class="headerlink" href="#mmv-im2im-data-modules-package" title="Permalink to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-mmv_im2im.data_modules.data_loader">
-<span id="mmv-im2im-data-modules-data-loader-module"></span><h2>mmv_im2im.data_modules.data_loader module<a class="headerlink" href="#module-mmv_im2im.data_modules.data_loader" title="Permalink to this headline"></a></h2>
+<span id="mmv-im2im-data-modules-data-loader-module"></span><h2>mmv_im2im.data_modules.data_loader module<a class="headerlink" href="#module-mmv_im2im.data_modules.data_loader" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.data_modules.data_loader.</span></span><span class="sig-name descname"><span class="pre">Im2ImDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.datamodule.LightningDataModule</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningDataModule</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data">
 <span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="Permalink to this definition"></a></dt>
@@ -380,11 +381,11 @@ will have an argument <code class="docutils literal notranslate"><span class="pr
 
 </section>
 <section id="module-mmv_im2im.data_modules.data_loader_embedseg">
-<span id="mmv-im2im-data-modules-data-loader-embedseg-module"></span><h2>mmv_im2im.data_modules.data_loader_embedseg module<a class="headerlink" href="#module-mmv_im2im.data_modules.data_loader_embedseg" title="Permalink to this headline"></a></h2>
+<span id="mmv-im2im-data-modules-data-loader-embedseg-module"></span><h2>mmv_im2im.data_modules.data_loader_embedseg module<a class="headerlink" href="#module-mmv_im2im.data_modules.data_loader_embedseg" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.data_modules.data_loader_embedseg.</span></span><span class="sig-name descname"><span class="pre">Im2ImDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.datamodule.LightningDataModule</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningDataModule</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data">
 <span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="Permalink to this definition"></a></dt>
@@ -610,7 +611,7 @@ will have an argument <code class="docutils literal notranslate"><span class="pr
 
 </section>
 <section id="module-mmv_im2im.data_modules">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.data_modules" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.data_modules" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.get_data_module">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.data_modules.</span></span><span class="sig-name descname"><span class="pre">get_data_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules.html#get_data_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.get_data_module" title="Permalink to this definition"></a></dt>

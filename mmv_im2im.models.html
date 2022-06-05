@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -104,16 +105,16 @@
            <div itemprop="articleBody">
              
   <section id="mmv-im2im-models-package">
-<h1>mmv_im2im.models package<a class="headerlink" href="#mmv-im2im-models-package" title="Permalink to this headline"></a></h1>
+<h1>mmv_im2im.models package<a class="headerlink" href="#mmv-im2im-models-package" title="Permalink to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-mmv_im2im.models.pl_FCN">
-<span id="mmv-im2im-models-pl-fcn-module"></span><h2>mmv_im2im.models.pl_FCN module<a class="headerlink" href="#module-mmv_im2im.models.pl_FCN" title="Permalink to this headline"></a></h2>
+<span id="mmv-im2im-models-pl-fcn-module"></span><h2>mmv_im2im.models.pl_FCN module<a class="headerlink" href="#module-mmv_im2im.models.pl_FCN" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_FCN.Model">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.pl_FCN.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_info_xx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_FCN.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningModule</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_FCN.Model.configure_optimizers">
 <span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_FCN.html#Model.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model.configure_optimizers" title="Permalink to this definition"></a></dt>
@@ -440,14 +441,14 @@ the model goes back to training mode and gradients are enabled.</p>
 
 </section>
 <section id="mmv-im2im-models-pl-cyclegan-module">
-<h2>mmv_im2im.models.pl_cyclegan module<a class="headerlink" href="#mmv-im2im-models-pl-cyclegan-module" title="Permalink to this headline"></a></h2>
+<h2>mmv_im2im.models.pl_cyclegan module<a class="headerlink" href="#mmv-im2im-models-pl-cyclegan-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-mmv_im2im.models.pl_embedseg">
-<span id="mmv-im2im-models-pl-embedseg-module"></span><h2>mmv_im2im.models.pl_embedseg module<a class="headerlink" href="#module-mmv_im2im.models.pl_embedseg" title="Permalink to this headline"></a></h2>
+<span id="mmv-im2im-models-pl-embedseg-module"></span><h2>mmv_im2im.models.pl_embedseg module<a class="headerlink" href="#module-mmv_im2im.models.pl_embedseg" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_embedseg.Model">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.pl_embedseg.</span></span><span class="sig-name descname"><span class="pre">Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_info_xx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_embedseg.html#Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningModule</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_embedseg.Model.configure_optimizers">
 <span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_embedseg.html#Model.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model.configure_optimizers" title="Permalink to this definition"></a></dt>
@@ -774,10 +775,10 @@ the model goes back to training mode and gradients are enabled.</p>
 
 </section>
 <section id="mmv-im2im-models-pl-pix2pix-module">
-<h2>mmv_im2im.models.pl_pix2pix module<a class="headerlink" href="#mmv-im2im-models-pl-pix2pix-module" title="Permalink to this headline"></a></h2>
+<h2>mmv_im2im.models.pl_pix2pix module<a class="headerlink" href="#mmv-im2im-models-pl-pix2pix-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="module-mmv_im2im.models">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.models" title="Permalink to this headline"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.models" title="Permalink to this heading"></a></h2>
 </section>
 </section>
 
