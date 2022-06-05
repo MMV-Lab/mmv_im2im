@@ -62,8 +62,12 @@ def parse_monai_ops(trans_func: List[Dict]):
 
     # Here, we will use the Compose function in MONAI to merge
     # all transformations. If any trnasformation not from MONAI,
-    # a torchio Lambda function will be used to wrap around it.
+    # a MONAI Lambda function will be used to wrap around it.
     trans_list = []
+
+    # we assume a PersistentDataset with dictionary-type dataset
+    # so, always need LoadImaged as the first one transform.
+    # Here, we handle the LoadImaged seperatedly to allow bio-reader
     reader = trans_func.pop(0)
     if (
         reader["module_name"] == "monai.transforms"
@@ -73,19 +77,22 @@ def parse_monai_ops(trans_func: List[Dict]):
         from monai.transforms import LoadImaged
 
         trans_list.append(LoadImaged(reader=monai_bio_reader, **reader["params"]))
+
+    # loop throught the config
     for func_info in trans_func:
         if func_info["module_name"] == "monai.transforms":
             trans_list.append(parse_config(func_info))
         else:
             my_func = parse_config_func_without_params(func_info)
-            if "params" in func_info:
-                callable_func = partial(my_func, **func_info["params"])
+            func_params = func_info["params"]
+            apply_keys = func_params.pop("keys")
+
+            # check if any other params
+            if len(func_params) > 0:
+                callable_func = partial(my_func, **func_params)
             else:
                 callable_func = my_func
 
-            if "extra_kwargs" in func_info:
-                trans_list.append(Lambdad(callable_func, **func_info["extra_kwargs"]))
-            else:
-                trans_list.append(Lambdad(callable_func))
+            trans_list.append(Lambdad(keys=apply_keys, func=callable_func))
 
     return Compose(trans_list)
