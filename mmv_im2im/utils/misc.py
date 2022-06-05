@@ -254,9 +254,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     return dataset_list
 
 
-def generate_dataset_dict_monai(
-    data: Union[str, Path, Dict]
-) -> List[Dict]:
+def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
     """
     different options for "data":
     - one CSV (columns: source, target, cmap), then split
@@ -281,9 +279,11 @@ def generate_dataset_dict_monai(
 
             # parse how many images associated with one subject
             basename = all_filename[0].stem
-            basename = basename[:basename.rfind("_")]
+            basename = basename[: basename.rfind("_")]
             subject_files = sorted(data.glob(f"{basename}_*.*"))
-            all_tags = [sfile.stem[sfile.stem.rfind("_") + 1:] for sfile in subject_files]
+            all_tags = [
+                sfile.stem[sfile.stem.rfind("_") + 1 :] for sfile in subject_files
+            ]
 
             all_filename.sort()
             for fn in all_filename:

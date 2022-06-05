@@ -45,15 +45,20 @@ data:
       func_name: AddChanneld
       params:
         keys: ["IM", "GT"]
-    - module_name: monai.transforms
-      func_name: ScaleIntensityRanged
+    #- module_name: monai.transforms
+    #  func_name: ScaleIntensityRanged
+    #  params:
+    #    keys: ["IM"]
+    #    a_min: 0
+    #    a_max: 255
+    #    b_min: 0.0
+    #    b_max: 1.0
+    #    clip: True
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
       params:
+        min_z: 32
         keys: ["IM"]
-        a_min: 0
-        a_max: 255
-        b_min: 0.0
-        b_max: 1.0
-        clip: True
     - module_name: monai.transforms
       func_name: RandSpatialCropSamplesd
       params:

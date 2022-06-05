@@ -65,9 +65,13 @@ def parse_monai_ops(trans_func: List[Dict]):
     # a torchio Lambda function will be used to wrap around it.
     trans_list = []
     reader = trans_func.pop(0)
-    if reader["module_name"] == "monai.transforms" and reader["func_name"] == "LoadImaged":
+    if (
+        reader["module_name"] == "monai.transforms"
+        and reader["func_name"] == "LoadImaged"
+    ):
         from mmv_im2im.utils.misc import monai_bio_reader
         from monai.transforms import LoadImaged
+
         trans_list.append(LoadImaged(reader=monai_bio_reader, **reader["params"]))
     for func_info in trans_func:
         if func_info["module_name"] == "monai.transforms":
@@ -80,9 +84,7 @@ def parse_monai_ops(trans_func: List[Dict]):
                 callable_func = my_func
 
             if "extra_kwargs" in func_info:
-                trans_list.append(
-                    Lambdad(callable_func, **func_info["extra_kwargs"])
-                )
+                trans_list.append(Lambdad(callable_func, **func_info["extra_kwargs"]))
             else:
                 trans_list.append(Lambdad(callable_func))
 

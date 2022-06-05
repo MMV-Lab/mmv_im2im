@@ -18,9 +18,9 @@ class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super().__init__()
         self.net = parse_config(model_info_xx["net"])
-        #if "sliding_window_params" in model_info_xx:
+        # if "sliding_window_params" in model_info_xx:
         #    self.sliding_window = model_info_xx["sliding_window_params"]
-        #else:
+        # else:
         #    self.sliding_window = None
         self.model_info = model_info_xx
         self.verbose = verbose
@@ -49,14 +49,14 @@ class Model(pl.LightningModule):
         return self.net(x)
 
     def run_step(self, batch, validation_stage):
-        #if "costmap" in batch:
+        # if "costmap" in batch:
         #    costmap = batch.pop("costmap")
         #    costmap = costmap[tio.DATA]
-        #else:
+        # else:
         #    costmap = None
 
-        #x = batch["source"][tio.DATA]
-        #y = batch["target"][tio.DATA]
+        # x = batch["source"][tio.DATA]
+        # y = batch["target"][tio.DATA]
         x = batch["IM"]
         y = batch["GT"]
 
@@ -79,7 +79,7 @@ class Model(pl.LightningModule):
             x = torch.squeeze(x, dim=-1)
             y = torch.squeeze(y, dim=-1)
 
-        #if validation_stage and self.sliding_window is not None:
+        # if validation_stage and self.sliding_window is not None:
         #    y_hat = predict_piecewise(
         #        self,
         #        x[
@@ -87,7 +87,7 @@ class Model(pl.LightningModule):
         #        ],
         #        **self.sliding_window
         #    )
-        #else:
+        # else:
         #    y_hat = self(x)
 
         y_hat = self(x)
@@ -97,9 +97,9 @@ class Model(pl.LightningModule):
             # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
             y = torch.squeeze(y, dim=1)  # remove C dimension
 
-        #if costmap is None:
+        # if costmap is None:
         #    loss = self.criterion(y_hat, y)
-        #else:
+        # else:
         #    loss = self.criterion(y_hat, y, costmap)
 
         loss = self.criterion(y_hat, y)
@@ -111,8 +111,8 @@ class Model(pl.LightningModule):
         self.log("train_loss", loss, prog_bar=True)
 
         if self.verbose and batch_idx == 0:
-            src = batch["IM"] # batch["source"][tio.DATA]
-            tar = batch["GT"] # batch["target"][tio.DATA]
+            src = batch["IM"]  # batch["source"][tio.DATA]
+            tar = batch["GT"]  # batch["target"][tio.DATA]
             if not os.path.exists(self.trainer.log_dir):
                 os.mkdir(self.trainer.log_dir)
 
