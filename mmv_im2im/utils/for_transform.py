@@ -76,9 +76,7 @@ def parse_monai_ops(trans_func: List[Dict]):
         from mmv_im2im.utils.misc import monai_bio_reader
         from monai.transforms import LoadImaged
 
-        trans_list.append(
-            LoadImaged(reader=monai_bio_reader, **reader["params"])
-        )
+        trans_list.append(LoadImaged(reader=monai_bio_reader, **reader["params"]))
 
     # loop throught the config
     for func_info in trans_func:

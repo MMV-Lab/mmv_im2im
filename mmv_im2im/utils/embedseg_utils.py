@@ -188,9 +188,7 @@ def prepare_embedseg_cache(data_path, cache_path, data_cfg):
                     crop_size,
                 ):
                     im_crop = image[jj : jj + crop_size, ii : ii + crop_size]
-                    instance_crop = instance[
-                        jj : jj + crop_size, ii : ii + crop_size
-                    ]
+                    instance_crop = instance[jj : jj + crop_size, ii : ii + crop_size]
                     center_image_crop = generate_center_image(
                         instance_crop, "centroid", ids
                     )
