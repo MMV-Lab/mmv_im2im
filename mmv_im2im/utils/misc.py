@@ -136,6 +136,7 @@ def generate_test_dataset_dict(
     elif data.is_dir():
         all_filename = sorted(data.glob(f"*{data_type}"))
         assert len(all_filename) > 0, f"no file found in {data}"
+        print(f"{len(all_filename)} files are found at {data}")
         all_filename.sort()
         for fn in all_filename:
             dataset_list.append(fn)

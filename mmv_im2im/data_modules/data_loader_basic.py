@@ -10,28 +10,28 @@
 # can be optional. Note that image_target could be masks
 # (e.g. for segmentation) or images (e.g. for labelfree)
 ########################################################
-from importlib import import_module
-from functools import partial
+from typing import Union
+from pathlib import Path
 from torch.utils.data import random_split, DataLoader
-import sys
 import pytorch_lightning as pl
 from mmv_im2im.utils.for_transform import parse_monai_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import (
     generate_dataset_dict_monai,
-    aicsimageio_reader,
     parse_config_func_without_params,
 )
-import random
 import monai
 from monai.data import list_data_collate
 
 
 class Im2ImDataModule(pl.LightningDataModule):
-    def __init__(self, data_cfg):
+    def __init__(self, data_cfg, cache_path: Union[str, Path] = None):
         super().__init__()
 
-        self.data_path = data_cfg["data_path"]
-        self.category = data_cfg["category"]
+        if cache_path is None:
+            self.data_path = data_cfg["data_path"]
+        else:
+            # use the cache path as the directory to load data
+            self.data_path = cache_path
 
         # train/val split
         self.train_val_ratio = data_cfg["dataloader"]["train_val_ratio"] or 0.2

@@ -62,7 +62,14 @@ data:
     - module_name: monai.transforms
       func_name: RandSpatialCropSamplesd
       params:
-        keys: ["IM", "GT"]
+        keys: ["IM"]
+        random_size: False
+        num_samples: 4
+        roi_size: [32, 64, 64]
+    - module_name: monai.transforms
+      func_name: RandSpatialCropSamplesd
+      params:
+        keys: ["GT"]
         random_size: False
         num_samples: 4
         roi_size: [32, 64, 64]
@@ -107,7 +114,7 @@ model:
 # training
 training:
   params:
-    gpus: 2
+    gpus: 1
     precision: 16
     stochastic_weight_avg: True
     max_epochs: 5

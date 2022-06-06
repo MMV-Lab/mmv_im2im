@@ -1,16 +1,16 @@
 # everything about data
 data:
   input: 
-    dir: "/mnt/eternus/sample_data/im2im/pix2pixHD_2d/test"
+    dir: "~/ambiomgroupdrive/MicroscopyData/dead_cell_prediction/22_05_23/movies"
+    #"/mnt/eternus/sample_data/im2im/pix2pixHD_2d/test"
     params:
       data_type: "tiff"
     reader_params:
-      dimension_order_out: "CYX"
-      C: [0]
-      T: 0
+      dimension_order_out: "TYX"
+      C: 0
       Z: 0
   output:
-    path: "/mnt/eternus/sample_data/im2im/pix2pixHD_2d/test_out"
+    path: "~/ambiomgroupdrive/MicroscopyData/dead_cell_prediction/22_05_23/pred"
     suffix: "pred"
   preprocess:
     - module_name: monai.transforms
