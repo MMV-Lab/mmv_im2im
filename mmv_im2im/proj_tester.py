@@ -8,8 +8,9 @@ from aicsimageio.writers import OmeTiffWriter
 import torch
 from torchio.data.io import check_uint_to_int
 from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config_func
-from mmv_im2im.utils.for_transform import parse_tio_ops, center_crop
-from mmv_im2im.utils.piecewise_inference import predict_piecewise
+from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla, center_crop
+# from mmv_im2im.utils.piecewise_inference import predict_piecewise
+from monai.inferers import sliding_window_inference
 
 # https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction_guide.html#predicting
 ###############################################################################
@@ -68,7 +69,7 @@ class ProjectTester(object):
             self.spatial_dims = 2
 
         # load preprocessing transformation
-        pre_process = parse_tio_ops(self.data_cfg["preprocess"])
+        pre_process = parse_monai_ops_vanilla(self.data_cfg["preprocess"])
 
         # loop through all images and apply the model
         for i, ds in enumerate(dataset_list):
@@ -77,39 +78,30 @@ class ProjectTester(object):
             img = AICSImage(ds).reader.get_image_dask_data(
                 **self.data_cfg["input"]["reader_params"]
             )
-            x = torch.tensor(check_uint_to_int(img.compute()))
 
+            # TODO: adjust/double_check for MONAI
             # record the input dimension
-            original_size = x.size()
-            if original_size[0] == 1:
-                original_size = original_size[1:]
-            original_size = tuple(original_size)
+            # original_size = x.size()
+            # if original_size[0] == 1:
+            #    original_size = original_size[1:]
+            # original_size = tuple(original_size)
 
             # Perform the prediction
             print("Predicting the image")
-            if self.spatial_dims == 2:
-                # if data is 2D
-                # Initial shape (1, W, H)
-                x = torch.unsqueeze(x, dim=-1)
-                # Adding dimension for torchio to handle 2D data
-                # to become (1, W, H, 1)
-                x = pre_process(x)  # (1, resized_W, resized_H, 1)
-
-                # TODO: some model requires (1, W, H), some requires (1, 1, W, H)
-                # solution: update all 2D models to accept (1, 1, W, H)
-                x = torch.squeeze(x, dim=-1)
-                if len(x.size()) == 3:
-                    x = torch.unsqueeze(x, dim=0)
-            else:
-                x = pre_process(x)
+            x = pre_process(img.compute())
 
             # choose different inference function for different types of models
             with torch.no_grad():
                 if "sliding_window_params" in self.model_cfg:
-                    y_hat = predict_piecewise(
-                        self.model,
-                        x[0].float().cuda(),
-                        **self.model_cfg["sliding_window_params"],
+                    # add convert to tensor with proper type
+                    x = torch.tensor(check_uint_to_int(x))
+                    # add the batch dimension
+                    x = torch.unsqueeze(x, dim=0)
+
+                    y_hat = sliding_window_inference(
+                        inputs=x.float().cuda(),
+                        predictor=self.model,
+                        **self.model_cfg["sliding_window_params"]
                     )
                 else:
                     y_hat = self.model(x.float().cuda())
@@ -127,8 +119,8 @@ class ProjectTester(object):
             else:
                 pred = y_hat.cpu().numpy()
 
-            if original_size != pred.shape[-1 * len(original_size) :]:
-                pred = center_crop(pred, original_size)
+            # if original_size != pred.shape[-1 * len(original_size) :]:
+            #     pred = center_crop(pred, original_size)
 
             # prepare output filename
             fn_core = Path(ds).stem

@@ -1,7 +1,7 @@
 from typing import List, Dict
 from functools import partial
 from mmv_im2im.utils.misc import parse_config, parse_config_func_without_params
-from monai.transforms import Compose, Lambdad
+from monai.transforms import Compose, Lambdad, Lambda
 
 
 def parse_tio_ops(trans_func: List[Dict]):
@@ -94,5 +94,27 @@ def parse_monai_ops(trans_func: List[Dict]):
                 callable_func = my_func
 
             trans_list.append(Lambdad(keys=apply_keys, func=callable_func))
+
+    return Compose(trans_list)
+
+
+def parse_monai_ops_vanilla(trans_func: List[Dict]):
+
+    # Here, we will use the Compose function in MONAI to merge
+    # all transformations. If any trnasformation not from MONAI,
+    # a MONAI Lambda function will be used to wrap around it.
+    trans_list = []
+    # loop throught the config
+    for func_info in trans_func:
+        if func_info["module_name"] == "monai.transforms":
+            trans_list.append(parse_config(func_info))
+        else:
+            my_func = parse_config_func_without_params(func_info)
+            if "params" in func_info:
+                func_params = func_info["params"]
+                callable_func = partial(my_func, **func_params)
+            else:
+                callable_func = my_func
+            trans_list.append(Lambda(func=callable_func))
 
     return Compose(trans_list)
