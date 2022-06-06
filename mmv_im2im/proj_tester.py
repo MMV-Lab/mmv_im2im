@@ -9,6 +9,7 @@ import torch
 from torchio.data.io import check_uint_to_int
 from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config_func
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla, center_crop
+
 # from mmv_im2im.utils.piecewise_inference import predict_piecewise
 from monai.inferers import sliding_window_inference
 
@@ -101,7 +102,7 @@ class ProjectTester(object):
                     y_hat = sliding_window_inference(
                         inputs=x.float().cuda(),
                         predictor=self.model,
-                        **self.model_cfg["sliding_window_params"]
+                        **self.model_cfg["sliding_window_params"],
                     )
                 else:
                     y_hat = self.model(x.float().cuda())
