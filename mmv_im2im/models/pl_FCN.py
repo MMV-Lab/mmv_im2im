@@ -2,7 +2,6 @@ import os
 import numpy as np
 from typing import Dict
 import pytorch_lightning as pl
-import torchio as tio
 import torch
 from aicsimageio.writers import OmeTiffWriter
 
@@ -11,7 +10,6 @@ from mmv_im2im.utils.misc import (
     parse_config_func,
     parse_config_func_without_params,
 )
-from mmv_im2im.utils.piecewise_inference import predict_piecewise
 
 
 class Model(pl.LightningModule):

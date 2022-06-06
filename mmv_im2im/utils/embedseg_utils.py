@@ -139,7 +139,8 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
 
 
 def prepare_embedseg_cache(data_path, cache_path, data_cfg):
-
+    # TODO: this is just a placeholder function
+    # data_cfg is not working well yet, need new dataclass as the real solution
     dataset_list = generate_dataset_dict(data_path)
 
     min_xy = 65535

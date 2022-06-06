@@ -2,19 +2,6 @@
 # everything about data
 data:
   category: "pair"
-  spatial_dims: 2
-  target_type: "Image" # "Label" or "Image
-  target_reader_params:
-    dimension_order_out: "YX"
-    C: 0
-    T: 0
-    Z: 0
-  source_type: "Image" # "Label" or "Image
-  source_reader_params:
-    dimension_order_out: "YX"
-    C: 0
-    T: 0
-    Z: 0
   # data_path: "/mnt/data/xyz.csv"
   data_path: "/mnt/eternus/sample_data/im2im/pix2pix_2d/train"
   # data_path:
@@ -22,47 +9,69 @@ data:
   #   target_path:
   #   costmap_path: optional
   #   image_type: "tiff"
-  dataloader_params:
+  dataloader:
+    train_val_ratio: 0.1
     train:
-      batch_size: 1
-      pin_memory: True
-      num_workers: 2  # if dataload_path_queue is used, num_workers must be 0 here
+      dataloader_type:
+        module_name: monai.data
+        func_name: PersistentDataset
+      dataset_params: 
+        cache_dir: "./tmp"
+      dataloader_params:
+        batch_size: 1
+        pin_memory: True
+        num_workers: 4
+      partial_loader:
+        load_percentage: 0.5
     val:
-      batch_size: 1
-      num_workers: 2
-  train_val_ratio: 0.1
+      dataloader_type:
+        module_name: monai.data
+        func_name: PersistentDataset
+      dataset_params: 
+        cache_dir: "./tmp"
+      dataloader_params:
+        batch_size: 1
+        pin_memory: True
+        num_workers: 4
   preprocess:
-    - module_name: torchio
-      func_name: RescaleIntensity
+    - module_name: monai.transforms
+      func_name: LoadImaged
       params:
-        out_min_max: 1
-        percentiles: [0.05, 99.5]
-        include: ["source"]
-    #- module_name: torchio
-    #  func_name: ZNormalization
-    #  params:
-    #    include: ["source"]
-    - module_name: torchio
-      func_name: RescaleIntensity
+        keys: ["IM", "GT"]
+        dimension_order_out: "YX"
+        C: 0
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: AddChanneld
       params:
-        out_min_max: 1
-        percentiles: [0.01, 99.99]
-        include: ["target"]
-    - module_name: torchio
-      func_name: CropOrPad
+        keys: ["IM", "GT"]
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
       params:
-        target_shape: [1024, 1024, 1]
+        keys: ["IM"]
+        lower: 0.05
+        upper: 99.5
+        b_min: -1
+        b_max: 1
+    - module_name: monai.transforms
+      func_name: RandSpatialCropSamplesd
+      params:
+        keys: ["IM", "GT"]
+        random_size: False
+        num_samples: 4
+        roi_size: [1024, 1024]
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT"]
   augmentation:
-    - module_name: torchio
-      func_name: RandomFlip
+    - module_name: monai.transforms
+      func_name: RandFlipd
       params:
-        axes: [1, 2]
-        flip_probability: 0.5
-#    - module_name: torchio
-#      func_name: RandomAffine
-#      params:
-#        degrees: [0, 0, 0, 90, 0, 90]
-#        p: 0.5
+        prob: 0.5
+        keys: ["IM", "GT"]
+
 # model
 model:
   category: pix2pix
@@ -144,11 +153,9 @@ training:
   verbose: True
   params:
     gpus: 1
-    # precision: 16
-    # auto_scale_batch_size: True
+    precision: 16
     max_epochs: 10000
     terminate_on_nan: True
-    # stochastic_weight_avg: True  # only work with 1 optimizer
   callbacks:
     #- module_name: pytorch_lightning.callbacks.early_stopping
     #  func_name: EarlyStopping

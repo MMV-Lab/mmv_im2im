@@ -2,7 +2,6 @@ import os
 from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
 import pytorch_lightning as pl
-import torchio as tio
 import torch
 from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 
