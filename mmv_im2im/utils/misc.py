@@ -267,7 +267,7 @@ def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
         "GT", and more (optional, e.g. "LM", "CM", etc.)
     """
     dataset_list = []
-    if isinstance(data, str):
+    if isinstance(data, str) or isinstance(data, Path):
         data = Path(data).expanduser()
         if data.is_file():
             # should be a csv of dataframe
