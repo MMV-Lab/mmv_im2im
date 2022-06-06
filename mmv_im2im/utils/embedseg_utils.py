@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from numba import jit
 from scipy.ndimage.measurements import find_objects
@@ -5,6 +6,8 @@ from scipy.ndimage.morphology import binary_fill_holes
 from aicsimageio.writers import OmeTiffWriter
 from aicsimageio import AICSImage
 from tqdm import tqdm
+
+from mmv_im2im.utils.misc import generate_dataset_dict
 
 
 @jit(nopython=True)
@@ -135,26 +138,28 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
         raise ValueError("instance image must be either 2D or 3D")
 
 
-def prepare_embedseg_cache(data_path, cache_path):
+def prepare_embedseg_cache(data_path, cache_path, data_cfg):
 
     dataset_list = generate_dataset_dict(data_path)
 
     min_xy = 65535
     min_z = 65535
     for ds in dataset_list:
-        reader = AICSImage(ds["source_fn"])
-        min_xy = min((reader.dims.X, reader.dims.Y, min_xy))
+        fn = ds["source_fn"]
+        reader = AICSImage(fn)
+        this_minXY = min(reader.dims.X, reader.dims.Y)
+        min_xy = min((this_minXY, min_xy))
         min_z = min((reader.dims.Z, min_z))
-    assert min_xy >= 128, "some images have dimension smaller than 128"
+        assert this_minXY >= 128, "{fn}: XY dimension smaller than 128, not good"
     crop_size = 128 * (min_xy // 128)
-    if self.spatial_dim == 3:
-        assert min_z >= 16, "some 3D data has less than 16 Z slices"
+
+    if data_cfg.spatial_dim == 3:
+        assert min_z >= 16, "some 3D data has less than 16 Z slices, not good"
         crop_size_z = min((32, min_z))
 
-    print("cache intermediate results ...")
     for ds in tqdm(dataset_list):
-        instance, _ = self.target_reader(ds["target_fn"])
-        image, _ = self.source_reader(ds["source_fn"])
+        instance, _ = data_cfg.target_reader(ds["target_fn"])
+        image, _ = data_cfg.source_reader(ds["source_fn"])
         fn_base = str(os.path.basename(ds["target_fn"]))
         if fn_base.endswith("GT.tiff"):
             fn_base = fn_base[:-7]
@@ -169,7 +174,7 @@ def prepare_embedseg_cache(data_path, cache_path):
 
         # loop over instances
         for j, id in enumerate(ids):
-            if self.spatial_dim == 2:
+            if data_cfg.spatial_dim == 2:
                 h, w = image.shape
                 y, x = np.where(instance_np == id)
                 ym, xm = np.mean(y), np.mean(x)
@@ -193,7 +198,7 @@ def prepare_embedseg_cache(data_path, cache_path):
                     ]
                     dim_order = "YX"
 
-            elif self.spatial_dim == 3:
+            elif data_cfg.spatial_dim == 3:
                 d, h, w = image.shape
                 z, y, x = np.where(instance_np == id)
                 zm, ym, xm = np.mean(z), np.mean(y), np.mean(x)
@@ -230,21 +235,21 @@ def prepare_embedseg_cache(data_path, cache_path):
 
             OmeTiffWriter.save(
                 im_crop,
-                self.cache_path + os.sep + fn_base + f"_{j:04d}_IM.tiff",
+                cache_path + os.sep + fn_base + f"_{j:04d}_IM.tiff",
                 dim_order=dim_order,
             )
             OmeTiffWriter.save(
                 instance_crop.astype(np.uint16),
-                self.cache_path + os.sep + fn_base + f"_{j:04d}_GT.tiff",
+                cache_path + os.sep + fn_base + f"_{j:04d}_GT.tiff",
                 dim_order=dim_order,
             )
             OmeTiffWriter.save(
                 center_image_crop.astype(np.uint8),
-                self.cache_path + os.sep + fn_base + f"_{j:04d}_CE.tiff",
+                cache_path + os.sep + fn_base + f"_{j:04d}_CE.tiff",
                 dim_order=dim_order,
             )
             OmeTiffWriter.save(
                 class_image_crop.astype(np.uint8),
-                self.cache_path + os.sep + fn_base + f"_{j:04d}_CL.tiff",
+                cache_path + os.sep + fn_base + f"_{j:04d}_CL.tiff",
                 dim_order=dim_order,
             )
