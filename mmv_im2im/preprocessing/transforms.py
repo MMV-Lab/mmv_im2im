@@ -22,7 +22,7 @@ def norm_around_center(img, z_center: Optional[int] = None, min_z: Optional[int]
     Parameters
     ----------
     img
-        Input 4D torch.Tensor to be normalized.
+        Input 4D torch.Tensor or numpy array to be normalized.
     z_center
         Z-index of cell centers.
     Returns
@@ -30,7 +30,10 @@ def norm_around_center(img, z_center: Optional[int] = None, min_z: Optional[int]
     4D torch.Tensor
        Normalized img
     """
-    img_array = img.numpy()
+    if not isinstance(img, np.ndarray):
+        img_array = img.numpy()
+    else:
+        img_array = img.copy()
     img_array = np.squeeze(img_array, axis=0).astype(np.float32)
     if img_array.shape[0] < min_z:
         raise ValueError("Input array must be at least length 32 in first dimension")
@@ -62,7 +65,7 @@ def pad_to_multiple(
     Parameters
     ----------
     img:
-        Input 4D torch.Tensor to be padded, C x X x Y x Z
+        Input 4D torch.Tensor or numpy array to be padded, C x X x Y x Z
     multiple_base:
         int or a sequence of int
 
@@ -72,7 +75,11 @@ def pad_to_multiple(
        padded img
     """
 
-    img_array = img.numpy()
+    if not isinstance(img, np.ndarray):
+        img_array = img.numpy()
+    else:
+        img_array = img.copy()
+
     if isinstance(multiple_base, int):
         if img_array.shape[-1] == 1:
             # Z dim = 1, only pad XY
@@ -140,7 +147,7 @@ def pad_z(img, target_size: int = 64, pad_value: Union[str, float, int] = 0):
     Parameters
     ----------
     img:
-        Input 4D torch.Tensor to be padded, C x Z x Y x X
+        Input 4D torch.Tensor or numpy array to be padded, C x Z x Y x X
     target_size:
         int
 
@@ -150,7 +157,11 @@ def pad_z(img, target_size: int = 64, pad_value: Union[str, float, int] = 0):
        padded img
     """
 
-    img_array = img.numpy()
+    if not isinstance(img, np.ndarray):
+        img_array = img.numpy()
+    else:
+        img_array = img.copy()
+
     if img_array.shape[1] < target_size:
         diff_z = target_size - img_array.shape[1]
         pad_shape = (
