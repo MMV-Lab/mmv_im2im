@@ -123,7 +123,7 @@
 img will be normalized with respect to the mean, std pixel intensity
 of the sub-array of length 32 in the z-dimension centered around the
 img’s “z_center”.
-:Parameters: * <strong>img</strong> – Input 4D torch.Tensor to be normalized.</p>
+:Parameters: * <strong>img</strong> – Input 4D torch.Tensor or numpy array to be normalized.</p>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>z_center</strong> – Z-index of cell centers.</p></li>
@@ -147,7 +147,7 @@ img will be padded to the size of multiple of “multiple_base”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> – Input 4D torch.Tensor to be padded, C x X x Y x Z</p></li>
+<li><p><strong>img</strong> – Input 4D torch.Tensor or numpy array to be padded, C x X x Y x Z</p></li>
 <li><p><strong>multiple_base</strong> – int or a sequence of int</p></li>
 </ul>
 </dd>
@@ -168,7 +168,7 @@ img will be padded along z to the size of “target_size”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> – Input 4D torch.Tensor to be padded, C x Z x Y x X</p></li>
+<li><p><strong>img</strong> – Input 4D torch.Tensor or numpy array to be padded, C x Z x Y x X</p></li>
 <li><p><strong>target_size</strong> – int</p></li>
 </ul>
 </dd>

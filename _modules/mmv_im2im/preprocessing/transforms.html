@@ -122,7 +122,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    img</span>
-<span class="sd">        Input 4D torch.Tensor to be normalized.</span>
+<span class="sd">        Input 4D torch.Tensor or numpy array to be normalized.</span>
 <span class="sd">    z_center</span>
 <span class="sd">        Z-index of cell centers.</span>
 <span class="sd">    Returns</span>
@@ -130,7 +130,10 @@
 <span class="sd">    4D torch.Tensor</span>
 <span class="sd">       Normalized img</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">img_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">img_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_z</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input array must be at least length 32 in first dimension&quot;</span><span class="p">)</span>
@@ -162,7 +165,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    img:</span>
-<span class="sd">        Input 4D torch.Tensor to be padded, C x X x Y x Z</span>
+<span class="sd">        Input 4D torch.Tensor or numpy array to be padded, C x X x Y x Z</span>
 <span class="sd">    multiple_base:</span>
 <span class="sd">        int or a sequence of int</span>
 
@@ -172,7 +175,11 @@
 <span class="sd">       padded img</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">multiple_base</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># Z dim = 1, only pad XY</span>
@@ -240,7 +247,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    img:</span>
-<span class="sd">        Input 4D torch.Tensor to be padded, C x Z x Y x X</span>
+<span class="sd">        Input 4D torch.Tensor or numpy array to be padded, C x Z x Y x X</span>
 <span class="sd">    target_size:</span>
 <span class="sd">        int</span>
 
@@ -250,7 +257,11 @@
 <span class="sd">       padded img</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
     <span class="k">if</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target_size</span><span class="p">:</span>
         <span class="n">diff_z</span> <span class="o">=</span> <span class="n">target_size</span> <span class="o">-</span> <span class="n">img_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">pad_shape</span> <span class="o">=</span> <span class="p">(</span>

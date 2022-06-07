@@ -109,15 +109,15 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
-<section id="module-mmv_im2im.data_modules.data_loader">
-<span id="mmv-im2im-data-modules-data-loader-module"></span><h2>mmv_im2im.data_modules.data_loader module<a class="headerlink" href="#module-mmv_im2im.data_modules.data_loader" title="Permalink to this heading"></a></h2>
+<section id="module-mmv_im2im.data_modules.data_loader_basic">
+<span id="mmv-im2im-data-modules-data-loader-basic-module"></span><h2>mmv_im2im.data_modules.data_loader_basic module<a class="headerlink" href="#module-mmv_im2im.data_modules.data_loader_basic" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.data_modules.data_loader.</span></span><span class="sig-name descname"><span class="pre">Im2ImDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.data_modules.data_loader_basic.</span></span><span class="sig-name descname"><span class="pre">Im2ImDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningDataModule</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data">
-<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data">
+<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data" title="Permalink to this definition"></a></dt>
 <dd><p>Use this to download and prepare data. Downloading and saving data with multiple processes (distributed
 settings) will result in corrupted data. Lightning ensures this method is called only within a single
 process, so you can safely add your downloading logic within.</p>
@@ -165,8 +165,8 @@ since this is NOT called on every device</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup" title="Permalink to this definition"></a></dt>
 <dd><p>Called at the beginning of fit (train + validate), validate, test, or predict. This is a good hook when
 you need to build models dynamically or adjust something about them. This hook is called on every process
 when using DDP.</p>
@@ -194,65 +194,8 @@ when using DDP.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule.test_dataloader">
-<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.test_dataloader" title="Permalink to this definition"></a></dt>
-<dd><p>Implement one or multiple PyTorch DataLoaders for testing.</p>
-<p>For data processing use the following pattern:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>download in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p>process and split in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
-</ul>
-</div></blockquote>
-<p>However, the above are only necessary for distributed processing.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>do not assign state in prepare_data</p>
-</div>
-<ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">test()</span></code></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
-</ul>
-<dl class="simple">
-<dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware.
-There is no need to set it yourself.</p>
-</dd>
-<dt>Return:</dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> or a sequence of them specifying testing samples.</p>
-</dd>
-</dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-                                    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,))])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;/path/to/mnist/&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
-                    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">loader</span>
-
-<span class="c1"># can also return multiple dataloaders</span>
-<span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">loader_a</span><span class="p">,</span> <span class="n">loader_b</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">loader_n</span><span class="p">]</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt>Note:</dt><dd><p>If you don’t need a test dataset and a <code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code>, you don’t need to implement
-this method.</p>
-</dd>
-<dt>Note:</dt><dd><p>In the case where you return multiple test dataloaders, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code>
-will have an argument <code class="docutils literal notranslate"><span class="pre">dataloader_idx</span></code> which matches the order here.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule.train_dataloader">
-<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
 <dd><p>Implement one or more PyTorch DataLoaders for training.</p>
 <dl class="simple">
 <dt>Return:</dt><dd><p>A collection of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> specifying training samples.
@@ -265,8 +208,8 @@ a positive integer.</p>
 <p>For data processing use the following pattern:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>download in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p>process and split in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
+<li><p>download in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
+<li><p>process and split in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
 </ul>
 </div></blockquote>
 <p>However, the above are only necessary for distributed processing.</p>
@@ -276,8 +219,8 @@ a positive integer.</p>
 </div>
 <ul class="simple">
 <li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
 </ul>
 <dl class="simple">
 <dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware.
@@ -328,248 +271,18 @@ There is no need to set it yourself.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader.Im2ImDataModule.val_dataloader">
-<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader.html#Im2ImDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
 <dd><p>Implement one or multiple PyTorch DataLoaders for validation.</p>
 <p>The dataloader you return will not be reloaded unless you set
 <a href="#id3"><span class="problematic" id="id4">:paramref:`~pytorch_lightning.trainer.Trainer.reload_dataloaders_every_n_epochs`</span></a> to
 a positive integer.</p>
-<p>It’s recommended that all data downloads and preparation happen in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a>.</p>
+<p>It’s recommended that all data downloads and preparation happen in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a>.</p>
 <ul class="simple">
 <li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></p></li>
 <li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">validate()</span></code></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
-</ul>
-<dl class="simple">
-<dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware
-There is no need to set it yourself.</p>
-</dd>
-<dt>Return:</dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> or a sequence of them specifying validation samples.</p>
-</dd>
-</dl>
-<p>Examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-                                    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,))])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;/path/to/mnist/&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">loader</span>
-
-<span class="c1"># can also return multiple dataloaders</span>
-<span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">loader_a</span><span class="p">,</span> <span class="n">loader_b</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">loader_n</span><span class="p">]</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt>Note:</dt><dd><p>If you don’t need a validation dataset and a <code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code>, you don’t need to
-implement this method.</p>
-</dd>
-<dt>Note:</dt><dd><p>In the case where you return multiple validation dataloaders, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code>
-will have an argument <code class="docutils literal notranslate"><span class="pre">dataloader_idx</span></code> which matches the order here.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-mmv_im2im.data_modules.data_loader_embedseg">
-<span id="mmv-im2im-data-modules-data-loader-embedseg-module"></span><h2>mmv_im2im.data_modules.data_loader_embedseg module<a class="headerlink" href="#module-mmv_im2im.data_modules.data_loader_embedseg" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.data_modules.data_loader_embedseg.</span></span><span class="sig-name descname"><span class="pre">Im2ImDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningDataModule</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data">
-<span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="Permalink to this definition"></a></dt>
-<dd><p>Note from Pytorch Lightning documentation:
-prepare_data is called from the main process. It is not recommended
-to assign state here (e.g. self.x = y).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup">
-<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup" title="Permalink to this definition"></a></dt>
-<dd><p>Called at the beginning of fit (train + validate), validate, test, or predict. This is a good hook when
-you need to build models dynamically or adjust something about them. This hook is called on every process
-when using DDP.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>stage: either <code class="docutils literal notranslate"><span class="pre">'fit'</span></code>, <code class="docutils literal notranslate"><span class="pre">'validate'</span></code>, <code class="docutils literal notranslate"><span class="pre">'test'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'predict'</span></code></p>
-</dd>
-</dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LitModel</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">l1</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">download_data</span><span class="p">()</span>
-        <span class="n">tokenize</span><span class="p">()</span>
-
-        <span class="c1"># don&#39;t do this</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">something</span> <span class="o">=</span> <span class="k">else</span>
-
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">l1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.test_dataloader">
-<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule.test_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.test_dataloader" title="Permalink to this definition"></a></dt>
-<dd><p>Implement one or multiple PyTorch DataLoaders for testing.</p>
-<p>For data processing use the following pattern:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>download in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p>process and split in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
-</ul>
-</div></blockquote>
-<p>However, the above are only necessary for distributed processing.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>do not assign state in prepare_data</p>
-</div>
-<ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">test()</span></code></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
-</ul>
-<dl class="simple">
-<dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware.
-There is no need to set it yourself.</p>
-</dd>
-<dt>Return:</dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> or a sequence of them specifying testing samples.</p>
-</dd>
-</dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-                                    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,))])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;/path/to/mnist/&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
-                    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">loader</span>
-
-<span class="c1"># can also return multiple dataloaders</span>
-<span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">loader_a</span><span class="p">,</span> <span class="n">loader_b</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">loader_n</span><span class="p">]</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt>Note:</dt><dd><p>If you don’t need a test dataset and a <code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code>, you don’t need to implement
-this method.</p>
-</dd>
-<dt>Note:</dt><dd><p>In the case where you return multiple test dataloaders, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">test_step()</span></code>
-will have an argument <code class="docutils literal notranslate"><span class="pre">dataloader_idx</span></code> which matches the order here.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.train_dataloader">
-<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.train_dataloader" title="Permalink to this definition"></a></dt>
-<dd><p>Implement one or more PyTorch DataLoaders for training.</p>
-<dl class="simple">
-<dt>Return:</dt><dd><p>A collection of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> specifying training samples.
-In the case of multiple dataloaders, please see this <span class="xref std std-ref">section</span>.</p>
-</dd>
-</dl>
-<p>The dataloader you return will not be reloaded unless you set
-<a href="#id5"><span class="problematic" id="id6">:paramref:`~pytorch_lightning.trainer.Trainer.reload_dataloaders_every_n_epochs`</span></a> to
-a positive integer.</p>
-<p>For data processing use the following pattern:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>download in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p>process and split in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
-</ul>
-</div></blockquote>
-<p>However, the above are only necessary for distributed processing.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>do not assign state in prepare_data</p>
-</div>
-<ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
-</ul>
-<dl class="simple">
-<dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware.
-There is no need to set it yourself.</p>
-</dd>
-</dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># single dataloader</span>
-<span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-                                    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,))])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;/path/to/mnist/&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
-                    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">loader</span>
-
-<span class="c1"># multiple dataloaders, return as list</span>
-<span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">mnist</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">cifar</span> <span class="o">=</span> <span class="n">CIFAR</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">mnist_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">mnist</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">cifar_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">cifar</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="c1"># each batch will be a list of tensors: [batch_mnist, batch_cifar]</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">mnist_loader</span><span class="p">,</span> <span class="n">cifar_loader</span><span class="p">]</span>
-
-<span class="c1"># multiple dataloader, return as dict</span>
-<span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">mnist</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">cifar</span> <span class="o">=</span> <span class="n">CIFAR</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">mnist_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">mnist</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">cifar_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">cifar</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="c1"># each batch will be a dict of tensors: {&#39;mnist&#39;: batch_mnist, &#39;cifar&#39;: batch_cifar}</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;mnist&#39;</span><span class="p">:</span> <span class="n">mnist_loader</span><span class="p">,</span> <span class="s1">&#39;cifar&#39;</span><span class="p">:</span> <span class="n">cifar_loader</span><span class="p">}</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.val_dataloader">
-<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_embedseg.html#Im2ImDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.val_dataloader" title="Permalink to this definition"></a></dt>
-<dd><p>Implement one or multiple PyTorch DataLoaders for validation.</p>
-<p>The dataloader you return will not be reloaded unless you set
-<a href="#id7"><span class="problematic" id="id8">:paramref:`~pytorch_lightning.trainer.Trainer.reload_dataloaders_every_n_epochs`</span></a> to
-a positive integer.</p>
-<p>It’s recommended that all data downloads and preparation happen in <a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a>.</p>
-<ul class="simple">
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></p></li>
-<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">validate()</span></code></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
-<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_data()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
 </ul>
 <dl class="simple">
 <dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware

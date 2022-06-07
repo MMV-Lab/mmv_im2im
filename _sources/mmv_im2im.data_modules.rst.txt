@@ -4,18 +4,10 @@ mmv\_im2im.data\_modules package
 Submodules
 ----------
 
-mmv\_im2im.data\_modules.data\_loader module
---------------------------------------------
+mmv\_im2im.data\_modules.data\_loader\_basic module
+---------------------------------------------------
 
-.. automodule:: mmv_im2im.data_modules.data_loader
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-mmv\_im2im.data\_modules.data\_loader\_embedseg module
-------------------------------------------------------
-
-.. automodule:: mmv_im2im.data_modules.data_loader_embedseg
+.. automodule:: mmv_im2im.data_modules.data_loader_basic
    :members:
    :undoc-members:
    :show-inheritance:

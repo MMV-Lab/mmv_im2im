@@ -98,13 +98,19 @@
            <div itemprop="articleBody">
              
   <h1>Source code for mmv_im2im.data_modules</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">mmv_im2im.data_modules.data_loader_embedseg</span> <span class="kn">import</span> <span class="n">Im2ImDataModule</span> <span class="k">as</span> <span class="n">dm_embedseg</span>
-<span class="kn">from</span> <span class="nn">mmv_im2im.data_modules.data_loader</span> <span class="kn">import</span> <span class="n">Im2ImDataModule</span> <span class="k">as</span> <span class="n">dm_basic</span>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.data_modules.data_loader_basic</span> <span class="kn">import</span> <span class="n">Im2ImDataModule</span> <span class="k">as</span> <span class="n">dm_basic</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.embedseg_utils</span> <span class="kn">import</span> <span class="n">prepare_embedseg_cache</span>
 
 
 <div class="viewcode-block" id="get_data_module"><a class="viewcode-back" href="../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.get_data_module">[docs]</a><span class="k">def</span> <span class="nf">get_data_module</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;embedseg&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">dm_embedseg</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="c1"># check cache path</span>
+        <span class="n">cache_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;cache_path&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">cache_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cache for embedseg is empty, start generating ...&quot;</span><span class="p">)</span>
+            <span class="n">prepare_embedseg_cache</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="s2">&quot;data_path&quot;</span><span class="p">],</span> <span class="n">cache_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dm_basic</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cache_path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">dm_basic</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></div>
 </pre></div>

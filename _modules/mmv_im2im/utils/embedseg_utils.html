@@ -98,10 +98,16 @@
            <div itemprop="articleBody">
              
   <h1>Source code for mmv_im2im.utils.embedseg_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage.measurements</span> <span class="kn">import</span> <span class="n">find_objects</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage.morphology</span> <span class="kn">import</span> <span class="n">binary_fill_holes</span>
+<span class="kn">from</span> <span class="nn">aicsimageio.writers</span> <span class="kn">import</span> <span class="n">OmeTiffWriter</span>
+<span class="kn">from</span> <span class="nn">aicsimageio</span> <span class="kn">import</span> <span class="n">AICSImage</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">generate_dataset_dict</span>
 
 
 <div class="viewcode-block" id="pairwise_python"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.pairwise_python">[docs]</a><span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -230,6 +236,122 @@
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;instance image must be either 2D or 3D&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prepare_embedseg_cache"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.prepare_embedseg_cache">[docs]</a><span class="k">def</span> <span class="nf">prepare_embedseg_cache</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">data_cfg</span><span class="p">):</span>
+    <span class="c1"># TODO: this is just a placeholder function</span>
+    <span class="c1"># data_cfg is not working well yet, need new dataclass as the real solution</span>
+    <span class="n">dataset_list</span> <span class="o">=</span> <span class="n">generate_dataset_dict</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+
+    <span class="n">min_xy</span> <span class="o">=</span> <span class="mi">65535</span>
+    <span class="n">min_z</span> <span class="o">=</span> <span class="mi">65535</span>
+    <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">dataset_list</span><span class="p">:</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;source_fn&quot;</span><span class="p">]</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="n">this_minXY</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">reader</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">min_xy</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">this_minXY</span><span class="p">,</span> <span class="n">min_xy</span><span class="p">))</span>
+        <span class="n">min_z</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">reader</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">min_z</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">this_minXY</span> <span class="o">&gt;=</span> <span class="mi">128</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{fn}</span><span class="s2">: XY dimension smaller than 128, not good&quot;</span>
+    <span class="n">crop_size</span> <span class="o">=</span> <span class="mi">128</span> <span class="o">*</span> <span class="p">(</span><span class="n">min_xy</span> <span class="o">//</span> <span class="mi">128</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">spatial_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">min_z</span> <span class="o">&gt;=</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;some 3D data has less than 16 Z slices, not good&quot;</span>
+        <span class="n">crop_size_z</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="n">min_z</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">):</span>
+        <span class="n">instance</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">target_reader</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;target_fn&quot;</span><span class="p">])</span>
+        <span class="n">image</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">source_reader</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;source_fn&quot;</span><span class="p">])</span>
+        <span class="n">fn_base</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;target_fn&quot;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">fn_base</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;GT.tiff&quot;</span><span class="p">):</span>
+            <span class="n">fn_base</span> <span class="o">=</span> <span class="n">fn_base</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fn_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fn_base</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">instance_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">object_mask</span> <span class="o">=</span> <span class="n">instance_np</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">instance_np</span><span class="p">[</span><span class="n">object_mask</span><span class="p">])</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="n">ids</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># loop over instances</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="nb">id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">spatial_dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+                <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">instance_np</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span>
+                <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+                <span class="n">jj</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ym</span> <span class="o">-</span> <span class="n">crop_size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="n">crop_size</span><span class="p">))</span>
+                <span class="n">ii</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">xm</span> <span class="o">-</span> <span class="n">crop_size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">crop_size</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">image</span><span class="p">[</span><span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span>
+                    <span class="n">crop_size</span><span class="p">,</span>
+                    <span class="n">crop_size</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="n">im_crop</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">]</span>
+                    <span class="n">instance_crop</span> <span class="o">=</span> <span class="n">instance</span><span class="p">[</span><span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">]</span>
+                    <span class="n">center_image_crop</span> <span class="o">=</span> <span class="n">generate_center_image</span><span class="p">(</span>
+                        <span class="n">instance_crop</span><span class="p">,</span> <span class="s2">&quot;centroid&quot;</span><span class="p">,</span> <span class="n">ids</span>
+                    <span class="p">)</span>
+                    <span class="n">class_image_crop</span> <span class="o">=</span> <span class="n">object_mask</span><span class="p">[</span>
+                        <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span>
+                    <span class="p">]</span>
+                    <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;YX&quot;</span>
+
+            <span class="k">elif</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">spatial_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+                <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">instance_np</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span>
+                <span class="n">zm</span><span class="p">,</span> <span class="n">ym</span><span class="p">,</span> <span class="n">xm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">kk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">zm</span> <span class="o">-</span> <span class="n">crop_size_z</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">d</span> <span class="o">-</span> <span class="n">crop_size_z</span><span class="p">))</span>
+                <span class="n">jj</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ym</span> <span class="o">-</span> <span class="n">crop_size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="n">crop_size</span><span class="p">))</span>
+                <span class="n">ii</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">xm</span> <span class="o">-</span> <span class="n">crop_size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">crop_size</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">image</span><span class="p">[</span>
+                    <span class="n">kk</span> <span class="p">:</span> <span class="n">kk</span> <span class="o">+</span> <span class="n">crop_size_z</span><span class="p">,</span> <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">crop_size_z</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">crop_size</span><span class="p">):</span>
+                    <span class="n">im_crop</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span>
+                        <span class="n">kk</span> <span class="p">:</span> <span class="n">kk</span> <span class="o">+</span> <span class="n">crop_size_z</span><span class="p">,</span>
+                        <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                        <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                    <span class="p">]</span>
+                    <span class="n">instance_crop</span> <span class="o">=</span> <span class="n">instance</span><span class="p">[</span>
+                        <span class="n">kk</span> <span class="p">:</span> <span class="n">kk</span> <span class="o">+</span> <span class="n">crop_size_z</span><span class="p">,</span>
+                        <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                        <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                    <span class="p">]</span>
+                    <span class="n">center_image_crop</span> <span class="o">=</span> <span class="n">generate_center_image</span><span class="p">(</span>
+                        <span class="n">instance_crop</span><span class="p">,</span>
+                        <span class="s2">&quot;centroid&quot;</span><span class="p">,</span>
+                        <span class="n">ids</span><span class="p">,</span>
+                        <span class="n">anisotropy_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">speed_up</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">class_image_crop</span> <span class="o">=</span> <span class="n">object_mask</span><span class="p">[</span>
+                        <span class="n">kk</span> <span class="p">:</span> <span class="n">kk</span> <span class="o">+</span> <span class="n">crop_size_z</span><span class="p">,</span>
+                        <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                        <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                    <span class="p">]</span>
+                    <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;ZYX&quot;</span>
+
+            <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">im_crop</span><span class="p">,</span>
+                <span class="n">cache_path</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">fn_base</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">_IM.tiff&quot;</span><span class="p">,</span>
+                <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">instance_crop</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">),</span>
+                <span class="n">cache_path</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">fn_base</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">_GT.tiff&quot;</span><span class="p">,</span>
+                <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">center_image_crop</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span>
+                <span class="n">cache_path</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">fn_base</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">_CE.tiff&quot;</span><span class="p">,</span>
+                <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">class_image_crop</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span>
+                <span class="n">cache_path</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="n">fn_base</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">_CL.tiff&quot;</span><span class="p">,</span>
+                <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+            <span class="p">)</span></div>
 </pre></div>
 
            </div>

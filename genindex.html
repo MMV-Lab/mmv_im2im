@@ -239,6 +239,8 @@
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict">generate_dataset_dict() (in module mmv_im2im.utils.misc)</a>
 </li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict_monai">generate_dataset_dict_monai() (in module mmv_im2im.utils.misc)</a>
+</li>
       <li><a href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.generate_instance_clusters">generate_instance_clusters() (in module mmv_im2im.postprocessing.embedseg_cluster)</a>
 </li>
   </ul></td>
@@ -253,6 +255,8 @@
         <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original.generator_step">(mmv_im2im.utils.gan_losses.pix2pix_HD_original method)</a>
 </li>
       </ul></li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader.get_data">get_data() (mmv_im2im.utils.misc.monai_bio_reader method)</a>
+</li>
       <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.get_data_module">get_data_module() (in module mmv_im2im.data_modules)</a>
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.get_max_shape">get_max_shape() (in module mmv_im2im.utils.misc)</a>
@@ -265,16 +269,12 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule">Im2ImDataModule (class in mmv_im2im.data_modules.data_loader)</a>
-
-      <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule">(class in mmv_im2im.data_modules.data_loader_embedseg)</a>
+      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule">Im2ImDataModule (class in mmv_im2im.data_modules.data_loader_basic)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.model_utils.init_weights">init_weights() (in module mmv_im2im.utils.model_utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou">iou() (in module mmv_im2im.utils.lovasz_losses)</a>
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou_binary">iou_binary() (in module mmv_im2im.utils.lovasz_losses)</a>
@@ -338,17 +338,10 @@
 </li>
       </ul></li>
       <li>
-    mmv_im2im.data_modules.data_loader
+    mmv_im2im.data_modules.data_loader_basic
 
       <ul>
-        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader">module</a>
-</li>
-      </ul></li>
-      <li>
-    mmv_im2im.data_modules.data_loader_embedseg
-
-      <ul>
-        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_embedseg">module</a>
+        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_basic">module</a>
 </li>
       </ul></li>
       <li>
@@ -449,8 +442,6 @@
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     mmv_im2im.utils.gan_losses
 
@@ -458,6 +449,8 @@
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.gan_losses">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     mmv_im2im.utils.gan_utils
 
@@ -511,9 +504,7 @@
 </li>
         <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules">mmv_im2im.data_modules</a>
 </li>
-        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader">mmv_im2im.data_modules.data_loader</a>
-</li>
-        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_embedseg">mmv_im2im.data_modules.data_loader_embedseg</a>
+        <li><a href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_basic">mmv_im2im.data_modules.data_loader_basic</a>
 </li>
         <li><a href="mmv_im2im.models.html#module-mmv_im2im.models">mmv_im2im.models</a>
 </li>
@@ -556,6 +547,8 @@
         <li><a href="mmv_im2im.utils.html#module-mmv_im2im.utils.piecewise_inference">mmv_im2im.utils.piecewise_inference</a>
 </li>
       </ul></li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader">monai_bio_reader (class in mmv_im2im.utils.misc)</a>
+</li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original.multi_gan">multi_gan() (mmv_im2im.utils.gan_losses.pix2pix_HD_original method)</a>
 </li>
   </ul></td>
@@ -584,6 +577,10 @@
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func_without_params">parse_config_func_without_params() (in module mmv_im2im.utils.misc)</a>
 </li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_monai_ops">parse_monai_ops() (in module mmv_im2im.utils.for_transform)</a>
+</li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_monai_ops_vanilla">parse_monai_ops_vanilla() (in module mmv_im2im.utils.for_transform)</a>
+</li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_ops_list">parse_ops_list() (in module mmv_im2im.utils.misc)</a>
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_tio_ops">parse_tio_ops() (in module mmv_im2im.utils.for_transform)</a>
@@ -604,12 +601,12 @@
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.prepare_batch">(mmv_im2im.models.pl_FCN.Model method)</a>
 </li>
       </ul></li>
-      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.prepare_data">prepare_data() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
-
-      <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.prepare_data">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
+      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data">prepare_data() (mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule method)</a>
 </li>
-      </ul></li>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.prepare_embedseg_cache">prepare_embedseg_cache() (in module mmv_im2im.utils.embedseg_utils)</a>
+</li>
+      <li><a href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.process_one_image">process_one_image() (mmv_im2im.proj_tester.ProjectTester method)</a>
+</li>
       <li><a href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester">ProjectTester (class in mmv_im2im.proj_tester)</a>
 </li>
       <li><a href="mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer">ProjectTrainer (class in mmv_im2im.proj_trainer)</a>
@@ -622,6 +619,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader.read">read() (mmv_im2im.utils.misc.monai_bio_reader method)</a>
+</li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.gan_utils.ReplayBuffer">ReplayBuffer (class in mmv_im2im.utils.gan_utils)</a>
 </li>
       <li><a href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.run_inference">run_inference() (mmv_im2im.proj_tester.ProjectTester method)</a>
@@ -642,16 +641,12 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.setup">setup() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
-
-      <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.setup">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
+      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup">setup() (mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2D">SpatialEmbLoss_2D (class in mmv_im2im.utils.embedding_loss)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d">SpatialEmbLoss_3d (class in mmv_im2im.utils.embedding_loss)</a>
 </li>
       <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.StableBCELoss">StableBCELoss (class in mmv_im2im.utils.lovasz_losses)</a>
@@ -662,20 +657,10 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.test_dataloader">test_dataloader() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
-
-      <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.test_dataloader">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
-</li>
-      </ul></li>
       <li><a href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.to_float">to_float() (in module mmv_im2im.preprocessing.transforms)</a>
 </li>
-      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.train_dataloader">train_dataloader() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
-
-      <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.train_dataloader">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
+      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.train_dataloader">train_dataloader() (mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule method)</a>
 </li>
-      </ul></li>
       <li><a href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.training">training (mmv_im2im.models.pl_embedseg.Model attribute)</a>
 
       <ul>
@@ -702,20 +687,18 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader.Im2ImDataModule.val_dataloader">val_dataloader() (mmv_im2im.data_modules.data_loader.Im2ImDataModule method)</a>
-
-      <ul>
-        <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule.val_dataloader">(mmv_im2im.data_modules.data_loader_embedseg.Im2ImDataModule method)</a>
+      <li><a href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.val_dataloader">val_dataloader() (mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule method)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.validation_step">validation_step() (mmv_im2im.models.pl_embedseg.Model method)</a>
 
       <ul>
         <li><a href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.validation_step">(mmv_im2im.models.pl_FCN.Model method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader.verify_suffix">verify_suffix() (mmv_im2im.utils.misc.monai_bio_reader method)</a>
+</li>
   </ul></td>
 </tr></table>
 

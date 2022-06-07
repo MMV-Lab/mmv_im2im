@@ -216,12 +216,27 @@ own slice and zero elsewhere.</p>
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedseg_utils.</span></span><span class="sig-name descname"><span class="pre">pairwise_python</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedseg_utils.html#pairwise_python"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedseg_utils.pairwise_python" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.embedseg_utils.prepare_embedseg_cache">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.embedseg_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_embedseg_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_cfg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/embedseg_utils.html#prepare_embedseg_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.embedseg_utils.prepare_embedseg_cache" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-mmv_im2im.utils.for_transform">
 <span id="mmv-im2im-utils-for-transform-module"></span><h2>mmv_im2im.utils.for_transform module<a class="headerlink" href="#module-mmv_im2im.utils.for_transform" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.utils.for_transform.center_crop">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.for_transform.</span></span><span class="sig-name descname"><span class="pre">center_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/for_transform.html#center_crop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.for_transform.center_crop" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.for_transform.parse_monai_ops">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.for_transform.</span></span><span class="sig-name descname"><span class="pre">parse_monai_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trans_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/for_transform.html#parse_monai_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.for_transform.parse_monai_ops" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.for_transform.parse_monai_ops_vanilla">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.for_transform.</span></span><span class="sig-name descname"><span class="pre">parse_monai_ops_vanilla</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trans_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/for_transform.html#parse_monai_ops_vanilla"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.for_transform.parse_monai_ops_vanilla" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -459,6 +474,20 @@ only_present: average only on classes present in ground truth</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.utils.misc.generate_dataset_dict_monai">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">generate_dataset_dict_monai</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#generate_dataset_dict_monai"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.generate_dataset_dict_monai" title="Permalink to this definition"></a></dt>
+<dd><p>different options for “data”:
+- one CSV (columns: source, target, cmap), then split
+- one folder (_IM.tiff, _GT.tiff, _CM.tiff), then split
+- a dictionary of two or three folders (Im, GT, CM), then split</p>
+<dl class="simple">
+<dt>Return</dt><dd><p>a list of dict, each dict contains 2 or more keys, such as “IM”,
+“GT”, and more (optional, e.g. “LM”, “CM”, etc.)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.utils.misc.generate_test_dataset_dict">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">generate_test_dataset_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#generate_test_dataset_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.generate_test_dataset_dict" title="Permalink to this definition"></a></dt>
 <dd><p>different options for “data”:
@@ -479,6 +508,51 @@ Return</p>
 <dt class="sig sig-object py" id="mmv_im2im.utils.misc.load_yaml_cfg">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">load_yaml_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#load_yaml_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.load_yaml_cfg" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.utils.misc.monai_bio_reader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.utils.misc.</span></span><span class="sig-name descname"><span class="pre">monai_bio_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#monai_bio_reader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.monai_bio_reader" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ImageReader</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.misc.monai_bio_reader.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#monai_bio_reader.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.monai_bio_reader.get_data" title="Permalink to this definition"></a></dt>
+<dd><p>Extract data array and meta data from loaded image and return them.
+This function must return two objects, the first is a numpy array of image data,
+the second is a dictionary of meta data.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>img: an image object loaded from an image file or a list of image objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.misc.monai_bio_reader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#monai_bio_reader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.monai_bio_reader.read" title="Permalink to this definition"></a></dt>
+<dd><p>Read image data from specified file or files.
+Note that it returns a data object or a sequence of data objects.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data: file name or a list of file names to read.
+kwargs: additional args for actual <cite>read</cite> API of 3rd party libs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.utils.misc.monai_bio_reader.verify_suffix">
+<span class="sig-name descname"><span class="pre">verify_suffix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/mmv_im2im/utils/misc.html#monai_bio_reader.verify_suffix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.utils.misc.monai_bio_reader.verify_suffix" title="Permalink to this definition"></a></dt>
+<dd><p>Verify whether the specified <cite>filename</cite> is supported by the current reader.
+This method should return True if the reader is able to read the format suggested by the
+<cite>filename</cite>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>filename: file name or a list of file names to read.</dt><dd><p>if a list of files, verify all the suffixes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.utils.misc.parse_config">

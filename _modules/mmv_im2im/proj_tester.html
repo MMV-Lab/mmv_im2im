@@ -103,13 +103,18 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">aicsimageio</span> <span class="kn">import</span> <span class="n">AICSImage</span>
 <span class="kn">from</span> <span class="nn">aicsimageio.writers</span> <span class="kn">import</span> <span class="n">OmeTiffWriter</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchio.data.io</span> <span class="kn">import</span> <span class="n">check_uint_to_int</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">generate_test_dataset_dict</span><span class="p">,</span> <span class="n">parse_config_func</span>
-<span class="kn">from</span> <span class="nn">mmv_im2im.utils.for_transform</span> <span class="kn">import</span> <span class="n">parse_tio_ops</span><span class="p">,</span> <span class="n">center_crop</span>
-<span class="kn">from</span> <span class="nn">mmv_im2im.utils.piecewise_inference</span> <span class="kn">import</span> <span class="n">predict_piecewise</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.for_transform</span> <span class="kn">import</span> <span class="n">parse_monai_ops_vanilla</span>
+
+<span class="c1"># from mmv_im2im.utils.piecewise_inference import predict_piecewise</span>
+<span class="kn">from</span> <span class="nn">monai.inferers</span> <span class="kn">import</span> <span class="n">sliding_window_inference</span>
 
 <span class="c1"># https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction_guide.html#predicting</span>
 <span class="c1">###############################################################################</span>
@@ -137,6 +142,85 @@
         <span class="c1"># define variables</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ProjectTester.process_one_image"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.process_one_image">[docs]</a>    <span class="k">def</span> <span class="nf">process_one_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">):</span>
+
+        <span class="c1"># TODO: adjust/double_check for MONAI</span>
+        <span class="c1"># record the input dimension</span>
+        <span class="c1"># original_size = x.size()</span>
+        <span class="c1"># if original_size[0] == 1:</span>
+        <span class="c1">#    original_size = original_size[1:]</span>
+        <span class="c1"># original_size = tuple(original_size)</span>
+
+        <span class="c1"># Perform the prediction</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+
+        <span class="c1"># choose different inference function for different types of models</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">&quot;sliding_window_params&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
+                <span class="c1"># add convert to tensor with proper type</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">check_uint_to_int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="c1"># add the batch dimension</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">y_hat</span> <span class="o">=</span> <span class="n">sliding_window_inference</span><span class="p">(</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
+                    <span class="n">predictor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;sliding_window_params&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+
+        <span class="c1"># do post-processing on the prediction</span>
+        <span class="k">if</span> <span class="s2">&quot;post_processing&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
+            <span class="n">pp_data</span> <span class="o">=</span> <span class="n">y_hat</span>
+            <span class="k">for</span> <span class="n">pp_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;post_processing&quot;</span><span class="p">]:</span>
+                <span class="n">pp</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">pp_info</span><span class="p">)</span>
+                <span class="n">pp_data</span> <span class="o">=</span> <span class="n">pp</span><span class="p">(</span><span class="n">pp_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">pp_data</span><span class="p">):</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">pp_data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">pp_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+        <span class="c1"># TODO: needs to clean up after checking how to restore image size in MONAI</span>
+        <span class="c1"># if original_size != pred.shape[-1 * len(original_size) :]:</span>
+        <span class="c1">#     pred = center_crop(pred, original_size)</span>
+
+        <span class="c1"># determine output dimension orders</span>
+        <span class="k">if</span> <span class="n">out_fn</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.npy&quot;</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CYX&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;ZYX&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CZYX&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;4D output detected for 2d problem with non-trivil dims&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;find non-trivial batch dimension&quot;</span>
+                <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">pred</span><span class="p">[</span>
+                        <span class="mi">0</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="n">out_fn</span><span class="p">,</span>
+                    <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CZYX&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;error in prediction output shape&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProjectTester.run_inference"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.run_inference">[docs]</a>    <span class="k">def</span> <span class="nf">run_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -168,102 +252,84 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">=</span> <span class="mi">2</span>
 
         <span class="c1"># load preprocessing transformation</span>
-        <span class="n">pre_process</span> <span class="o">=</span> <span class="n">parse_tio_ops</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;preprocess&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="n">parse_monai_ops_vanilla</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;preprocess&quot;</span><span class="p">])</span>
 
         <span class="c1"># loop through all images and apply the model</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">):</span>
             <span class="c1"># Read the image</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading the image </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">dataset_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span>
-                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">check_uint_to_int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">()))</span>
 
-            <span class="c1"># record the input dimension</span>
-            <span class="n">original_size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">original_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">original_size</span> <span class="o">=</span> <span class="n">original_size</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-            <span class="n">original_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">original_size</span><span class="p">)</span>
-
-            <span class="c1"># Perform the prediction</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicting the image&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="c1"># if data is 2D</span>
-                <span class="c1"># Initial shape (1, W, H)</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-                <span class="c1"># Adding dimension for torchio to handle 2D data</span>
-                <span class="c1"># to become (1, W, H, 1)</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">pre_process</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># (1, resized_W, resized_H, 1)</span>
-
-                <span class="c1"># TODO: some model requires (1, W, H), some requires (1, 1, W, H)</span>
-                <span class="c1"># solution: update all 2D models to accept (1, 1, W, H)</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">pre_process</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-            <span class="c1"># choose different inference function for different types of models</span>
-            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-                <span class="k">if</span> <span class="s2">&quot;sliding_window_params&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
-                    <span class="n">y_hat</span> <span class="o">=</span> <span class="n">predict_piecewise</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
-                        <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
-                        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;sliding_window_params&quot;</span><span class="p">],</span>
-                    <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
-
-            <span class="c1"># do post-processing on the prediction</span>
-            <span class="k">if</span> <span class="s2">&quot;post_processing&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
-                <span class="n">pp_data</span> <span class="o">=</span> <span class="n">y_hat</span>
-                <span class="k">for</span> <span class="n">pp_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;post_processing&quot;</span><span class="p">]:</span>
-                    <span class="n">pp</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">pp_info</span><span class="p">)</span>
-                    <span class="n">pp_data</span> <span class="o">=</span> <span class="n">pp</span><span class="p">(</span><span class="n">pp_data</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">pp_data</span><span class="p">):</span>
-                    <span class="n">pred</span> <span class="o">=</span> <span class="n">pp_data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">pred</span> <span class="o">=</span> <span class="n">pp_data</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">pred</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="n">original_size</span> <span class="o">!=</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_size</span><span class="p">)</span> <span class="p">:]:</span>
-                <span class="n">pred</span> <span class="o">=</span> <span class="n">center_crop</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">original_size</span><span class="p">)</span>
-
-            <span class="c1"># prepare output filename</span>
+            <span class="c1"># output file name info</span>
             <span class="n">fn_core</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
             <span class="n">suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;suffix&quot;</span><span class="p">]</span>
-            <span class="n">out_fn</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
 
-            <span class="c1"># determine output dimension orders</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CYX&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;ZYX&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                    <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CZYX&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;4D output detected for 2d problem with non-trivil dims&quot;</span>
-                        <span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;find non-trivial batch dimension&quot;</span>
-                <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-                    <span class="n">pred</span><span class="p">[</span>
-                        <span class="mi">0</span><span class="p">,</span>
-                    <span class="p">],</span>
-                    <span class="n">out_fn</span><span class="p">,</span>
-                    <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CZYX&quot;</span><span class="p">,</span>
+            <span class="n">timelapse_data</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">][</span><span class="s2">&quot;dimension_order_out&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                        <span class="s2">&quot;processing a subset of all timepoint is not supported yet&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">tmppath</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+
+                <span class="c1"># get the number of time points</span>
+                <span class="n">reader</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+                <span class="n">timelapse_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">T</span>
+
+                <span class="n">tmpfile_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">t_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">timelapse_data</span><span class="p">):</span>
+                    <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span>
+                        <span class="n">T</span><span class="o">=</span><span class="p">[</span><span class="n">t_idx</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predicting the image timepoint </span><span class="si">{</span><span class="n">t_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># prepare output filename</span>
+                    <span class="n">out_fn</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmppath</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">t_idx</span><span class="si">}</span><span class="s2">.npy&quot;</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">process_one_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">)</span>
+                    <span class="n">tmpfile_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_fn</span><span class="p">)</span>
+
+                <span class="c1"># gather all individual outputs and save as timelapse</span>
+                <span class="n">out_array</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_one_file</span><span class="p">)</span> <span class="k">for</span> <span class="n">tmp_one_file</span> <span class="ow">in</span> <span class="n">tmpfile_list</span><span class="p">]</span>
+                <span class="n">out_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">out_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
                 <span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;TYX&quot;</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="s2">&quot;Z&quot;</span>
+                        <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">][</span>
+                            <span class="s2">&quot;dimension_order_out&quot;</span>
+                        <span class="p">]</span>
+                    <span class="p">):</span>
+                        <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;TZYX&quot;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;TCYX&quot;</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                    <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;TCZYX&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected pred of shape </span><span class="si">{</span><span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># save the file output</span>
+                <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_array</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">)</span>
+
+                <span class="c1"># clean up temporary dir</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">tmppath</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;error in prediction output shape&quot;</span><span class="p">)</span></div></div>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+                <span class="c1"># prepare output filename</span>
+
+                <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
+                <span class="p">)</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicting the image&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_one_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
