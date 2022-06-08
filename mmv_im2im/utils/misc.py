@@ -7,38 +7,6 @@ import numpy as np
 from munch import Munch
 from aicsimageio import AICSImage
 import torchio as tio
-from typing import Sequence, Tuple
-from monai.data import ImageReader
-from monai.utils import ensure_tuple, require_pkg
-from monai.config import PathLike
-from monai.data.image_reader import _stack_images
-
-
-@require_pkg(pkg_name="aicsimageio")
-class monai_bio_reader(ImageReader):
-    def __init__(self, **kwargs):
-        super().__init__()
-        self.kwargs = kwargs
-
-    def read(self, data: Union[Sequence[PathLike], PathLike]):
-        filenames: Sequence[PathLike] = ensure_tuple(data)
-        img_ = []
-        for name in filenames:
-            img_.append(AICSImage(f"{name}"))
-
-        return img_ if len(filenames) > 1 else img_[0]
-
-    def get_data(self, img) -> Tuple[np.ndarray, Dict]:
-        img_array: List[np.ndarray] = []
-
-        for img_obj in ensure_tuple(img):
-            data = img_obj.get_image_data(**self.kwargs)
-            img_array.append(data)
-
-        return _stack_images(img_array, {}), {}
-
-    def verify_suffix(self, filename: Union[Sequence[PathLike], PathLike]) -> bool:
-        return True
 
 
 def aicsimageio_reader(fn, **kwargs):
@@ -136,7 +104,6 @@ def generate_test_dataset_dict(
     elif data.is_dir():
         all_filename = sorted(data.glob(f"*{data_type}"))
         assert len(all_filename) > 0, f"no file found in {data}"
-        print(f"{len(all_filename)} files are found at {data}")
         all_filename.sort()
         for fn in all_filename:
             dataset_list.append(fn)
@@ -247,58 +214,6 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
             else:
                 dataset_list.append({"source_fn": fn, "target_fn": target_fn})
 
-    else:
-        print("unsupported data type")
-
-    assert len(dataset_list) > 0, "empty dataset"
-
-    return dataset_list
-
-
-def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
-    """
-    different options for "data":
-    - one CSV (columns: source, target, cmap), then split
-    - one folder (_IM.tiff, _GT.tiff, _CM.tiff), then split
-    - a dictionary of two or three folders (Im, GT, CM), then split
-
-    Return
-        a list of dict, each dict contains 2 or more keys, such as "IM",
-        "GT", and more (optional, e.g. "LM", "CM", etc.)
-    """
-    dataset_list = []
-    if isinstance(data, str) or isinstance(data, Path):
-        data = Path(data).expanduser()
-        if data.is_file():
-            # should be a csv of dataframe
-
-            # TODO: add loading
-            pass
-        elif data.is_dir():
-            all_filename = sorted(data.glob("*_IM.*"))
-            assert len(all_filename) > 0, f"no file found in {data}"
-
-            # parse how many images associated with one subject
-            basename = all_filename[0].stem
-            basename = basename[: basename.rfind("_")]
-            subject_files = sorted(data.glob(f"{basename}_*.*"))
-            all_tags = [
-                sfile.stem[sfile.stem.rfind("_") + 1 :] for sfile in subject_files
-            ]
-
-            all_filename.sort()
-            for fn in all_filename:
-                path_list = {}
-                for tag_name in all_tags:
-                    fn = data / fn.name.replace("_IM.", f"_{tag_name}.")
-                    path_list[tag_name] = fn
-                dataset_list.append(path_list)
-        else:
-            print(f"{data} is not a valid file or directory")
-
-    elif isinstance(data, Dict):
-        # TODO: add loading case
-        pass
     else:
         print("unsupported data type")
 

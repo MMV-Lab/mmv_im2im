@@ -2,6 +2,7 @@ import os
 from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
 import pytorch_lightning as pl
+import torchio as tio
 import torch
 from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 
@@ -67,10 +68,10 @@ class Model(pl.LightningModule):
         # But, the FCN models do not like this. We just need to remove the
         # dummy dimension
 
-        im = batch["IM"]
-        instances = batch["GT"]
-        class_labels = batch["CL"]
-        center_images = batch["CE"]
+        im = batch["source"][tio.DATA]
+        instances = batch["target"][tio.DATA]
+        class_labels = batch["class_image"][tio.DATA]
+        center_images = batch["center_image"][tio.DATA]
 
         if im.size()[-1] == 1:
             im = torch.squeeze(im, dim=-1).float()

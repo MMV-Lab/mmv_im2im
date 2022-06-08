@@ -1,6 +1,8 @@
 """
 This module provides lighting module for cycleGAN
 """
+
+import torchio as tio
 import torch
 import pytorch_lightning as pl
 from mmv_im2im.utils.misc import parse_config, parse_config_func
@@ -105,12 +107,12 @@ class Model(pl.LightningModule):
     # only for test or validation
     def run_step(self, batch, batch_idx):
         # get the data
-        image_A = batch["IM"]
-        image_B = batch["GT"]
+        image_A = batch["source"][tio.DATA]
+        image_B = batch["target"][tio.DATA]
 
-        # if image_A.size()[-1] == 1:
-        #    image_A = torch.squeeze(image_A, dim=-1)
-        #    image_B = torch.squeeze(image_B, dim=-1)
+        if image_A.size()[-1] == 1:
+            image_A = torch.squeeze(image_A, dim=-1)
+            image_B = torch.squeeze(image_B, dim=-1)
 
         # run generators and discriminators
         fake_B_from_A = self.generator_model_image_AtoB(image_A)
@@ -197,12 +199,12 @@ class Model(pl.LightningModule):
 
     def training_step(self, batch, batch_idx, optimizer_idx):
         # get the batch
-        image_A = batch["IM"]
-        image_B = batch["GT"]
+        image_A = batch["source"][tio.DATA]
+        image_B = batch["target"][tio.DATA]
 
-        # if image_A.size()[-1] == 1:
-        #    image_A = torch.squeeze(image_A, dim=-1)
-        #    image_B = torch.squeeze(image_B, dim=-1)
+        if image_A.size()[-1] == 1:
+            image_A = torch.squeeze(image_A, dim=-1)
+            image_B = torch.squeeze(image_B, dim=-1)
 
         # generate fake images
         fake_A_from_B = self.generator_model_image_BtoA(image_B)

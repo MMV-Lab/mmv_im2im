@@ -1,7 +1,7 @@
 from typing import List, Dict
 from functools import partial
 from mmv_im2im.utils.misc import parse_config, parse_config_func_without_params
-from monai.transforms import Compose, Lambdad, Lambda
+import torchio
 
 
 def parse_tio_ops(trans_func: List[Dict]):
@@ -23,10 +23,10 @@ def parse_tio_ops(trans_func: List[Dict]):
 
             if "extra_kwargs" in func_info:
                 trans_list.append(
-                    tio.Lambda(callable_func, **func_info["extra_kwargs"])
+                    torchio.Lambda(callable_func, **func_info["extra_kwargs"])
                 )
             else:
-                trans_list.append(tio.Lambda(callable_func))
+                trans_list.append(torchio.Lambda(callable_func))
 
     return tio.Compose(trans_list)
 
@@ -56,65 +56,3 @@ def center_crop(img, target_shape):
         ]
     else:
         return img[half_y : -(diff_y - half_y), half_x : -(diff_x - half_x)]
-
-
-def parse_monai_ops(trans_func: List[Dict]):
-
-    # Here, we will use the Compose function in MONAI to merge
-    # all transformations. If any trnasformation not from MONAI,
-    # a MONAI Lambda function will be used to wrap around it.
-    trans_list = []
-
-    # we assume a PersistentDataset with dictionary-type dataset
-    # so, always need LoadImaged as the first one transform.
-    # Here, we handle the LoadImaged seperatedly to allow bio-reader
-    reader = trans_func.pop(0)
-    if (
-        reader["module_name"] == "monai.transforms"
-        and reader["func_name"] == "LoadImaged"
-    ):
-        from mmv_im2im.utils.misc import monai_bio_reader
-        from monai.transforms import LoadImaged
-
-        trans_list.append(LoadImaged(reader=monai_bio_reader, **reader["params"]))
-
-    # loop throught the config
-    for func_info in trans_func:
-        if func_info["module_name"] == "monai.transforms":
-            trans_list.append(parse_config(func_info))
-        else:
-            my_func = parse_config_func_without_params(func_info)
-            func_params = func_info["params"]
-            apply_keys = func_params.pop("keys")
-
-            # check if any other params
-            if len(func_params) > 0:
-                callable_func = partial(my_func, **func_params)
-            else:
-                callable_func = my_func
-
-            trans_list.append(Lambdad(keys=apply_keys, func=callable_func))
-
-    return Compose(trans_list)
-
-
-def parse_monai_ops_vanilla(trans_func: List[Dict]):
-
-    # Here, we will use the Compose function in MONAI to merge
-    # all transformations. If any trnasformation not from MONAI,
-    # a MONAI Lambda function will be used to wrap around it.
-    trans_list = []
-    # loop throught the config
-    for func_info in trans_func:
-        if func_info["module_name"] == "monai.transforms":
-            trans_list.append(parse_config(func_info))
-        else:
-            my_func = parse_config_func_without_params(func_info)
-            if "params" in func_info:
-                func_params = func_info["params"]
-                callable_func = partial(my_func, **func_params)
-            else:
-                callable_func = my_func
-            trans_list.append(Lambda(func=callable_func))
-
-    return Compose(trans_list)

@@ -2,6 +2,7 @@ import os
 import torch
 from typing import Dict
 import pytorch_lightning as pl
+import torchio as tio
 from mmv_im2im.utils.misc import parse_config_func
 from mmv_im2im.utils.model_utils import init_weights
 from mmv_im2im.models.nets.gans import define_generator, define_discriminator
@@ -33,8 +34,8 @@ class Model(pl.LightningModule):
             self.scheduler_info = model_info_xx["scheduler"]
 
     def forward(self, x):
-        # if x.size()[-1] == 1:
-        #    x = torch.squeeze(x, dim=-1)
+        if x.size()[-1] == 1:
+            x = torch.squeeze(x, dim=-1)
         return self.generator(x)
 
     def configure_optimizers(self):
@@ -67,8 +68,8 @@ class Model(pl.LightningModule):
         # imageA : condition image
         # conditional GAN refers generating a realistic image (image B as ground truth),
         # conditioned on image A
-        image_A = batch["IM"]
-        image_B = batch["GT"]
+        image_A = batch["source"][tio.DATA]
+        image_B = batch["target"][tio.DATA]
 
         ##########################################
         # check if the data is 2D or 3D
@@ -85,9 +86,9 @@ class Model(pl.LightningModule):
         # with the syntax for fliping along Y in 1 x Y x X x 1.
         # But, the FCN models do not like this. We just need to remove the
         # dummy dimension
-        # if image_A.size()[-1] == 1:
-        #    image_A = torch.squeeze(image_A, dim=-1)
-        #    image_B = torch.squeeze(image_B, dim=-1)
+        if image_A.size()[-1] == 1:
+            image_A = torch.squeeze(image_A, dim=-1)
+            image_B = torch.squeeze(image_B, dim=-1)
 
         self.generator.train()
 
