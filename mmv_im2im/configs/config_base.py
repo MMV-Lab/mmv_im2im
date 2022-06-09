@@ -26,7 +26,7 @@ class ArgumentParser(Generic[T], argparse.ArgumentParser):
     def __init__(
         self,
         config_class: Type[T],
-        config_path: Optional[str] = None,
+        config: Optional[str] = None,
         formatter_class: Type[HelpFormatter] = SimpleHelpFormatter,
         *args,
         **kwargs,
@@ -41,7 +41,7 @@ class ArgumentParser(Generic[T], argparse.ArgumentParser):
 
         self._wrappers: List[DataclassWrapper] = []
 
-        self.config_path = config_path
+        self.config = config
         self.config_class = config_class
 
         self._assert_no_conflicts()
@@ -129,34 +129,36 @@ class ArgumentParser(Generic[T], argparse.ArgumentParser):
         for key in parsed_arg_values:
             parsed_arg_values[key] = cfgparsing.parse_string(parsed_arg_values[key])
 
-        config_path = self.config_path  # Could be NONE
+        config = self.config  # Could be NONE
 
         if utils.CONFIG_ARG in parsed_arg_values:
-            new_config_path = parsed_arg_values[utils.CONFIG_ARG]
-            if config_path is not None:
+            new_config = parsed_arg_values[utils.CONFIG_ARG]
+            if config is not None:
                 warnings.warn(
                     UserWarning(
-                        f"Overriding default {config_path} with {new_config_path}"
+                        f"Overriding default {config} with {new_config}"
                     )
                 )
             ######################################################################
             # adapted from original implementation in pyrallis
             ######################################################################
-            if Path(new_config_path).is_file():
+            if Path(new_config).is_file():
                 # pass in a absolute path
-                config_path = new_config_path
+                config = new_config
             else:
-                new_config_path = str(new_config_path)
-                print(f"trying to locate preset config for {new_config_path} ...")
+                new_config = str(new_config)
+                print(f"trying to locate preset config for {new_config} ...")
 
-                config_path = Path(__file__).parent / f"preset_{new_config_path}.yaml"
+                config = Path(__file__).parent / f"preset_{new_config}.yaml"
             del parsed_arg_values[utils.CONFIG_ARG]
 
-        if config_path is not None:
-            file_args = cfgparsing.load_config(open(config_path, "r"))
+        if config is not None:
+            print(f"loading configuration from {config} ...")
+            file_args = cfgparsing.load_config(open(config, "r"))
             file_args = utils.flatten(file_args, sep=".")
             file_args.update(parsed_arg_values)
             parsed_arg_values = file_args
+            print("configuration loading is completed")
 
         deflat_d = utils.deflatten(parsed_arg_values, sep=".")
         cfg = decoding.decode(self.config_class, deflat_d)
@@ -166,11 +168,11 @@ class ArgumentParser(Generic[T], argparse.ArgumentParser):
 
 def parse_adaptor(
     config_class: Type[T],
-    config_path: Optional[Union[Path, str]] = None,
+    config: Optional[Union[Path, str]] = None,
     args: Optional[Sequence[str]] = None,
 ) -> T:
 
-    parser = ArgumentParser(config_class=config_class, config_path=config_path)
+    parser = ArgumentParser(config_class=config_class, config=config)
     return parser.parse_args(args)
 
 
@@ -195,13 +197,13 @@ class DataloaderModuleConfig:
         default={
             "batch_size": 1,
             "pin_memory": True,
-            "num_workers": 4,
+            "num_workers": 2,
         },
         is_mutable=True,
     )
 
     # whether to load part of the dataset, and periodically reload
-    partial_loader: Dict = field(default={"load_percentage": 1.0}, is_mutable=True)
+    partial_loader: float = field(default=1.0)
 
 
 @dataclass
@@ -215,18 +217,21 @@ class DataloaderConfig:
     train: DataloaderModuleConfig = field(default_factory=DataloaderModuleConfig)
 
     # config for the validation dataloader
-    val: DataloaderModuleConfig = field(default=DataloaderModuleConfig)
+    val: DataloaderModuleConfig = field(default_factory=DataloaderModuleConfig)
 
 
 @dataclass
 class DataConfig:
     """Config for data and data loaders"""
 
-    # The type of data: "pair" | "unpair"
+    # The type of data: "pair" | "unpair" | "embedseg"
     category: str = field(default=None)
 
     # The data path
     data_path: Union[Path, str] = field(default=None)
+
+    # save pre-processed training data into a cache folder (currently, only for embedseg)
+    cache_path: Union[Path, str] = field(default=None)
 
     # config for dataloader
     dataloader: DataloaderConfig = field(default_factory=DataloaderConfig)
@@ -279,7 +284,7 @@ class TrainingConfig:
             {
                 "module_name": "pytorch_lightning.callbacks",
                 "func_name": "ModelCheckpoint",
-                "params": {"save_last": True, "save_top_k": 5},
+                "params": {"save_last": True},
             }
         ],
         is_mutable=True,
@@ -301,3 +306,16 @@ class ProgramConfig:
 
     # the configuration for trainer
     training: TrainingConfig = field(default_factory=TrainingConfig)
+
+
+def configuration_validation(cfg):
+
+    # check 1: if partial loading is used, make sure reloading is enabled in trainer
+
+    # check 2: partial_loader should be a value between 0 (excluded) and 1 (included)
+
+    # check 3: partial_loader for validation dataloader should be 1.0
+
+    # check 4: for embedseg, the patch size needs to be consistent with grid x y in criterion
+
+    return cfg

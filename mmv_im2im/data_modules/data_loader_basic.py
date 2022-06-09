@@ -28,25 +28,25 @@ class Im2ImDataModule(pl.LightningDataModule):
         super().__init__()
 
         if cache_path is None:
-            self.data_path = data_cfg["data_path"]
+            self.data_path = data_cfg.data_path
         else:
             # use the cache path as the directory to load data
             self.data_path = cache_path
 
         # train/val split
-        self.train_val_ratio = data_cfg["dataloader"]["train_val_ratio"] or 0.2
+        self.train_val_ratio = data_cfg.dataloader.train_val_ratio or 0.2
         self.train_set = None
         self.val_set = None
 
-        if "preprocess" in data_cfg:
-            self.preproc = parse_monai_ops(data_cfg["preprocess"])
-        else:
+        if data_cfg.preprocess is None:
             self.preproc = None
-
-        if "augmentation" in data_cfg:
-            self.augment = parse_monai_ops(data_cfg["augmentation"])
         else:
+            self.preproc = parse_monai_ops(data_cfg.preprocess)
+
+        if data_cfg.augmentation is None:
             self.augment = None
+        else:
+            self.augment = parse_monai_ops(data_cfg.augmentation)
 
         if self.preproc is None and self.augment is not None:
             self.transform = self.augment
@@ -58,7 +58,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             self.transform = monai.transforms.Compose([self.preproc, self.augment])
 
         # parameters for dataloader
-        self.dataloader_info = data_cfg["dataloader"]
+        self.dataloader_info = data_cfg.dataloader
 
     def prepare_data(self):
         dataset_list = generate_dataset_dict_monai(self.data_path)
@@ -82,16 +82,13 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.train_data = train_subjects
 
     def train_dataloader(self):
-        train_loader_info = self.dataloader_info["train"]
+        train_loader_info = self.dataloader_info.train
         train_dataset_func = parse_config_func_without_params(
-            train_loader_info["dataloader_type"]
+            train_loader_info.dataloader_type
         )
         train_data = self.train_data
-        if "partial_loader" in train_loader_info:
-            num_load = int(
-                train_loader_info["partial_loader"]["load_percentage"]
-                * len(self.train_data)
-            )
+        if train_loader_info.partial_loader < 1.0:
+            num_load = int(train_loader_info.partial_loader * len(self.train_data))
             from sklearn.utils import shuffle
 
             train_data = shuffle(train_data)
@@ -99,30 +96,30 @@ class Im2ImDataModule(pl.LightningDataModule):
         train_dataset = train_dataset_func(
             data=train_data,
             transform=self.transform,
-            **train_loader_info["dataset_params"]
+            **train_loader_info.dataset_params
         )
         train_dataloader = DataLoader(
             train_dataset,
             shuffle=True,
             collate_fn=list_data_collate,
-            **train_loader_info["dataloader_params"]
+            **train_loader_info.dataloader_params
         )
         return train_dataloader
 
     def val_dataloader(self):
-        val_loader_info = self.dataloader_info["val"]
+        val_loader_info = self.dataloader_info.val
         val_dataset_func = parse_config_func_without_params(
-            val_loader_info["dataloader_type"]
+            val_loader_info.dataloader_type
         )
         val_dataset = val_dataset_func(
             data=self.val_data,
             transform=self.preproc,
-            **val_loader_info["dataset_params"]
+            **val_loader_info.dataset_params
         )
         val_dataloader = DataLoader(
             val_dataset,
             shuffle=True,
             collate_fn=list_data_collate,
-            **val_loader_info["dataloader_params"]
+            **val_loader_info.dataloader_params
         )
         return val_dataloader
