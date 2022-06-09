@@ -61,12 +61,8 @@ class Model(pl.LightningModule):
             return self.generator_model_image_BtoA(x)
 
     def configure_optimizers(self):
-        generator_optimizer_func = parse_config_func(
-            self.optimizer_info["generator"]
-        )
-        generator_scheduler_func = parse_config_func(
-            self.scheduler_info["generator"]
-        )
+        generator_optimizer_func = parse_config_func(self.optimizer_info["generator"])
+        generator_scheduler_func = parse_config_func(self.scheduler_info["generator"])
         generator_optimizer = generator_optimizer_func(
             itertools.chain(
                 self.generator_model_image_AtoB.parameters(),

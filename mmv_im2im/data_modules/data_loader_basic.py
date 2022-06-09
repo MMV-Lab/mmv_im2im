@@ -116,9 +116,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             val_loader_info.dataloader_type
         )
         val_dataset = val_dataset_func(
-            data=self.val_data,
-            transform=self.preproc,
-            **val_loader_info.dataset_params
+            data=self.val_data, transform=self.preproc, **val_loader_info.dataset_params
         )
         val_dataloader = DataLoader(
             val_dataset,

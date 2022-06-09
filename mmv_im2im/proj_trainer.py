@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 import warnings
 
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 ###############################################################################
 

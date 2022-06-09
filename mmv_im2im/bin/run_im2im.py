@@ -12,7 +12,11 @@ import traceback
 import torch
 
 from mmv_im2im import ProjectTester, ProjectTrainer
-from mmv_im2im.configs.config_base import ProgramConfig, parse_adaptor, configuration_validation
+from mmv_im2im.configs.config_base import (
+    ProgramConfig,
+    parse_adaptor,
+    configuration_validation,
+)
 
 
 ###############################################################################

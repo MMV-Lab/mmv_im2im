@@ -38,9 +38,7 @@ class Model(pl.LightningModule):
         if self.model_info.scheduler is None:
             return optimizer
         else:
-            scheduler_func = parse_config_func_without_params(
-                self.model_info.scheduler
-            )
+            scheduler_func = parse_config_func_without_params(self.model_info.scheduler)
             lr_scheduler = scheduler_func(
                 optimizer, **self.model_info.scheduler["params"]
             )

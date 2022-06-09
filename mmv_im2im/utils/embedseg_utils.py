@@ -139,8 +139,10 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
         raise ValueError("instance image must be either 2D or 3D")
 
 
-def prepare_embedseg_cache(data_path: Union[str, Path], cache_path: Union[str, Path], data_cfg):
-    
+def prepare_embedseg_cache(
+    data_path: Union[str, Path], cache_path: Union[str, Path], data_cfg
+):
+
     data_path = Path(data_path)
     cache_path = Path(cache_path)
     dataset_list = generate_dataset_dict(data_path)
@@ -261,7 +263,9 @@ def prepare_embedseg_cache(data_path: Union[str, Path], cache_path: Union[str, P
 
             if im_crop.shape[0] == 1:
                 OmeTiffWriter.save(
-                    im_crop[0, ],
+                    im_crop[
+                        0,
+                    ],
                     cache_path / f"{fn_base}_{j:04d}_IM.tiff",
                     dim_order=dim_order,
                 )

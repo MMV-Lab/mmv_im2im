@@ -135,9 +135,7 @@ class ArgumentParser(Generic[T], argparse.ArgumentParser):
             new_config = parsed_arg_values[utils.CONFIG_ARG]
             if config is not None:
                 warnings.warn(
-                    UserWarning(
-                        f"Overriding default {config} with {new_config}"
-                    )
+                    UserWarning(f"Overriding default {config} with {new_config}")
                 )
             ######################################################################
             # adapted from original implementation in pyrallis
