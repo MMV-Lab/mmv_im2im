@@ -180,7 +180,7 @@ def prepare_embedseg_cache(
             new_patch_size = [crop_size, crop_size]
         warnings.warn(
             UserWarning(
-                f"A patch_size is determined from data. MAKE SURE to set data.patch_size as {new_patch_size}."
+                f"A patch_size is determined from data. MAKE SURE to set data.patch_size as {new_patch_size}."  # noqa E501
             )
         )
 
