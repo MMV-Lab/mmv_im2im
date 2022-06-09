@@ -14,8 +14,8 @@ class Model(pl.LightningModule):
         super(Model, self).__init__()
 
         self.verbose = verbose
-        self.generator = define_generator(model_info_xx["generator"])
-        self.discriminator = define_discriminator(model_info_xx["discriminator"])
+        self.generator = define_generator(model_info_xx.net["generator"])
+        self.discriminator = define_discriminator(model_info_xx.net["discriminator"])
         # self.sliding_window = model_info_xx["sliding_window_params"]
         if train:
             # initialize model weights
@@ -23,34 +23,32 @@ class Model(pl.LightningModule):
             init_weights(self.discriminator, init_type="normal")
 
             # get loss functions
-            loss_category = model_info_xx["criterion"].pop("type")
+            loss_category = model_info_xx.criterion.pop("loss_type")
             loss_module = import_module("mmv_im2im.utils.gan_losses")
             loss_func = getattr(loss_module, loss_category)
-            self.loss = loss_func(**model_info_xx["criterion"])
+            self.loss = loss_func(**model_info_xx.criterion)
 
             # get info of optimizer and scheduler
-            self.optimizer_info = model_info_xx["optimizer"]
-            self.scheduler_info = model_info_xx["scheduler"]
+            self.optimizer_info = model_info_xx.optimizer
+            self.scheduler_info = model_info_xx.scheduler
 
     def forward(self, x):
-        # if x.size()[-1] == 1:
-        #    x = torch.squeeze(x, dim=-1)
         return self.generator(x)
 
     def configure_optimizers(self):
         discriminator_optimizer_func = parse_config_func(
-            self.optimizer_info["discriminator"]
+            self.optimizer_info.net["discriminator"]
         )
         discriminator_scheduler_func = parse_config_func(
-            self.scheduler_info["discriminator"]
+            self.scheduler_info.net["discriminator"]
         )
         discriminator_optimizer = discriminator_optimizer_func(
             self.discriminator.parameters()
         )
         discriminator_scheduler = discriminator_scheduler_func(discriminator_optimizer)
 
-        generator_optimizer_func = parse_config_func(self.optimizer_info["generator"])
-        generator_scheduler_func = parse_config_func(self.scheduler_info["generator"])
+        generator_optimizer_func = parse_config_func(self.optimizer_info.net["generator"])
+        generator_scheduler_func = parse_config_func(self.scheduler_info.net["generator"])
         generator_optimizer = generator_optimizer_func(
             self.generator.parameters(),
         )

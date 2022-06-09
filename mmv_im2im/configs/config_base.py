@@ -262,16 +262,19 @@ class ModelConfig:
     framework: str = field(default=None)
 
     # the exact network configuration
-    net: Dict = field(default=None)
+    net: Dict = field(default=None, is_mutable=True)
 
     # the config for criterion
-    criterion: Dict = field(default=None)
+    criterion: Dict = field(default=None, is_mutable=True)
 
     # the config for optimizer
-    optimizer: Dict = field(default=None)
+    optimizer: Dict = field(default=None, is_mutable=True)
 
     # the config for learning scheduler
-    scheduler: Dict = field(default=None)
+    scheduler: Dict = field(default=None, is_mutable=True)
+
+    # extra for special parameters of specific method
+    model_extra: Dict = field(default=None, is_mutable=True)
 
 
 @dataclass
