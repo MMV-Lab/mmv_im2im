@@ -1,7 +1,10 @@
 """
 This module provides lighting module for cycleGAN
 """
+<<<<<<< HEAD
 import os
+=======
+>>>>>>> main
 import torch
 import pytorch_lightning as pl
 from mmv_im2im.utils.misc import parse_config, parse_config_func
