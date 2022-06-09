@@ -36,10 +36,9 @@ class Model(pl.LightningModule):
                 self.model_info.scheduler
             )
             lr_scheduler = scheduler_func(
-                optimizer, **self.model_info.scheduler.["params"]
+                optimizer, **self.model_info.scheduler["params"]
             )
             return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
-            
 
     def prepare_batch(self, batch):
         return
@@ -76,10 +75,9 @@ class Model(pl.LightningModule):
 
         y_hat = self(x)
 
-        if isinstance(self.criterion, torch.nn.CrossEntropyLoss):
-            # remove C dimension
-            # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
-            y = torch.squeeze(y, dim=1)  # remove C dimension
+        # in case of CrossEntropy related error
+        # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
+        # #y = torch.squeeze(y, dim=1)  # remove C dimension
 
         # if costmap is None:
         #    loss = self.criterion(y_hat, y)

@@ -1,6 +1,7 @@
 """
 This module provides lighting module for cycleGAN
 """
+import os
 import torch
 import pytorch_lightning as pl
 from mmv_im2im.utils.misc import parse_config, parse_config_func
@@ -9,13 +10,19 @@ from mmv_im2im.models.nets.gans import define_generator, define_discriminator
 from typing import Dict
 from collections import OrderedDict
 import itertools
+from tifffile import imsave
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_info_xx: Dict, train: bool = True):
+    def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super(Model, self).__init__()
-        self.generator_model_image_AtoB = define_generator(model_info_xx.net["generator"])
-        self.generator_model_image_BtoA = define_generator(model_info_xx.net["generator"])
+        self.verbose = verbose
+        self.generator_model_image_AtoB = define_generator(
+            model_info_xx.net["generator"]
+        )
+        self.generator_model_image_BtoA = define_generator(
+            model_info_xx.net["generator"]
+        )
         self.discriminator_model_image_A = define_discriminator(
             model_info_xx.net["discriminator"]
         )
@@ -34,9 +41,7 @@ class Model(pl.LightningModule):
             # get loss functions
             self.gan_loss = parse_config(model_info_xx.criterion["gan_loss"])
             self.cycle_loss = parse_config(model_info_xx.criterion["cycle_loss"])
-            self.identity_loss = parse_config(
-                model_info_xx.criterion["identity_loss"]
-            )
+            self.identity_loss = parse_config(model_info_xx.criterion["identity_loss"])
 
             # get weights of different loss
             self.gan_w = model_info_xx.criterion["weights"]["gan_loss"]
@@ -50,31 +55,18 @@ class Model(pl.LightningModule):
             self.direction = model_info_xx.extra["inference_direction"]
 
     def forward(self, x):
-        #  ##########################################
-        # check if the data is 2D or 3D
-        ##########################################
-        # torchio will add dummy dimension to 2D images to ensure 4D tensor
-        # see: https://github.com/fepegar/torchio/blob/1c217d8716bf42051e91487ece82f0372b59d903/torchio/data/io.py#L402  # noqa E501
-        # but in PyTorch, we usually follow the convention as C x D x H x W
-        # or C x Z x Y x X, where the Z dimension of depth dimension is before
-        # HW or YX. Padding the dummy dimmension at the end is okay and
-        # actually makes data augmentation easier to implement. For example,
-        # you have 2D image of Y x X, then becomes 1 x Y x X x 1. If you want
-        # to apply a flip on the first dimension of your image, i.e. Y, you
-        # can simply specify axes as [0], which is compatable
-        # with the syntax for fliping along Y in 1 x Y x X x 1.
-        # But, the FCN models do not like this. We just need to remove the
-        # dummy dimension
-        if x.size()[-1] == 1:
-            x = torch.squeeze(x, dim=-1)
         if self.direction == "AtoB":
             return self.generator_model_image_AtoB(x)
         elif self.direction == "BtoA":
             return self.generator_model_image_BtoA(x)
 
     def configure_optimizers(self):
-        generator_optimizer_func = parse_config_func(self.optimizer_info.net["generator"])
-        generator_scheduler_func = parse_config_func(self.scheduler_info.net["generator"])
+        generator_optimizer_func = parse_config_func(
+            self.optimizer_info["generator"]
+        )
+        generator_scheduler_func = parse_config_func(
+            self.scheduler_info["generator"]
+        )
         generator_optimizer = generator_optimizer_func(
             itertools.chain(
                 self.generator_model_image_AtoB.parameters(),
@@ -84,10 +76,10 @@ class Model(pl.LightningModule):
         generator_scheduler = generator_scheduler_func(generator_optimizer)
 
         discriminator_optimizer_func = parse_config_func(
-            self.optimizer_info.net["discriminator"]
+            self.optimizer_info["discriminator"]
         )
         discriminator_scheduler_func = parse_config_func(
-            self.scheduler_info.net["discriminator"]
+            self.scheduler_info["discriminator"]
         )
         discriminator_optimizer = discriminator_optimizer_func(
             itertools.chain(
@@ -107,10 +99,6 @@ class Model(pl.LightningModule):
         # get the data
         image_A = batch["IM"]
         image_B = batch["GT"]
-
-        # if image_A.size()[-1] == 1:
-        #    image_A = torch.squeeze(image_A, dim=-1)
-        #    image_B = torch.squeeze(image_B, dim=-1)
 
         # run generators and discriminators
         fake_B_from_A = self.generator_model_image_AtoB(image_A)
@@ -223,6 +211,41 @@ class Model(pl.LightningModule):
                 {"loss": G_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
             )
             self.log("Generator Loss", tqdm_dict["g_loss"])
+
+            if self.verbose and batch_idx == 0:
+                if not os.path.exists(self.trainer.log_dir):
+                    os.mkdir(self.trainer.log_dir)
+                fake_images_A = fake_A_from_B.detach()
+                out_fn = (
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_fake_A.tiff"
+                )
+                imsave(out_fn, fake_images_A[0].detach().cpu().numpy())
+                fake_images_B = fake_B_from_A.detach()
+                out_fn = (
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_fake_B.tiff"
+                )
+                imsave(out_fn, fake_images_B[0].detach().cpu().numpy())
+                out_fn = (
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_real_B.tiff"
+                )
+                imsave(out_fn, image_B[0].detach().cpu().numpy())
+                out_fn = (
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_real_A.tiff"
+                )
+                imsave(out_fn, image_A[0].detach().cpu().numpy())
+
             return output
 
         elif optimizer_idx == 1:

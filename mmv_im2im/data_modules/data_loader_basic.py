@@ -12,6 +12,7 @@
 ########################################################
 from typing import Union
 from pathlib import Path
+import random
 from torch.utils.data import random_split, DataLoader
 import pytorch_lightning as pl
 from mmv_im2im.utils.for_transform import parse_monai_ops  # , custom_preproc_to_tio
@@ -32,6 +33,8 @@ class Im2ImDataModule(pl.LightningDataModule):
         else:
             # use the cache path as the directory to load data
             self.data_path = cache_path
+
+        self.category = data_cfg.category
 
         # train/val split
         self.train_val_ratio = data_cfg.dataloader.train_val_ratio or 0.2
@@ -63,13 +66,12 @@ class Im2ImDataModule(pl.LightningDataModule):
     def prepare_data(self):
         dataset_list = generate_dataset_dict_monai(self.data_path)
 
-        """
         if self.category == "unpair":
             shuffled_dataset_list = dataset_list.copy()
             random.shuffle(shuffled_dataset_list)
             for i, shuffled_ds in enumerate(shuffled_dataset_list):
-                dataset_list[i]["target_fn"] = shuffled_ds["target_fn"]
-        """
+                dataset_list[i]["GT"] = shuffled_ds["GT"]
+
         self.data = dataset_list
 
     def setup(self, stage=None):

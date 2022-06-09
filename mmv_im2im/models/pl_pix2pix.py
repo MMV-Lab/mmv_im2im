@@ -37,18 +37,18 @@ class Model(pl.LightningModule):
 
     def configure_optimizers(self):
         discriminator_optimizer_func = parse_config_func(
-            self.optimizer_info.net["discriminator"]
+            self.optimizer_info["discriminator"]
         )
         discriminator_scheduler_func = parse_config_func(
-            self.scheduler_info.net["discriminator"]
+            self.scheduler_info["discriminator"]
         )
         discriminator_optimizer = discriminator_optimizer_func(
             self.discriminator.parameters()
         )
         discriminator_scheduler = discriminator_scheduler_func(discriminator_optimizer)
 
-        generator_optimizer_func = parse_config_func(self.optimizer_info.net["generator"])
-        generator_scheduler_func = parse_config_func(self.scheduler_info.net["generator"])
+        generator_optimizer_func = parse_config_func(self.optimizer_info["generator"])
+        generator_scheduler_func = parse_config_func(self.scheduler_info["generator"])
         generator_optimizer = generator_optimizer_func(
             self.generator.parameters(),
         )
@@ -67,25 +67,6 @@ class Model(pl.LightningModule):
         # conditioned on image A
         image_A = batch["IM"]
         image_B = batch["GT"]
-
-        ##########################################
-        # check if the data is 2D or 3D
-        ##########################################
-        # torchio will add dummy dimension to 2D images to ensure 4D tensor
-        # see: https://github.com/fepegar/torchio/blob/1c217d8716bf42051e91487ece82f0372b59d903/torchio/data/io.py#L402  # noqa E501
-        # but in PyTorch, we usually follow the convention as C x D x H x W
-        # or C x Z x Y x X, where the Z dimension of depth dimension is before
-        # HW or YX. Padding the dummy dimmension at the end is okay and
-        # actually makes data augmentation easier to implement. For example,
-        # you have 2D image of Y x X, then becomes 1 x Y x X x 1. If you want
-        # to apply a flip on the first dimension of your image, i.e. Y, you
-        # can simply specify axes as [0], which is compatable
-        # with the syntax for fliping along Y in 1 x Y x X x 1.
-        # But, the FCN models do not like this. We just need to remove the
-        # dummy dimension
-        # if image_A.size()[-1] == 1:
-        #    image_A = torch.squeeze(image_A, dim=-1)
-        #    image_B = torch.squeeze(image_B, dim=-1)
 
         self.generator.train()
 
