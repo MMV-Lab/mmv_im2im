@@ -9,7 +9,7 @@ def get_data_module(cfg):
         cache_path = Path(cfg.cache_path)
         if not any(cache_path.iterdir()):
             print("cache for embedseg is empty, start generating ...")
-            prepare_embedseg_cache(cfg.data_path, cache_path)
+            prepare_embedseg_cache(cfg.data_path, cache_path, cfg)
         return dm_basic(cfg, cache_path=cache_path)
     else:
         return dm_basic(cfg)

@@ -242,6 +242,12 @@ class DataConfig:
     # what to do in data augmentation
     augmentation: List[Dict] = field(default=None)
 
+    # global variable that can be used to verify or overwrite other related settings
+    patch_size: List = field(default=None, is_mutable=True)
+
+    # extra parameters for specific methods:
+    extra: Dict = field(default=None, is_mutable=True)
+
     # @property
     # def exp_dir(self) -> Path:
     #    # Properties are great for arguments that can be derived from existing ones
@@ -289,6 +295,9 @@ class TrainingConfig:
         ],
         is_mutable=True,
     )
+
+    # global variable that can be used to overwrite gpus in trainer
+    gpus: Union[int, List[int]] = field(default=None, is_mutable=True)
 
 
 @dataclass

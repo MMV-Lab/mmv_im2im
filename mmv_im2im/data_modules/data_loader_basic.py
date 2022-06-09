@@ -86,6 +86,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         train_dataset_func = parse_config_func_without_params(
             train_loader_info.dataloader_type
         )
+        # gather the data filepath into dataset
         train_data = self.train_data
         if train_loader_info.partial_loader < 1.0:
             num_load = int(train_loader_info.partial_loader * len(self.train_data))
@@ -98,6 +99,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             transform=self.transform,
             **train_loader_info.dataset_params
         )
+        # wrap the dataset into dataloader
         train_dataloader = DataLoader(
             train_dataset,
             shuffle=True,
