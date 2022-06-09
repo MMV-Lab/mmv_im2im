@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 import logging
 from importlib import import_module
+import pytorch_lightning as pl
 from mmv_im2im.data_modules import get_data_module
 from mmv_im2im.utils.misc import parse_ops_list
-import pytorch_lightning as pl
+
 import warnings
-
-
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 ###############################################################################

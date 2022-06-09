@@ -1,6 +1,5 @@
-import os
 import numpy as np
-from typing import Union
+from typing import Union, Tuple, List
 from numba import jit
 from scipy.ndimage.measurements import find_objects
 from scipy.ndimage.morphology import binary_fill_holes
@@ -8,6 +7,7 @@ from aicsimageio.writers import OmeTiffWriter
 from aicsimageio import AICSImage
 from tqdm import tqdm
 from pathlib import Path
+import warnings
 
 from mmv_im2im.utils.misc import generate_dataset_dict
 
@@ -141,7 +141,10 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
 
 
 def prepare_embedseg_cache(
-    data_path: Union[str, Path], cache_path: Union[str, Path], data_cfg
+    data_path: Union[str, Path],
+    cache_path: Union[str, Path],
+    data_cfg,
+    patch_size: Union[Tuple, List] = None,
 ):
 
     data_path = Path(data_path)
@@ -165,11 +168,29 @@ def prepare_embedseg_cache(
             spatial_dim = 3
         min_z = min((reader.dims.Z, min_z))
         assert this_minXY >= 128, "{fn}: XY dimension smaller than 128, not good"
-    crop_size = 128 * (min_xy // 128)
+        if spatial_dim == 3:
+            assert reader.dims.Z >= 16, "{fn} has less than 16 Z slices, not good"
+
+    if patch_size is None:
+        crop_size = 128 * (min_xy // 128)
+        if spatial_dim == 3:
+            crop_size_z = min((32, min_z))
+            new_patch_size = [crop_size_z, crop_size, crop_size]
+        else:
+            new_patch_size = [crop_size, crop_size]
+        warnings.warn(
+            UserWarning(
+                f"A patch_size is determined from data. MAKE SURE to set data.patch_size as {new_patch_size}."
+            )
+        )
+
+    else:
+        spatial_dim = len(patch_size)
+        crop_size = min(patch_size[0:2])
+        if spatial_dim == 3:
+            crop_size_z = patch_size[2]
 
     if spatial_dim == 3:
-        assert min_z >= 16, "some 3D data has less than 16 Z slices, not good"
-        crop_size_z = min((32, min_z))
         reader_params = {"dimension_order_out": "ZYX", "C": 0, "T": 0}
         raw_reader_params = {"dimension_order_out": "CZYX", "T": 0}
     else:

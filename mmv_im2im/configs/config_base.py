@@ -190,7 +190,8 @@ class DataloaderModuleConfig:
     dataset_params: Dict = field(default={"cache_dir": "./tmp"}, is_mutable=True)
 
     # the parameters to be passed in when making the DataLoader
-    # find full API here: https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader
+    # find full API here:
+    # https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader
     dataloader_params: Dict = field(
         default={
             "batch_size": 1,
@@ -228,7 +229,7 @@ class DataConfig:
     # The data path
     data_path: Union[Path, str] = field(default=None)
 
-    # save pre-processed training data into a cache folder (currently, only for embedseg)
+    # save pre-processed data into a cache folder (currently, only for embedseg)
     cache_path: Union[Path, str] = field(default=None)
 
     # config for dataloader
@@ -319,13 +320,44 @@ class ProgramConfig:
 
 
 def configuration_validation(cfg):
+    # check 1: partial_loader should be a value between 0 (excluded) and 1 (included)
+    assert (
+        cfg.data.dataloader.train.partial_loader <= 1.0
+        and cfg.data.dataloader.train.partial_loader > 0
+    ), "partial loading percentage for training loader is not valid"
 
-    # check 1: if partial loading is used, make sure reloading is enabled in trainer
-
-    # check 2: partial_loader should be a value between 0 (excluded) and 1 (included)
+    # check 2: if partial loading is used, make sure reloading is enabled in trainer
+    if cfg.data.dataloader.train.partial_loader < 1.0:
+        if "reload_dataloaders_every_n_epochs" not in cfg.training.params:
+            cfg.training.params["reload_dataloaders_every_n_epochs"] = 5
 
     # check 3: partial_loader for validation dataloader should be 1.0
+    if cfg.data.dataloader.val.partial_loader != 1.0:
+        cfg.data.dataloader.val.partial_loader = 1.0
+        warnings.warn(
+            UserWarning("partial loading for validation step is not allowed.")
+        )
 
-    # check 4: for embedseg, the patch size needs to be consistent with grid x y in criterion
+    # check 4: for embedseg, patch_size needs to be consistent with grid in criterion
+    if cfg.data.patch_size is not None:
+        grid = cfg.model.criterion["params"]["grid_x"]
+        assert (
+            grid == cfg.data.patch_size[-1]
+        ), f"grid_x is set as {grid}, needs to be the same as the dimX of patch_size {cfg.data.patch_size}"  # noqa E501
+
+        grid = cfg.model.criterion["params"]["grid_y"]
+        assert (
+            grid == cfg.data.patch_size[-2]
+        ), f"grid_y is set as {grid}, needs to be the same as the dimY of patch_size {cfg.data.patch_size}"  # noqa E501
+
+        if len(cfg.data.patch_size) == 3:
+            grid = cfg.model.criterion["params"]["grid_z"]
+            assert (
+                grid == cfg.data.patch_size[0]
+            ), f"grid_z is set as {grid}, needs to be the same as the dimZ of patch_size {cfg.data.patch_size}"  # noqa E501
+
+    # check 5, if a global GPU number is set, update the value in trainer
+    if cfg.training.gpu is not None:
+        cfg.training.params["gpu"] = cfg.training.gpu
 
     return cfg
