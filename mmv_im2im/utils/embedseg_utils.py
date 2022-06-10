@@ -1,11 +1,13 @@
-import os
 import numpy as np
+from typing import Union, Tuple, List
 from numba import jit
 from scipy.ndimage.measurements import find_objects
 from scipy.ndimage.morphology import binary_fill_holes
 from aicsimageio.writers import OmeTiffWriter
 from aicsimageio import AICSImage
 from tqdm import tqdm
+from pathlib import Path
+import warnings
 
 from mmv_im2im.utils.misc import generate_dataset_dict
 
@@ -138,35 +140,77 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
         raise ValueError("instance image must be either 2D or 3D")
 
 
-def prepare_embedseg_cache(data_path, cache_path, data_cfg):
-    # TODO: this is just a placeholder function
-    # data_cfg is not working well yet, need new dataclass as the real solution
+def prepare_embedseg_cache(
+    data_path: Union[str, Path],
+    cache_path: Union[str, Path],
+    data_cfg,
+    patch_size: Union[Tuple, List] = None,
+):
+
+    data_path = Path(data_path)
+    cache_path = Path(cache_path)
     dataset_list = generate_dataset_dict(data_path)
 
+    # parse the method for centroid computation
+    if data_cfg.extra is not None:
+        center_method = data_cfg.extra["center_method"]
+
+    # get some basic statistics from the data and do some basic validation
     min_xy = 65535
     min_z = 65535
+    spatial_dim = 2
     for ds in dataset_list:
         fn = ds["source_fn"]
         reader = AICSImage(fn)
         this_minXY = min(reader.dims.X, reader.dims.Y)
         min_xy = min((this_minXY, min_xy))
+        if reader.dims.Z > 1 and spatial_dim == 2:
+            spatial_dim = 3
         min_z = min((reader.dims.Z, min_z))
         assert this_minXY >= 128, "{fn}: XY dimension smaller than 128, not good"
-    crop_size = 128 * (min_xy // 128)
+        if spatial_dim == 3:
+            assert reader.dims.Z >= 16, "{fn} has less than 16 Z slices, not good"
 
-    if data_cfg.spatial_dim == 3:
-        assert min_z >= 16, "some 3D data has less than 16 Z slices, not good"
-        crop_size_z = min((32, min_z))
-
-    for ds in tqdm(dataset_list):
-        instance, _ = data_cfg.target_reader(ds["target_fn"])
-        image, _ = data_cfg.source_reader(ds["source_fn"])
-        fn_base = str(os.path.basename(ds["target_fn"]))
-        if fn_base.endswith("GT.tiff"):
-            fn_base = fn_base[:-7]
+    if patch_size is None:
+        crop_size = 128 * (min_xy // 128)
+        if spatial_dim == 3:
+            crop_size_z = min((32, min_z))
+            new_patch_size = [crop_size_z, crop_size, crop_size]
         else:
-            fn_base = os.path.splitext(fn_base)[0]
+            new_patch_size = [crop_size, crop_size]
+        warnings.warn(
+            UserWarning(
+                f"A patch_size is determined from data. MAKE SURE to set data.patch_size as {new_patch_size}."  # noqa E501
+            )
+        )
 
+    else:
+        spatial_dim = len(patch_size)
+        crop_size = min(patch_size[0:2])
+        if spatial_dim == 3:
+            crop_size_z = patch_size[2]
+
+    if spatial_dim == 3:
+        reader_params = {"dimension_order_out": "ZYX", "C": 0, "T": 0}
+        raw_reader_params = {"dimension_order_out": "CZYX", "T": 0}
+    else:
+        reader_params = {"dimension_order_out": "YX", "C": 0, "T": 0, "Z": 0}
+        raw_reader_params = {"dimension_order_out": "CYX", "T": 0, "Z": 0}
+
+    # loop through the dataset
+    for ds in tqdm(dataset_list):
+        # get instance segmentation labels
+        instance_reader = AICSImage(ds["target_fn"])
+        instance = instance_reader.get_image_data(**reader_params)
+
+        # get raw image
+        image_reader = AICSImage(ds["source_fn"])
+        image = image_reader.get_image_data(**raw_reader_params)
+
+        # parse filename
+        fn_base = Path(ds["source_fn"]).stem[:-3]  # get rid of "_IM"
+
+        # get all obejcts
         instance_np = np.array(instance, copy=False)
         object_mask = instance_np > 0
 
@@ -175,40 +219,42 @@ def prepare_embedseg_cache(data_path, cache_path, data_cfg):
 
         # loop over instances
         for j, id in enumerate(ids):
-            if data_cfg.spatial_dim == 2:
-                h, w = image.shape
+            if spatial_dim == 2:
+                h, w = instance.shape
                 y, x = np.where(instance_np == id)
                 ym, xm = np.mean(y), np.mean(x)
 
                 jj = int(np.clip(ym - crop_size / 2, 0, h - crop_size))
                 ii = int(np.clip(xm - crop_size / 2, 0, w - crop_size))
 
-                if image[jj : jj + crop_size, ii : ii + crop_size].shape == (
+                # only crop patches away from image borders
+                if instance[jj : jj + crop_size, ii : ii + crop_size].shape == (
                     crop_size,
                     crop_size,
                 ):
-                    im_crop = image[jj : jj + crop_size, ii : ii + crop_size]
+                    im_crop = image[:, jj : jj + crop_size, ii : ii + crop_size]
                     instance_crop = instance[jj : jj + crop_size, ii : ii + crop_size]
                     center_image_crop = generate_center_image(
-                        instance_crop, "centroid", ids
+                        instance_crop, center_method, ids
                     )
                     class_image_crop = object_mask[
                         jj : jj + crop_size, ii : ii + crop_size
                     ]
                     dim_order = "YX"
 
-            elif data_cfg.spatial_dim == 3:
-                d, h, w = image.shape
+            elif spatial_dim == 3:
+                d, h, w = instance.shape
                 z, y, x = np.where(instance_np == id)
                 zm, ym, xm = np.mean(z), np.mean(y), np.mean(x)
                 kk = int(np.clip(zm - crop_size_z / 2, 0, d - crop_size_z))
                 jj = int(np.clip(ym - crop_size / 2, 0, h - crop_size))
                 ii = int(np.clip(xm - crop_size / 2, 0, w - crop_size))
 
-                if image[
+                if instance[
                     kk : kk + crop_size_z, jj : jj + crop_size, ii : ii + crop_size
                 ].shape == (crop_size_z, crop_size, crop_size):
                     im_crop = image[
+                        :,
                         kk : kk + crop_size_z,
                         jj : jj + crop_size,
                         ii : ii + crop_size,
@@ -220,7 +266,7 @@ def prepare_embedseg_cache(data_path, cache_path, data_cfg):
                     ]
                     center_image_crop = generate_center_image(
                         instance_crop,
-                        "centroid",
+                        center_method,
                         ids,
                         anisotropy_factor=1,
                         speed_up=1,
@@ -232,23 +278,37 @@ def prepare_embedseg_cache(data_path, cache_path, data_cfg):
                     ]
                     dim_order = "ZYX"
 
-            OmeTiffWriter.save(
-                im_crop,
-                cache_path + os.sep + fn_base + f"_{j:04d}_IM.tiff",
-                dim_order=dim_order,
-            )
+            else:
+                raise ValueError(
+                    "error in spatial dimension when preparing embedseg dataset"
+                )
+
+            if im_crop.shape[0] == 1:
+                OmeTiffWriter.save(
+                    im_crop[
+                        0,
+                    ],
+                    cache_path / f"{fn_base}_{j:04d}_IM.tiff",
+                    dim_order=dim_order,
+                )
+            else:
+                OmeTiffWriter.save(
+                    im_crop,
+                    cache_path / f"{fn_base}_{j:04d}_IM.tiff",
+                    dim_order="C" + dim_order,
+                )
             OmeTiffWriter.save(
                 instance_crop.astype(np.uint16),
-                cache_path + os.sep + fn_base + f"_{j:04d}_GT.tiff",
+                cache_path / f"{fn_base}_{j:04d}_GT.tiff",
                 dim_order=dim_order,
             )
             OmeTiffWriter.save(
                 center_image_crop.astype(np.uint8),
-                cache_path + os.sep + fn_base + f"_{j:04d}_CE.tiff",
+                cache_path / f"{fn_base}_{j:04d}_CE.tiff",
                 dim_order=dim_order,
             )
             OmeTiffWriter.save(
                 class_image_crop.astype(np.uint8),
-                cache_path + os.sep + fn_base + f"_{j:04d}_CL.tiff",
+                cache_path / f"{fn_base}_{j:04d}_CL.tiff",
                 dim_order=dim_order,
             )

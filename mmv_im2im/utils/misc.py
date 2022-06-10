@@ -158,7 +158,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
         "source_fn", "target_fn", "costmap_fn" (optional)
     """
     dataset_list = []
-    if isinstance(data, str):
+    if isinstance(data, str) or isinstance(data, Path):
         data = Path(data).expanduser()
         if data.is_file():
             # should be a csv of dataframe
@@ -250,7 +250,7 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
     else:
         print("unsupported data type")
 
-    assert len(dataset_list) > 0, "empty dataset"
+    assert len(dataset_list) > 0, f"empty dataset in {data}"
 
     return dataset_list
 

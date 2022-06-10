@@ -16,32 +16,33 @@ class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super().__init__()
         self.verbose = verbose
-        if verbose:
-            self.clustering_params = model_info_xx["criterion"]["params"]
-            self.clustering_params.pop("foreground_weight")
-        self.net = parse_config(model_info_xx["net"])
 
-        if "sliding_window_params" in model_info_xx:
-            print("sliding window parameters are detected, but not needed for embedseg")
+        # for training, we need the clustering parameters for the validation step,
+        # the same set of parameters as in the criterion, except "foreground_weight", so
+        # pop it out
+        if train:
+            self.clustering_params = model_info_xx.criterion["params"]
+            self.clustering_params.pop("foreground_weight")
+
+        self.net = parse_config(model_info_xx.net)
+
         self.model_info = model_info_xx
         if train:
-            self.criterion = parse_config(model_info_xx["criterion"])
-            self.optimizer_func = parse_config_func(model_info_xx["optimizer"])
+            self.criterion = parse_config(model_info_xx.criterion)
+            self.optimizer_func = parse_config_func(model_info_xx.optimizer)
 
     def configure_optimizers(self):
         # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
         optimizer = self.optimizer_func(self.parameters())
         print("optim done")
-        if "scheduler" in self.model_info:
-            scheduler_func = parse_config_func_without_params(
-                self.model_info["scheduler"]
-            )
+        if self.model_info.scheduler is None:
+            return optimizer
+        else:
+            scheduler_func = parse_config_func_without_params(self.model_info.scheduler)
             lr_scheduler = scheduler_func(
-                optimizer, **self.model_info["scheduler"]["params"]
+                optimizer, **self.model_info.scheduler["params"]
             )
             return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
-        else:
-            return optimizer
 
     def prepare_batch(self, batch):
         return
@@ -50,23 +51,6 @@ class Model(pl.LightningModule):
         return self.net(x)
 
     def run_step(self, batch, validation_stage, save_path: str = None):
-
-        ##########################################
-        # check if the data is 2D or 3D
-        ##########################################
-        # torchio will add dummy dimension to 2D images to ensure 4D tensor
-        # see: https://github.com/fepegar/torchio/blob/1c217d8716bf42051e91487ece82f0372b59d903/torchio/data/io.py#L402  # noqa E501
-        # but in PyTorch, we usually follow the convention as C x D x H x W
-        # or C x Z x Y x X, where the Z dimension of depth dimension is before
-        # HW or YX. Padding the dummy dimmension at the end is okay and
-        # actually makes data augmentation easier to implement. For example,
-        # you have 2D image of Y x X, then becomes 1 x Y x X x 1. If you want
-        # to apply a flip on the first dimension of your image, i.e. Y, you
-        # can simply specify axes as [0], which is compatable
-        # with the syntax for fliping along Y in 1 x Y x X x 1.
-        # But, the FCN models do not like this. We just need to remove the
-        # dummy dimension
-
         im = batch["IM"]
         instances = batch["GT"]
         class_labels = batch["CL"]
