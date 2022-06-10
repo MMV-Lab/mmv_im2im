@@ -258,7 +258,7 @@
 <span class="sd">        &quot;source_fn&quot;, &quot;target_fn&quot;, &quot;costmap_fn&quot; (optional)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="c1"># should be a csv of dataframe</span>
@@ -350,7 +350,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;unsupported data type&quot;</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;empty dataset&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;empty dataset in </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">return</span> <span class="n">dataset_list</span></div>
 

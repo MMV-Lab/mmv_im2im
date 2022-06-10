@@ -116,32 +116,33 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_info_xx</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;foreground_weight&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="s2">&quot;sliding_window_params&quot;</span> <span class="ow">in</span> <span class="n">model_info_xx</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sliding window parameters are detected, but not needed for embedseg&quot;</span><span class="p">)</span>
+        <span class="c1"># for training, we need the clustering parameters for the validation step,</span>
+        <span class="c1"># the same set of parameters as in the criterion, except &quot;foreground_weight&quot;, so</span>
+        <span class="c1"># pop it out</span>
+        <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;foreground_weight&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">net</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span> <span class="o">=</span> <span class="n">model_info_xx</span>
         <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info_xx</span><span class="p">[</span><span class="s2">&quot;optimizer&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Model.configure_optimizers"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501</span>
         <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;optim done&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;scheduler&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="p">:</span>
-            <span class="n">scheduler_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;scheduler&quot;</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">scheduler_func</span><span class="p">(</span>
-                <span class="n">optimizer</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;scheduler&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span> <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="n">lr_scheduler</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="o">.</span><span class="n">scheduler</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">optimizer</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">optimizer</span></div>
+            <span class="n">scheduler_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="o">.</span><span class="n">scheduler</span><span class="p">)</span>
+            <span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">scheduler_func</span><span class="p">(</span>
+                <span class="n">optimizer</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="o">.</span><span class="n">scheduler</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span> <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="n">lr_scheduler</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="Model.prepare_batch"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.prepare_batch">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="k">return</span></div>
@@ -150,23 +151,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.run_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.run_step">[docs]</a>    <span class="k">def</span> <span class="nf">run_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">validation_stage</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
-        <span class="c1">##########################################</span>
-        <span class="c1"># check if the data is 2D or 3D</span>
-        <span class="c1">##########################################</span>
-        <span class="c1"># torchio will add dummy dimension to 2D images to ensure 4D tensor</span>
-        <span class="c1"># see: https://github.com/fepegar/torchio/blob/1c217d8716bf42051e91487ece82f0372b59d903/torchio/data/io.py#L402  # noqa E501</span>
-        <span class="c1"># but in PyTorch, we usually follow the convention as C x D x H x W</span>
-        <span class="c1"># or C x Z x Y x X, where the Z dimension of depth dimension is before</span>
-        <span class="c1"># HW or YX. Padding the dummy dimmension at the end is okay and</span>
-        <span class="c1"># actually makes data augmentation easier to implement. For example,</span>
-        <span class="c1"># you have 2D image of Y x X, then becomes 1 x Y x X x 1. If you want</span>
-        <span class="c1"># to apply a flip on the first dimension of your image, i.e. Y, you</span>
-        <span class="c1"># can simply specify axes as [0], which is compatable</span>
-        <span class="c1"># with the syntax for fliping along Y in 1 x Y x X x 1.</span>
-        <span class="c1"># But, the FCN models do not like this. We just need to remove the</span>
-        <span class="c1"># dummy dimension</span>
-
         <span class="n">im</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;IM&quot;</span><span class="p">]</span>
         <span class="n">instances</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span>
         <span class="n">class_labels</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;CL&quot;</span><span class="p">]</span>

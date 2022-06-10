@@ -102,10 +102,13 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.data_modules</span> <span class="kn">import</span> <span class="n">get_data_module</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">parse_ops_list</span>
-<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -142,32 +145,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">get_data_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">)</span>
 
         <span class="c1"># set up model</span>
-        <span class="n">model_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+        <span class="n">model_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">framework</span>
         <span class="n">model_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mmv_im2im.models.pl_</span><span class="si">{</span><span class="n">model_category</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">my_model_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_module</span><span class="p">,</span> <span class="s2">&quot;Model&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;verbose&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">my_model_func</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">[</span><span class="s2">&quot;verbose&quot;</span><span class="p">]</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">my_model_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">my_model_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;resume&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;resume&quot;</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="s2">&quot;pre-train&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
-            <span class="n">pre_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;pre-train&quot;</span><span class="p">])</span>
-            <span class="c1"># TODO: hacky solution to remove a wrongly registered key</span>
-            <span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;criterion.xym&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
+        <span class="c1"># #TODO: need some work here</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if &quot;resume&quot; in self.model_cfg:</span>
+<span class="sd">            self.model = self.model.load_from_checkpoint(self.model_cfg[&quot;resume&quot;])</span>
+<span class="sd">        elif &quot;pre-train&quot; in self.model_cfg:</span>
+<span class="sd">            pre_train = torch.load(self.model_cfg[&quot;pre-train&quot;])</span>
+<span class="sd">            # TODO: hacky solution to remove a wrongly registered key</span>
+<span class="sd">            pre_train[&quot;state_dict&quot;].pop(&quot;criterion.xym&quot;, None)</span>
+<span class="sd">            self.model.load_state_dict(pre_train[&quot;state_dict&quot;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># set up training</span>
-        <span class="k">if</span> <span class="s2">&quot;callbacks&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">:</span>
-            <span class="n">callback_list</span> <span class="o">=</span> <span class="n">parse_ops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">callbacks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">callback_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
-            <span class="n">callbacks</span><span class="o">=</span><span class="n">callback_list</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
-        <span class="p">)</span>  <span class="c1"># noqa E501</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">callback_list</span> <span class="o">=</span> <span class="n">parse_ops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">callbacks</span><span class="p">)</span>
+        <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="n">callback_list</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 
         <span class="c1"># start training</span>
         <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div></div>

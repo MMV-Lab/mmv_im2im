@@ -113,6 +113,7 @@
 <span class="c1">########################################################</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">random_split</span><span class="p">,</span> <span class="n">DataLoader</span>
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.for_transform</span> <span class="kn">import</span> <span class="n">parse_monai_ops</span>  <span class="c1"># , custom_preproc_to_tio</span>
@@ -129,25 +130,27 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">cache_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;data_path&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">data_path</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># use the cache path as the directory to load data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">cache_path</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">category</span>
+
         <span class="c1"># train/val split</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">train_val_ratio</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;dataloader&quot;</span><span class="p">][</span><span class="s2">&quot;train_val_ratio&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="mf">0.2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_val_ratio</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train_val_ratio</span> <span class="ow">or</span> <span class="mf">0.2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_set</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_set</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="s2">&quot;preprocess&quot;</span> <span class="ow">in</span> <span class="n">data_cfg</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">preproc</span> <span class="o">=</span> <span class="n">parse_monai_ops</span><span class="p">(</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;preprocess&quot;</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">preprocess</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">preproc</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="s2">&quot;augmentation&quot;</span> <span class="ow">in</span> <span class="n">data_cfg</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="o">=</span> <span class="n">parse_monai_ops</span><span class="p">(</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;augmentation&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">preproc</span> <span class="o">=</span> <span class="n">parse_monai_ops</span><span class="p">(</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">preprocess</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">augmentation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="o">=</span> <span class="n">parse_monai_ops</span><span class="p">(</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">augmentation</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preproc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span>
@@ -159,18 +162,17 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">monai</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">preproc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">augment</span><span class="p">])</span>
 
         <span class="c1"># parameters for dataloader</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_info</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;dataloader&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_info</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">dataloader</span>
 
 <div class="viewcode-block" id="Im2ImDataModule.prepare_data"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">dataset_list</span> <span class="o">=</span> <span class="n">generate_dataset_dict_monai</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">)</span>
 
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        if self.category == &quot;unpair&quot;:</span>
-<span class="sd">            shuffled_dataset_list = dataset_list.copy()</span>
-<span class="sd">            random.shuffle(shuffled_dataset_list)</span>
-<span class="sd">            for i, shuffled_ds in enumerate(shuffled_dataset_list):</span>
-<span class="sd">                dataset_list[i][&quot;target_fn&quot;] = shuffled_ds[&quot;target_fn&quot;]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="s2">&quot;unpair&quot;</span><span class="p">:</span>
+            <span class="n">shuffled_dataset_list</span> <span class="o">=</span> <span class="n">dataset_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">shuffled_dataset_list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">shuffled_ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shuffled_dataset_list</span><span class="p">):</span>
+                <span class="n">dataset_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shuffled_ds</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">dataset_list</span></div>
 
 <div class="viewcode-block" id="Im2ImDataModule.setup"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -183,16 +185,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span> <span class="o">=</span> <span class="n">train_subjects</span></div>
 
 <div class="viewcode-block" id="Im2ImDataModule.train_dataloader"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">train_loader_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_info</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span>
+        <span class="n">train_loader_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_info</span><span class="o">.</span><span class="n">train</span>
         <span class="n">train_dataset_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span>
-            <span class="n">train_loader_info</span><span class="p">[</span><span class="s2">&quot;dataloader_type&quot;</span><span class="p">]</span>
+            <span class="n">train_loader_info</span><span class="o">.</span><span class="n">dataloader_type</span>
         <span class="p">)</span>
+        <span class="c1"># gather the data filepath into dataset</span>
         <span class="n">train_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_data</span>
-        <span class="k">if</span> <span class="s2">&quot;partial_loader&quot;</span> <span class="ow">in</span> <span class="n">train_loader_info</span><span class="p">:</span>
-            <span class="n">num_load</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-                <span class="n">train_loader_info</span><span class="p">[</span><span class="s2">&quot;partial_loader&quot;</span><span class="p">][</span><span class="s2">&quot;load_percentage&quot;</span><span class="p">]</span>
-                <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">)</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">train_loader_info</span><span class="o">.</span><span class="n">partial_loader</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">num_load</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">train_loader_info</span><span class="o">.</span><span class="n">partial_loader</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_data</span><span class="p">))</span>
             <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">shuffle</span>
 
             <span class="n">train_data</span> <span class="o">=</span> <span class="n">shuffle</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span>
@@ -200,31 +200,30 @@
         <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset_func</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
             <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">train_loader_info</span><span class="p">[</span><span class="s2">&quot;dataset_params&quot;</span><span class="p">]</span>
+            <span class="o">**</span><span class="n">train_loader_info</span><span class="o">.</span><span class="n">dataset_params</span>
         <span class="p">)</span>
+        <span class="c1"># wrap the dataset into dataloader</span>
         <span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
             <span class="n">train_dataset</span><span class="p">,</span>
             <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">collate_fn</span><span class="o">=</span><span class="n">list_data_collate</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">train_loader_info</span><span class="p">[</span><span class="s2">&quot;dataloader_params&quot;</span><span class="p">]</span>
+            <span class="o">**</span><span class="n">train_loader_info</span><span class="o">.</span><span class="n">dataloader_params</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">train_dataloader</span></div>
 
 <div class="viewcode-block" id="Im2ImDataModule.val_dataloader"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val_loader_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_info</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">]</span>
+        <span class="n">val_loader_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_info</span><span class="o">.</span><span class="n">val</span>
         <span class="n">val_dataset_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span>
-            <span class="n">val_loader_info</span><span class="p">[</span><span class="s2">&quot;dataloader_type&quot;</span><span class="p">]</span>
+            <span class="n">val_loader_info</span><span class="o">.</span><span class="n">dataloader_type</span>
         <span class="p">)</span>
         <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">val_dataset_func</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span>
-            <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preproc</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">val_loader_info</span><span class="p">[</span><span class="s2">&quot;dataset_params&quot;</span><span class="p">]</span>
+            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_data</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preproc</span><span class="p">,</span> <span class="o">**</span><span class="n">val_loader_info</span><span class="o">.</span><span class="n">dataset_params</span>
         <span class="p">)</span>
         <span class="n">val_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
             <span class="n">val_dataset</span><span class="p">,</span>
             <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">collate_fn</span><span class="o">=</span><span class="n">list_data_collate</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">val_loader_info</span><span class="p">[</span><span class="s2">&quot;dataloader_params&quot;</span><span class="p">]</span>
+            <span class="o">**</span><span class="n">val_loader_info</span><span class="o">.</span><span class="n">dataloader_params</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">val_dataloader</span></div></div>
 </pre></div>
