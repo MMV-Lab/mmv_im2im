@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from pyrallis import field
+import tempfile
 
 import argparse
 import dataclasses
@@ -359,5 +360,25 @@ def configuration_validation(cfg):
     # check 5, if a global GPU number is set, update the value in trainer
     if cfg.training.gpus is not None:
         cfg.training.params["gpus"] = cfg.training.gpu
+
+    # check 5, if PersistentDataset is used, make sure add a tmpdir in subdirectory (otherwise may cause hash errors)
+    if cfg.data.dataloader.train.dataloader_type['func_name'] == 'PersistentDataset':
+        if 'cache_dir' in cfg.data.dataloader.train.dataset_params:
+            cache_dir = cfg.data.dataloader.train.dataset_params['cache_dir']
+            cache_dir_tmp = tempfile.mkdtemp(dir=cache_dir)
+            cfg.data.dataloader.train.dataset_params['cache_dir'] = cache_dir_tmp
+        else:
+            warnings.warn(
+                UserWarning("The cache dir of PersistentDataset for training was overwritten to None. No caching ...")
+            )
+    if cfg.data.dataloader.val.dataloader_type['func_name'] == 'PersistentDataset':
+        if 'cache_dir' in cfg.data.dataloader.val.dataset_params:
+            cache_dir = cfg.data.dataloader.val.dataset_params['cache_dir']
+            cache_dir_tmp = tempfile.mkdtemp(dir=cache_dir)
+            cfg.data.dataloader.val.dataset_params['cache_dir'] = cache_dir_tmp
+        else:
+            warnings.warn(
+                UserWarning("The cache dir of PersistentDataset for val was overwritten to None. No caching ...")
+            )
 
     return cfg
