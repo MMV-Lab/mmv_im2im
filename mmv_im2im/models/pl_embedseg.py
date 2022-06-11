@@ -55,6 +55,10 @@ class Model(pl.LightningModule):
         instances = batch["GT"].int()
         class_labels = batch["CL"].byte()
         center_images = batch["CE"].byte()
+        print(im.size())
+        print(instances.size())
+        print(class_labels.size())
+        print(center_images.size())
         output = self(im)
 
         loss = self.criterion(output, instances, class_labels, center_images)
