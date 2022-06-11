@@ -279,8 +279,8 @@ def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
             for fn in all_filename:
                 path_list = {}
                 for tag_name in all_tags:
-                    fn = data / fn.name.replace("_IM.", f"_{tag_name}.")
-                    path_list[tag_name] = fn
+                    fn_full = data / fn.name.replace("_IM.", f"_{tag_name}.")
+                    path_list[tag_name] = fn_full
                 dataset_list.append(path_list)
         else:
             print(f"{data} is not a valid file or directory")
