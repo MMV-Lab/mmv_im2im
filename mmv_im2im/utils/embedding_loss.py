@@ -71,18 +71,16 @@ class SpatialEmbLoss_3d(nn.Module):
 
             spatial_emb = torch.tanh(prediction[b, 0:3]) + xyzm_s  # 3 x d x h x w
             sigma = prediction[b, 3 : 3 + self.n_sigma]  # n_sigma x d x h x w
-            seed_map = torch.sigmoid(
-                prediction[b, 3 + self.n_sigma : 3 + self.n_sigma + 1]
-            )  # 1 x d x h x w
+            seed_map = torch.sigmoid(prediction[b, 3 + self.n_sigma : 3 + self.n_sigma + 1])  # 1 x d x h x w
             # loss accumulators
             var_loss = 0
             instance_loss = 0
             seed_loss = 0
             obj_count = 0
 
-            instance = instances[b].unsqueeze(0)  # 1 x d x h x w
-            label = labels[b].unsqueeze(0)  # 1 x d x h x w
-            center_image = center_images[b].unsqueeze(0)  # 1 x d x h x w
+            instance = instances[b]
+            label = labels[b]
+            center_image = center_images[b]
             instance_ids = instance.unique()
             instance_ids = instance_ids[instance_ids != 0]
 
@@ -147,7 +145,7 @@ class SpatialEmbLoss_3d(nn.Module):
         return loss + prediction.sum() * 0
 
 
-class SpatialEmbLoss_2D(nn.Module):
+class SpatialEmbLoss_2s(nn.Module):
     def __init__(
         self,
         grid_y=1024,
@@ -208,9 +206,9 @@ class SpatialEmbLoss_2D(nn.Module):
             seed_loss = 0
             obj_count = 0
 
-            instance = instances[b]  # 1 x h x w or 1 x d x h x w (one_hot)
-            label = labels[b]  # 1 x h x w
-            center_image = center_images[b] > 0  # 1 x h x w
+            instance = instances[b]
+            label = labels[b]
+            center_image = center_images[b] > 0  
             instance_ids = instance.unique()
             instance_ids = instance_ids[instance_ids != 0]
 

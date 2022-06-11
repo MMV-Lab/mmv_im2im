@@ -53,7 +53,7 @@ model:
       input_channels: 1
   criterion:
     module_name: mmv_im2im.utils.embedding_loss
-    func_name: SpatialEmbLoss_2D
+    func_name: SpatialEmbLoss_2d
     params:
       grid_y: 1024
       grid_x: 1024

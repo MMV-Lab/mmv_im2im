@@ -51,19 +51,12 @@ class Model(pl.LightningModule):
         return self.net(x)
 
     def run_step(self, batch, validation_stage, save_path: str = None):
-        im = batch["IM"]
-        instances = batch["GT"]
-        class_labels = batch["CL"]
-        center_images = batch["CE"]
-
-        if im.size()[-1] == 1:
-            im = torch.squeeze(im, dim=-1).float()
-            instances = torch.squeeze(instances, dim=-1)
-            class_labels = torch.squeeze(class_labels, dim=-1)
-            center_images = torch.squeeze(center_images, dim=-1)
+        im = batch["IM"].float()
+        instances = batch["GT"].int()
+        class_labels = batch["CL"].byte()
+        center_images = batch["CE"].byte()
         output = self(im)
 
-        # TODO: need to handle args, try to receive the args in the definition step
         loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()
 
