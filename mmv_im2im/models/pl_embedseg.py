@@ -2,7 +2,6 @@ import os
 from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
 import pytorch_lightning as pl
-import torch
 from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 
 from mmv_im2im.utils.misc import (
@@ -23,6 +22,7 @@ class Model(pl.LightningModule):
         if train:
             self.clustering_params = model_info_xx.criterion["params"]
             self.clustering_params.pop("foreground_weight")
+            self.clustering_params.pop("use_costmap")
 
         self.net = parse_config(model_info_xx.net)
 
@@ -55,9 +55,17 @@ class Model(pl.LightningModule):
         instances = batch["GT"].int()
         class_labels = batch["CL"].byte()
         center_images = batch["CE"].byte()
+
+        use_costmap = False
+        if "CM" in batch:
+            use_costmap = True
+            costmap = batch["CM"]
         output = self(im)
 
-        loss = self.criterion(output, instances, class_labels, center_images)
+        if use_costmap:
+            loss = self.criterion(output, instances, class_labels, center_images, costmap)
+        else:
+            loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()
 
         if validation_stage:

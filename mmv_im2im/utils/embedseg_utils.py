@@ -212,6 +212,15 @@ def prepare_embedseg_cache(
         image_reader = AICSImage(ds["source_fn"])
         image = image_reader.get_image_data(**raw_reader_params)
 
+        # check if costmap exists
+        fn_base = ds["source_fn"].stem[:-3]
+        cm_fn = ds["source_fn"].parent / f"{fn_base}_CM.tiff"
+        costmap_flag = False
+        if cm_fn.is_file():
+            costmap_flag = True
+            cm_reader = AICSImage(cm_fn)
+            costmap = cm_reader.get_image_data(**reader_params)
+
         # parse filename
         fn_base = Path(ds["source_fn"]).stem[:-3]  # get rid of "_IM"
 
@@ -245,6 +254,10 @@ def prepare_embedseg_cache(
                     class_image_crop = object_mask[
                         jj : jj + crop_size, ii : ii + crop_size
                     ]
+                    if costmap_flag:
+                        costmap_crop = costmap[
+                            jj : jj + crop_size, ii : ii + crop_size
+                        ]
                     dim_order = "YX"
                 else:
                     continue
@@ -283,6 +296,12 @@ def prepare_embedseg_cache(
                         jj : jj + crop_size,
                         ii : ii + crop_size,
                     ]
+                    if costmap_flag:
+                        costmap_crop = costmap[
+                            kk : kk + crop_size_z,
+                            jj : jj + crop_size,
+                            ii : ii + crop_size,
+                        ]
                     dim_order = "ZYX"
                 else:
                     continue
@@ -321,3 +340,9 @@ def prepare_embedseg_cache(
                 cache_path / f"{fn_base}_{j:04d}_CL.tiff",
                 dim_order=dim_order,
             )
+            if costmap_flag:
+                OmeTiffWriter.save(
+                    costmap_crop.astype(np.float),
+                    cache_path / f"{fn_base}_{j:04d}_CM.tiff",
+                    dim_order=dim_order,
+                )
