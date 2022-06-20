@@ -1,3 +1,4 @@
+from multiprocessing.spawn import old_main_modules
 from torch.nn import init
 
 
@@ -38,3 +39,12 @@ def init_weights(net, init_type="kaiming", init_gain=0.02):
 
     print("initialize network with %s" % init_type)
     net.apply(init_func)  # apply the initialization function <init_func>
+
+
+def state_dict_simplification(state_dict, cut: str="net."):
+    """remove the prefix in all keys of state_dict"""
+    state_dict_copy = state_dict.copy()
+    for old_key in state_dict.keys():
+        new_key = old_key.removeprefix(cut)
+        state_dict_copy[new_key] = state_dict_copy.pop(old_key)
+    return state_dict_copy

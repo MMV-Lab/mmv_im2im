@@ -34,8 +34,8 @@ data:
       func_name: ScaleIntensityRangePercentilesd
       params:
         keys: ["GT"]
-        lower: 0.1
-        upper: 99.9
+        lower: 0.0
+        upper: 100.0
         b_min: -1
         b_max: 1
     - module_name: monai.transforms

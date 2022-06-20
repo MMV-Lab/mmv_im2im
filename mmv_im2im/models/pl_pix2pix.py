@@ -1,12 +1,15 @@
 import os
-import torch
+from pathlib import Path
 from typing import Dict
-import pytorch_lightning as pl
-from mmv_im2im.utils.misc import parse_config_func
-from mmv_im2im.utils.model_utils import init_weights
-from mmv_im2im.models.nets.gans import define_generator, define_discriminator
-from tifffile import imsave
 from importlib import import_module
+import numpy as np
+from tifffile import imsave
+from skimage.io import imsave as save_rgb
+import pytorch_lightning as pl
+import torch
+from mmv_im2im.utils.misc import parse_config_func
+from mmv_im2im.utils.model_utils import init_weights, state_dict_simplification
+from mmv_im2im.models.nets.gans import define_generator, define_discriminator
 
 
 class Model(pl.LightningModule):
@@ -14,13 +17,38 @@ class Model(pl.LightningModule):
         super(Model, self).__init__()
 
         self.verbose = verbose
+        gen_init = None
+        dis_init = None
+        if "init_weight" in model_info_xx.net["generator"]:
+            gen_init = model_info_xx.net["generator"].pop("init_weight")
+        if "init_weight" in model_info_xx.net["discriminator"]:
+            dis_init = model_info_xx.net["discriminator"].pop("init_weight")
         self.generator = define_generator(model_info_xx.net["generator"])
         self.discriminator = define_discriminator(model_info_xx.net["discriminator"])
         # self.sliding_window = model_info_xx["sliding_window_params"]
         if train:
             # initialize model weights
-            init_weights(self.generator, init_type="normal")
-            init_weights(self.discriminator, init_type="normal")
+            if gen_init is not None:
+                if Path(gen_init).is_file:
+                    pre_train = torch.load(Path(gen_init))
+                    try:
+                        self.generator.load_state_dict(pre_train["state_dict"])
+                    except Exception:
+                        cleaned_state_dict = state_dict_simplification(pre_train["state_dict"])
+                        self.generator.load_state_dict(cleaned_state_dict)
+                else:
+                    init_weights(self.generator, init_type=gen_init)
+            else:
+                init_weights(self.generator, init_type="normal")
+
+            if dis_init is not None:
+                if Path(dis_init).is_file:
+                    pre_train = torch.load(Path(dis_init))
+                    self.discriminator.load_state_dict(pre_train["state_dict"])
+                else:
+                    init_weights(self.discriminator, init_type=dis_init)
+            else:
+                init_weights(self.discriminator, init_type="normal")
 
             # get loss functions
             loss_category = model_info_xx.criterion.pop("loss_type")
@@ -89,18 +117,34 @@ class Model(pl.LightningModule):
             if not os.path.exists(self.trainer.log_dir):
                 os.mkdir(self.trainer.log_dir)
             fake_images = fake_B.detach()
-            out_fn = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_fake_B.tiff"
-            )
-            imsave(out_fn, fake_images[0].detach().cpu().numpy())
-            out_fn = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_B.tiff"
-            )
-            imsave(out_fn, image_B[0].detach().cpu().numpy())
-            out_fn = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_A.tiff"
-            )
-            imsave(out_fn, image_A[0].detach().cpu().numpy())
+            fake_image = fake_images[0].cpu().numpy()
+
+            if len(fake_image.shape) == 3 and fake_image.shape[0] == 3:
+                out_fn = (
+                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_fake_B.png"
+                )
+                save_rgb(out_fn, np.moveaxis(fake_image, 0, -1))
+                out_fn = (
+                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_B.png"
+                )
+                save_rgb(out_fn, np.moveaxis(image_B[0].detach().cpu().numpy(), 0, -1))
+                out_fn = (
+                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_A.png"
+                )
+                save_rgb(out_fn, np.moveaxis(image_A[0].detach().cpu().numpy(), 0, -1))
+            else:
+                out_fn = (
+                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_fake_B.tiff"
+                )
+                imsave(out_fn, fake_images[0].detach().cpu().numpy())
+                out_fn = (
+                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_B.tiff"
+                )
+                imsave(out_fn, image_B[0].detach().cpu().numpy())
+                out_fn = (
+                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_A.tiff"
+                )
+                imsave(out_fn, image_A[0].detach().cpu().numpy())
 
         return loss
 
