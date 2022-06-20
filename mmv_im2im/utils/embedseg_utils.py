@@ -255,9 +255,7 @@ def prepare_embedseg_cache(
                         jj : jj + crop_size, ii : ii + crop_size
                     ]
                     if costmap_flag:
-                        costmap_crop = costmap[
-                            jj : jj + crop_size, ii : ii + crop_size
-                        ]
+                        costmap_crop = costmap[jj : jj + crop_size, ii : ii + crop_size]
                     dim_order = "YX"
                 else:
                     continue

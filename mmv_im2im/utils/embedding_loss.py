@@ -266,13 +266,13 @@ class SpatialEmbLoss_2s(nn.Module):
             instance = instances[b]
             label = labels[b]
             center_image = center_images[b] > 0
-            
+
             # use adjusted instance to find all ids
             instance_ids = instances_adjusted[b].unique()
             instance_ids = instance_ids[instance_ids != 0]
 
             # regress bg to zero
-            bg_mask = label == 0          
+            bg_mask = label == 0
             if bg_mask.sum() > 0:
                 if self.use_costmap:
                     # adjust the cost here, because some of the background pixels might have zero weight

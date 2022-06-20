@@ -63,7 +63,9 @@ class Model(pl.LightningModule):
         output = self(im)
 
         if use_costmap:
-            loss = self.criterion(output, instances, class_labels, center_images, costmap)
+            loss = self.criterion(
+                output, instances, class_labels, center_images, costmap
+            )
         else:
             loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()

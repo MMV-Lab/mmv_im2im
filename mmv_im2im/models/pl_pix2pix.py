@@ -34,7 +34,9 @@ class Model(pl.LightningModule):
                     try:
                         self.generator.load_state_dict(pre_train["state_dict"])
                     except Exception:
-                        cleaned_state_dict = state_dict_simplification(pre_train["state_dict"])
+                        cleaned_state_dict = state_dict_simplification(
+                            pre_train["state_dict"]
+                        )
                         self.generator.load_state_dict(cleaned_state_dict)
                 else:
                     init_weights(self.generator, init_type=gen_init)
@@ -121,28 +123,46 @@ class Model(pl.LightningModule):
 
             if len(fake_image.shape) == 3 and fake_image.shape[0] == 3:
                 out_fn = (
-                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_fake_B.png"
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_fake_B.png"
                 )
                 save_rgb(out_fn, np.moveaxis(fake_image, 0, -1))
                 out_fn = (
-                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_B.png"
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_real_B.png"
                 )
                 save_rgb(out_fn, np.moveaxis(image_B[0].detach().cpu().numpy(), 0, -1))
                 out_fn = (
-                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_A.png"
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_real_A.png"
                 )
                 save_rgb(out_fn, np.moveaxis(image_A[0].detach().cpu().numpy(), 0, -1))
             else:
                 out_fn = (
-                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_fake_B.tiff"
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_fake_B.tiff"
                 )
                 imsave(out_fn, fake_images[0].detach().cpu().numpy())
                 out_fn = (
-                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_B.tiff"
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_real_B.tiff"
                 )
                 imsave(out_fn, image_B[0].detach().cpu().numpy())
                 out_fn = (
-                    self.trainer.log_dir + os.sep + str(self.current_epoch) + "_real_A.tiff"
+                    self.trainer.log_dir
+                    + os.sep
+                    + str(self.current_epoch)
+                    + "_real_A.tiff"
                 )
                 imsave(out_fn, image_A[0].detach().cpu().numpy())
 

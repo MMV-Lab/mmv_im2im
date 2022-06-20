@@ -31,6 +31,7 @@ def parse_tio_ops(trans_func: List[Dict]):
     return tio.Compose(trans_list)
 """
 
+
 def center_crop(img, target_shape):
     # target_shape is smaller than img.shape
     target_x = target_shape[-1]

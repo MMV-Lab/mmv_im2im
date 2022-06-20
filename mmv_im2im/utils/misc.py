@@ -37,6 +37,7 @@ class monai_bio_reader(ImageReader):
     def verify_suffix(self, filename: Union[Sequence[PathLike], PathLike]) -> bool:
         return True
 
+
 """
 def aicsimageio_reader(fn, **kwargs):
     img = AICSImage(fn).reader.get_image_dask_data(**kwargs)
