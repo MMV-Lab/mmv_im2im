@@ -37,24 +37,27 @@ dev_requirements = [
     "wheel>=0.34.2",
 ]
 
+data_requirements = [
+    "quilt3"
+]
+
 requirements = [
-    "torchio",
     "pytorch-lightning",
     "monai",
     "aicsimageio",
     "pandas",
-    "munch",
     "scikit-image",
-    "quilt3",
     "einops",
-    "numba",
+    "numba",  # required by embedseg
     "protobuf<4.21.0",
+    "pyrallis"
 ]
 
 extra_requirements = {
     "setup": setup_requirements,
     "test": test_requirements,
     "dev": dev_requirements,
+    "data": data_requirements,
     "all": [
         *requirements,
         *dev_requirements,

@@ -32,7 +32,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             self.data_path = data_cfg.data_path
         else:
             # use the cache path as the directory to load data
-            self.data_path = cache_path
+            self.data_path = str(cache_path)
 
         self.category = data_cfg.category
 

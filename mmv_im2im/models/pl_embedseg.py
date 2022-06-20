@@ -2,7 +2,6 @@ import os
 from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
 import pytorch_lightning as pl
-import torch
 from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 
 from mmv_im2im.utils.misc import (
@@ -23,6 +22,7 @@ class Model(pl.LightningModule):
         if train:
             self.clustering_params = model_info_xx.criterion["params"]
             self.clustering_params.pop("foreground_weight")
+            self.clustering_params.pop("use_costmap")
 
         self.net = parse_config(model_info_xx.net)
 
@@ -51,20 +51,23 @@ class Model(pl.LightningModule):
         return self.net(x)
 
     def run_step(self, batch, validation_stage, save_path: str = None):
-        im = batch["IM"]
-        instances = batch["GT"]
-        class_labels = batch["CL"]
-        center_images = batch["CE"]
+        im = batch["IM"].float()
+        instances = batch["GT"].int()
+        class_labels = batch["CL"].byte()
+        center_images = batch["CE"].byte()
 
-        if im.size()[-1] == 1:
-            im = torch.squeeze(im, dim=-1).float()
-            instances = torch.squeeze(instances, dim=-1)
-            class_labels = torch.squeeze(class_labels, dim=-1)
-            center_images = torch.squeeze(center_images, dim=-1)
+        use_costmap = False
+        if "CM" in batch:
+            use_costmap = True
+            costmap = batch["CM"]
         output = self(im)
 
-        # TODO: need to handle args, try to receive the args in the definition step
-        loss = self.criterion(output, instances, class_labels, center_images)
+        if use_costmap:
+            loss = self.criterion(
+                output, instances, class_labels, center_images, costmap
+            )
+        else:
+            loss = self.criterion(output, instances, class_labels, center_images)
         loss = loss.mean()
 
         if validation_stage:

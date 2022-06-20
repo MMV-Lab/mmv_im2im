@@ -9,7 +9,6 @@ import numpy as np
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 import torch
-from torchio.data.io import check_uint_to_int
 from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config_func
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla
 
@@ -59,8 +58,8 @@ class ProjectTester(object):
         # choose different inference function for different types of models
         with torch.no_grad():
             if "sliding_window_params" in self.model_cfg:
-                # add convert to tensor with proper type
-                x = torch.tensor(check_uint_to_int(x))
+                # TODO: add convert to tensor with proper type, similar to torchio check
+                x = torch.tensor(x)
                 # add the batch dimension
                 x = torch.unsqueeze(x, dim=0)
 

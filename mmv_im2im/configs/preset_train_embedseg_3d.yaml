@@ -7,7 +7,7 @@ data:
   dataloader:
     train:
       dataloader_params:
-        batch_size: 4
+        batch_size: 2
         pin_memory: True
         num_workers: 4
 
@@ -16,10 +16,9 @@ data:
       func_name: LoadImaged
       params:
         keys: ["IM", "GT", "CE", "CL"]
-        dimension_order_out: "YX"
+        dimension_order_out: "ZYX"
         C: 0
         T: 0
-        Z: 0
     - module_name: monai.transforms
       func_name: AddChanneld
       params:
@@ -28,8 +27,8 @@ data:
       func_name: ScaleIntensityRangePercentilesd
       params:
         keys: ["IM"]
-        lower: 0.5
-        upper: 99.5
+        lower: 0.1
+        upper: 99.9
         b_min: -1
         b_max: 1
     - module_name: monai.transforms
@@ -46,21 +45,23 @@ data:
 model:
   framework: embedseg
   net:
-    module_name: mmv_im2im.models.nets.BranchedERFNet_2d
-    func_name: BranchedERFNet_2d
+    module_name: mmv_im2im.models.nets.BranchedERFNet_3d
+    func_name: BranchedERFNet_3d
     params:
-      num_classes: [4, 1]
+      num_classes: [6, 1]
       input_channels: 1
   criterion:
     module_name: mmv_im2im.utils.embedding_loss
-    func_name: SpatialEmbLoss_2d
+    func_name: SpatialEmbLoss_3d
     params:
-      grid_y: 1024
-      grid_x: 1024
+      grid_y: 256
+      grid_x: 256
+      grid_z: 128
       pixel_y: 1
       pixel_x: 1
-      n_sigma: 2
-      foreground_weight: 2
+      pixel_z: 1
+      n_sigma: 3
+      foreground_weight: 3
   optimizer:
       module_name: torch.optim
       func_name: Adam  # AdamW
@@ -70,7 +71,7 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.97
+        gamma: 0.98
 training:
   verbose: True
   params:

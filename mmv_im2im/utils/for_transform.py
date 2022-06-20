@@ -3,7 +3,7 @@ from functools import partial
 from mmv_im2im.utils.misc import parse_config, parse_config_func_without_params
 from monai.transforms import Compose, Lambdad, Lambda
 
-
+"""
 def parse_tio_ops(trans_func: List[Dict]):
     import torchio as tio
 
@@ -29,6 +29,7 @@ def parse_tio_ops(trans_func: List[Dict]):
                 trans_list.append(tio.Lambda(callable_func))
 
     return tio.Compose(trans_list)
+"""
 
 
 def center_crop(img, target_shape):

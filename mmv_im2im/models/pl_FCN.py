@@ -3,6 +3,7 @@ import numpy as np
 from typing import Dict
 import pytorch_lightning as pl
 import torch
+from monai.losses import MaskedLoss
 from aicsimageio.writers import OmeTiffWriter
 
 from mmv_im2im.utils.misc import (
@@ -23,7 +24,12 @@ class Model(pl.LightningModule):
         self.model_info = model_info_xx
         self.verbose = verbose
         if train:
-            self.criterion = parse_config(model_info_xx.criterion)
+            if "costmap" in model_info_xx.criterion and model_info_xx.criterion.pop(
+                "costmap"
+            ):
+                self.criterion = MaskedLoss(parse_config(model_info_xx.criterion))
+            else:
+                self.criterion = parse_config(model_info_xx.criterion)
             self.optimizer_func = parse_config_func(model_info_xx.optimizer)
 
     def configure_optimizers(self):
