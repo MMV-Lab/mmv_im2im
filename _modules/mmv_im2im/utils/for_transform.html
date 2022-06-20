@@ -103,32 +103,33 @@
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">parse_config</span><span class="p">,</span> <span class="n">parse_config_func_without_params</span>
 <span class="kn">from</span> <span class="nn">monai.transforms</span> <span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">Lambdad</span><span class="p">,</span> <span class="n">Lambda</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">def parse_tio_ops(trans_func: List[Dict]):</span>
+<span class="sd">    import torchio as tio</span>
 
-<div class="viewcode-block" id="parse_tio_ops"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_tio_ops">[docs]</a><span class="k">def</span> <span class="nf">parse_tio_ops</span><span class="p">(</span><span class="n">trans_func</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]):</span>
-    <span class="kn">import</span> <span class="nn">torchio</span> <span class="k">as</span> <span class="nn">tio</span>
+<span class="sd">    # Here, we will use the Compose function in torchio to merge</span>
+<span class="sd">    # all transformations. If any trnasformation not from torchio,</span>
+<span class="sd">    # a torchio Lambda function will be used to wrap around it.</span>
+<span class="sd">    trans_list = []</span>
+<span class="sd">    for func_info in trans_func:</span>
+<span class="sd">        if func_info[&quot;module_name&quot;] == &quot;torchio&quot;:</span>
+<span class="sd">            trans_list.append(parse_config(func_info))</span>
+<span class="sd">        else:</span>
+<span class="sd">            my_func = parse_config_func_without_params(func_info)</span>
+<span class="sd">            if &quot;params&quot; in func_info:</span>
+<span class="sd">                callable_func = partial(my_func, **func_info[&quot;params&quot;])</span>
+<span class="sd">            else:</span>
+<span class="sd">                callable_func = my_func</span>
 
-    <span class="c1"># Here, we will use the Compose function in torchio to merge</span>
-    <span class="c1"># all transformations. If any trnasformation not from torchio,</span>
-    <span class="c1"># a torchio Lambda function will be used to wrap around it.</span>
-    <span class="n">trans_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">func_info</span> <span class="ow">in</span> <span class="n">trans_func</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;torchio&quot;</span><span class="p">:</span>
-            <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_config</span><span class="p">(</span><span class="n">func_info</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">my_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">func_info</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">func_info</span><span class="p">:</span>
-                <span class="n">callable_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">callable_func</span> <span class="o">=</span> <span class="n">my_func</span>
+<span class="sd">            if &quot;extra_kwargs&quot; in func_info:</span>
+<span class="sd">                trans_list.append(</span>
+<span class="sd">                    tio.Lambda(callable_func, **func_info[&quot;extra_kwargs&quot;])</span>
+<span class="sd">                )</span>
+<span class="sd">            else:</span>
+<span class="sd">                trans_list.append(tio.Lambda(callable_func))</span>
 
-            <span class="k">if</span> <span class="s2">&quot;extra_kwargs&quot;</span> <span class="ow">in</span> <span class="n">func_info</span><span class="p">:</span>
-                <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">tio</span><span class="o">.</span><span class="n">Lambda</span><span class="p">(</span><span class="n">callable_func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;extra_kwargs&quot;</span><span class="p">])</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tio</span><span class="o">.</span><span class="n">Lambda</span><span class="p">(</span><span class="n">callable_func</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">tio</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span><span class="n">trans_list</span><span class="p">)</span></div>
+<span class="sd">    return tio.Compose(trans_list)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="center_crop"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.for_transform.center_crop">[docs]</a><span class="k">def</span> <span class="nf">center_crop</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">target_shape</span><span class="p">):</span>

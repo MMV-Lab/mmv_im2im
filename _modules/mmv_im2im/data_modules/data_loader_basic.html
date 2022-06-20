@@ -133,7 +133,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">data_path</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># use the cache path as the directory to load data</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">cache_path</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">category</span>
 

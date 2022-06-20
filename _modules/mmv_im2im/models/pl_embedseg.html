@@ -102,7 +102,6 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">aicsimageio.writers</span> <span class="kn">import</span> <span class="n">OmeTiffWriter</span>
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
-<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.postprocessing.embedseg_cluster</span> <span class="kn">import</span> <span class="n">generate_instance_clusters</span>
 
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="p">(</span>
@@ -123,6 +122,7 @@
         <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;foreground_weight&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;use_costmap&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">net</span><span class="p">)</span>
 
@@ -151,20 +151,23 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.run_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.run_step">[docs]</a>    <span class="k">def</span> <span class="nf">run_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">validation_stage</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">im</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;IM&quot;</span><span class="p">]</span>
-        <span class="n">instances</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span>
-        <span class="n">class_labels</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;CL&quot;</span><span class="p">]</span>
-        <span class="n">center_images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;CE&quot;</span><span class="p">]</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;IM&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">instances</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
+        <span class="n">class_labels</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;CL&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span>
+        <span class="n">center_images</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;CE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">im</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-            <span class="n">instances</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">class_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">class_labels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">center_images</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">center_images</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">use_costmap</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="s2">&quot;CM&quot;</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+            <span class="n">use_costmap</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">costmap</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;CM&quot;</span><span class="p">]</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
 
-        <span class="c1"># TODO: need to handle args, try to receive the args in the definition step</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">instances</span><span class="p">,</span> <span class="n">class_labels</span><span class="p">,</span> <span class="n">center_images</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_costmap</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span>
+                <span class="n">output</span><span class="p">,</span> <span class="n">instances</span><span class="p">,</span> <span class="n">class_labels</span><span class="p">,</span> <span class="n">center_images</span><span class="p">,</span> <span class="n">costmap</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">instances</span><span class="p">,</span> <span class="n">class_labels</span><span class="p">,</span> <span class="n">center_images</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">validation_stage</span><span class="p">:</span>

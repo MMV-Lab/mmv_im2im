@@ -138,6 +138,15 @@
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;initialize network with </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">init_type</span><span class="p">)</span>
     <span class="n">net</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">init_func</span><span class="p">)</span>  <span class="c1"># apply the initialization function &lt;init_func&gt;</span></div>
+
+
+<div class="viewcode-block" id="state_dict_simplification"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.model_utils.state_dict_simplification">[docs]</a><span class="k">def</span> <span class="nf">state_dict_simplification</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">cut</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;net.&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;remove the prefix in all keys of state_dict&quot;&quot;&quot;</span>
+    <span class="n">state_dict_copy</span> <span class="o">=</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">old_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">new_key</span> <span class="o">=</span> <span class="n">old_key</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span>
+        <span class="n">state_dict_copy</span><span class="p">[</span><span class="n">new_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_dict_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">state_dict_copy</span></div>
 </pre></div>
 
            </div>

@@ -246,6 +246,9 @@
     <span class="n">data_cfg</span><span class="p">,</span>
     <span class="n">patch_size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    patch_size should be in the format of [Z Y X] or [Y X]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
     <span class="n">cache_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)</span>
@@ -286,9 +289,11 @@
 
     <span class="k">else</span><span class="p">:</span>
         <span class="n">spatial_dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">patch_size</span><span class="p">)</span>
-        <span class="n">crop_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">spatial_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="n">crop_size_z</span> <span class="o">=</span> <span class="n">patch_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">crop_size_z</span> <span class="o">=</span> <span class="n">patch_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">crop_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">patch_size</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">crop_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">patch_size</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">spatial_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">reader_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dimension_order_out&quot;</span><span class="p">:</span> <span class="s2">&quot;ZYX&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
@@ -306,6 +311,15 @@
         <span class="c1"># get raw image</span>
         <span class="n">image_reader</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;source_fn&quot;</span><span class="p">])</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">image_reader</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="o">**</span><span class="n">raw_reader_params</span><span class="p">)</span>
+
+        <span class="c1"># check if costmap exists</span>
+        <span class="n">fn_base</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;source_fn&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">stem</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">cm_fn</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;source_fn&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_base</span><span class="si">}</span><span class="s2">_CM.tiff&quot;</span>
+        <span class="n">costmap_flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">cm_fn</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">costmap_flag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">cm_reader</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">cm_fn</span><span class="p">)</span>
+            <span class="n">costmap</span> <span class="o">=</span> <span class="n">cm_reader</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="o">**</span><span class="n">reader_params</span><span class="p">)</span>
 
         <span class="c1"># parse filename</span>
         <span class="n">fn_base</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;source_fn&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">stem</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># get rid of &quot;_IM&quot;</span>
@@ -340,7 +354,11 @@
                     <span class="n">class_image_crop</span> <span class="o">=</span> <span class="n">object_mask</span><span class="p">[</span>
                         <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span>
                     <span class="p">]</span>
+                    <span class="k">if</span> <span class="n">costmap_flag</span><span class="p">:</span>
+                        <span class="n">costmap_crop</span> <span class="o">=</span> <span class="n">costmap</span><span class="p">[</span><span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span> <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">]</span>
                     <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;YX&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
 
             <span class="k">elif</span> <span class="n">spatial_dim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="n">d</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">shape</span>
@@ -376,7 +394,15 @@
                         <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
                         <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
                     <span class="p">]</span>
+                    <span class="k">if</span> <span class="n">costmap_flag</span><span class="p">:</span>
+                        <span class="n">costmap_crop</span> <span class="o">=</span> <span class="n">costmap</span><span class="p">[</span>
+                            <span class="n">kk</span> <span class="p">:</span> <span class="n">kk</span> <span class="o">+</span> <span class="n">crop_size_z</span><span class="p">,</span>
+                            <span class="n">jj</span> <span class="p">:</span> <span class="n">jj</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                            <span class="n">ii</span> <span class="p">:</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">crop_size</span><span class="p">,</span>
+                        <span class="p">]</span>
                     <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;ZYX&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
 
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -411,7 +437,13 @@
                 <span class="n">class_image_crop</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span>
                 <span class="n">cache_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_base</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">_CL.tiff&quot;</span><span class="p">,</span>
                 <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">costmap_flag</span><span class="p">:</span>
+                <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">costmap_crop</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
+                    <span class="n">cache_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_base</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">_CM.tiff&quot;</span><span class="p">,</span>
+                    <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+                <span class="p">)</span></div>
 </pre></div>
 
            </div>

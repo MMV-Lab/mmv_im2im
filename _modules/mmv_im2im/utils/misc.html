@@ -102,11 +102,8 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">munch</span> <span class="kn">import</span> <span class="n">Munch</span>
 <span class="kn">from</span> <span class="nn">aicsimageio</span> <span class="kn">import</span> <span class="n">AICSImage</span>
-<span class="kn">import</span> <span class="nn">torchio</span> <span class="k">as</span> <span class="nn">tio</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">from</span> <span class="nn">monai.data</span> <span class="kn">import</span> <span class="n">ImageReader</span>
 <span class="kn">from</span> <span class="nn">monai.utils</span> <span class="kn">import</span> <span class="n">ensure_tuple</span><span class="p">,</span> <span class="n">require_pkg</span>
@@ -141,35 +138,28 @@
         <span class="k">return</span> <span class="kc">True</span></div></div>
 
 
-<div class="viewcode-block" id="aicsimageio_reader"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.aicsimageio_reader">[docs]</a><span class="k">def</span> <span class="nf">aicsimageio_reader</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">img_data</span> <span class="o">=</span> <span class="n">tio</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">check_uint_to_int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">img_data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    if len(img_data.shape) == 3:</span>
-<span class="sd">        return img_data, np.eye(4)</span>
-<span class="sd">    elif len(img_data.shape) == 2:</span>
-<span class="sd">        return img_data, np.eye(3)</span>
-<span class="sd">    else:</span>
-<span class="sd">        print(&quot;error in aicsimage loader&quot;)</span>
-<span class="sd">        sys.exit(0)</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">def aicsimageio_reader(fn, **kwargs):</span>
+<span class="sd">    img = AICSImage(fn).reader.get_image_dask_data(**kwargs)</span>
+<span class="sd">    img_data = tio.data.io.check_uint_to_int(img.compute())</span>
+<span class="sd">    return img_data, np.eye(4)</span>
 
 
-<div class="viewcode-block" id="load_yaml_cfg"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.load_yaml_cfg">[docs]</a><span class="k">def</span> <span class="nf">load_yaml_cfg</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
-        <span class="n">opt_dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+<span class="sd">def load_yaml_cfg(yaml_path):</span>
+<span class="sd">    with open(yaml_path, &quot;r&quot;) as stream:</span>
+<span class="sd">        opt_dict = yaml.safe_load(stream)</span>
 
-    <span class="c1"># convert dictionary to attribute-like object</span>
-    <span class="n">opt</span> <span class="o">=</span> <span class="n">Munch</span><span class="p">(</span><span class="n">opt_dict</span><span class="p">)</span>
+<span class="sd">    # convert dictionary to attribute-like object</span>
+<span class="sd">    opt = Munch(opt_dict)</span>
 
-    <span class="k">return</span> <span class="n">opt</span></div>
+<span class="sd">    return opt</span>
 
 
-<div class="viewcode-block" id="get_max_shape"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.get_max_shape">[docs]</a><span class="k">def</span> <span class="nf">get_max_shape</span><span class="p">(</span><span class="n">subjects</span><span class="p">):</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">tio</span><span class="o">.</span><span class="n">SubjectsDataset</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span>
-    <span class="n">shapes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">spatial_shape</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">shapes</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+<span class="sd">def get_max_shape(subjects):</span>
+<span class="sd">    dataset = tio.SubjectsDataset(subjects)</span>
+<span class="sd">    shapes = np.array([s.spatial_shape for s in dataset])</span>
+<span class="sd">    return shapes.max(axis=0)</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="parse_config_func_without_params"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func_without_params">[docs]</a><span class="k">def</span> <span class="nf">parse_config_func_without_params</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
@@ -390,8 +380,8 @@
             <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">all_filename</span><span class="p">:</span>
                 <span class="n">path_list</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="n">all_tags</span><span class="p">:</span>
-                    <span class="n">fn</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_IM.&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-                    <span class="n">path_list</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span>
+                    <span class="n">fn_full</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_IM.&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                    <span class="n">path_list</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn_full</span>
                 <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> is not a valid file or directory&quot;</span><span class="p">)</span>
