@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from mmv_im2im.utils.lovasz_losses import lovasz_hinge
-from monai.losses import MaskedLoss
 
 
 class SpatialEmbLoss_3d(nn.Module):
@@ -69,8 +68,8 @@ class SpatialEmbLoss_3d(nn.Module):
 
         # weighted loss
         if self.use_costmap:
-            # only need to adjust instances in this step, because for pixels with zero weight
-            # this step will ignore the corresponding instances
+            # only need to adjust instances in this step, because for pixels
+            # with zero weight, this step will ignore the corresponding instances
             instances_adjusted = instances * costmaps
         else:
             instances_adjusted = instances
@@ -106,7 +105,8 @@ class SpatialEmbLoss_3d(nn.Module):
 
             if bg_mask.sum() > 0:
                 if self.use_costmap:
-                    # adjust the cost here, because some of the background pixels might have zero weight
+                    # adjust the cost here, because some of the background pixels might
+                    # have zero weight
                     seed_loss += torch.sum(
                         costmap * torch.pow(seed_map[bg_mask] - 0, 2)
                     )
@@ -115,9 +115,10 @@ class SpatialEmbLoss_3d(nn.Module):
 
             for id in instance_ids:
 
-                # use the original instance without costmap adjustment to fetch instance mask,
-                # since the costmap may partial cut some instances and alter the ground truth
-                # only use the costmap to adjust the loss values at the end
+                # use the original instance without costmap adjustment to fetch
+                # instance mask, since the costmap may partial cut some instances
+                # and alter the ground truth only use the costmap to adjust the
+                # loss values at the end
                 in_mask = instance.eq(id)  # 1 x d x h x w
 
                 center_mask = in_mask & center_image
@@ -239,8 +240,8 @@ class SpatialEmbLoss_2s(nn.Module):
 
         # weighted loss
         if self.use_costmap:
-            # only need to adjust instances in this step, because for pixels with zero weight
-            # this step will ignore the corresponding instances
+            # only need to adjust instances in this step, because for pixels with
+            # zero weight, this step will ignore the corresponding instances
             instances_adjusted = instances * costmaps
         else:
             instances_adjusted = instances
@@ -275,7 +276,8 @@ class SpatialEmbLoss_2s(nn.Module):
             bg_mask = label == 0
             if bg_mask.sum() > 0:
                 if self.use_costmap:
-                    # adjust the cost here, because some of the background pixels might have zero weight
+                    # adjust the cost here, because some of the background pixels might
+                    # have zero weight
                     seed_loss += torch.sum(
                         costmap * torch.pow(seed_map[bg_mask] - 0, 2)
                     )
@@ -283,9 +285,10 @@ class SpatialEmbLoss_2s(nn.Module):
                     seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 
             for id in instance_ids:
-                # use the original instance without costmap adjustment to fetch instance mask,
-                # since the costmap may partial cut some instances and alter the ground truth
-                # only use the costmap to adjust the loss values at the end
+                # use the original instance without costmap adjustment to fetch
+                # instance mask, since the costmap may partial cut some instances
+                # and alter the ground truth only use the costmap to adjust the loss
+                # values at the end
                 in_mask = instance.eq(id)  # 1 x h x w
 
                 center_mask = in_mask & center_image
