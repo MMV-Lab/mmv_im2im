@@ -1,0 +1,112 @@
+
+# everything about data
+data:
+  category: "cellpose_test_lightning"
+  target_type: "Label"
+  target_reader_params:
+    dimension_order_out: "YXS" # YX
+    C: 0
+    T: 0
+    Z: 0
+  source_type: "Image"
+  source_reader_params:
+    dimension_order_out: "YX"
+    C: 0
+    T: 0
+    Z: 0
+  data_path: "/mnt/eternus/users/Justin/data/cp_test/use_train/" #"/mnt/eternus/users/Jianxu/data/embedseg/train/"
+  #cache_path: "/mnt/eternus/users/Jianxu/data/embedseg/train_cache/"
+  # data_path: "/mnt/data/xyz.csv"
+  # data_path: "~/ambiomgroupdrive/Jianxu/data/cells/training"
+  # data_path:
+  #   source_path:
+  #   target_path:
+  #   costmap_path: optional
+  #   image_type: "tiff"
+  dataloader_params:
+    train:
+      batch_size: 1 #4
+      pin_memory: True
+      num_workers: 4
+    val:
+      batch_size: 1
+      num_workers: 2
+  train_val_ratio: 0.2
+  preprocess:
+    - module_name: torchio
+      func_name: ZNormalization
+  augmentation:
+    - module_name: torchio
+      func_name: RandomFlip
+      params:
+        axes: [0, 1]
+        flip_probability: 0.5
+    #- module_name: torchio
+    #  func_name: RandomAffine
+    #  params:
+    #    degrees: [0, 90, 0, 90, 0, 0]
+    #    p: 0.5
+# model
+model:
+  category: cellpose
+  net:
+    module_name: mmv_im2im.models.nets.CPnet
+    func_name: CPnet
+    params:
+      nbase: [2, 32, 64, 128, 256]           
+      nout: 3
+      sz: 3
+      residual_on: True
+      style_on: True
+      concatenation: False
+      diam_mean: 30.                        # depends on pT model
+      #nchan: 2    
+  criterion:
+    module_name: torch.nn
+    func_name: MSELoss
+    params:
+      reduction: 'mean'
+  criterion2:               # is this needed?
+    module_name: torch.nn
+    func_name: BCEWithLogitsLoss
+    params:
+      reduction: 'mean'      
+  optimizer:
+    module_name: torch.optim
+    func_name: SGD  # AdamW
+    params:
+      lr: 0.001
+      momentum: 0.9
+      weight_decay: 0.00001
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    func_name: ExponentialLR
+    params:
+      gamma: 0.98      
+
+# training
+training:
+  params:
+    gpus: 1
+    precision: 16
+    #stochastic_weight_avg: True
+    max_epochs: 2000 #20000
+  callbacks:
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 100 #10
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: '{epoch}-{val_loss:.3f}'
+        save_top_k: 3
+        save_last: True
+        save_weights_only: True 
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: 'best'
