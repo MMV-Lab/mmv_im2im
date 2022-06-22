@@ -228,7 +228,7 @@ class DataConfig:
     category: str = field(default=None)
 
     # The data path
-    data_path: Union[Path, str] = field(default=None)
+    data_path: Union[Path, str, Dict] = field(default=None)
 
     # save pre-processed data into a cache folder (currently, only for embedseg)
     cache_path: Union[Path, str] = field(default=None)
