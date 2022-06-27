@@ -177,9 +177,9 @@ def parse_adaptor(
 
 @dataclass
 class DataloaderModuleConfig:
-    """Config for the dataloader module"""
+    """low-level config for data: specifically about the dataloader"""
 
-    # the module information
+    # which dataset module to use: default is PersistentDataset
     dataloader_type: Dict = field(
         default={"module_name": "monai.data", "func_name": "PersistentDataset"},
         is_mutable=True,
@@ -208,21 +208,21 @@ class DataloaderModuleConfig:
 
 @dataclass
 class DataloaderConfig:
-    """Config for training resources"""
+    """Mid-level config for data: about dataloader module"""
 
     # The ratio of train/validation split
     train_val_ratio: float = field(default=0.1)
 
-    # config for the training dataloader
+    # config for the training dataloader (see DataloaderModuleConfig)
     train: DataloaderModuleConfig = field(default_factory=DataloaderModuleConfig)
 
-    # config for the validation dataloader
+    # config for the validation dataloader (see DataloaderModuleConfig)
     val: DataloaderModuleConfig = field(default_factory=DataloaderModuleConfig)
 
 
 @dataclass
 class DataConfig:
-    """Config for data and data loaders"""
+    """Top-level config for data: major components"""
 
     # The type of data: "pair" | "unpair" | "embedseg"
     category: str = field(default=None)
@@ -233,13 +233,13 @@ class DataConfig:
     # save pre-processed data into a cache folder (currently, only for embedseg)
     cache_path: Union[Path, str] = field(default=None)
 
-    # config for dataloader
+    # config for dataloader (see DataloaderConfig)
     dataloader: DataloaderConfig = field(default_factory=DataloaderConfig)
 
-    # what to do in pre-processing
+    # what to do in pre-processing (see examples in preset  configs)
     preprocess: List[Dict] = field(default=None)
 
-    # what to do in data augmentation
+    # what to do in data augmentation (see examples in preset  configs)
     augmentation: List[Dict] = field(default=None)
 
     # global variable that can be used to verify or overwrite other related settings
@@ -248,29 +248,24 @@ class DataConfig:
     # extra parameters for specific methods:
     extra: Dict = field(default=None, is_mutable=True)
 
-    # @property
-    # def exp_dir(self) -> Path:
-    #    # Properties are great for arguments that can be derived from existing ones
-    #    return self.exp_root / self.exp_name
-
 
 @dataclass
 class ModelConfig:
     """Config for model"""
 
-    # the type of model
+    # the type of model: FCN | pix2pix | cyclegan | embedseg
     framework: str = field(default=None)
 
-    # the exact network configuration
+    # the exact network configuration (see preset configs for example)
     net: Dict = field(default=None, is_mutable=True)
 
-    # the config for criterion
+    # the config for criterion (see preset configs for example)
     criterion: Dict = field(default=None, is_mutable=True)
 
-    # the config for optimizer
+    # the config for optimizer (see preset configs for example)
     optimizer: Dict = field(default=None, is_mutable=True)
 
-    # the config for learning scheduler
+    # the config for learning scheduler (see preset configs for example)
     scheduler: Dict = field(default=None, is_mutable=True)
 
     # extra for special parameters of specific method

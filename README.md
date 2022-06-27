@@ -57,73 +57,25 @@ Finally, [aicsimageio](https://github.com/AllenCellModeling/aicsimageio) is adop
         -  Other scripts under `mmv_im2im/models/nets/` and `mmv_im2im/preprocessing`, as well as `mmv_im2im/utils`, are low level functions to instantiate the pytorch-lightining module defined in `pl_XYZ.py` or `data_loader.py`
 
 
+3. Understand the configuration system and make customizations
+
+`run_im2im --help` can print out all the configuration details, including their default values. We pre-compiled a collection of configuration for various tasks, see `/mmv_im2im/configs/preset_XXYYZZ.yaml`. To use a preset configuration, one can simply do `run_im2im --config XXYYZZ` Or, you can run on your customized configuration file `run_im2im --config /full/path/to/your/config.yaml`. You can specify everything in the yaml file, or you can also pass in additional args via the command line. For example, we have a general configuration file at `/home/example/my_config.yaml`, which specific the model details and training details for one specific project. But, when you train different models for this same project with different data, you don't have to change the yaml file. Instead, you can simply pass in the extra data path in command line, like `run_im2im --config /home/example/my_config.yaml --data.data_path /path/to/my/data`. So, it is a good practice to make different generic configurations for different projects, and leave the runtime specific args, like data_path, to the command line. 
+
+A special note on dictionary parameters. After printing out all the details from `run_im2im --help`, if you see one parameter is a Dict, for example `training.params`, you need to be careful if you want to overwrite the values specified in yaml by values passed in command line. Specifically, you have to overwrite the whole dictionary, and cannot overwrite only a specific key. In this situation, I would recommed to change the config file directly, instead of overwriting with command line args.  
+
+
+4. About the training data directory
+
+Currently, the package supports three types of training data organizations. First, one single folder with "X1_IM.tiff", "X1_GT.tiff", "X1_CM.tiff", "X2_IM.tiff", etc.. Second, one single folder with multiple sub-folders "IM", "GT", "CM" (optional), where the name of each file is exactly the same accross different subfolders. The first two scenario will incur a train/validatio split on all files. If you already have train/validation split done, then you can pass in the something like `--data.data_path "{'train': '/path/to/train', 'val': '/path/to/val'}"`, where `/path/to/train` and `/path/to/val` are similar to the first scenario above.
+
+**preset keys**: "IM" (raw images), "GT" (ground truth or training target), "CM" (costmap, e.g. to exclude certain pixels by setting corresponding value in costmap as 0)
+
+**Additional note for EmbedSeg**: When doing `run_im2im --config train_embedseg_3d --data.data_path /path/to/train`, we expect "IM" and "GT" in the folder `/path/to/train` ("CM" is optional). However, the program will automatically convert this dataset into a special format needed for EmbedSeg and save them at the folder specified by `data.cache_path` (default is `./tmp`). Two new types of files wil be created in the cache_path, including "CL" (CLass image) and "CE" (CEnter image). Since preparing this compatible dataset takes time, one can directly specify the cache_path to load without re-generating from original training data. Namely `run_im2im --config train_embegseg_3d --data.cache_path ./tmp/` even without passing the `data.data_path`.  
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
 
-## The Four Commands You Need To Know
-
-1. `pip install -e .[dev]`
-
-    This will install your package in editable mode with all the required development
-    dependencies (i.e. `tox`).
-
-2. `make build`
-
-    This will run `tox` which will run all your tests in both Python 3.7
-    and Python 3.8 as well as linting your code.
-
-3. `make clean`
-
-    This will clean up various Python and build generated files so that you can ensure
-    that you are working in a clean environment.
-
-4. `make docs`
-
-    This will generate and launch a web browser to view the most up-to-date
-    documentation for your Python package.
-
-#### Additional Optional Setup Steps:
-
--   Turn your project into a GitHub repository:
-    -   Make an account on [github.com](https://github.com)
-    -   Go to [make a new repository](https://github.com/new)
-    -   _Recommendations:_
-        -   _It is strongly recommended to make the repository name the same as the Python
-            package name_
-        -   _A lot of the following optional steps are *free* if the repository is Public,
-            plus open source is cool_
-    -   After a GitHub repo has been created, run the commands listed under:
-        "...or push an existing repository from the command line"
--   Register your project with Codecov:
-    -   Make an account on [codecov.io](https://codecov.io)(Recommended to sign in with GitHub)
-        everything else will be handled for you.
--   Ensure that you have set GitHub pages to build the `gh-pages` branch by selecting the
-    `gh-pages` branch in the dropdown in the "GitHub Pages" section of the repository settings.
-    ([Repo Settings](https://github.com/MMV-Lab/mmv_im2im/settings))
--   Register your project with PyPI:
-    -   Make an account on [pypi.org](https://pypi.org)
-    -   Go to your GitHub repository's settings and under the
-        [Secrets tab](https://github.com/MMV-Lab/mmv_im2im/settings/secrets/actions),
-        add a secret called `PYPI_TOKEN` with your password for your PyPI account.
-        Don't worry, no one will see this password because it will be encrypted.
-    -   Next time you push to the branch `main` after using `bump2version`, GitHub
-        actions will build and deploy your Python package to PyPI.
-
-#### Suggested Git Branch Strategy
-
-1. `main` is for the most up-to-date development, very rarely should you directly
-   commit to this branch. GitHub Actions will run on every push and on a CRON to this
-   branch but still recommended to commit to your development branches and make pull
-   requests to main. If you push a tagged commit with bumpversion, this will also release to PyPI.
-2. Your day-to-day work should exist on branches separate from `main`. Even if it is
-   just yourself working on the repository, make a PR from your working branch to `main`
-   so that you can ensure your commits don't break the development head. GitHub Actions
-   will run on every push to any branch or any pull request from any branch to any other
-   branch.
-3. It is recommended to use "Squash and Merge" commits when committing PR's. It makes
-   each set of changes to `main` atomic and as a side effect naturally encourages small
-   well defined PR's.
 
 
 **MIT license**

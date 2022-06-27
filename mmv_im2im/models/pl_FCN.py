@@ -103,9 +103,30 @@ class Model(pl.LightningModule):
             if not os.path.exists(self.trainer.log_dir):
                 os.mkdir(self.trainer.log_dir)
 
-            src_out = np.squeeze(src[0, ].detach().cpu().numpy()).astype(np.float)
-            tar_out = np.squeeze(tar[0, ].detach().cpu().numpy()).astype(np.float)
-            prd_out = np.squeeze(y_hat[0, ].detach().cpu().numpy()).astype(np.float)
+            src_out = np.squeeze(
+                src[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
+            tar_out = np.squeeze(
+                tar[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
+            prd_out = np.squeeze(
+                y_hat[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
 
             if len(src_out.shape) == 2:
                 src_order = "YX"
