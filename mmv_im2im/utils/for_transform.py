@@ -66,23 +66,17 @@ def parse_monai_ops(trans_func: List[Dict]):
     # a MONAI Lambda function will be used to wrap around it.
     trans_list = []
 
-    # we assume a PersistentDataset with dictionary-type dataset
-    # so, always need LoadImaged as the first one transform.
-    # Here, we handle the LoadImaged seperatedly to allow bio-reader
-    reader = trans_func.pop(0)
-    if (
-        reader["module_name"] == "monai.transforms"
-        and reader["func_name"] == "LoadImaged"
-    ):
-        from mmv_im2im.utils.misc import monai_bio_reader
-        from monai.transforms import LoadImaged
-
-        trans_list.append(LoadImaged(reader=monai_bio_reader, **reader["params"]))
-
     # loop throught the config
     for func_info in trans_func:
         if func_info["module_name"] == "monai.transforms":
-            trans_list.append(parse_config(func_info))
+            if func_info["func_name"] == "LoadImaged":
+                # Here, we handle the LoadImaged seperatedly to allow bio-reader
+                from mmv_im2im.utils.misc import monai_bio_reader
+                from monai.transforms import LoadImaged
+
+                trans_list.append(LoadImaged(reader=monai_bio_reader, **func_info["params"]))
+            else:
+                trans_list.append(parse_config(func_info))
         else:
             my_func = parse_config_func_without_params(func_info)
             func_params = func_info["params"]

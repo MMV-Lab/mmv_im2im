@@ -50,7 +50,8 @@ requirements = [
     "einops",
     "numba",  # required by embedseg
     "protobuf<4.21.0",
-    "pyrallis"
+    "pyrallis",
+    "scikit-learn"
 ]
 
 extra_requirements = {
