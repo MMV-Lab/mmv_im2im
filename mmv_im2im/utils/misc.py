@@ -101,9 +101,9 @@ def parse_ops_list(trans_func: List[Dict]):
 
 
 def generate_test_dataset_dict(
-    data: Union[str, Path], data_column: str = None, data_type: str = None
+    data: Union[str, Path], data_type: str = None
 ) -> List:
-    # TODO: this function needs to be fixed
+
     """
     different options for "data":
     - one CSV
@@ -116,12 +116,9 @@ def generate_test_dataset_dict(
     if data.is_file():
         # should be a csv of dataframe
         import pandas as pd
-
         df = pd.read_csv(data)
-        data_column
-
         for row in df.iterrows():
-            dataset_list.append(row[data_column])
+            dataset_list.append(row[data_type])
 
     elif data.is_dir():
         all_filename = sorted(data.glob(f"*{data_type}"))

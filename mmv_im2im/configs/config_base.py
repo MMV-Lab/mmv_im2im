@@ -221,6 +221,31 @@ class DataloaderConfig:
 
 
 @dataclass
+class InferOutConfig:
+    """config for the output of inference"""
+
+    # The path to save output
+    path: Union[Path, str, Dict] = field(default=None)
+
+    # the suffix to attach in the filename
+    suffix: str = field(default="pred")
+
+
+@dataclass
+class InferInConfig:
+    """config for the input to inference"""
+
+    # The path to apply the model
+    dir: Union[Path, str, Dict] = field(default=None)
+
+    # the type of data to load
+    data_type: str = field(default="tiff")
+
+    # the parameters for reader
+    reader_params: Dict = field(default=None)
+
+
+@dataclass
 class DataConfig:
     """Top-level config for data: major components"""
 
@@ -233,13 +258,22 @@ class DataConfig:
     # save pre-processed data into a cache folder (currently, only for embedseg)
     cache_path: Union[Path, str] = field(default=None)
 
+    # about the inference output (Inference Only)
+    inference_output: InferOutConfig = field(default_factory=InferOutConfig)
+
+    # about the inference input (Inference Only)
+    inference_input: InferInConfig = field(default_factory=InferInConfig)
+
     # config for dataloader (see DataloaderConfig)
     dataloader: DataloaderConfig = field(default_factory=DataloaderConfig)
 
-    # what to do in pre-processing (see examples in preset  configs)
+    # what to do in pre-processing (see examples in preset configs)
     preprocess: List[Dict] = field(default=None)
 
-    # what to do in data augmentation (see examples in preset  configs)
+    # what to do in postprocessing (see examples in preset configs)
+    postprocess: List[Dict] = field(default=None)
+
+    # what to do in data augmentation (see examples in preset configs)
     augmentation: List[Dict] = field(default=None)
 
     # global variable that can be used to verify or overwrite other related settings
@@ -268,12 +302,15 @@ class ModelConfig:
     # the config for learning scheduler (see preset configs for example)
     scheduler: Dict = field(default=None, is_mutable=True)
 
+    # the checkpoint to load (for finetuning or inference)
+    checkpoint: Union[Path, str] = field(default=None)
+
     # extra for special parameters of specific method
     model_extra: Dict = field(default=None, is_mutable=True)
 
 
 @dataclass
-class TrainingConfig:
+class TrainerConfig:
     """Config for how to run the training"""
 
     # whether to save sample outputs at the beginning of each epoch
@@ -312,7 +349,7 @@ class ProgramConfig:
     model: ModelConfig = field(default_factory=ModelConfig)
 
     # the configuration for trainer
-    training: TrainingConfig = field(default_factory=TrainingConfig)
+    trainer: TrainerConfig = field(default_factory=TrainerConfig)
 
 
 def configuration_validation(cfg):
@@ -324,8 +361,8 @@ def configuration_validation(cfg):
 
     # check 2: if partial loading is used, make sure reloading is enabled in trainer
     if cfg.data.dataloader.train.partial_loader < 1.0:
-        if "reload_dataloaders_every_n_epochs" not in cfg.training.params:
-            cfg.training.params["reload_dataloaders_every_n_epochs"] = 5
+        if "reload_dataloaders_every_n_epochs" not in cfg.trainer.params:
+            cfg.trainer.params["reload_dataloaders_every_n_epochs"] = 5
 
     # check 3: partial_loader for validation dataloader should be 1.0
     if cfg.data.dataloader.val.partial_loader != 1.0:
@@ -353,8 +390,8 @@ def configuration_validation(cfg):
             ), f"grid_z is set as {grid}, needs to be the same as the dimZ of patch_size {cfg.data.patch_size}"  # noqa E501
 
     # check 5, if a global GPU number is set, update the value in trainer
-    if cfg.training.gpus is not None:
-        cfg.training.params["gpus"] = cfg.training.gpu
+    if cfg.trainer.gpus is not None:
+        cfg.trainer.params["gpus"] = cfg.trainer.gpu
 
     # check 5, if PersistentDataset is used, make sure add a tmpdir in subdirectory
     # (otherwise may cause hash errors)

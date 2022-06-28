@@ -98,7 +98,7 @@ model:
       func_name: ExponentialLR
       params:
         gamma: 0.999
-training:
+trainer:
   verbose: True
   params:
     gpus: 1
