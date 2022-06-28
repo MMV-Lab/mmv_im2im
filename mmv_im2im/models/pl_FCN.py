@@ -79,9 +79,10 @@ class Model(pl.LightningModule):
 
         y_hat = self(x)
 
-        # in case of CrossEntropy related error
-        # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
-        # #y = torch.squeeze(y, dim=1)  # remove C dimension
+        if isinstance(self.criterion, torch.nn.CrossEntropyLoss):
+            # in case of CrossEntropy related error
+            # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
+            y = torch.squeeze(y, dim=1)  # remove C dimension
 
         # if costmap is None:
         #    loss = self.criterion(y_hat, y)
@@ -102,9 +103,30 @@ class Model(pl.LightningModule):
             if not os.path.exists(self.trainer.log_dir):
                 os.mkdir(self.trainer.log_dir)
 
-            src_out = np.squeeze(src.detach().cpu().numpy()).astype(np.float)
-            tar_out = np.squeeze(tar.detach().cpu().numpy()).astype(np.float)
-            prd_out = np.squeeze(y_hat.detach().cpu().numpy()).astype(np.float)
+            src_out = np.squeeze(
+                src[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
+            tar_out = np.squeeze(
+                tar[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
+            prd_out = np.squeeze(
+                y_hat[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
 
             if len(src_out.shape) == 2:
                 src_order = "YX"
@@ -112,6 +134,8 @@ class Model(pl.LightningModule):
                 src_order = "ZYX"
             elif len(src_out.shape) == 4:
                 src_order = "CZYX"
+            else:
+                raise ValueError("unexpected source dims")
 
             if len(tar_out.shape) == 2:
                 tar_order = "YX"
@@ -119,6 +143,8 @@ class Model(pl.LightningModule):
                 tar_order = "ZYX"
             elif len(tar_out.shape) == 4:
                 tar_order = "CZYX"
+            else:
+                raise ValueError("unexpected target dims")
 
             if len(prd_out.shape) == 2:
                 prd_order = "YX"
@@ -126,6 +152,8 @@ class Model(pl.LightningModule):
                 prd_order = "ZYX"
             elif len(prd_out.shape) == 4:
                 prd_order = "CZYX"
+            else:
+                raise ValueError(f"unexpected pred dims {prd_out.shape}")
 
             out_fn = (
                 self.trainer.log_dir + os.sep + str(self.current_epoch) + "_src.tiff"

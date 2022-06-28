@@ -36,7 +36,7 @@ class ProjectTester(object):
         # extract the three major chuck of the config
         self.model_cfg = cfg.model
         self.data_cfg = cfg.data
-        self.run_cfg = cfg.run
+        self.run_cfg = cfg.trainer
 
         # define variables
         self.model = None
@@ -57,7 +57,7 @@ class ProjectTester(object):
 
         # choose different inference function for different types of models
         with torch.no_grad():
-            if "sliding_window_params" in self.model_cfg:
+            if "sliding_window_params" in self.model_cfg.model_extra:
                 # TODO: add convert to tensor with proper type, similar to torchio check
                 x = torch.tensor(x)
                 # add the batch dimension
@@ -66,15 +66,15 @@ class ProjectTester(object):
                 y_hat = sliding_window_inference(
                     inputs=x.float().cuda(),
                     predictor=self.model,
-                    **self.model_cfg["sliding_window_params"],
+                    **self.model_cfg.model_extra["sliding_window_params"],
                 )
             else:
                 y_hat = self.model(x.float().cuda())
 
         # do post-processing on the prediction
-        if "post_processing" in self.model_cfg:
+        if self.data_cfg.postprocess is not None:
             pp_data = y_hat
-            for pp_info in self.model_cfg["post_processing"]:
+            for pp_info in self.data_cfg.postprocess:
                 pp = parse_config_func(pp_info)
                 pp_data = pp(pp_data)
             if torch.is_tensor(pp_data):
@@ -124,11 +124,12 @@ class ProjectTester(object):
     def run_inference(self):
 
         # set up model
-        model_category = self.model_cfg.pop("category")
+        model_category = self.model_cfg.framework
         model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg, train=False)
-        pre_train = torch.load(self.model_cfg["ckpt"]["checkpoint_path"])
+
+        pre_train = torch.load(self.model_cfg.checkpoint)
         # TODO: hacky solution to remove a wrongly registered key
         pre_train["state_dict"].pop("criterion.xym", None)
         self.model.load_state_dict(pre_train["state_dict"])
@@ -141,17 +142,17 @@ class ProjectTester(object):
 
         # set up data
         dataset_list = generate_test_dataset_dict(
-            self.data_cfg["input"]["dir"], **self.data_cfg["input"]["params"]
+            self.data_cfg.inference_input.dir, self.data_cfg.inference_input.data_type
         )
 
         dataset_length = len(dataset_list)
-        if "Z" in self.data_cfg["input"]["reader_params"]["dimension_order_out"]:
+        if "Z" in self.data_cfg.inference_input.reader_params["dimension_order_out"]:
             self.spatial_dims = 3
         else:
             self.spatial_dims = 2
 
         # load preprocessing transformation
-        self.pre_process = parse_monai_ops_vanilla(self.data_cfg["preprocess"])
+        self.pre_process = parse_monai_ops_vanilla(self.data_cfg.preprocess)
 
         # loop through all images and apply the model
         for i, ds in enumerate(dataset_list):
@@ -160,15 +161,19 @@ class ProjectTester(object):
 
             # output file name info
             fn_core = Path(ds).stem
-            suffix = self.data_cfg["output"]["suffix"]
+            suffix = self.data_cfg.inference_output.suffix
 
             timelapse_data = 0
-            if "T" in self.data_cfg["input"]["reader_params"]["dimension_order_out"]:
-                if "T" in self.data_cfg["input"]["reader_params"]:
+            if (
+                "T"
+                in self.data_cfg.inference_input.reader_params["dimension_order_out"]
+            ):
+                if "T" in self.data_cfg.inference_input.reader_params:
                     raise NotImplementedError(
                         "processing a subset of all timepoint is not supported yet"
                     )
                 tmppath = tempfile.mkdtemp()
+                print(f"making a temp folder at {tmppath}")
 
                 # get the number of time points
                 reader = AICSImage(ds)
@@ -177,7 +182,7 @@ class ProjectTester(object):
                 tmpfile_list = []
                 for t_idx in range(timelapse_data):
                     img = AICSImage(ds).reader.get_image_dask_data(
-                        T=[t_idx], **self.data_cfg["input"]["reader_params"]
+                        T=[t_idx], **self.data_cfg.inference_input.reader_params
                     )
                     print(f"Predicting the image timepoint {t_idx}")
 
@@ -191,18 +196,14 @@ class ProjectTester(object):
                 out_array = [np.load(tmp_one_file) for tmp_one_file in tmpfile_list]
                 out_array = np.stack(out_array, axis=0)
                 out_fn = (
-                    Path(self.data_cfg["output"]["path"]) / f"{fn_core}_{suffix}.tiff"
+                    Path(self.data_cfg.inference_output.path)
+                    / f"{fn_core}_{suffix}.tiff"
                 )
 
                 if len(out_array.shape) == 3:
                     dim_order = "TYX"
                 elif len(out_array.shape) == 4:
-                    if (
-                        "Z"
-                        in self.data_cfg["input"]["reader_params"][
-                            "dimension_order_out"
-                        ]
-                    ):
+                    if self.spatial_dims == 3:
                         dim_order = "TZYX"
                     else:
                         dim_order = "TCYX"
@@ -218,13 +219,14 @@ class ProjectTester(object):
                 shutil.rmtree(tmppath)
             else:
                 img = AICSImage(ds).reader.get_image_dask_data(
-                    **self.data_cfg["input"]["reader_params"]
+                    **self.data_cfg.inference_input.reader_params
                 )
 
                 # prepare output filename
 
                 out_fn = (
-                    Path(self.data_cfg["output"]["path"]) / f"{fn_core}_{suffix}.tiff"
+                    Path(self.data_cfg.inference_output.path)
+                    / f"{fn_core}_{suffix}.tiff"
                 )
 
                 print("Predicting the image")

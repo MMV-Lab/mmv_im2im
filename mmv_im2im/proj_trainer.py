@@ -33,7 +33,7 @@ class ProjectTrainer(object):
 
         # extract the three major chuck of the config
         self.model_cfg = cfg.model
-        self.train_cfg = cfg.training
+        self.train_cfg = cfg.trainer
         self.data_cfg = cfg.data
 
         # define variables

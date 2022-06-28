@@ -67,6 +67,11 @@ class Im2ImDataModule(pl.LightningDataModule):
         dataset_list = generate_dataset_dict_monai(self.data_path)
 
         if self.category == "unpair":
+            if "train" in dataset_list and "val" in dataset_list:
+                raise ValueError(
+                    "currently, unpaired data loading does not support "
+                    "pre-partitioned dataset"
+                )
             shuffled_dataset_list = dataset_list.copy()
             random.shuffle(shuffled_dataset_list)
             for i, shuffled_ds in enumerate(shuffled_dataset_list):
@@ -75,11 +80,18 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.data = dataset_list
 
     def setup(self, stage=None):
-        num_subjects = len(self.data)
-        num_val_subjects = int(round(num_subjects * self.train_val_ratio))
-        num_train_subjects = num_subjects - num_val_subjects
-        splits = num_train_subjects, num_val_subjects
-        train_subjects, val_subjects = random_split(self.data, splits)
+
+        if "train" in self.data and "val" in self.data:
+            train_subjects = self.data["train"]
+            val_subjects = self.data["val"]
+        else:
+            num_subjects = len(self.data)
+            num_val_subjects = int(round(num_subjects * self.train_val_ratio))
+            num_train_subjects = num_subjects - num_val_subjects
+            splits = num_train_subjects, num_val_subjects
+            train_subjects, val_subjects = random_split(self.data, splits)
+        assert len(val_subjects) > 0
+        assert len(train_subjects) > 0
         self.val_data = val_subjects
         self.train_data = train_subjects
 
