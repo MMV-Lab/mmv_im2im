@@ -164,7 +164,10 @@ class ProjectTester(object):
             suffix = self.data_cfg.inference_output.suffix
 
             timelapse_data = 0
-            if "T" in self.data_cfg.inference_input.reader_params["dimension_order_out"]:
+            if (
+                "T"
+                in self.data_cfg.inference_input.reader_params["dimension_order_out"]
+            ):
                 if "T" in self.data_cfg.inference_input.reader_params:
                     raise NotImplementedError(
                         "processing a subset of all timepoint is not supported yet"

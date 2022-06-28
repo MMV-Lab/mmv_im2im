@@ -100,9 +100,7 @@ def parse_ops_list(trans_func: List[Dict]):
     return op_list
 
 
-def generate_test_dataset_dict(
-    data: Union[str, Path], data_type: str = None
-) -> List:
+def generate_test_dataset_dict(data: Union[str, Path], data_type: str = None) -> List:
 
     """
     different options for "data":
@@ -116,6 +114,7 @@ def generate_test_dataset_dict(
     if data.is_file():
         # should be a csv of dataframe
         import pandas as pd
+
         df = pd.read_csv(data)
         for row in df.iterrows():
             dataset_list.append(row[data_type])
