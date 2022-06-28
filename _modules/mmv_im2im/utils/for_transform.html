@@ -166,23 +166,19 @@
     <span class="c1"># a MONAI Lambda function will be used to wrap around it.</span>
     <span class="n">trans_list</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="c1"># we assume a PersistentDataset with dictionary-type dataset</span>
-    <span class="c1"># so, always need LoadImaged as the first one transform.</span>
-    <span class="c1"># Here, we handle the LoadImaged seperatedly to allow bio-reader</span>
-    <span class="n">reader</span> <span class="o">=</span> <span class="n">trans_func</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span>
-        <span class="n">reader</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;monai.transforms&quot;</span>
-        <span class="ow">and</span> <span class="n">reader</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LoadImaged&quot;</span>
-    <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">monai_bio_reader</span>
-        <span class="kn">from</span> <span class="nn">monai.transforms</span> <span class="kn">import</span> <span class="n">LoadImaged</span>
-
-        <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LoadImaged</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">monai_bio_reader</span><span class="p">,</span> <span class="o">**</span><span class="n">reader</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]))</span>
-
     <span class="c1"># loop throught the config</span>
     <span class="k">for</span> <span class="n">func_info</span> <span class="ow">in</span> <span class="n">trans_func</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;module_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;monai.transforms&quot;</span><span class="p">:</span>
-            <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_config</span><span class="p">(</span><span class="n">func_info</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LoadImaged&quot;</span><span class="p">:</span>
+                <span class="c1"># Here, we handle the LoadImaged seperatedly to allow bio-reader</span>
+                <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">monai_bio_reader</span>
+                <span class="kn">from</span> <span class="nn">monai.transforms</span> <span class="kn">import</span> <span class="n">LoadImaged</span>
+
+                <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">LoadImaged</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="n">monai_bio_reader</span><span class="p">,</span> <span class="o">**</span><span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">trans_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_config</span><span class="p">(</span><span class="n">func_info</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">my_func</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">func_info</span><span class="p">)</span>
             <span class="n">func_params</span> <span class="o">=</span> <span class="n">func_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>

@@ -110,28 +110,8 @@
 <a class="reference external image-reference" href="https://github.com/MMV-Lab/mmv_im2im/actions"><img alt="Build Status" src="https://github.com/MMV-Lab/mmv_im2im/workflows/Build%20Main/badge.svg" /></a>
 <a class="reference external image-reference" href="https://MMV-Lab.github.io/mmv_im2im/"><img alt="Documentation" src="https://github.com/MMV-Lab/mmv_im2im/workflows/Documentation/badge.svg" /></a>
 <a class="reference external image-reference" href="https://codecov.io/gh/MMV-Lab/mmv_im2im"><img alt="Code Coverage" src="https://codecov.io/gh/MMV-Lab/mmv_im2im/branch/main/graph/badge.svg" /></a>
-<p>A python package for deep learing based image to image transformation</p>
+<p>A python package for deep learing based image to image transformation in biomedical applications</p>
 <hr class="docutils" />
-<section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
-<ul class="simple">
-<li><p>Store values and retain the prior value in memory</p></li>
-<li><p>… some other functionality</p></li>
-</ul>
-</section>
-<section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
-<p>Here, we use a <a class="reference external" href="https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F">3D labelfree determination</a> as a test case.</p>
-<p>First, we pull 100 examples from the AllenCell quilt bucket by running the following. Make sure you change the <code class="docutils literal notranslate"><span class="pre">parent_path</span></code> before running.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python  scripts/generate_synthetic_data.py
-</pre></div>
-</div>
-<p>Then, we can train a labelfree model like this:</p>
-<div class="highlight-base notranslate"><div class="highlight"><pre><span></span>run_im2im --config ./mmv_im2im/example_configs/example_labelfree.yaml  --mode train --debug
-</pre></div>
-</div>
-<p>Make sure you double check all the file paths in the yaml file.</p>
-</section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mmv_im2im</span></code><span class="raw-html-m2r"><br></span>
@@ -141,113 +121,59 @@
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h2>
 <p>For full package documentation please visit <a class="reference external" href="https://MMV-Lab.github.io/mmv_im2im">MMV-Lab.github.io/mmv_im2im</a>.</p>
 </section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
+<p>Here, we use a <a class="reference external" href="https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F">3D labelfree determination</a> as a test case.</p>
+<p>First, we pull 100 examples from the AllenCell quilt bucket by running the following. Make sure you change the <code class="docutils literal notranslate"><span class="pre">parent_path</span></code> before running.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python  scripts/generate_synthetic_data.py
+</pre></div>
+</div>
+<p>Then, we can train a labelfree model like this:</p>
+<div class="highlight-base notranslate"><div class="highlight"><pre><span></span>run_im2im --config train_labelfree_3d  --data.data_path /path/to/your/dataset
+</pre></div>
+</div>
+<p>This will apply all the default settings on your data to train the 3D labelfree model.</p>
+</section>
 <section id="notes-on-the-package-design">
 <h2>Notes on the package design<a class="headerlink" href="#notes-on-the-package-design" title="Permalink to this heading"></a></h2>
-<p>There are three levels of abstraction:</p>
+<ol class="arabic simple">
+<li><p>The four main packages we build upon: <a class="reference external" href="https://www.pytorchlightning.ai/">pytorch-lightning</a>, <a class="reference external" href="https://monai.io/">MONAI</a>, <a class="reference external" href="https://eladrich.github.io/pyrallis/">pyrallis</a>, and <a class="reference external" href="https://github.com/AllenCellModeling/aicsimageio">aicsimageio</a>.</p></li>
+</ol>
+<p>The whole package uses <a class="reference external" href="https://www.pytorchlightning.ai/">pytorch-lightning</a> as the core of its backend, in the sense that the package is implemented following the biolerplate components in pytorch-lightning, such as <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code>, <code class="docutils literal notranslate"><span class="pre">DataModule</span></code> and <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. All small building blocks, like network architecture, optimizer, etc., can be swapped easily without changing the boilerplate.</p>
+<p>We adopt the <a class="reference external" href="https://docs.monai.io/en/stable/data.html#persistentdataset">PersistentDataset</a> in <a class="reference external" href="https://monai.io">MONAI</a> as the default dataloader, which combines the efficiency and flexibility in data handling for biomedical applications. E.g., able to efficiently handle: when any single file in training data is large, sampling mutiple patches from each of the large image in training data, and when there are a huge number of files and have to load a small portion to memory in each epoch and periodically refresh the data in memory, etc.</p>
+<p><a class="reference external" href="https://eladrich.github.io/pyrallis/">Pyrallis</a> provides a handy configuration system. Combining pyrallis and the boilerplate concepts in pytorch-lightning, it is very easy to configurate your method at any level of details (as high level as only providing the path to the training data, all the way to as low level as changing which type of normalization to use in the model).</p>
+<p>Finally, <a class="reference external" href="https://github.com/AllenCellModeling/aicsimageio">aicsimageio</a> is adopted for efficient data I/O, which not only supports all major bio-formats and OME-TIFF, but also makes it painless to handle hugh data by delayed loading.</p>
+<ol class="arabic simple">
+<li><p>There are three levels of abstraction:</p></li>
+</ol>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">proj_trainer.py</span></code> (main entry point to define data module, pytorch-lightning module, and trainer)</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">mmv_im2im/proj_trainer.py</span></code> (main entry point to define data module, pytorch-lightning module, and trainer)</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">./data_modules/data_loaders.py</span></code> (Currently, all 2D/3D paired/unpaired data loader can share the same universal dataloader. We may add other generic dataloaders when really needed, otherwise, the current one is general enough to cover current applications)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">./models/basic_XYZ.py</span></code> (the middle level wrapper for different categories of models: FCN, pix2pix, GAN, embedseg. We can add more when needed, e.g., for denoising. This is the pytorch-lightning module specific for this category of models. The specific model backbone, loss function, etc. can be easily specified via parameters in yaml config)</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">mmv_im2im/data_modules/data_loaders.py</span></code> (Currently, all 2D/3D paired/unpaired data loader can share the same universal dataloader. We may add other generic dataloaders when really needed, otherwise, the current one is general enough to cover current applications)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mmv_im2im/models/pl_XYZ.py</span></code> (the middle level wrapper for different categories of models: FCN, pix2pix (conditional GAN), CycleGAN, embedseg. We can add more when needed, e.g., for denoising or cellpose. This is the pytorch-lightning module specific for this category of models. The specific model backbone, loss function, etc. can be easily specified via parameters in yaml config)</p>
 <ul>
-<li><p>Other scripts under <code class="docutils literal notranslate"><span class="pre">./models/</span></code> and <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code>, as well as <code class="docutils literal notranslate"><span class="pre">utils</span></code>, are low level functions to instantiate the pytorch-lightining module defined in <code class="docutils literal notranslate"><span class="pre">basic_XYZ.py</span></code> or <code class="docutils literal notranslate"><span class="pre">data_loader.py</span></code></p></li>
+<li><p>Other scripts under <code class="docutils literal notranslate"><span class="pre">mmv_im2im/models/nets/</span></code> and <code class="docutils literal notranslate"><span class="pre">mmv_im2im/preprocessing</span></code>, as well as <code class="docutils literal notranslate"><span class="pre">mmv_im2im/utils</span></code>, are low level functions to instantiate the pytorch-lightining module defined in <code class="docutils literal notranslate"><span class="pre">pl_XYZ.py</span></code> or <code class="docutils literal notranslate"><span class="pre">data_loader.py</span></code></p></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
+<ol class="arabic simple">
+<li><p>Understand the configuration system and make customizations</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--help</span></code> can print out all the configuration details, including their default values. We pre-compiled a collection of configuration for various tasks, see <code class="docutils literal notranslate"><span class="pre">/mmv_im2im/configs/preset_XXYYZZ.yaml</span></code>. To use a preset configuration, one can simply do <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">XXYYZZ</span></code> Or, you can run on your customized configuration file <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">/full/path/to/your/config.yaml</span></code>. You can specify everything in the yaml file, or you can also pass in additional args via the command line. For example, we have a general configuration file at <code class="docutils literal notranslate"><span class="pre">/home/example/my_config.yaml</span></code>, which specific the model details and training details for one specific project. But, when you train different models for this same project with different data, you don’t have to change the yaml file. Instead, you can simply pass in the extra data path in command line, like <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">/home/example/my_config.yaml</span> <span class="pre">--data.data_path</span> <span class="pre">/path/to/my/data</span></code>. So, it is a good practice to make different generic configurations for different projects, and leave the runtime specific args, like data_path, to the command line.</p>
+<p>A special note on dictionary parameters. After printing out all the details from <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--help</span></code>, if you see one parameter is a Dict, for example <code class="docutils literal notranslate"><span class="pre">training.params</span></code>, you need to be careful if you want to overwrite the values specified in yaml by values passed in command line. Specifically, you have to overwrite the whole dictionary, and cannot overwrite only a specific key. In this situation, I would recommed to change the config file directly, instead of overwriting with command line args.</p>
+<ol class="arabic simple">
+<li><p>About the training data directory</p></li>
+</ol>
+<p>Currently, the package supports three types of training data organizations. First, one single folder with “X1_IM.tiff”, “X1_GT.tiff”, “X1_CM.tiff”, “X2_IM.tiff”, etc.. Second, one single folder with multiple sub-folders “IM”, “GT”, “CM” (optional), where the name of each file is exactly the same accross different subfolders. The first two scenario will incur a train/validatio split on all files. If you already have train/validation split done, then you can pass in the something like <code class="docutils literal notranslate"><span class="pre">--data.data_path</span> <span class="pre">&quot;{'train':</span> <span class="pre">'/path/to/train',</span> <span class="pre">'val':</span> <span class="pre">'/path/to/val'}&quot;</span></code>, where <code class="docutils literal notranslate"><span class="pre">/path/to/train</span></code> and <code class="docutils literal notranslate"><span class="pre">/path/to/val</span></code> are similar to the first scenario above.</p>
+<p><strong>preset keys</strong>: “IM” (raw images), “GT” (ground truth or training target), “CM” (costmap, e.g. to exclude certain pixels by setting corresponding value in costmap as 0)</p>
+<p><strong>Additional note for EmbedSeg</strong>: When doing <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">train_embedseg_3d</span> <span class="pre">--data.data_path</span> <span class="pre">/path/to/train</span></code>, we expect “IM” and “GT” in the folder <code class="docutils literal notranslate"><span class="pre">/path/to/train</span></code> (“CM” is optional). However, the program will automatically convert this dataset into a special format needed for EmbedSeg and save them at the folder specified by <code class="docutils literal notranslate"><span class="pre">data.cache_path</span></code> (default is <code class="docutils literal notranslate"><span class="pre">./tmp</span></code>). Two new types of files wil be created in the cache_path, including “CL” (CLass image) and “CE” (CEnter image). Since preparing this compatible dataset takes time, one can directly specify the cache_path to load without re-generating from original training data. Namely <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">train_embegseg_3d</span> <span class="pre">--data.cache_path</span> <span class="pre">./tmp/</span></code> even without passing the <code class="docutils literal notranslate"><span class="pre">data.data_path</span></code>.</p>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this heading"></a></h2>
 <p>See <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a> for information related to developing the code.</p>
-</section>
-<section id="the-four-commands-you-need-to-know">
-<h2>The Four Commands You Need To Know<a class="headerlink" href="#the-four-commands-you-need-to-know" title="Permalink to this heading"></a></h2>
-<ol class="arabic">
-<li><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[dev]</span></code></p>
-<blockquote>
-<div><p>This will install your package in editable mode with all the required development
-dependencies (i.e. <code class="docutils literal notranslate"><span class="pre">tox</span></code>).</p>
-</div></blockquote>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">build</span></code></p>
-<blockquote>
-<div><p>This will run <code class="docutils literal notranslate"><span class="pre">tox</span></code> which will run all your tests in both Python 3.7
-and Python 3.8 as well as linting your code.</p>
-</div></blockquote>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code></p>
-<blockquote>
-<div><p>This will clean up various Python and build generated files so that you can ensure
-that you are working in a clean environment.</p>
-</div></blockquote>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">docs</span></code></p>
-<blockquote>
-<div><p>This will generate and launch a web browser to view the most up-to-date
-documentation for your Python package.</p>
-</div></blockquote>
-</li>
-</ol>
-<section id="additional-optional-setup-steps">
-<h3>Additional Optional Setup Steps:<a class="headerlink" href="#additional-optional-setup-steps" title="Permalink to this heading"></a></h3>
-<ul class="simple">
-<li><p>Turn your project into a GitHub repository:</p>
-<ul>
-<li><p>Make an account on <a class="reference external" href="https://github.com">github.com</a></p></li>
-<li><p>Go to <a class="reference external" href="https://github.com/new">make a new repository</a></p></li>
-<li><p><em>Recommendations:</em></p>
-<ul>
-<li><p><em>It is strongly recommended to make the repository name the same as the Python
-package name</em></p></li>
-<li><p><em>A lot of the following optional steps are *free</em> if the repository is Public,
-plus open source is cool*</p></li>
-</ul>
-</li>
-<li><p>After a GitHub repo has been created, run the commands listed under:
-“…or push an existing repository from the command line”</p></li>
-</ul>
-</li>
-<li><p>Register your project with Codecov:</p>
-<ul>
-<li><p>Make an account on <a class="reference external" href="https://codecov.io">codecov.io</a>(Recommended to sign in with GitHub)
-everything else will be handled for you.</p></li>
-</ul>
-</li>
-<li><p>Ensure that you have set GitHub pages to build the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch by selecting the
-<code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch in the dropdown in the “GitHub Pages” section of the repository settings.
-(<a class="reference external" href="https://github.com/MMV-Lab/mmv_im2im/settings">Repo Settings</a>)</p></li>
-<li><p>Register your project with PyPI:</p>
-<ul>
-<li><p>Make an account on <a class="reference external" href="https://pypi.org">pypi.org</a></p></li>
-<li><p>Go to your GitHub repository’s settings and under the
-<a class="reference external" href="https://github.com/MMV-Lab/mmv_im2im/settings/secrets/actions">Secrets tab</a>,
-add a secret called <code class="docutils literal notranslate"><span class="pre">PYPI_TOKEN</span></code> with your password for your PyPI account.
-Don’t worry, no one will see this password because it will be encrypted.</p></li>
-<li><p>Next time you push to the branch <code class="docutils literal notranslate"><span class="pre">main</span></code> after using <code class="docutils literal notranslate"><span class="pre">bump2version</span></code>, GitHub
-actions will build and deploy your Python package to PyPI.</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="suggested-git-branch-strategy">
-<h3>Suggested Git Branch Strategy<a class="headerlink" href="#suggested-git-branch-strategy" title="Permalink to this heading"></a></h3>
-<ol class="arabic simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">main</span></code> is for the most up-to-date development, very rarely should you directly
-commit to this branch. GitHub Actions will run on every push and on a CRON to this
-branch but still recommended to commit to your development branches and make pull
-requests to main. If you push a tagged commit with bumpversion, this will also release to PyPI.</p></li>
-<li><p>Your day-to-day work should exist on branches separate from <code class="docutils literal notranslate"><span class="pre">main</span></code>. Even if it is
-just yourself working on the repository, make a PR from your working branch to <code class="docutils literal notranslate"><span class="pre">main</span></code>
-so that you can ensure your commits don’t break the development head. GitHub Actions
-will run on every push to any branch or any pull request from any branch to any other
-branch.</p></li>
-<li><p>It is recommended to use “Squash and Merge” commits when committing PR’s. It makes
-each set of changes to <code class="docutils literal notranslate"><span class="pre">main</span></code> atomic and as a side effect naturally encourages small
-well defined PR’s.</p></li>
-</ol>
 <p><strong>MIT license</strong></p>
-</section>
 </section>
 </section>
 <section id="indices-and-tables">

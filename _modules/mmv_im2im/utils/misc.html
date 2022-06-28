@@ -200,10 +200,8 @@
     <span class="k">return</span> <span class="n">op_list</span></div>
 
 
-<div class="viewcode-block" id="generate_test_dataset_dict"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_test_dataset_dict">[docs]</a><span class="k">def</span> <span class="nf">generate_test_dataset_dict</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">data_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-    <span class="c1"># TODO: this function needs to be fixed</span>
+<div class="viewcode-block" id="generate_test_dataset_dict"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_test_dataset_dict">[docs]</a><span class="k">def</span> <span class="nf">generate_test_dataset_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">data_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    different options for &quot;data&quot;:</span>
 <span class="sd">    - one CSV</span>
@@ -218,10 +216,8 @@
         <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">data_column</span>
-
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">data_column</span><span class="p">])</span>
+            <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">data_type</span><span class="p">])</span>
 
     <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
         <span class="n">all_filename</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*</span><span class="si">{</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
@@ -345,17 +341,71 @@
     <span class="k">return</span> <span class="n">dataset_list</span></div>
 
 
+<div class="viewcode-block" id="load_one_folder"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.load_one_folder">[docs]</a><span class="k">def</span> <span class="nf">load_one_folder</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">all_filename</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*_IM.*&quot;</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;no file found in </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># parse how many images associated with one subject</span>
+    <span class="n">basename</span> <span class="o">=</span> <span class="n">all_filename</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stem</span>
+    <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="p">[:</span> <span class="n">basename</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
+    <span class="n">subject_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">basename</span><span class="si">}</span><span class="s2">_*.*&quot;</span><span class="p">))</span>
+    <span class="n">all_tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">sfile</span><span class="o">.</span><span class="n">stem</span><span class="p">[</span><span class="n">sfile</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">sfile</span> <span class="ow">in</span> <span class="n">subject_files</span><span class="p">]</span>
+
+    <span class="n">all_filename</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">all_filename</span><span class="p">:</span>
+        <span class="n">path_list</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="n">all_tags</span><span class="p">:</span>
+            <span class="n">fn_full</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_IM.&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">path_list</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn_full</span>
+        <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset_list</span></div>
+
+
+<div class="viewcode-block" id="load_subfolders"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.load_subfolders">[docs]</a><span class="k">def</span> <span class="nf">load_subfolders</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># parse how many images associated with one subject</span>
+    <span class="n">all_tags</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">data_p1</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">all_tags</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">all_filename</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data_p1</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.*&quot;</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;no file found in </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">all_filename</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">all_filename</span><span class="p">:</span>
+        <span class="n">path_list</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="n">all_tags</span><span class="p">:</span>
+            <span class="n">fn_full</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">tag_name</span><span class="p">)</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">path_list</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn_full</span>
+        <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset_list</span></div>
+
+
 <div class="viewcode-block" id="generate_dataset_dict_monai"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict_monai">[docs]</a><span class="k">def</span> <span class="nf">generate_dataset_dict_monai</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    different options for &quot;data&quot;:</span>
 <span class="sd">    - one CSV (columns: source, target, cmap), then split</span>
 <span class="sd">    - one folder (_IM.tiff, _GT.tiff, _CM.tiff), then split</span>
-<span class="sd">    - a dictionary of two or three folders (Im, GT, CM), then split</span>
+<span class="sd">    - one folder with two or three subfolders (Im, GT, CM), then split</span>
+<span class="sd">    - a dictionary of train/val</span>
 
 <span class="sd">    Return</span>
 <span class="sd">        a list of dict, each dict contains 2 or more keys, such as &quot;IM&quot;,</span>
 <span class="sd">        &quot;GT&quot;, and more (optional, e.g. &quot;LM&quot;, &quot;CM&quot;, etc.)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;data path is recognized as a string ...&quot;</span><span class="p">)</span>
     <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
@@ -365,30 +415,26 @@
             <span class="c1"># TODO: add loading</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-            <span class="n">all_filename</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*_IM.*&quot;</span><span class="p">))</span>
-            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;no file found in </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span>
-
-            <span class="c1"># parse how many images associated with one subject</span>
-            <span class="n">basename</span> <span class="o">=</span> <span class="n">all_filename</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">stem</span>
-            <span class="n">basename</span> <span class="o">=</span> <span class="n">basename</span><span class="p">[:</span> <span class="n">basename</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
-            <span class="n">subject_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">basename</span><span class="si">}</span><span class="s2">_*.*&quot;</span><span class="p">))</span>
-            <span class="n">all_tags</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">sfile</span><span class="o">.</span><span class="n">stem</span><span class="p">[</span><span class="n">sfile</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">sfile</span> <span class="ow">in</span> <span class="n">subject_files</span>
-            <span class="p">]</span>
-
-            <span class="n">all_filename</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">all_filename</span><span class="p">:</span>
-                <span class="n">path_list</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="k">for</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="n">all_tags</span><span class="p">:</span>
-                    <span class="n">fn_full</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">fn</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_IM.&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">tag_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-                    <span class="n">path_list</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn_full</span>
-                <span class="n">dataset_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path_list</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*_IM.*&quot;</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dataset_list</span> <span class="o">=</span> <span class="n">load_one_folder</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># one folder with multiple subfolders (Im, GT, CM)</span>
+                <span class="n">dataset_list</span> <span class="o">=</span> <span class="n">load_subfolders</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> is not a valid file or directory&quot;</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Dict</span><span class="p">):</span>
-        <span class="c1"># TODO: add loading case</span>
-        <span class="k">pass</span>
+        <span class="c1"># a dictionary of train/val</span>
+        <span class="k">if</span> <span class="s2">&quot;train&quot;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="s2">&quot;val&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">train_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">])</span>
+            <span class="n">train_list</span> <span class="o">=</span> <span class="n">load_one_folder</span><span class="p">(</span><span class="n">train_path</span><span class="p">)</span>
+            <span class="n">val_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;val&quot;</span><span class="p">])</span>
+            <span class="n">val_list</span> <span class="o">=</span> <span class="n">load_one_folder</span><span class="p">(</span><span class="n">val_path</span><span class="p">)</span>
+            <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_list</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">:</span> <span class="n">val_list</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;dictionary based loading only takes keywords: train and val&quot;</span>
+            <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;unsupported data type&quot;</span><span class="p">)</span>
 

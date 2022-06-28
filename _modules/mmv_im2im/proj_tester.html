@@ -136,7 +136,7 @@
         <span class="c1"># extract the three major chuck of the config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_cfg</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_cfg</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">trainer</span>
 
         <span class="c1"># define variables</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
@@ -157,7 +157,7 @@
 
         <span class="c1"># choose different inference function for different types of models</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="k">if</span> <span class="s2">&quot;sliding_window_params&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;sliding_window_params&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">model_extra</span><span class="p">:</span>
                 <span class="c1"># TODO: add convert to tensor with proper type, similar to torchio check</span>
                 <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
                 <span class="c1"># add the batch dimension</span>
@@ -166,15 +166,15 @@
                 <span class="n">y_hat</span> <span class="o">=</span> <span class="n">sliding_window_inference</span><span class="p">(</span>
                     <span class="n">inputs</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
                     <span class="n">predictor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
-                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;sliding_window_params&quot;</span><span class="p">],</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">model_extra</span><span class="p">[</span><span class="s2">&quot;sliding_window_params&quot;</span><span class="p">],</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
 
         <span class="c1"># do post-processing on the prediction</span>
-        <span class="k">if</span> <span class="s2">&quot;post_processing&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">postprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">pp_data</span> <span class="o">=</span> <span class="n">y_hat</span>
-            <span class="k">for</span> <span class="n">pp_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;post_processing&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">pp_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">postprocess</span><span class="p">:</span>
                 <span class="n">pp</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">pp_info</span><span class="p">)</span>
                 <span class="n">pp_data</span> <span class="o">=</span> <span class="n">pp</span><span class="p">(</span><span class="n">pp_data</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">pp_data</span><span class="p">):</span>
@@ -224,11 +224,12 @@
 <div class="viewcode-block" id="ProjectTester.run_inference"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.run_inference">[docs]</a>    <span class="k">def</span> <span class="nf">run_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c1"># set up model</span>
-        <span class="n">model_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+        <span class="n">model_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">framework</span>
         <span class="n">model_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mmv_im2im.models.pl_</span><span class="si">{</span><span class="n">model_category</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">my_model_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model_module</span><span class="p">,</span> <span class="s2">&quot;Model&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">my_model_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">pre_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">[</span><span class="s2">&quot;ckpt&quot;</span><span class="p">][</span><span class="s2">&quot;checkpoint_path&quot;</span><span class="p">])</span>
+
+        <span class="n">pre_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">)</span>
         <span class="c1"># TODO: hacky solution to remove a wrongly registered key</span>
         <span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;criterion.xym&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
@@ -241,17 +242,17 @@
 
         <span class="c1"># set up data</span>
         <span class="n">dataset_list</span> <span class="o">=</span> <span class="n">generate_test_dataset_dict</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">data_type</span>
         <span class="p">)</span>
 
         <span class="n">dataset_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;Z&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">][</span><span class="s2">&quot;dimension_order_out&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;Z&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">reader_params</span><span class="p">[</span><span class="s2">&quot;dimension_order_out&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">=</span> <span class="mi">2</span>
 
         <span class="c1"># load preprocessing transformation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="n">parse_monai_ops_vanilla</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;preprocess&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="n">parse_monai_ops_vanilla</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">preprocess</span><span class="p">)</span>
 
         <span class="c1"># loop through all images and apply the model</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">):</span>
@@ -260,15 +261,19 @@
 
             <span class="c1"># output file name info</span>
             <span class="n">fn_core</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
-            <span class="n">suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;suffix&quot;</span><span class="p">]</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_output</span><span class="o">.</span><span class="n">suffix</span>
 
             <span class="n">timelapse_data</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">][</span><span class="s2">&quot;dimension_order_out&quot;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="s2">&quot;T&quot;</span>
+                <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">reader_params</span><span class="p">[</span><span class="s2">&quot;dimension_order_out&quot;</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;T&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">reader_params</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                         <span class="s2">&quot;processing a subset of all timepoint is not supported yet&quot;</span>
                     <span class="p">)</span>
                 <span class="n">tmppath</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;making a temp folder at </span><span class="si">{</span><span class="n">tmppath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                 <span class="c1"># get the number of time points</span>
                 <span class="n">reader</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
@@ -277,7 +282,7 @@
                 <span class="n">tmpfile_list</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">t_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">timelapse_data</span><span class="p">):</span>
                     <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span>
-                        <span class="n">T</span><span class="o">=</span><span class="p">[</span><span class="n">t_idx</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]</span>
+                        <span class="n">T</span><span class="o">=</span><span class="p">[</span><span class="n">t_idx</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">reader_params</span>
                     <span class="p">)</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predicting the image timepoint </span><span class="si">{</span><span class="n">t_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -291,18 +296,14 @@
                 <span class="n">out_array</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_one_file</span><span class="p">)</span> <span class="k">for</span> <span class="n">tmp_one_file</span> <span class="ow">in</span> <span class="n">tmpfile_list</span><span class="p">]</span>
                 <span class="n">out_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">out_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_output</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                    <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
                 <span class="p">)</span>
 
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;TYX&quot;</span>
                 <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="p">(</span>
-                        <span class="s2">&quot;Z&quot;</span>
-                        <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">][</span>
-                            <span class="s2">&quot;dimension_order_out&quot;</span>
-                        <span class="p">]</span>
-                    <span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                         <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;TZYX&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;TCYX&quot;</span>
@@ -318,13 +319,14 @@
                 <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">tmppath</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">get_image_dask_data</span><span class="p">(</span>
-                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;input&quot;</span><span class="p">][</span><span class="s2">&quot;reader_params&quot;</span><span class="p">]</span>
+                    <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">reader_params</span>
                 <span class="p">)</span>
 
                 <span class="c1"># prepare output filename</span>
 
                 <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_output</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                    <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>
                 <span class="p">)</span>
 
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Predicting the image&quot;</span><span class="p">)</span>
