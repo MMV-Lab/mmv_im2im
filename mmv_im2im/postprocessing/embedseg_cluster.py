@@ -21,10 +21,7 @@ class Cluster_2d:
         self.pixel_y = pixel_y
 
     def cluster_with_gt(
-        self,
-        prediction,
-        instance,
-        n_sigma=1,
+        self, prediction, instance, n_sigma=1,
     ):
         height, width = prediction.size(1), prediction.size(2)
 
@@ -189,10 +186,7 @@ class Cluster_3d:
         self.pixel_z = pixel_z
 
     def cluster_with_gt(
-        self,
-        prediction,
-        instance,
-        n_sigma=1,
+        self, prediction, instance, n_sigma=1,
     ):
 
         depth, height, width = (

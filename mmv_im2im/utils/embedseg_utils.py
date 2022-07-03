@@ -131,11 +131,7 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
             instance, center, ids, anisotropy_factor, speed_up
         )
     elif len(instance.shape) == 2:
-        return generate_center_image_2d(
-            instance,
-            center,
-            ids,
-        )
+        return generate_center_image_2d(instance, center, ids,)
     else:
         raise ValueError("instance image must be either 2D or 3D")
 
@@ -278,9 +274,7 @@ def prepare_embedseg_cache(
                         ii : ii + crop_size,
                     ]
                     instance_crop = instance[
-                        kk : kk + crop_size_z,
-                        jj : jj + crop_size,
-                        ii : ii + crop_size,
+                        kk : kk + crop_size_z, jj : jj + crop_size, ii : ii + crop_size,
                     ]
                     center_image_crop = generate_center_image(
                         instance_crop,
@@ -290,9 +284,7 @@ def prepare_embedseg_cache(
                         speed_up=1,
                     )
                     class_image_crop = object_mask[
-                        kk : kk + crop_size_z,
-                        jj : jj + crop_size,
-                        ii : ii + crop_size,
+                        kk : kk + crop_size_z, jj : jj + crop_size, ii : ii + crop_size,
                     ]
                     if costmap_flag:
                         costmap_crop = costmap[
@@ -311,9 +303,7 @@ def prepare_embedseg_cache(
 
             if im_crop.shape[0] == 1:
                 OmeTiffWriter.save(
-                    im_crop[
-                        0,
-                    ],
+                    im_crop[0,],
                     cache_path / f"{fn_base}_{j:04d}_IM.tiff",
                     dim_order=dim_order,
                 )

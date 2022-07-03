@@ -46,7 +46,7 @@ class preset_generator_resent(nn.Module):
 
         # add downsampling layers
         for i in range(n_down_blocks):
-            mult = 2**i
+            mult = 2 ** i
             model += [
                 Convolution(
                     spatial_dims=spatial_dims,
@@ -61,7 +61,7 @@ class preset_generator_resent(nn.Module):
             ]
 
         # add ResNet blocks
-        mult = 2**n_down_blocks
+        mult = 2 ** n_down_blocks
         for i in range(n_res_blocks):
             model += [
                 ResidualUnit(
@@ -213,7 +213,7 @@ class patch_discriminator(nn.Module):
         nf_mult_prev = 1
         for n in range(1, n_layers):  # gradually increase the number of filters
             nf_mult_prev = nf_mult
-            nf_mult = min(2**n, 8)
+            nf_mult = min(2 ** n, 8)
             blocks += [
                 Convolution(
                     spatial_dims=spatial_dims,

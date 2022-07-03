@@ -86,10 +86,10 @@ class Model(pl.LightningModule):
         )
         discriminator_scheduler = discriminator_scheduler_func(discriminator_optimizer)
 
-        return [generator_optimizer, discriminator_optimizer], [
-            generator_scheduler,
-            discriminator_scheduler,
-        ]
+        return (
+            [generator_optimizer, discriminator_optimizer],
+            [generator_scheduler, discriminator_scheduler,],
+        )
 
     # only for test or validation
     def run_step(self, batch, batch_idx):
