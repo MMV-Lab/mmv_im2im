@@ -1,0 +1,21 @@
+mmv\_im2im.configs package
+==========================
+
+Submodules
+----------
+
+mmv\_im2im.configs.config\_base module
+--------------------------------------
+
+.. automodule:: mmv_im2im.configs.config_base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mmv_im2im.configs
+   :members:
+   :undoc-members:
+   :show-inheritance:
