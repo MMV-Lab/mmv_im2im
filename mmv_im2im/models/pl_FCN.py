@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from typing import Dict
+from pathlib import Path
 import pytorch_lightning as pl
 import torch
 from monai.losses import MaskedLoss
@@ -100,8 +101,9 @@ class Model(pl.LightningModule):
         if self.verbose and batch_idx == 0:
             src = batch["IM"]  # batch["source"][tio.DATA]
             tar = batch["GT"]  # batch["target"][tio.DATA]
-            if not os.path.exists(self.trainer.log_dir):
-                os.mkdir(self.trainer.log_dir)
+
+            # check if the log path exists, if not create one
+            Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
 
             src_out = np.squeeze(
                 src[

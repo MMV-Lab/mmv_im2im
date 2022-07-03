@@ -116,8 +116,9 @@ class Model(pl.LightningModule):
             self.log("G Loss", loss)
 
         if self.verbose and batch_idx == 0 and optimizer_idx == 0:
-            if not os.path.exists(self.trainer.log_dir):
-                os.mkdir(self.trainer.log_dir)
+            # check if the log path exists, if not create one
+            Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
+
             fake_images = fake_B.detach()
             fake_image = fake_images[0].cpu().numpy()
 
