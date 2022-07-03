@@ -194,7 +194,11 @@ class DataloaderModuleConfig:
     # find full API here:
     # https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader
     dataloader_params: Dict = field(
-        default={"batch_size": 1, "pin_memory": True, "num_workers": 2,},
+        default={
+            "batch_size": 1,
+            "pin_memory": True,
+            "num_workers": 2,
+        },
         is_mutable=True,
     )
 

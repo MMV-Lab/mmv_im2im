@@ -79,12 +79,17 @@ class Model(pl.LightningModule):
 
         generator_optimizer_func = parse_config_func(self.optimizer_info["generator"])
         generator_scheduler_func = parse_config_func(self.scheduler_info["generator"])
-        generator_optimizer = generator_optimizer_func(self.generator.parameters(),)
+        generator_optimizer = generator_optimizer_func(
+            self.generator.parameters(),
+        )
         generator_scheduler = generator_scheduler_func(generator_optimizer)
 
         return (
             [discriminator_optimizer, generator_optimizer],
-            [discriminator_scheduler, generator_scheduler,],
+            [
+                discriminator_scheduler,
+                generator_scheduler,
+            ],
         )
 
     def training_step(self, batch, batch_idx, optimizer_idx):

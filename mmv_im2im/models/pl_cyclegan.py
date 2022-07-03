@@ -88,7 +88,10 @@ class Model(pl.LightningModule):
 
         return (
             [generator_optimizer, discriminator_optimizer],
-            [generator_scheduler, discriminator_scheduler,],
+            [
+                generator_scheduler,
+                discriminator_scheduler,
+            ],
         )
 
     # only for test or validation

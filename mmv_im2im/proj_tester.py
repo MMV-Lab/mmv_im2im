@@ -112,7 +112,11 @@ class ProjectTester(object):
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "find non-trivial batch dimension"
                 OmeTiffWriter.save(
-                    pred[0,], out_fn, dim_order="CZYX",
+                    pred[
+                        0,
+                    ],
+                    out_fn,
+                    dim_order="CZYX",
                 )
             else:
                 raise ValueError("error in prediction output shape")

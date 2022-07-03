@@ -105,9 +105,30 @@ class Model(pl.LightningModule):
             # check if the log path exists, if not create one
             Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
 
-            src_out = np.squeeze(src[0,].detach().cpu().numpy()).astype(np.float)
-            tar_out = np.squeeze(tar[0,].detach().cpu().numpy()).astype(np.float)
-            prd_out = np.squeeze(y_hat[0,].detach().cpu().numpy()).astype(np.float)
+            src_out = np.squeeze(
+                src[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
+            tar_out = np.squeeze(
+                tar[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
+            prd_out = np.squeeze(
+                y_hat[
+                    0,
+                ]
+                .detach()
+                .cpu()
+                .numpy()
+            ).astype(np.float)
 
             if len(src_out.shape) == 2:
                 src_order = "YX"

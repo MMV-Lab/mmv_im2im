@@ -194,7 +194,10 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
                     )
                 else:
                     dataset_list.append(
-                        {"source_fn": fn, "target_fn": target_fn,}
+                        {
+                            "source_fn": fn,
+                            "target_fn": target_fn,
+                        }
                     )
         else:
             print(f"{data} is not a valid file or directory")
