@@ -2,7 +2,7 @@ include CONTRIBUTING.md
 include LICENSE
 include README.md
 
-recursive-include * *.yaml
+recursive-include * preset_*.yaml
 
 recursive-include tests *
 recursive-exclude * __pycache__
