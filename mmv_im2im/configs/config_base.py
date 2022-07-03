@@ -397,7 +397,12 @@ def configuration_validation(cfg):
     # (otherwise may cause hash errors)
     if cfg.data.dataloader.train.dataloader_type["func_name"] == "PersistentDataset":
         if "cache_dir" in cfg.data.dataloader.train.dataset_params:
-            cache_dir = cfg.data.dataloader.train.dataset_params["cache_dir"]
+            cache_dir = Path(cfg.data.dataloader.train.dataset_params["cache_dir"])
+
+            # make sure cache_dir exists, otherwise create one
+            cache_dir.mkdir(parents=True, exist_ok=True)
+
+            # replace the cache_dir with a subfolder with random name
             cache_dir_tmp = tempfile.mkdtemp(dir=cache_dir)
             cfg.data.dataloader.train.dataset_params["cache_dir"] = cache_dir_tmp
         else:
@@ -405,18 +410,6 @@ def configuration_validation(cfg):
                 UserWarning(
                     "The cache dir of PersistentDataset for training was overwritten"
                     "to None. No caching ..."
-                )
-            )
-    if cfg.data.dataloader.val.dataloader_type["func_name"] == "PersistentDataset":
-        if "cache_dir" in cfg.data.dataloader.val.dataset_params:
-            cache_dir = cfg.data.dataloader.val.dataset_params["cache_dir"]
-            cache_dir_tmp = tempfile.mkdtemp(dir=cache_dir)
-            cfg.data.dataloader.val.dataset_params["cache_dir"] = cache_dir_tmp
-        else:
-            warnings.warn(
-                UserWarning(
-                    "The cache dir of PersistentDataset for val was overwritten to "
-                    "None. No caching ..."
                 )
             )
 

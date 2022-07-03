@@ -4,6 +4,7 @@ This module provides lighting module for cycleGAN
 import os
 import torch
 import pytorch_lightning as pl
+from pathlib import Path
 from mmv_im2im.utils.misc import parse_config, parse_config_func
 from mmv_im2im.utils.gan_utils import ReplayBuffer
 from mmv_im2im.models.nets.gans import define_generator, define_discriminator
@@ -85,10 +86,13 @@ class Model(pl.LightningModule):
         )
         discriminator_scheduler = discriminator_scheduler_func(discriminator_optimizer)
 
-        return [generator_optimizer, discriminator_optimizer], [
-            generator_scheduler,
-            discriminator_scheduler,
-        ]
+        return (
+            [generator_optimizer, discriminator_optimizer],
+            [
+                generator_scheduler,
+                discriminator_scheduler,
+            ],
+        )
 
     # only for test or validation
     def run_step(self, batch, batch_idx):
@@ -209,8 +213,9 @@ class Model(pl.LightningModule):
             self.log("Generator Loss", tqdm_dict["g_loss"])
 
             if self.verbose and batch_idx == 0:
-                if not os.path.exists(self.trainer.log_dir):
-                    os.mkdir(self.trainer.log_dir)
+                # check if the log path exists, if not create one
+                Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
+
                 fake_images_A = fake_A_from_B.detach()
                 out_fn = (
                     self.trainer.log_dir

@@ -11,8 +11,20 @@ A python package for deep learing based image to image transformation in biomedi
 
 ## Installation
 
+For users (only using the package, not planning to change any code):
+
 **Stable Release:** `pip install mmv_im2im`<br>
 **Development Head:** `pip install git+https://github.com/MMV-Lab/mmv_im2im.git`
+
+For developers (planning to extend the package):
+
+```
+git clone https://github.com/MMV-Lab/mmv_im2im.git
+cd mmv_im2im
+pip install -e .[all]
+```
+
+Note: The `-e` option is so-called "editable" mode. This will allow code changes taking effect immediately.
 
 ## Documentation
 
