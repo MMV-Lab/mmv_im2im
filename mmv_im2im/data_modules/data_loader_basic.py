@@ -132,7 +132,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         )
         val_dataloader = DataLoader(
             val_dataset,
-            shuffle=True,
+            shuffle=False,
             collate_fn=list_data_collate,
             **val_loader_info.dataloader_params
         )

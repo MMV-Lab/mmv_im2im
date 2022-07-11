@@ -22,7 +22,8 @@ class Model(pl.LightningModule):
         if train:
             self.clustering_params = model_info_xx.criterion["params"]
             self.clustering_params.pop("foreground_weight")
-            self.clustering_params.pop("use_costmap")
+            if "use_costmap" in self.clustering_params:
+                self.clustering_params.pop("use_costmap")
 
         self.net = parse_config(model_info_xx.net)
 
@@ -43,9 +44,6 @@ class Model(pl.LightningModule):
                 optimizer, **self.model_info.scheduler["params"]
             )
             return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
-
-    def prepare_batch(self, batch):
-        return
 
     def forward(self, x):
         return self.net(x)
