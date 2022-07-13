@@ -1,0 +1,39 @@
+mode: inference
+
+data:
+  inference_input:
+    dir: "/PATH/TO/TEST/DATA/"  #ADD-YOURS
+    reader_params:
+      dimension_order_out: "SYX"  # S is for RGB images
+      C: 0
+      Z: 0
+  inference_output:
+    path: "/OUTPUT/PATH/"       #ADD-YOURS
+
+model:
+  framework: pix2pix
+  net:
+    generator:
+      type: predefined_resnet
+      params:
+        spatial_dims: 2
+        in_channels: 3
+        out_channels: 3
+        n_down_blocks: 4
+        n_res_blocks: 9
+        nf: 64
+        norm_layer: "BATCH"
+    discriminator:
+      type: predefined_multiscale
+      params:
+        num_discriminator: 2
+        spatial_dims: 2
+        in_channels: 6
+        n_layers: 4
+        nf: 64
+        norm_layer: "INSTANCE"
+  checkpoint:  "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"  #ADD-YOURS
+trainer:
+  params:
+    gpus: 1
+    precision: 16

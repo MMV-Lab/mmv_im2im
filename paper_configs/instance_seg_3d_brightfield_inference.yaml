@@ -1,0 +1,37 @@
+mode: inference
+
+data:
+  inference_input:
+    dir: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/holdout_fluorescent #  "/PATH/TO/DATA/"   #ADD-YOURS
+    reader_params:
+      dimension_order_out: "ZYX"
+      C: 0
+      T: 0
+  inference_output:
+    path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/  #  "/OUTPUT/PATH/"   #ADD-YOURS
+  preprocess:      
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
+      params:
+        min_z: 32
+
+model:
+  framework: FCN
+  net:
+    module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+    func_name: UNet3D
+    params:
+      in_channel: 1
+      n_classes: 7
+      down_ratio: 4
+  checkpoint: "/mnt/eternus/users/Jianxu/projects/mmv_im2im/lightning_logs/version_42/checkpoints/last.ckpt"  # "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
+  model_extra:
+    sliding_window_params:
+      roi_size: [32, 128, 128]
+      sw_batch_size: 4
+      overlap: 0.2
+      mode: "gaussian"
+trainer:
+  params:
+    gpus: 1
+    precision: 16

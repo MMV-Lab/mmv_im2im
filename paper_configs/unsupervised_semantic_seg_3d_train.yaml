@@ -1,0 +1,156 @@
+mode: train
+
+data:
+  data_path: "/PATH/TO/DATA/"   #ADD-YOURS
+  category: "unpair"
+  dataloader:
+    train:
+      dataloader_params:
+        batch_size: 2
+        pin_memory: True
+        num_workers: 4
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["IM", "GT"]
+        dimension_order_out: "ZYX"
+        C: 0
+        T: 0
+    - module_name: monai.transforms
+      func_name: AddChanneld
+      params:
+        keys: ["IM", "GT"]
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
+      params:
+        keys: ["GT"]
+        lower: 0
+        upper: 100
+        b_min: -1
+        b_max: 1
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
+      params:
+        keys: ["IM"]
+        lower: 0.1
+        upper: 99.9
+        b_min: -1
+        b_max: 1
+    # - module_name: monai.transforms
+    #   func_name: NormalizeIntensityd
+    #   params:
+    #     keys: ["IM", "GT"]                # Applying the same normalization to IM & GT is also fine
+    # - module_name: mmv_im2im.preprocessing.transforms
+    #   func_name: norm_around_center
+    #   params:
+    #     keys: ["IM","GT"]
+    #     min_z: 32          
+    - module_name: monai.transforms
+      func_name: RandSpatialCropd
+      params:
+        keys: ["IM"]
+        random_size: False
+        roi_size: [64, 192, 192]
+    # different random crop to avoid cropping at the same location
+    - module_name: monai.transforms
+      func_name: RandSpatialCropd
+      params:
+        keys: ["GT"]
+        random_size: False
+        roi_size: [64, 192, 192]
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT"]
+  augmentation:
+    - module_name: monai.transforms
+      func_name: RandFlipd
+      params:
+        prob: 0.5
+        keys: ["IM", "GT"]
+
+model:
+  framework: cyclegan
+  net:
+    generator:
+      module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single  
+      func_name: UNet3D
+      params:
+        in_channel: 1
+        n_classes: 1
+        down_ratio: 3
+    discriminator:
+      type: predefined_basic
+      params:
+        spatial_dims: 3
+        in_channels: 1
+        n_layers: 4
+        nf: 64
+        norm_layer: "INSTANCE"
+  criterion:
+    gan_loss:
+      module_name: torch.nn
+      func_name: MSELoss
+      params:
+        reduction: 'mean'
+    cycle_loss:
+      module_name: torch.nn
+      func_name: L1Loss
+      params:
+        reduction: 'mean'
+    identity_loss:
+      module_name: torch.nn
+      func_name: L1Loss
+      params:
+        reduction: 'mean'
+    weights:
+      gan_loss: 1
+      cycle_loss: 10
+      identity_loss: 2
+    fake_pool_size: 30
+  optimizer:
+    generator:
+      module_name: torch.optim
+      func_name: Adam  # AdamW
+      params:
+        lr: 0.0002
+        betas: [0.5, 0.999]
+        weight_decay: 0.0005
+    discriminator:
+      module_name: torch.optim
+      func_name: Adam  # AdamW
+      params:
+        lr: 0.0002
+        betas: [0.5, 0.999]
+        weight_decay: 0.0005
+  scheduler:
+    generator:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.999
+    discriminator:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.999
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 16
+    max_epochs: 10000
+    terminate_on_nan: True
+  callbacks:
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'Average Loss'
+        patience: 50 
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'Average Loss'
+        filename: 'best'

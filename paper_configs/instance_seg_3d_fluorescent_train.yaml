@@ -1,0 +1,79 @@
+mode: train
+
+data:
+  category: "embedseg"
+  extra:
+    center_method: "centroid"
+  dataloader:
+    train:
+      dataloader_params:
+        batch_size: 2
+        pin_memory: True
+        num_workers: 4
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["IM", "GT", "CE", "CL", "CM"]
+        dimension_order_out: "ZYX"
+        C: 0
+        T: 0
+    - module_name: monai.transforms
+      func_name: AddChanneld
+      params:
+        keys: ["IM", "GT", "CE", "CL", "CM"]
+    - module_name: monai.transforms
+      func_name: NormalizeIntensityd
+      params:
+        keys: ["IM"] 
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT", "CE", "CL", "CM"]
+  augmentation:
+    - module_name: monai.transforms
+      func_name: RandFlipd
+      params:
+        prob: 0.5
+        keys: ["IM", "GT", "CE", "CL", "CM"]
+   
+model:
+  framework: embedseg
+  net:
+    module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+    func_name: UNet3D
+    params:
+      in_channel: 1
+      n_classes: 7
+      down_ratio: 4
+  criterion:
+    module_name: mmv_im2im.utils.embedding_loss
+    func_name: SpatialEmbLoss_3d
+    params:
+      grid_y: 512
+      grid_x: 512
+      grid_z: 32
+      pixel_y: 1
+      pixel_x: 1
+      pixel_z: 1
+      n_sigma: 3
+      foreground_weight: 3.5
+      use_costmap: True
+  optimizer:
+      module_name: torch.optim
+      func_name: Adam  # AdamW
+      params:
+        lr: 0.001
+  scheduler:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.98
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 16
+    max_epochs: 10000
+    terminate_on_nan: True

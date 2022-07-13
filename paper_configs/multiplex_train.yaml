@@ -2,6 +2,7 @@ mode: train
 
 data:
   category: "pair"
+  data_path: /mnt/eternus/project_data/im2im_paper/multiplex/train/trans1
   dataloader:
     train:
       dataloader_params:
@@ -14,7 +15,7 @@ data:
       func_name: LoadImaged
       params:
         keys: ["IM", "GT"]
-        dimension_order_out: "SYX"
+        dimension_order_out: "SYX"  # S is for RGB image
         C: 0
         T: 0
         Z: 0
@@ -42,6 +43,14 @@ model:
         n_res_blocks: 9
         nf: 64
         norm_layer: "BATCH"
+    #discriminator:
+    #  type: predefined_basic
+    #  params:
+    #    spatial_dims: 2
+    #    in_channels: 6
+    #    n_layers: 4
+    #    nf: 64
+    #    norm_layer: "INSTANCE"
     discriminator:
       type: predefined_multiscale
       params:
