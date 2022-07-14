@@ -189,7 +189,7 @@ class SpatialEmbLoss_3d(nn.Module):
         return loss + prediction.sum() * 0
 
 
-class SpatialEmbLoss_2s(nn.Module):
+class SpatialEmbLoss_2d(nn.Module):
     def __init__(
         self,
         grid_y=1024,
@@ -308,11 +308,11 @@ class SpatialEmbLoss_2s(nn.Module):
                 # calculate var loss before exp
                 if self.use_costmap:
                     var_loss = var_loss + torch.mean(
-                        costmap * torch.pow(sigma_in - s[..., 0, 0].detach(), 2)
+                        costmap * torch.pow(sigma_in - s[..., 0].detach(), 2)
                     )
                 else:
                     var_loss = var_loss + torch.mean(
-                        torch.pow(sigma_in - s[..., 0, 0].detach(), 2)
+                        torch.pow(sigma_in - s[..., 0].detach(), 2)
                     )
 
                 s = torch.exp(s * 10)  # TODO
