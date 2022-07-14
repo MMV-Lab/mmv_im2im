@@ -2,18 +2,33 @@ mode: inference
 
 data:
   inference_input:
-    dir: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/holdout_fluorescent #  "/PATH/TO/DATA/"   #ADD-YOURS
+    dir: "/PATH/TO/DATA/"   #ADD-YOURS
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/  #  "/OUTPUT/PATH/"   #ADD-YOURS
+    path: "/OUTPUT/PATH/"   #ADD-YOURS
   preprocess:      
     - module_name: monai.transforms
       func_name: NormalizeIntensityd
       params:
-        keys: ["IM"] 
+        keys: ["IM"]
+  postprocess:
+    - module_name: mmv_im2im.postprocessing.embedseg_cluster
+      func_name: generate_instance_clusters
+      params:
+        grid_x: 1024
+        grid_y: 1024
+        grid_z: 80
+        pixel_x: 1
+        pixel_y: 1
+        pixel_z: 1
+        n_sigma: 3
+        seed_thresh: 0.5
+        min_mask_sum: 2
+        min_unclustered_sum: 2
+        min_object_size: 2
 
 model:
   framework: FCN
@@ -24,7 +39,7 @@ model:
       in_channel: 1
       n_classes: 7
       down_ratio: 4
-  checkpoint: "/mnt/eternus/users/Jianxu/projects/mmv_im2im/lightning_logs/version_42/checkpoints/last.ckpt"  # "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
+  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
   model_extra:
     sliding_window_params:
       roi_size: [32, 128, 128]
