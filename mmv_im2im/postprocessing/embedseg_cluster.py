@@ -67,9 +67,9 @@ class Cluster_2d:
         prediction,
         n_sigma=2,
         seed_thresh=0.5,
-        min_mask_sum=128,
+        min_mask_sum=5,
         min_unclustered_sum=0,
-        min_object_size=36,
+        min_object_size=5,
     ):
 
         height, width = prediction.size(1), prediction.size(2)
