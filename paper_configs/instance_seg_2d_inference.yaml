@@ -38,7 +38,7 @@ data:
         min_object_size: 4
 
 model:
-  framework: FCN
+  framework: embedseg
   net:
     module_name: mmv_im2im.models.nets.BranchedERFNet_2d
     func_name: BranchedERFNet_2d

@@ -31,7 +31,7 @@ data:
         min_object_size: 2
 
 model:
-  framework: FCN
+  framework: embegseg
   net:
     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
     func_name: UNet3D
