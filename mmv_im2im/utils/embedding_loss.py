@@ -1,3 +1,4 @@
+# adapted from https://github.com/juglab/EmbedSeg/tree/main/EmbedSeg/criterions
 import torch
 import torch.nn as nn
 from mmv_im2im.utils.lovasz_losses import lovasz_hinge
@@ -189,7 +190,7 @@ class SpatialEmbLoss_3d(nn.Module):
         return loss + prediction.sum() * 0
 
 
-class SpatialEmbLoss_2s(nn.Module):
+class SpatialEmbLoss_2d(nn.Module):
     def __init__(
         self,
         grid_y=1024,
@@ -239,12 +240,11 @@ class SpatialEmbLoss_2s(nn.Module):
         xym_s = self.xym[:, 0:height, 0:width].contiguous()  # 2 x h x w
 
         # weighted loss
+        instances_adjusted = instances
         if self.use_costmap:
             # only need to adjust instances in this step, because for pixels with
             # zero weight, this step will ignore the corresponding instances
-            instances_adjusted = instances * costmaps
-        else:
-            instances_adjusted = instances
+            instances_adjusted[costmaps == 0] = 0
 
         loss = 0
 
@@ -308,11 +308,11 @@ class SpatialEmbLoss_2s(nn.Module):
                 # calculate var loss before exp
                 if self.use_costmap:
                     var_loss = var_loss + torch.mean(
-                        costmap * torch.pow(sigma_in - s[..., 0, 0].detach(), 2)
+                        costmap * torch.pow(sigma_in - s[..., 0].detach(), 2)
                     )
                 else:
                     var_loss = var_loss + torch.mean(
-                        torch.pow(sigma_in - s[..., 0, 0].detach(), 2)
+                        torch.pow(sigma_in - s[..., 0].detach(), 2)
                     )
 
                 s = torch.exp(s * 10)  # TODO

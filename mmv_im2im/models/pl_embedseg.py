@@ -27,6 +27,9 @@ class Model(pl.LightningModule):
 
         self.net = parse_config(model_info_xx.net)
 
+        if model_info_xx.net["func_name"].startswith("BranchedERFNet"):
+            self.net.init_output(model_info_xx.criterion["params"]["n_sigma"])
+
         self.model_info = model_info_xx
         if train:
             self.criterion = parse_config(model_info_xx.criterion)
@@ -49,10 +52,10 @@ class Model(pl.LightningModule):
         return self.net(x)
 
     def run_step(self, batch, validation_stage, save_path: str = None):
-        im = batch["IM"].float()
-        instances = batch["GT"].int()
-        class_labels = batch["CL"].byte()
-        center_images = batch["CE"].byte()
+        im = batch["IM"]
+        instances = batch["GT"]
+        class_labels = batch["CL"]
+        center_images = batch["CE"]
 
         use_costmap = False
         if "CM" in batch:

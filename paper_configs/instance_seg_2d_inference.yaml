@@ -1,0 +1,52 @@
+mode: inference
+
+data:
+  inference_input:
+    dir:  "/PATH/TO/DATA/"   #ADD-YOURS
+    reader_params:
+      dimension_order_out: "YX"
+      C: 0
+      T: 0
+      Z: 0
+  inference_output:
+    path:  "/OUTPUT/PATH/"   #ADD-YOURS
+  preprocess:      
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentiles
+      params:
+        lower: 0.05
+        upper: 99.95
+        b_min: 0
+        b_max: 1
+    - module_name: monai.transforms
+      func_name: DivisiblePad
+      params:
+        k: 8
+
+  postprocess:
+    - module_name: mmv_im2im.postprocessing.embedseg_cluster
+      func_name: generate_instance_clusters
+      params:
+        grid_x: 1280
+        grid_y: 1280
+        pixel_x: 1
+        pixel_y: 1
+        n_sigma: 2
+        seed_thresh: 0.9
+        min_mask_sum: 2
+        min_unclustered_sum: 2
+        min_object_size: 4
+
+model:
+  framework: embedseg
+  net:
+    module_name: mmv_im2im.models.nets.BranchedERFNet_2d
+    func_name: BranchedERFNet_2d
+    params:
+      num_classes: [4, 1]
+      input_channels: 1
+  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
+trainer:
+  params:
+    gpus: 1
+    precision: 16

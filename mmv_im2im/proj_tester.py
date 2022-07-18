@@ -11,6 +11,7 @@ from aicsimageio.writers import OmeTiffWriter
 import torch
 from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config_func
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla
+from skimage.io import imsave as save_rgb
 
 # from mmv_im2im.utils.piecewise_inference import predict_piecewise
 from monai.inferers import sliding_window_inference
@@ -53,16 +54,26 @@ class ProjectTester(object):
         # original_size = tuple(original_size)
 
         # Perform the prediction
-        x = self.pre_process(img.compute())
+        x = img.compute()
+        # check if need to add channel dimension
+        if len(x.shape) == self.spatial_dims:
+            x = np.expand_dims(x, axis=0)
+
+        if self.pre_process is not None:
+            x = self.pre_process(x)
 
         # choose different inference function for different types of models
         with torch.no_grad():
-            if "sliding_window_params" in self.model_cfg.model_extra:
-                # TODO: add convert to tensor with proper type, similar to torchio check
-                x = torch.tensor(x)
-                # add the batch dimension
-                x = torch.unsqueeze(x, dim=0)
+            # add batch dimension
+            x = np.expand_dims(x, axis=0)
 
+            # TODO: add convert to tensor with proper type, similar to torchio check
+            x = torch.tensor(x)
+
+            if (
+                self.model_cfg.model_extra is not None
+                and "sliding_window_params" in self.model_cfg.model_extra
+            ):
                 y_hat = sliding_window_inference(
                     inputs=x.float().cuda(),
                     predictor=self.model,
@@ -96,18 +107,37 @@ class ProjectTester(object):
                 OmeTiffWriter.save(pred, out_fn, dim_order="YX")
             elif len(pred.shape) == 3:
                 if self.spatial_dims == 2:
-                    OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
+                    if pred.shape[0] == 3:
+                        if out_fn.suffix != ".png":
+                            out_fn = out_fn.with_suffix(".png")
+                        save_rgb(out_fn, np.moveaxis(pred, 0, -1))
+                    else:
+                        OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
                 else:
                     OmeTiffWriter.save(pred, out_fn, dim_order="ZYX")
             elif len(pred.shape) == 4:
                 if self.spatial_dims == 3:
                     OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
                 else:
-                    if pred.shape[0] == 1 and pred.shape[1] == 1:
-                        OmeTiffWriter.save(pred[0, 0], out_fn, dim_order="YX")
+                    if pred.shape[0] == 1:
+                        if pred.shape[1] == 1:
+                            OmeTiffWriter.save(pred[0, 0], out_fn, dim_order="YX")
+                        elif pred.shape[1] == 3:
+                            if out_fn.suffix != ".png":
+                                out_fn = out_fn.with_suffix(".png")
+                            save_rgb(
+                                out_fn,
+                                np.moveaxis(
+                                    pred[
+                                        0,
+                                    ],
+                                    0,
+                                    -1,
+                                ),
+                            )
                     else:
                         raise ValueError(
-                            "4D output detected for 2d problem with non-trivil dims"
+                            "4D output for 2d problem with non-trivil or RGB dims"
                         )
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "find non-trivial batch dimension"
@@ -132,6 +162,7 @@ class ProjectTester(object):
         pre_train = torch.load(self.model_cfg.checkpoint)
         # TODO: hacky solution to remove a wrongly registered key
         pre_train["state_dict"].pop("criterion.xym", None)
+        pre_train["state_dict"].pop("criterion.xyzm", None)
         self.model.load_state_dict(pre_train["state_dict"])
         self.model.cuda()
 
@@ -151,8 +182,9 @@ class ProjectTester(object):
         else:
             self.spatial_dims = 2
 
-        # load preprocessing transformation
-        self.pre_process = parse_monai_ops_vanilla(self.data_cfg.preprocess)
+        if self.data_cfg.preprocess is not None:
+            # load preprocessing transformation
+            self.pre_process = parse_monai_ops_vanilla(self.data_cfg.preprocess)
 
         # loop through all images and apply the model
         for i, ds in enumerate(dataset_list):

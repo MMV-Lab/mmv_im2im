@@ -2,6 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
+  data_path: "/PATH/TO/YOUR/DATA"   #ADD-YOURS
+  cache_path: "/PATH/TO/TEMP/FOLDER/FOR/CROPPED/DATA"   #ADD-YOURS
   extra:
     center_method: "centroid"
   dataloader:
@@ -23,14 +25,11 @@ data:
       func_name: AddChanneld
       params:
         keys: ["IM", "GT", "CE", "CL", "CM"]
-    - module_name: monai.transforms
-      func_name: ScaleIntensityRangePercentilesd
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
       params:
-        keys: ["IM"]
-        lower: 0.1
-        upper: 99.9
-        b_min: -1
-        b_max: 1
+        keys: ["IM","GT"]
+        min_z: 32 
     - module_name: monai.transforms
       func_name: EnsureTyped
       params:
@@ -41,7 +40,7 @@ data:
       params:
         prob: 0.5
         keys: ["IM", "GT", "CE", "CL", "CM"]
-   
+
 model:
   framework: embedseg
   net:
