@@ -513,6 +513,23 @@
                     <span class="s2">&quot;to None. No caching ...&quot;</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataloader_type</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PersistentDataset&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;cache_dir&quot;</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">:</span>
+            <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">])</span>
+
+            <span class="c1"># make sure cache_dir exists, otherwise create one</span>
+            <span class="n">cache_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># replace the cache_dir with a subfolder with random name</span>
+            <span class="n">cache_dir_tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">)</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache_dir_tmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="ne">UserWarning</span><span class="p">(</span>
+                    <span class="s2">&quot;The cache dir of PersistentDataset for validation was overwritten&quot;</span>
+                    <span class="s2">&quot;to None. No caching ...&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cfg</span></div>
 </pre></div>

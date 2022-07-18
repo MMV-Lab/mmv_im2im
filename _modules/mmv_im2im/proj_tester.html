@@ -112,6 +112,7 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">generate_test_dataset_dict</span><span class="p">,</span> <span class="n">parse_config_func</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.for_transform</span> <span class="kn">import</span> <span class="n">parse_monai_ops_vanilla</span>
+<span class="kn">from</span> <span class="nn">skimage.io</span> <span class="kn">import</span> <span class="n">imsave</span> <span class="k">as</span> <span class="n">save_rgb</span>
 
 <span class="c1"># from mmv_im2im.utils.piecewise_inference import predict_piecewise</span>
 <span class="kn">from</span> <span class="nn">monai.inferers</span> <span class="kn">import</span> <span class="n">sliding_window_inference</span>
@@ -154,16 +155,26 @@
         <span class="c1"># original_size = tuple(original_size)</span>
 
         <span class="c1"># Perform the prediction</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">())</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="c1"># check if need to add channel dimension</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
         <span class="c1"># choose different inference function for different types of models</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="k">if</span> <span class="s2">&quot;sliding_window_params&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">model_extra</span><span class="p">:</span>
-                <span class="c1"># TODO: add convert to tensor with proper type, similar to torchio check</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                <span class="c1"># add the batch dimension</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># add batch dimension</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
+            <span class="c1"># TODO: add convert to tensor with proper type, similar to torchio check</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">model_extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="s2">&quot;sliding_window_params&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">model_extra</span>
+            <span class="p">):</span>
                 <span class="n">y_hat</span> <span class="o">=</span> <span class="n">sliding_window_inference</span><span class="p">(</span>
                     <span class="n">inputs</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
                     <span class="n">predictor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
@@ -197,18 +208,37 @@
                 <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                    <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CYX&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">out_fn</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;.png&quot;</span><span class="p">:</span>
+                            <span class="n">out_fn</span> <span class="o">=</span> <span class="n">out_fn</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+                        <span class="n">save_rgb</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CYX&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;ZYX&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CZYX&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">out_fn</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;.png&quot;</span><span class="p">:</span>
+                                <span class="n">out_fn</span> <span class="o">=</span> <span class="n">out_fn</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+                            <span class="n">save_rgb</span><span class="p">(</span>
+                                <span class="n">out_fn</span><span class="p">,</span>
+                                <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span>
+                                    <span class="n">pred</span><span class="p">[</span>
+                                        <span class="mi">0</span><span class="p">,</span>
+                                    <span class="p">],</span>
+                                    <span class="mi">0</span><span class="p">,</span>
+                                    <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="p">),</span>
+                            <span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;4D output detected for 2d problem with non-trivil dims&quot;</span>
+                            <span class="s2">&quot;4D output for 2d problem with non-trivil or RGB dims&quot;</span>
                         <span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;find non-trivial batch dimension&quot;</span>
@@ -233,6 +263,7 @@
         <span class="n">pre_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">)</span>
         <span class="c1"># TODO: hacky solution to remove a wrongly registered key</span>
         <span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;criterion.xym&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;criterion.xyzm&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
@@ -252,8 +283,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">=</span> <span class="mi">2</span>
 
-        <span class="c1"># load preprocessing transformation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="n">parse_monai_ops_vanilla</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">preprocess</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">preprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># load preprocessing transformation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="n">parse_monai_ops_vanilla</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">preprocess</span><span class="p">)</span>
 
         <span class="c1"># loop through all images and apply the model</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">):</span>
