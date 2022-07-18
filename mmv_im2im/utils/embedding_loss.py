@@ -1,3 +1,4 @@
+# adapted from https://github.com/juglab/EmbedSeg/tree/main/EmbedSeg/criterions
 import torch
 import torch.nn as nn
 from mmv_im2im.utils.lovasz_losses import lovasz_hinge
@@ -239,12 +240,11 @@ class SpatialEmbLoss_2d(nn.Module):
         xym_s = self.xym[:, 0:height, 0:width].contiguous()  # 2 x h x w
 
         # weighted loss
+        instances_adjusted = instances
         if self.use_costmap:
             # only need to adjust instances in this step, because for pixels with
             # zero weight, this step will ignore the corresponding instances
-            instances_adjusted = instances * costmaps
-        else:
-            instances_adjusted = instances
+            instances_adjusted[costmaps == 0] = 0
 
         loss = 0
 

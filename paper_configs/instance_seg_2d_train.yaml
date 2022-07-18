@@ -2,22 +2,50 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: # /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/toy
-  cache_path: /mnt/eternus/users/Jianxu/data/embedseg/train_cache/  # /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/toy_cache
+  data_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/
+  cache_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/cache  # /mnt/eternus/users/Jianxu/data/embedseg/train_cache/
   extra:
     center_method: "medoid"
   dataloader:
     train:
       dataloader_params:
-        batch_size: 4
+        batch_size: 16
         pin_memory: True
-        num_workers: 4
+        num_workers: 8
 
   preprocess:
     - module_name: monai.transforms
       func_name: LoadImaged
       params:
-        keys: ["IM", "GT", "CE", "CL"]
+        keys: ["IM"]
+        dtype: float
+        dimension_order_out: "YX"
+        C: 0
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["GT"]
+        dtype: short
+        dimension_order_out: "YX"
+        C: 0
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["CL"]
+        dtype: ubyte
+        dimension_order_out: "YX"
+        C: 0
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["CE"]
+        dtype: bool
         dimension_order_out: "YX"
         C: 0
         T: 0
@@ -26,13 +54,19 @@ data:
       func_name: AddChanneld
       params:
         keys: ["IM", "GT", "CE", "CL"]
+    #- module_name: monai.transforms
+    #  func_name: NormalizeIntensityd
+    #  params:
+    #    keys: ["IM"]
+    #    subtrahend: 0
+    #    divisor: 65535
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentilesd
       params:
         keys: ["IM"]
-        lower: 0.01
-        upper: 99.99
-        b_min: -1
+        lower: 0.05
+        upper: 99.95
+        b_min: 0
         b_max: 1
     - module_name: monai.transforms
       func_name: EnsureTyped
@@ -57,17 +91,18 @@ model:
     module_name: mmv_im2im.utils.embedding_loss
     func_name: SpatialEmbLoss_2d
     params:
-      grid_y: 1024
-      grid_x: 1024
+      grid_y: 1280
+      grid_x: 1280
       pixel_y: 1
       pixel_x: 1
       n_sigma: 2
-      foreground_weight: 1
+      foreground_weight: 10
+      use_costmap: False
   optimizer:
       module_name: torch.optim
       func_name: Adam  # AdamW
       params:
-        lr: 0.001
+        lr: 0.0005
   scheduler:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
@@ -80,3 +115,4 @@ trainer:
     precision: 16
     max_epochs: 10000
     terminate_on_nan: True
+    num_sanity_val_steps: 0

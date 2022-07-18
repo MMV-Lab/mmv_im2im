@@ -2,6 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
+  data_path: /Path/to/your/data
+  cache_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/cache_small
   extra:
     center_method: "centroid"
   dataloader:
