@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: /mnt/eternus/project_data/im2im_paper/denoising/Denoising_Planaria/train_data
+  data_path: "/PATH/TO/DATA/"   #ADD-YOURS
   dataloader:
     train:
       dataloader_params:

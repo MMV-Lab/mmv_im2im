@@ -2,8 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/
-  cache_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/cache  # /mnt/eternus/users/Jianxu/data/embedseg/train_cache/
+  data_path: "/PATH/TO/DATA/"   #ADD-YOURS
+  cache_path: "/PATH/TO/TEMP/FOLDER/FOR/CROPPED/DATA/"   #ADD-YOURS
   extra:
     center_method: "medoid"
   dataloader:

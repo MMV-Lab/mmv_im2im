@@ -28,7 +28,7 @@ class Model(pl.LightningModule):
         self.net = parse_config(model_info_xx.net)
 
         if model_info_xx.net["func_name"].startswith("BranchedERFNet"):
-            self.net.init_output(model_info_xx.criterion["params"]['n_sigma'])
+            self.net.init_output(model_info_xx.criterion["params"]["n_sigma"])
 
         self.model_info = model_info_xx
         if train:

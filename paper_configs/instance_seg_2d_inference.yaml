@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/test #  "/PATH/TO/DATA/"   #ADD-YOURS
+    dir:  "/PATH/TO/DATA/"   #ADD-YOURS
     reader_params:
       dimension_order_out: "YX"
       C: 0
       T: 0
       Z: 0
   inference_output:
-    path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_2D/  #  "/OUTPUT/PATH/"   #ADD-YOURS
+    path:  "/OUTPUT/PATH/"   #ADD-YOURS
   preprocess:      
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -45,7 +45,7 @@ model:
     params:
       num_classes: [4, 1]
       input_channels: 1
-  checkpoint: "/mnt/eternus/users/Jianxu/projects/mmv_im2im/lightning_logs/version_14/checkpoints/last.ckpt"  # "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
+  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
 trainer:
   params:
     gpus: 1

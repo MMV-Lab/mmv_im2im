@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: /mnt/eternus/project_data/im2im_paper/denoising/Denoising_Planaria/test_data/raw # "/PATH/TO/DATA/"   #ADD-YOURS
+    dir: "/PATH/TO/DATA/"   #ADD-YOURS
     data_type: tif
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: /mnt/eternus/project_data/im2im_paper/denoising/Denoising_Planaria/test_data/ # "/OUTPUT/PATH/"   #ADD-YOURS
+    path: "/OUTPUT/PATH/"   #ADD-YOURS
   preprocess:       
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -32,7 +32,7 @@ model:
       strides: [2, 2]
       num_res_units: 3
       norm: "BATCH"
-  checkpoint: "/mnt/eternus/users/Jianxu/projects/mmv_im2im/lightning_logs/version_40/checkpoints/last.ckpt"  # "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
+  checkpoint:  "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
   model_extra:
     sliding_window_params:
       roi_size: [16, 128, 128]

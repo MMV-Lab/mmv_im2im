@@ -39,7 +39,7 @@ model:
       in_channel: 1
       n_classes: 7
       down_ratio: 4
-  checkpoint: # "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
+  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
   model_extra:
     sliding_window_params:
       roi_size: [32, 128, 128]
