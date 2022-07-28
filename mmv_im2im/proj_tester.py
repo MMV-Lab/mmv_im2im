@@ -68,19 +68,20 @@ class ProjectTester(object):
             x = np.expand_dims(x, axis=0)
 
             # TODO: add convert to tensor with proper type, similar to torchio check
-            x = torch.tensor(x)
+            x = torch.tensor(x).float().cuda()
 
             if (
                 self.model_cfg.model_extra is not None
                 and "sliding_window_params" in self.model_cfg.model_extra
             ):
                 y_hat = sliding_window_inference(
-                    inputs=x.float().cuda(),
+                    inputs=x,
                     predictor=self.model,
+                    device=torch.device('cpu'),
                     **self.model_cfg.model_extra["sliding_window_params"],
                 )
             else:
-                y_hat = self.model(x.float().cuda())
+                y_hat = self.model(x).cpu()
 
         # do post-processing on the prediction
         if self.data_cfg.postprocess is not None:
@@ -89,11 +90,11 @@ class ProjectTester(object):
                 pp = parse_config_func(pp_info)
                 pp_data = pp(pp_data)
             if torch.is_tensor(pp_data):
-                pred = pp_data.cpu().numpy()
+                pred = pp_data.numpy()
             else:
                 pred = pp_data
         else:
-            pred = y_hat.cpu().numpy()
+            pred = y_hat.numpy()
 
         # TODO: needs to clean up after checking how to restore image size in MONAI
         # if original_size != pred.shape[-1 * len(original_size) :]:
