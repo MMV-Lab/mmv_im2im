@@ -77,7 +77,7 @@ class ProjectTester(object):
                 y_hat = sliding_window_inference(
                     inputs=x,
                     predictor=self.model,
-                    device=torch.device('cpu'),
+                    device=torch.device("cpu"),
                     **self.model_cfg.model_extra["sliding_window_params"],
                 )
             else:
