@@ -3,6 +3,7 @@
 import logging
 from importlib import import_module
 import pytorch_lightning as pl
+import torch
 from mmv_im2im.data_modules import get_data_module
 from mmv_im2im.utils.misc import parse_ops_list
 
@@ -50,16 +51,16 @@ class ProjectTrainer(object):
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg, verbose=self.train_cfg.verbose)
 
-        # #TODO: need some work here
-        """
-        if "resume" in self.model_cfg:
-            self.model = self.model.load_from_checkpoint(self.model_cfg["resume"])
-        elif "pre-train" in self.model_cfg:
-            pre_train = torch.load(self.model_cfg["pre-train"])
-            # TODO: hacky solution to remove a wrongly registered key
-            pre_train["state_dict"].pop("criterion.xym", None)
-            self.model.load_state_dict(pre_train["state_dict"])
-        """
+        if self.model_cfg.model_extra is not None:
+            if "resume" in self.model_cfg.model_extra:
+                self.model = self.model.load_from_checkpoint(
+                    self.model_cfg.model_extra["resume"]
+                )
+            elif "pre-train" in self.model_cfg.model_extra:
+                pre_train = torch.load(self.model_cfg.model_extra["pre-train"])
+                # TODO: hacky solution to remove a wrongly registered key
+                pre_train["state_dict"].pop("criterion.xym", None)
+                self.model.load_state_dict(pre_train["state_dict"])
 
         # set up training
         if self.train_cfg.callbacks is None:

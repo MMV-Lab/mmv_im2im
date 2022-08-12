@@ -120,7 +120,10 @@ def generate_test_dataset_dict(data: Union[str, Path], data_type: str = None) ->
             dataset_list.append(row[data_type])
 
     elif data.is_dir():
-        all_filename = sorted(data.glob(f"*{data_type}"))
+        if "*" in data_type:
+            all_filename = sorted(data.glob(data_type))
+        else:
+            all_filename = sorted(data.glob(f"*{data_type}"))
         assert len(all_filename) > 0, f"no file found in {data}"
         print(f"{len(all_filename)} files are found at {data}")
         all_filename.sort()
