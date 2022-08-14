@@ -381,7 +381,9 @@
     <span class="c1"># the parameters to be passed in when making the dataset (e.g. PersistentDataset)</span>
     <span class="c1"># find full API in the corresponding Dataset function</span>
     <span class="c1"># e.g. https://docs.monai.io/en/stable/data.html#persistentdataset</span>
-    <span class="n">dataset_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;./tmp&quot;</span><span class="p">},</span> <span class="n">is_mutable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dataset_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;./tmp&quot;</span><span class="p">,</span> <span class="s2">&quot;pickle_protocol&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span> <span class="n">is_mutable</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 
     <span class="c1"># the parameters to be passed in when making the DataLoader</span>
     <span class="c1"># find full API here:</span>
