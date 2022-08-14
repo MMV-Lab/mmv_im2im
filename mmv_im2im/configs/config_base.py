@@ -188,7 +188,9 @@ class DataloaderModuleConfig:
     # the parameters to be passed in when making the dataset (e.g. PersistentDataset)
     # find full API in the corresponding Dataset function
     # e.g. https://docs.monai.io/en/stable/data.html#persistentdataset
-    dataset_params: Dict = field(default={"cache_dir": "./tmp"}, is_mutable=True)
+    dataset_params: Dict = field(
+        default={"cache_dir": "./tmp", "pickle_protocol": 5}, is_mutable=True
+    )
 
     # the parameters to be passed in when making the DataLoader
     # find full API here:

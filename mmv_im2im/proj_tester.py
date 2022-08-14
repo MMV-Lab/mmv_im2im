@@ -68,7 +68,7 @@ class ProjectTester(object):
             x = np.expand_dims(x, axis=0)
 
             # TODO: add convert to tensor with proper type, similar to torchio check
-            x = torch.tensor(x)
+            x = torch.tensor(x).cuda()
 
             if (
                 self.model_cfg.model_extra is not None

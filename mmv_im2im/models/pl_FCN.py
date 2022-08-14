@@ -12,6 +12,7 @@ from mmv_im2im.utils.misc import (
     parse_config_func,
     parse_config_func_without_params,
 )
+from mmv_im2im.utils.model_utils import init_weights
 
 
 class Model(pl.LightningModule):
@@ -22,6 +23,9 @@ class Model(pl.LightningModule):
         #    self.sliding_window = model_info_xx["sliding_window_params"]
         # else:
         #    self.sliding_window = None
+
+        init_weights(self.net, init_type="kaiming")
+
         self.model_info = model_info_xx
         self.verbose = verbose
         if train:

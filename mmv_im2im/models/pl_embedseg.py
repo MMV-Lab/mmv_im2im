@@ -3,6 +3,7 @@ from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
 import pytorch_lightning as pl
 from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
+from mmv_im2im.utils.model_utils import init_weights
 
 from mmv_im2im.utils.misc import (
     parse_config,
@@ -29,6 +30,8 @@ class Model(pl.LightningModule):
 
         if model_info_xx.net["func_name"].startswith("BranchedERFNet"):
             self.net.init_output(model_info_xx.criterion["params"]["n_sigma"])
+        else:
+            init_weights(self.net, init_type="kaiming")
 
         self.model_info = model_info_xx
         if train:
