@@ -152,12 +152,7 @@ class Model(pl.LightningModule):
             image_A0 = image_A[0].detach().cpu().numpy()
             image_B0 = image_B[0].detach().cpu().numpy()
 
-            self.save_pix2pix_output(
-                image_A0,
-                image_B0,
-                fake_image,
-                "train"
-            )
+            self.save_pix2pix_output(image_A0, image_B0, fake_image, "train")
 
         return loss
 
@@ -175,9 +170,7 @@ class Model(pl.LightningModule):
         D_loss = self.loss.discriminator_step(
             self.discriminator, image_A, image_B, fake_B
         )
-        G_loss = self.loss.generator_step(
-            self.discriminator, image_A, image_B, fake_B
-        )
+        G_loss = self.loss.generator_step(self.discriminator, image_A, image_B, fake_B)
 
         if self.verbose and batch_idx == 0:
             # check if the log path exists, if not create one
@@ -189,25 +182,16 @@ class Model(pl.LightningModule):
             image_A0 = image_A[0].detach().cpu().numpy()
             image_B0 = image_B[0].detach().cpu().numpy()
 
-            self.save_pix2pix_output(
-                image_A0,
-                image_B0,
-                fake_image,
-                "val"
-            )
+            self.save_pix2pix_output(image_A0, image_B0, fake_image, "val")
 
         return {"G_loss": G_loss, "D_loss": D_loss}
 
     def validation_epoch_end(self, val_step_outputs):
         val_gen_loss = (
-            torch.stack([x["G_loss"] for x in val_step_outputs], dim=0)
-            .mean()
-            .item()
+            torch.stack([x["G_loss"] for x in val_step_outputs], dim=0).mean().item()
         )
         val_disc_loss = (
-            torch.stack([x["D_loss"] for x in val_step_outputs], dim=0)
-            .mean()
-            .item()
+            torch.stack([x["D_loss"] for x in val_step_outputs], dim=0).mean().item()
         )
         self.log("val_loss_generator", val_gen_loss)
         self.log("val_loss_discriminator", val_disc_loss)
