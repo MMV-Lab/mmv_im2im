@@ -92,6 +92,33 @@ class Model(pl.LightningModule):
             ],
         )
 
+    def save_pix2pix_output(self, image_A, image_B, fake_image, current_stage):
+
+        # check if the log path exists, if not create one
+        log_dir = Path(self.trainer.log_dir)
+        log_dir.mkdir(parents=True, exist_ok=True)
+
+        current_epoch = self.current_epoch
+
+        if len(fake_image.shape) == 3 and fake_image.shape[0] == 3:
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_fake_B.png"
+            save_rgb(out_fn, np.moveaxis(fake_image, 0, -1))
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_B.png"
+            save_rgb(out_fn, np.moveaxis(image_B, 0, -1))
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_A.png"
+            save_rgb(out_fn, np.moveaxis(image_A, 0, -1))
+        else:
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_fake_B.tiff"
+            imsave(out_fn, fake_image)
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_B.tiff"
+            imsave(out_fn, image_B)
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_A.tiff"
+            imsave(out_fn, image_A)
+
     def training_step(self, batch, batch_idx, optimizer_idx):
 
         # imageB : real image
@@ -119,56 +146,18 @@ class Model(pl.LightningModule):
             self.log("G Loss", loss)
 
         if self.verbose and batch_idx == 0 and optimizer_idx == 0:
-            # check if the log path exists, if not create one
-            Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
-
             fake_images = fake_B.detach()
             fake_image = fake_images[0].cpu().numpy()
 
-            if len(fake_image.shape) == 3 and fake_image.shape[0] == 3:
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_fake_B.png"
-                )
-                save_rgb(out_fn, np.moveaxis(fake_image, 0, -1))
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_real_B.png"
-                )
-                save_rgb(out_fn, np.moveaxis(image_B[0].detach().cpu().numpy(), 0, -1))
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_real_A.png"
-                )
-                save_rgb(out_fn, np.moveaxis(image_A[0].detach().cpu().numpy(), 0, -1))
-            else:
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_fake_B.tiff"
-                )
-                imsave(out_fn, fake_images[0].detach().cpu().numpy())
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_real_B.tiff"
-                )
-                imsave(out_fn, image_B[0].detach().cpu().numpy())
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_real_A.tiff"
-                )
-                imsave(out_fn, image_A[0].detach().cpu().numpy())
+            image_A0 = image_A[0].detach().cpu().numpy()
+            image_B0 = image_B[0].detach().cpu().numpy()
+
+            self.save_pix2pix_output(
+                image_A0,
+                image_B0,
+                fake_image,
+                "train"
+            )
 
         return loss
 
@@ -178,22 +167,47 @@ class Model(pl.LightningModule):
         self.log("generator_loss", G_mean_loss)
         self.log("discriminator_loss", D_mean_loss)
 
-    """
     def validation_step(self, batch, batch_idx):
-        loss_dictionary = self.run_step(batch, batch_idx)
-        return loss_dictionary
+        image_A = batch["IM"]
+        image_B = batch["GT"]
+
+        fake_B = self.generator(image_A).detach()
+        D_loss = self.loss.discriminator_step(
+            self.discriminator, image_A, image_B, fake_B
+        )
+        G_loss = self.loss.generator_step(
+            self.discriminator, image_A, image_B, fake_B
+        )
+
+        if self.verbose and batch_idx == 0:
+            # check if the log path exists, if not create one
+            Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
+
+            fake_images = fake_B.detach()
+            fake_image = fake_images[0].cpu().numpy()
+
+            image_A0 = image_A[0].detach().cpu().numpy()
+            image_B0 = image_B[0].detach().cpu().numpy()
+
+            self.save_pix2pix_output(
+                image_A0,
+                image_B0,
+                fake_image,
+                "val"
+            )
+
+        return {"G_loss": G_loss, "D_loss": D_loss}
 
     def validation_epoch_end(self, val_step_outputs):
         val_gen_loss = (
-            torch.stack([x["generator_loss"] for x in val_step_outputs], dim=0)
+            torch.stack([x["G_loss"] for x in val_step_outputs], dim=0)
             .mean()
             .item()
         )
         val_disc_loss = (
-            torch.stack([x["discriminator_loss"] for x in val_step_outputs], dim=0)
+            torch.stack([x["D_loss"] for x in val_step_outputs], dim=0)
             .mean()
             .item()
         )
         self.log("val_loss_generator", val_gen_loss)
         self.log("val_loss_discriminator", val_disc_loss)
-    """
