@@ -20,10 +20,10 @@ class Net(torch.nn.Module):
             info["func_name"] = "deeplabv3_resnet50"
             self.net = parse_config(info)
         elif backbone == "deeplabv3_resnet101":
-            info["func_name": "deeplabv3_resnet101"]
+            info["func_name":"deeplabv3_resnet101"]
             self.net = parse_config(info)
         elif backbone == "deeplabv3_mobilenet_v3_large":
-            info["func_name": "deeplabv3_mobilenet_v3_large"]
+            info["func_name":"deeplabv3_mobilenet_v3_large"]
             self.net = parse_config(info)
         if in_channels != 3:
             self.net.backbone.conv1 = torch.nn.Conv2d(
