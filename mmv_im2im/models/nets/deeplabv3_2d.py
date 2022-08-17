@@ -1,5 +1,5 @@
-# ADAPTED FROM https://pytorch.org/vision/main/_modules/torchvision/models/segmentation/deeplabv3.html
-# and https://discuss.pytorch.org/t/how-to-modify-deeplabv3-and-fcn-models-for-grayscale-images/52688
+# ADAPTED FROM https://pytorch.org/vision/main/_modules/torchvision/models/segmentation/deeplabv3.html  # noqa E501
+# and https://discuss.pytorch.org/t/how-to-modify-deeplabv3-and-fcn-models-for-grayscale-images/52688  # noqa E501
 
 import torch
 from mmv_im2im.utils.misc import parse_config

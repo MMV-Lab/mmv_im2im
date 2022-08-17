@@ -62,7 +62,7 @@ class Model(pl.LightningModule):
         y = batch["GT"]
         if "CM" in batch.keys():
             assert (
-                self.masked_loss == True
+                self.masked_loss
             ), "Costmap is detected in training data, but not set up in criterion"
             cm = batch["CM"]
 
