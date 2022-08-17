@@ -28,11 +28,13 @@ class Model(pl.LightningModule):
 
         self.model_info = model_info_xx
         self.verbose = verbose
+        self.masked_loss = False
         if train:
-            if "costmap" in model_info_xx.criterion and model_info_xx.criterion.pop(
-                "costmap"
-            ):
+            if "use_costmap" in model_info_xx.criterion[
+                "params"
+            ] and model_info_xx.criterion["params"].pop("use_costmap"):
                 self.criterion = MaskedLoss(parse_config(model_info_xx.criterion))
+                self.masked_loss = True
             else:
                 self.criterion = parse_config(model_info_xx.criterion)
             self.optimizer_func = parse_config_func(model_info_xx.optimizer)
@@ -56,31 +58,18 @@ class Model(pl.LightningModule):
         return self.net(x)
 
     def run_step(self, batch, validation_stage):
-        # if "costmap" in batch:
-        #    costmap = batch.pop("costmap")
-        #    costmap = costmap[tio.DATA]
-        # else:
-        #    costmap = None
-
-        # x = batch["source"][tio.DATA]
-        # y = batch["target"][tio.DATA]
         x = batch["IM"]
         y = batch["GT"]
+        if "CM" in batch.keys():
+            assert (
+                self.masked_loss == True
+            ), "Costmap is detected in training data, but not set up in criterion"
+            cm = batch["CM"]
 
+        # only for badly formated data file
         if x.size()[-1] == 1:
             x = torch.squeeze(x, dim=-1)
             y = torch.squeeze(y, dim=-1)
-
-        # if validation_stage and self.sliding_window is not None:
-        #    y_hat = predict_piecewise(
-        #        self,
-        #        x[
-        #            0,
-        #        ],
-        #        **self.sliding_window
-        #    )
-        # else:
-        #    y_hat = self(x)
 
         y_hat = self(x)
 
@@ -94,7 +83,10 @@ class Model(pl.LightningModule):
         # else:
         #    loss = self.criterion(y_hat, y, costmap)
 
-        loss = self.criterion(y_hat, y)
+        if self.masked_loss:
+            loss = self.criterion(y_hat, y, cm)
+        else:
+            loss = self.criterion(y_hat, y)
 
         return loss, y_hat
 
@@ -103,8 +95,8 @@ class Model(pl.LightningModule):
         self.log("train_loss", loss, prog_bar=True)
 
         if self.verbose and batch_idx == 0:
-            src = batch["IM"]  # batch["source"][tio.DATA]
-            tar = batch["GT"]  # batch["target"][tio.DATA]
+            src = batch["IM"]
+            tar = batch["GT"]
 
             # check if the log path exists, if not create one
             Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
