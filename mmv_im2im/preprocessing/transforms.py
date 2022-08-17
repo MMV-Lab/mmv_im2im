@@ -5,15 +5,6 @@ import numpy as np
 from torch.nn import functional as F
 
 
-def to_float(img):
-    return img.float()
-
-
-def dummy_to_ones(img):
-    img[:] = 1
-    return img
-
-
 def norm_around_center(img, z_center: Optional[int] = None, min_z: Optional[int] = 32):
     """Returns normalized version of input img.
     img will be normalized with respect to the mean, std pixel intensity
@@ -27,9 +18,15 @@ def norm_around_center(img, z_center: Optional[int] = None, min_z: Optional[int]
         Z-index of cell centers.
     Returns
     -------
-    4D torch.Tensor
-       Normalized img
+    4D numpy array or tensor
+       Normalized image
     """
+
+    # #TODO: Currently, I am not 100 percent sure about how F.pad deals with
+    # tensor and ndarray. From the documentation, it seems like only tensors
+    # are supported. But, it also works on some kind of ndarray (not all), 
+    # very strange. Need to follow up to have a better understanding 
+
     if not isinstance(img, np.ndarray):
         img_array = img.numpy()
     else:
@@ -71,9 +68,14 @@ def pad_to_multiple(
 
     Returns
     -------
-    4D torch.Tensor
-       padded img
+    4D numpy array or tensor
+        padded image
     """
+
+    # #TODO: Currently, I am not 100 percent sure about how F.pad deals with
+    # tensor and ndarray. From the documentation, it seems like only tensors
+    # are supported. But, it also works on some kind of ndarray (not all), 
+    # very strange. Need to follow up to have a better understanding 
 
     if not isinstance(img, np.ndarray):
         img_array = img.numpy()
@@ -153,9 +155,14 @@ def pad_z(img, target_size: int = 64, pad_value: Union[str, float, int] = 0):
 
     Returns
     -------
-    4D torch.Tensor
-       padded img
+    4D numpy array or tensor
+       padded image
     """
+
+    # #TODO: Currently, I am not 100 percent sure about how F.pad deals with
+    # tensor and ndarray. From the documentation, it seems like only tensors
+    # are supported. But, it also works on some kind of ndarray (not all), 
+    # very strange. Need to follow up to have a better understanding 
 
     if not isinstance(img, np.ndarray):
         img_array = img.numpy()
@@ -179,6 +186,7 @@ def pad_z(img, target_size: int = 64, pad_value: Union[str, float, int] = 0):
             else:
                 return F.pad(img, pad_shape, pad_value)
         else:
+            print(type(img))
             return F.pad(img, pad_shape, "constant", pad_value)
     else:
         return img

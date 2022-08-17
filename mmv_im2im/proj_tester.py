@@ -59,16 +59,20 @@ class ProjectTester(object):
         if len(x.shape) == self.spatial_dims:
             x = np.expand_dims(x, axis=0)
 
+        # convert the numpy array to float tensor
+        x = torch.tensor(x.astype(np.float32))
+
+        # run pre-processing on tensor if needed
         if self.pre_process is not None:
             x = self.pre_process(x)
 
         # choose different inference function for different types of models
+        # the input here is assumed to be a tensor
         with torch.no_grad():
-            # add batch dimension
-            x = np.expand_dims(x, axis=0)
+            # add batch dimension and move to GPU
+            x = torch.unsqueeze(x, dim=0).cuda()
 
             # TODO: add convert to tensor with proper type, similar to torchio check
-            x = torch.tensor(x).float().cuda()
 
             if (
                 self.model_cfg.model_extra is not None
@@ -80,8 +84,27 @@ class ProjectTester(object):
                     device=torch.device("cpu"),
                     **self.model_cfg.model_extra["sliding_window_params"],
                 )
+                # currently, we keep sliding window stiching step on CPU, but assume
+                # the output is on GPU (see note below). So, we manually move the data
+                # back to GPU
+                y_hat = y_hat.cuda()
             else:
-                y_hat = self.model(x).cpu()
+                y_hat = self.model(x)
+
+        ###############################################################################
+        #
+        # Note: currently, we assume y_hat is still on gpu, because embedseg clustering
+        # step is still only running on GPU (possible on CPU, need to some update on
+        # grid loading). All the post-procesisng functions we tested so far can accept
+        # tensor on GPU. If it is from mmv_im2im.post_processing, it will automatically
+        # convert the tensor to a numpy array and return the result as numpy array; if
+        # it is from monai.transforms, it is tensor in and tensor out. We have two items
+        # as #TODO: (1) we will extend post-processing functions in mmv_im2im to work
+        # similarly to monai transforms, ie. ndarray in ndarray out or tensor in tensor
+        # out. (2) allow yaml config to control if we want to run post-processing on
+        # GPU tensors or ndarrays
+        #
+        ##############################################################################
 
         # do post-processing on the prediction
         if self.data_cfg.postprocess is not None:
