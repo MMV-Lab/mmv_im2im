@@ -24,8 +24,8 @@ def norm_around_center(img, z_center: Optional[int] = None, min_z: Optional[int]
 
     # #TODO: Currently, I am not 100 percent sure about how F.pad deals with
     # tensor and ndarray. From the documentation, it seems like only tensors
-    # are supported. But, it also works on some kind of ndarray (not all), 
-    # very strange. Need to follow up to have a better understanding 
+    # are supported. But, it also works on some kind of ndarray (not all),
+    # very strange. Need to follow up to have a better understanding
 
     if not isinstance(img, np.ndarray):
         img_array = img.numpy()
@@ -74,8 +74,8 @@ def pad_to_multiple(
 
     # #TODO: Currently, I am not 100 percent sure about how F.pad deals with
     # tensor and ndarray. From the documentation, it seems like only tensors
-    # are supported. But, it also works on some kind of ndarray (not all), 
-    # very strange. Need to follow up to have a better understanding 
+    # are supported. But, it also works on some kind of ndarray (not all),
+    # very strange. Need to follow up to have a better understanding
 
     if not isinstance(img, np.ndarray):
         img_array = img.numpy()
@@ -161,8 +161,8 @@ def pad_z(img, target_size: int = 64, pad_value: Union[str, float, int] = 0):
 
     # #TODO: Currently, I am not 100 percent sure about how F.pad deals with
     # tensor and ndarray. From the documentation, it seems like only tensors
-    # are supported. But, it also works on some kind of ndarray (not all), 
-    # very strange. Need to follow up to have a better understanding 
+    # are supported. But, it also works on some kind of ndarray (not all),
+    # very strange. Need to follow up to have a better understanding
 
     if not isinstance(img, np.ndarray):
         img_array = img.numpy()
