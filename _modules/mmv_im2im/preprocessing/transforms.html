@@ -198,15 +198,6 @@
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 
-<div class="viewcode-block" id="to_float"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.to_float">[docs]</a><span class="k">def</span> <span class="nf">to_float</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">img</span><span class="o">.</span><span class="n">float</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="dummy_to_ones"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.dummy_to_ones">[docs]</a><span class="k">def</span> <span class="nf">dummy_to_ones</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-    <span class="n">img</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">img</span></div>
-
-
 <div class="viewcode-block" id="norm_around_center"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.norm_around_center">[docs]</a><span class="k">def</span> <span class="nf">norm_around_center</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">z_center</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">min_z</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns normalized version of input img.</span>
 <span class="sd">    img will be normalized with respect to the mean, std pixel intensity</span>
@@ -220,9 +211,15 @@
 <span class="sd">        Z-index of cell centers.</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    4D torch.Tensor</span>
-<span class="sd">       Normalized img</span>
+<span class="sd">    4D numpy array or tensor</span>
+<span class="sd">       Normalized image</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># #TODO: Currently, I am not 100 percent sure about how F.pad deals with</span>
+    <span class="c1"># tensor and ndarray. From the documentation, it seems like only tensors</span>
+    <span class="c1"># are supported. But, it also works on some kind of ndarray (not all), </span>
+    <span class="c1"># very strange. Need to follow up to have a better understanding </span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
@@ -264,9 +261,14 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    4D torch.Tensor</span>
-<span class="sd">       padded img</span>
+<span class="sd">    4D numpy array or tensor</span>
+<span class="sd">        padded image</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># #TODO: Currently, I am not 100 percent sure about how F.pad deals with</span>
+    <span class="c1"># tensor and ndarray. From the documentation, it seems like only tensors</span>
+    <span class="c1"># are supported. But, it also works on some kind of ndarray (not all), </span>
+    <span class="c1"># very strange. Need to follow up to have a better understanding </span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -346,9 +348,14 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    4D torch.Tensor</span>
-<span class="sd">       padded img</span>
+<span class="sd">    4D numpy array or tensor</span>
+<span class="sd">       padded image</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># #TODO: Currently, I am not 100 percent sure about how F.pad deals with</span>
+    <span class="c1"># tensor and ndarray. From the documentation, it seems like only tensors</span>
+    <span class="c1"># are supported. But, it also works on some kind of ndarray (not all), </span>
+    <span class="c1"># very strange. Need to follow up to have a better understanding </span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="n">img_array</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -372,6 +379,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pad_shape</span><span class="p">,</span> <span class="n">pad_value</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pad_shape</span><span class="p">,</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">pad_value</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">img</span></div>

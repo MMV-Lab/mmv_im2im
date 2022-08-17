@@ -252,16 +252,20 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
+        <span class="c1"># convert the numpy array to float tensor</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="c1"># run pre-processing on tensor if needed</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
         <span class="c1"># choose different inference function for different types of models</span>
+        <span class="c1"># the input here is assumed to be a tensor</span>
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="c1"># add batch dimension</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># add batch dimension and move to GPU</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
             <span class="c1"># TODO: add convert to tensor with proper type, similar to torchio check</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">model_extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -273,8 +277,27 @@
                     <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">),</span>
                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">model_extra</span><span class="p">[</span><span class="s2">&quot;sliding_window_params&quot;</span><span class="p">],</span>
                 <span class="p">)</span>
+                <span class="c1"># currently, we keep sliding window stiching step on CPU, but assume</span>
+                <span class="c1"># the output is on GPU (see note below). So, we manually move the data</span>
+                <span class="c1"># back to GPU</span>
+                <span class="n">y_hat</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+                <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1">###############################################################################</span>
+        <span class="c1">#</span>
+        <span class="c1"># Note: currently, we assume y_hat is still on gpu, because embedseg clustering</span>
+        <span class="c1"># step is still only running on GPU (possible on CPU, need to some update on</span>
+        <span class="c1"># grid loading). All the post-procesisng functions we tested so far can accept</span>
+        <span class="c1"># tensor on GPU. If it is from mmv_im2im.post_processing, it will automatically</span>
+        <span class="c1"># convert the tensor to a numpy array and return the result as numpy array; if</span>
+        <span class="c1"># it is from monai.transforms, it is tensor in and tensor out. We have two items</span>
+        <span class="c1"># as #TODO: (1) we will extend post-processing functions in mmv_im2im to work</span>
+        <span class="c1"># similarly to monai transforms, ie. ndarray in ndarray out or tensor in tensor</span>
+        <span class="c1"># out. (2) allow yaml config to control if we want to run post-processing on</span>
+        <span class="c1"># GPU tensors or ndarrays</span>
+        <span class="c1">#</span>
+        <span class="c1">##############################################################################</span>
 
         <span class="c1"># do post-processing on the prediction</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">postprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

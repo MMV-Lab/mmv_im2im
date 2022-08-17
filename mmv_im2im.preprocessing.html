@@ -214,11 +214,6 @@
 <section id="module-mmv_im2im.preprocessing.transforms">
 <span id="mmv-im2im-preprocessing-transforms-module"></span><h2>mmv_im2im.preprocessing.transforms module<a class="headerlink" href="#module-mmv_im2im.preprocessing.transforms" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.dummy_to_ones">
-<span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">dummy_to_ones</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#dummy_to_ones"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.dummy_to_ones" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.norm_around_center">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">norm_around_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_center</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#norm_around_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.norm_around_center" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns normalized version of input img.
@@ -233,10 +228,10 @@ img’s “z_center”.
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Normalized img</p>
+<dd class="field-odd"><p>Normalized image</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>4D torch.Tensor</p>
+<dd class="field-even"><p>4D numpy array or tensor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -254,10 +249,10 @@ img will be padded to the size of multiple of “multiple_base”.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>padded img</p>
+<dd class="field-even"><p>padded image</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>4D torch.Tensor</p>
+<dd class="field-odd"><p>4D numpy array or tensor</p>
 </dd>
 </dl>
 </dd></dl>
@@ -275,18 +270,13 @@ img will be padded along z to the size of “target_size”.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>padded img</p>
+<dd class="field-even"><p>padded image</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>4D torch.Tensor</p>
+<dd class="field-odd"><p>4D numpy array or tensor</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.to_float">
-<span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">to_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#to_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.to_float" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-mmv_im2im.preprocessing">
