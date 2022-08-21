@@ -5,7 +5,10 @@ import torch
 
 
 def extract_segmentation(
-    im: Union[np.ndarray, torch.Tensor], channel: int, cutoff: Union[float, str] = None
+    im: Union[np.ndarray, torch.Tensor],
+    channel: int,
+    cutoff: Union[float, str] = None,
+    batch_dim: bool = False,
 ) -> np.ndarray:
     """extract segmentation from a prediction
 
@@ -18,15 +21,21 @@ def extract_segmentation(
     cutoff: float or str
         either a fixed cutoff value or a segmentation method from skimage, default is
         None (do not apply any cutoff)
+    batch_dim: bool
+        whether there is a batch dimension
     """
 
     # convert tensor to numpy
     if torch.is_tensor(im):
         im = im.cpu().numpy()
-    assert len(im.shape) == 4 or len(im.shape) == 5, "extract seg only accepts 4D/5D"
-    assert im.shape[0] == 1, "extract seg requires first dim to be 1"
+    if batch_dim:
+        assert len(im.shape) == 4 or len(im.shape) == 5, "extract seg with batch_dim only accepts 4D/5D"
+        assert im.shape[0] == 1, "extract seg with batch_dim requires first dim to be 1"
+        prob = im[0, channel, :]
+    else:
+        assert len(im.shape) == 3 or len(im.shape) == 4, "extract seg without batch_dim only accepts 3D/4D"
+        prob = im[channel, :]
 
-    prob = im[0, channel, :]
     if cutoff is None:
         return prob
     else:
