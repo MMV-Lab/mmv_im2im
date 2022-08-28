@@ -196,6 +196,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 
 
 <div class="viewcode-block" id="norm_around_center"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.norm_around_center">[docs]</a><span class="k">def</span> <span class="nf">norm_around_center</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">z_center</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">min_z</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span><span class="p">):</span>
@@ -383,6 +384,125 @@
             <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">pad_shape</span><span class="p">,</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">pad_value</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="normalize_staining"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.normalize_staining">[docs]</a><span class="k">def</span> <span class="nf">normalize_staining</span><span class="p">(</span>
+    <span class="n">img</span><span class="p">,</span> <span class="n">Io</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">return_unmix_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Normalize staining appearence of H&amp;E stained images</span>
+
+<span class="sd">    Input:</span>
+<span class="sd">        I: RGB input image (we assume channel order CYX), numpy array or torch.tensor</span>
+<span class="sd">        Io: (optional) transmitted light intensity</span>
+<span class="sd">        alpha: parameter from paper (see Reference)</span>
+<span class="sd">        beta: parameter from paper (see Reference)</span>
+<span class="sd">        return_unmix_results: whether to return unmixed H and E channel for debugging</span>
+
+<span class="sd">    Output:</span>
+<span class="sd">        Inorm: normalized image</span>
+<span class="sd">        H: (optional, only when return_unmix_results=True) hematoxylin image</span>
+<span class="sd">        E: (optional, only when return_unmix_results=True) eosin image</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">        A method for normalizing histology slides for quantitative analysis. M.</span>
+<span class="sd">        Macenko et al., ISBI 2009</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">HERef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5626</span><span class="p">,</span> <span class="mf">0.2159</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.7201</span><span class="p">,</span> <span class="mf">0.8012</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4062</span><span class="p">,</span> <span class="mf">0.5581</span><span class="p">]])</span>
+
+    <span class="n">maxCRef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.9705</span><span class="p">,</span> <span class="mf">1.0308</span><span class="p">])</span>
+
+    <span class="n">back_to_tensor</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">original_data_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+        <span class="n">back_to_tensor</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">original_data_type</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">dtype</span>
+
+    <span class="c1"># define height and width of image and move the color dimenstion to the last</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;the first dimension of the image must be 3 (RGB)&quot;</span>
+
+    <span class="c1"># reshape image</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="c1"># calculate optical density</span>
+    <span class="n">OD</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Io</span><span class="p">)</span>
+
+    <span class="c1"># remove transparent pixels</span>
+    <span class="n">ODhat</span> <span class="o">=</span> <span class="n">OD</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">OD</span> <span class="o">&lt;</span> <span class="n">beta</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="c1"># compute eigenvectors</span>
+    <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">ODhat</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+
+    <span class="c1"># eigvecs *= -1</span>
+
+    <span class="c1"># project on the plane spanned by the eigenvectors corresponding to the two</span>
+    <span class="c1"># largest eigenvalues</span>
+    <span class="n">That</span> <span class="o">=</span> <span class="n">ODhat</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">eigvecs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">That</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">That</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">minPhi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="n">maxPhi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="mi">100</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span>
+
+    <span class="n">vMin</span> <span class="o">=</span> <span class="n">eigvecs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">minPhi</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">minPhi</span><span class="p">))])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">vMax</span> <span class="o">=</span> <span class="n">eigvecs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">maxPhi</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">maxPhi</span><span class="p">))])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># a heuristic to make the vector corresponding to hematoxylin first and the</span>
+    <span class="c1"># one corresponding to eosin second</span>
+    <span class="k">if</span> <span class="n">vMin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">vMax</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">HE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">vMin</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vMax</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">HE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">vMax</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vMin</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># rows correspond to channels (RGB), columns to OD values</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">OD</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># determine concentrations of the individual stains</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">HE</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># normalize stain concentrations</span>
+    <span class="n">maxC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="mi">99</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="mi">99</span><span class="p">)])</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">maxC</span><span class="p">,</span> <span class="n">maxCRef</span><span class="p">)</span>
+    <span class="n">C2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">tmp</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span>
+
+    <span class="c1"># recreate the image using reference mixing matrix</span>
+    <span class="n">Inorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">Io</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">HERef</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">C2</span><span class="p">)))</span>
+    <span class="n">Inorm</span><span class="p">[</span><span class="n">Inorm</span> <span class="o">&gt;</span> <span class="mi">255</span><span class="p">]</span> <span class="o">=</span> <span class="mi">254</span>
+    <span class="n">Inorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Inorm</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="c1"># unmix hematoxylin and eosin</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+        <span class="n">Io</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="o">-</span><span class="n">HERef</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">C2</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">H</span><span class="p">[</span><span class="n">H</span> <span class="o">&gt;</span> <span class="mi">255</span><span class="p">]</span> <span class="o">=</span> <span class="mi">254</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+        <span class="n">Io</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="o">-</span><span class="n">HERef</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">C2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">E</span><span class="p">[</span><span class="n">E</span> <span class="o">&gt;</span> <span class="mi">255</span><span class="p">]</span> <span class="o">=</span> <span class="mi">254</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">E</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="c1"># move the color dimension to the first to be consistent with others transforms</span>
+    <span class="n">Inorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">Inorm</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">back_to_tensor</span><span class="p">:</span>
+        <span class="n">Inorm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">Inorm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">original_data_type</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">return_unmix_results</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Inorm</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">E</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Inorm</span></div>
 </pre></div>
 
            </div>

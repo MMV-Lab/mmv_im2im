@@ -237,6 +237,27 @@ img’s “z_center”.
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.normalize_staining">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">normalize_staining</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">240</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_unmix_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#normalize_staining"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.normalize_staining" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize staining appearence of H&amp;E stained images</p>
+<dl class="simple">
+<dt>Input:</dt><dd><p>I: RGB input image (we assume channel order CYX), numpy array or torch.tensor
+Io: (optional) transmitted light intensity
+alpha: parameter from paper (see Reference)
+beta: parameter from paper (see Reference)
+return_unmix_results: whether to return unmixed H and E channel for debugging</p>
+</dd>
+<dt>Output:</dt><dd><p>Inorm: normalized image
+H: (optional, only when return_unmix_results=True) hematoxylin image
+E: (optional, only when return_unmix_results=True) eosin image</p>
+</dd>
+<dt>Reference:</dt><dd><p>A method for normalizing histology slides for quantitative analysis. M.
+Macenko et al., ISBI 2009</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.preprocessing.transforms.pad_to_multiple">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.preprocessing.transforms.</span></span><span class="sig-name descname"><span class="pre">pad_to_multiple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/preprocessing/transforms.html#pad_to_multiple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.preprocessing.transforms.pad_to_multiple" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns padded image.

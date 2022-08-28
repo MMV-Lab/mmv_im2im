@@ -195,34 +195,7 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">parse_config</span><span class="p">,</span> <span class="n">parse_config_func_without_params</span>
 <span class="kn">from</span> <span class="nn">monai.transforms</span> <span class="kn">import</span> <span class="n">Compose</span><span class="p">,</span> <span class="n">Lambdad</span><span class="p">,</span> <span class="n">Lambda</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">def parse_tio_ops(trans_func: List[Dict]):</span>
-<span class="sd">    import torchio as tio</span>
-
-<span class="sd">    # Here, we will use the Compose function in torchio to merge</span>
-<span class="sd">    # all transformations. If any trnasformation not from torchio,</span>
-<span class="sd">    # a torchio Lambda function will be used to wrap around it.</span>
-<span class="sd">    trans_list = []</span>
-<span class="sd">    for func_info in trans_func:</span>
-<span class="sd">        if func_info[&quot;module_name&quot;] == &quot;torchio&quot;:</span>
-<span class="sd">            trans_list.append(parse_config(func_info))</span>
-<span class="sd">        else:</span>
-<span class="sd">            my_func = parse_config_func_without_params(func_info)</span>
-<span class="sd">            if &quot;params&quot; in func_info:</span>
-<span class="sd">                callable_func = partial(my_func, **func_info[&quot;params&quot;])</span>
-<span class="sd">            else:</span>
-<span class="sd">                callable_func = my_func</span>
-
-<span class="sd">            if &quot;extra_kwargs&quot; in func_info:</span>
-<span class="sd">                trans_list.append(</span>
-<span class="sd">                    tio.Lambda(callable_func, **func_info[&quot;extra_kwargs&quot;])</span>
-<span class="sd">                )</span>
-<span class="sd">            else:</span>
-<span class="sd">                trans_list.append(tio.Lambda(callable_func))</span>
-
-<span class="sd">    return tio.Compose(trans_list)</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 
 
 <div class="viewcode-block" id="center_crop"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.for_transform.center_crop">[docs]</a><span class="k">def</span> <span class="nf">center_crop</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">target_shape</span><span class="p">):</span>
@@ -279,7 +252,10 @@
 
             <span class="c1"># check if any other params</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">func_params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">callable_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_params</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">my_func</span><span class="p">):</span>
+                    <span class="n">callable_func</span> <span class="o">=</span> <span class="n">my_func</span><span class="p">(</span><span class="o">**</span><span class="n">func_params</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">callable_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="o">**</span><span class="n">func_params</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">callable_func</span> <span class="o">=</span> <span class="n">my_func</span>
 

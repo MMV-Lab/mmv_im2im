@@ -198,7 +198,10 @@
 
 
 <div class="viewcode-block" id="extract_segmentation"><a class="viewcode-back" href="../../../mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.basic_collection.extract_segmentation">[docs]</a><span class="k">def</span> <span class="nf">extract_segmentation</span><span class="p">(</span>
-    <span class="n">im</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">im</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">channel</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">batch_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;extract segmentation from a prediction</span>
 
@@ -211,15 +214,25 @@
 <span class="sd">    cutoff: float or str</span>
 <span class="sd">        either a fixed cutoff value or a segmentation method from skimage, default is</span>
 <span class="sd">        None (do not apply any cutoff)</span>
+<span class="sd">    batch_dim: bool</span>
+<span class="sd">        whether there is a batch dimension</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># convert tensor to numpy</span>
     <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">im</span><span class="p">):</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;extract seg only accepts 4D/5D&quot;</span>
-    <span class="k">assert</span> <span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;extract seg requires first dim to be 1&quot;</span>
+    <span class="k">if</span> <span class="n">batch_dim</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span>
+        <span class="p">),</span> <span class="s2">&quot;extract seg with batch_dim only accepts 4D/5D&quot;</span>
+        <span class="k">assert</span> <span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;extract seg with batch_dim requires first dim to be 1&quot;</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">im</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="p">),</span> <span class="s2">&quot;extract seg without batch_dim only accepts 3D/4D&quot;</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">im</span><span class="p">[</span><span class="n">channel</span><span class="p">,</span> <span class="p">:]</span>
 
-    <span class="n">prob</span> <span class="o">=</span> <span class="n">im</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="p">:]</span>
     <span class="k">if</span> <span class="n">cutoff</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">prob</span>
     <span class="k">else</span><span class="p">:</span>
