@@ -3,6 +3,7 @@
 from typing import Optional, Tuple, List, Union
 import numpy as np
 from torch.nn import functional as F
+import torch
 
 
 def norm_around_center(img, z_center: Optional[int] = None, min_z: Optional[int] = 32):
@@ -198,7 +199,7 @@ def normalize_staining(
     """Normalize staining appearence of H&E stained images
 
     Input:
-        I: RGB input image (we assume channel order CYX)
+        I: RGB input image (we assume channel order CYX), numpy array or torch.tensor
         Io: (optional) transmitted light intensity
         alpha: parameter from paper (see Reference)
         beta: parameter from paper (see Reference)
@@ -217,6 +218,13 @@ def normalize_staining(
     HERef = np.array([[0.5626, 0.2159], [0.7201, 0.8012], [0.4062, 0.5581]])
 
     maxCRef = np.array([1.9705, 1.0308])
+
+    back_to_tensor = False
+    original_data_type = None
+    if torch.is_tensor(img):
+        back_to_tensor = True
+        img = img.cpu().numpy()
+        original_data_type = img.dtype
 
     # define height and width of image and move the color dimenstion to the last
     c, h, w = img.shape
@@ -294,6 +302,9 @@ def normalize_staining(
 
     # move the color dimension to the first to be consistent with others transforms
     Inorm = np.moveaxis(Inorm, -1, 0)
+
+    if back_to_tensor:
+        Inorm = torch.tensor(Inorm.astype(original_data_type))
 
     if return_unmix_results:
         return Inorm, H, E
