@@ -3,6 +3,7 @@ from pathlib import Path
 from functools import partial
 import importlib
 import numpy as np
+import inspect
 from aicsimageio import AICSImage
 from typing import Sequence, Tuple
 from monai.data import ImageReader
@@ -70,20 +71,24 @@ def parse_config_func_without_params(info):
 
 
 def parse_config(info):
-    # TODO add docstring
+    # univeral configuration parser
     my_func = parse_config_func_without_params(info)
     if "params" in info:
-        return my_func(**info["params"])
+        if inspect.isclass(my_func):
+            return my_func(**info["params"])
+        else:
+            return partial(my_func, **info["params"])
     else:
         return my_func()
 
 
 def parse_config_func(info):
-    # TODO add docstring
-    my_module = importlib.import_module(info["module_name"])
-    my_func = getattr(my_module, info["func_name"])
-    child_func = partial(my_func, **info["params"])
-    return child_func
+    # TODO: remove this function, use the universal parse_config above
+    my_func = parse_config_func_without_params(info)
+    if "params" in info:
+        return partial(my_func, **info["params"])
+    else:
+        return my_func
 
 
 def parse_ops_list(trans_func: List[Dict]):

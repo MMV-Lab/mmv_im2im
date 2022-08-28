@@ -9,7 +9,7 @@ import numpy as np
 from aicsimageio import AICSImage
 from aicsimageio.writers import OmeTiffWriter
 import torch
-from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config_func
+from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla
 from skimage.io import imsave as save_rgb
 
@@ -110,14 +110,14 @@ class ProjectTester(object):
         if self.data_cfg.postprocess is not None:
             pp_data = y_hat
             for pp_info in self.data_cfg.postprocess:
-                pp = parse_config_func(pp_info)
+                pp = parse_config(pp_info)
                 pp_data = pp(pp_data)
             if torch.is_tensor(pp_data):
-                pred = pp_data.numpy()
+                pred = pp_data.cpu().numpy()
             else:
                 pred = pp_data
         else:
-            pred = y_hat.numpy()
+            pred = y_hat.cpu().numpy()
 
         # TODO: needs to clean up after checking how to restore image size in MONAI
         # if original_size != pred.shape[-1 * len(original_size) :]:
@@ -214,6 +214,7 @@ class ProjectTester(object):
         for i, ds in enumerate(dataset_list):
             # Read the image
             print(f"Reading the image {i}/{dataset_length}")
+            print(ds)
 
             # output file name info
             fn_core = Path(ds).stem
