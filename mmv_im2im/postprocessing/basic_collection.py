@@ -29,11 +29,15 @@ def extract_segmentation(
     if torch.is_tensor(im):
         im = im.cpu().numpy()
     if batch_dim:
-        assert len(im.shape) == 4 or len(im.shape) == 5, "extract seg with batch_dim only accepts 4D/5D"
+        assert (
+            len(im.shape) == 4 or len(im.shape) == 5
+        ), "extract seg with batch_dim only accepts 4D/5D"
         assert im.shape[0] == 1, "extract seg with batch_dim requires first dim to be 1"
         prob = im[0, channel, :]
     else:
-        assert len(im.shape) == 3 or len(im.shape) == 4, "extract seg without batch_dim only accepts 3D/4D"
+        assert (
+            len(im.shape) == 3 or len(im.shape) == 4
+        ), "extract seg without batch_dim only accepts 3D/4D"
         prob = im[channel, :]
 
     if cutoff is None:

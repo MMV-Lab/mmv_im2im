@@ -78,7 +78,9 @@ class Model(pl.LightningModule):
             # in case of CrossEntropy related error
             # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
             y = torch.squeeze(y, dim=1)  # remove C dimension
-        elif isinstance(self.criterion, monai.losses.MaskedLoss) and isinstance(self.criterion.loss, torch.nn.CrossEntropyLoss):
+        elif isinstance(self.criterion, monai.losses.MaskedLoss) and isinstance(
+            self.criterion.loss, torch.nn.CrossEntropyLoss
+        ):
             y = torch.squeeze(y, dim=1)
 
         # if costmap is None:
