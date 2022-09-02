@@ -79,7 +79,7 @@ def parse_config(info):
         else:
             return partial(my_func, **info["params"])
     else:
-        return my_func()
+        return my_func
 
 
 def parse_config_func(info):
