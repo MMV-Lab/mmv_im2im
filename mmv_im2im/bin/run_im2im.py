@@ -8,6 +8,8 @@ users' virtualenv when the parent module is installed using pip.
 import logging
 import sys
 import traceback
+import tempfile
+from pathlib import Path
 
 import torch
 
@@ -46,8 +48,25 @@ def main():
         # torch.cuda.set_device(torch.device("cuda:0"))
 
         if cfg.mode.lower() == TRAIN_MODE:
-            exe = ProjectTrainer(cfg)
-            exe.run_training()
+            if (
+                cfg.data.dataloader.train.dataloader_type["func_name"]
+                == "PersistentDataset"
+            ):
+                # currently, train and val have to use persistent load together, or
+                # both not use and their root cache dirs are the same. See the
+                # validation part in config
+                cache_root = Path(cfg.data.dataloader.train.dataset_params["cache_dir"])
+                cache_root.mkdir(exist_ok=True)
+                with tempfile.TemporaryDirectory(dir=cache_root) as tmp_exp:
+                    train_cache = Path(tmp_exp) / "train"
+                    val_cache = Path(tmp_exp) / "val"
+                    cfg.data.dataloader.train.dataset_params["cache_dir"] = train_cache
+                    cfg.data.dataloader.val.dataset_params["cache_dir"] = val_cache
+                    exe = ProjectTrainer(cfg)
+                    exe.run_training()
+            else:
+                exe = ProjectTrainer(cfg)
+                exe.run_training()
         elif cfg.mode.lower() == INFER_MODE:
             exe = ProjectTester(cfg)
             exe.run_inference()

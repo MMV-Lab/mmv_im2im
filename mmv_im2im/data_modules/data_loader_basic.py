@@ -13,7 +13,8 @@
 from typing import Union
 from pathlib import Path
 import random
-from torch.utils.data import random_split, DataLoader
+from torch.utils.data import random_split
+from monai.data import DataLoader
 import pytorch_lightning as pl
 from mmv_im2im.utils.for_transform import parse_monai_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import (
@@ -108,11 +109,16 @@ class Im2ImDataModule(pl.LightningDataModule):
 
             train_data = shuffle(train_data)
             train_data = train_data[:num_load]
-        train_dataset = train_dataset_func(
-            data=train_data,
-            transform=self.transform,
-            **train_loader_info.dataset_params
-        )
+        if len(train_loader_info.dataset_params) > 0:
+            train_dataset = train_dataset_func(
+                data=train_data,
+                transform=self.transform,
+                **train_loader_info.dataset_params
+            )
+        else:
+            train_dataset = train_dataset_func(
+                data=train_data, transform=self.transform
+            )
         # wrap the dataset into dataloader
         train_dataloader = DataLoader(
             train_dataset,
@@ -127,9 +133,14 @@ class Im2ImDataModule(pl.LightningDataModule):
         val_dataset_func = parse_config_func_without_params(
             val_loader_info.dataloader_type
         )
-        val_dataset = val_dataset_func(
-            data=self.val_data, transform=self.preproc, **val_loader_info.dataset_params
-        )
+        if len(val_loader_info.dataset_params) > 0:
+            val_dataset = val_dataset_func(
+                data=self.val_data,
+                transform=self.preproc,
+                **val_loader_info.dataset_params
+            )
+        else:
+            val_dataset = val_dataset_func(data=self.val_data, transform=self.preproc)
         val_dataloader = DataLoader(
             val_dataset,
             shuffle=False,

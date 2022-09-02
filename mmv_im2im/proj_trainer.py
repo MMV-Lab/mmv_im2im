@@ -70,4 +70,5 @@ class ProjectTrainer(object):
         trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg.params)
 
         # start training
+        print("start training ... ")
         trainer.fit(model=self.model, datamodule=self.data)
