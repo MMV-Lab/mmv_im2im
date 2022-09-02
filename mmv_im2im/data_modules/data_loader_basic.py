@@ -108,7 +108,7 @@ class Im2ImDataModule(pl.LightningDataModule):
 
             train_data = shuffle(train_data)
             train_data = train_data[:num_load]
-        if len(train_loader_info.dataset_params) == 0:
+        if len(train_loader_info.dataset_params) > 0:
             train_dataset = train_dataset_func(
                 data=train_data,
                 transform=self.transform,
@@ -132,7 +132,7 @@ class Im2ImDataModule(pl.LightningDataModule):
         val_dataset_func = parse_config_func_without_params(
             val_loader_info.dataloader_type
         )
-        if len(val_loader_info.dataset_params) == 0:
+        if len(val_loader_info.dataset_params) > 0:
             val_dataset = val_dataset_func(
                 data=self.val_data,
                 transform=self.preproc,
