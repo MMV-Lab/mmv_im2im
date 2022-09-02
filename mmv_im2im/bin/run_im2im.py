@@ -64,6 +64,9 @@ def main():
                     cfg.data.dataloader.val.dataset_params["cache_dir"] = val_cache
                     exe = ProjectTrainer(cfg)
                     exe.run_training()
+            else:
+                exe = ProjectTrainer(cfg)
+                exe.run_training()
         elif cfg.mode.lower() == INFER_MODE:
             exe = ProjectTester(cfg)
             exe.run_inference()
