@@ -194,7 +194,6 @@
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">pyrallis</span> <span class="kn">import</span> <span class="n">field</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
 
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">dataclasses</span>
@@ -590,40 +589,35 @@
 
     <span class="c1"># check 5, if PersistentDataset is used, make sure add a tmpdir in subdirectory</span>
     <span class="c1"># (otherwise may cause hash errors)</span>
-    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataloader_type</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PersistentDataset&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s2">&quot;cache_dir&quot;</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">:</span>
-            <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataloader_type</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span>
+            <span class="o">==</span> <span class="s2">&quot;PersistentDataset&quot;</span>
+        <span class="p">):</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataloader_type</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span>
+                <span class="o">==</span> <span class="s2">&quot;PersistentDataset&quot;</span>
+            <span class="p">),</span> <span class="s2">&quot;currently, train and val can only use persisten loader together&quot;</span>
 
-            <span class="c1"># make sure cache_dir exists, otherwise create one</span>
-            <span class="n">cache_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-            <span class="c1"># replace the cache_dir with a subfolder with random name</span>
-            <span class="n">cache_dir_tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">)</span>
-            <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache_dir_tmp</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="ne">UserWarning</span><span class="p">(</span>
-                    <span class="s2">&quot;The cache dir of PersistentDataset for training was overwritten&quot;</span>
-                    <span class="s2">&quot;to None. No caching ...&quot;</span>
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataloader_type</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PersistentDataset&quot;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span>
+                <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataloader_type</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span>
+                <span class="o">==</span> <span class="s2">&quot;PersistentDataset&quot;</span>
+            <span class="p">),</span> <span class="s2">&quot;currently, train and val can only use persisten loader together&quot;</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span>
+                <span class="o">!=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span>
+                    <span class="s2">&quot;cache_dir&quot;</span>
+                <span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="ne">UserWarning</span><span class="p">(</span>
+                        <span class="s2">&quot;The cache dir of PersistentDataset for validation was&quot;</span>
+                        <span class="s2">&quot;overwritten to the cache dir for train. Currently, they&quot;</span>
+                        <span class="s2">&quot;have to be the same to allow easy clean up&quot;</span>
+                    <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="p">)</span>
-    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataloader_type</span><span class="p">[</span><span class="s2">&quot;func_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PersistentDataset&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s2">&quot;cache_dir&quot;</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">:</span>
-            <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">])</span>
-
-            <span class="c1"># make sure cache_dir exists, otherwise create one</span>
-            <span class="n">cache_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-            <span class="c1"># replace the cache_dir with a subfolder with random name</span>
-            <span class="n">cache_dir_tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">cache_dir</span><span class="p">)</span>
-            <span class="n">cfg</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dataloader</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">dataset_params</span><span class="p">[</span><span class="s2">&quot;cache_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache_dir_tmp</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="ne">UserWarning</span><span class="p">(</span>
-                    <span class="s2">&quot;The cache dir of PersistentDataset for validation was overwritten&quot;</span>
-                    <span class="s2">&quot;to None. No caching ...&quot;</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cfg</span></div>
 </pre></div>
