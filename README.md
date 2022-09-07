@@ -3,7 +3,9 @@
 [![Build Status](https://github.com/MMV-Lab/mmv_im2im/workflows/Build%20Main/badge.svg)](https://github.com/MMV-Lab/mmv_im2im/actions)
 [![Documentation](https://github.com/MMV-Lab/mmv_im2im/workflows/Documentation/badge.svg)](https://MMV-Lab.github.io/mmv_im2im/)
 
-A generic python package for deep learing based image-to-image transformation in biomedical applications
+A generic python package for deep learning based image-to-image transformation in biomedical applications
+
+(We are actively working on the documentation and tutorials. Submit a feature request if there is anything you need.)
 
 ---
 
@@ -67,9 +69,9 @@ Suppose you run the training under the root of mmv_im2im. Then you will find a f
 run_im2im --config inference_labelfree_3d --data.inference_input.dir /path/to/save/the/downloaded/holdout --data.inference_output.path /path/to/save/predictions/ --model.checkpoint lightning_logs/checkpoints/last.ckpt
 ```
 
-## Tutorials
+## Walk-through Guide
 
-We provide [a comprehensive tutorial](tutorials/README.md) for users to understand how to enjoy both the simplicity and the full flexibility of the package. 
+We provide [a tutorial](tutorials/README.md) for users to understand how to enjoy both the simplicity and the full flexibility of the package. 
 
 
 ## API Documentation
