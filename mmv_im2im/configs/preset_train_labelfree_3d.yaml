@@ -26,14 +26,11 @@ data:
       params:
         keys: ["IM"]
         min_z: 32
-    - module_name: monai.transforms
-      func_name: ScaleIntensityRangePercentilesd
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
       params:
-        keys: ["GT"]
-        lower: 0.05
-        upper: 99.95
-        b_min: -1
-        b_max: 1
+        keys: ["IM","GT"]
+        min_z: 32
     - module_name: monai.transforms
       func_name: RandSpatialCropSamplesd
       params:
@@ -55,7 +52,7 @@ data:
 model:
   framework: FCN
   net:
-    module_name: mmv_im2im.models.nets.fnet_nn_3d_params
+    module_name: mmv_im2im.models.nets.fnet_nn_3d
     func_name: Net
     params:
       depth: 4
@@ -83,5 +80,16 @@ trainer:
   params:
     gpus: 1
     precision: 16
-    max_epochs: 10000
-    terminate_on_nan: True
+    max_epochs: 100
+    detect_anomaly: True
+  callbacks:
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 100 
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: 'best'
