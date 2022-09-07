@@ -1,0 +1,34 @@
+mode: inference
+
+data:
+  inference_input:
+    reader_params:
+      dimension_order_out: "ZYX"
+      C: 0
+      T: 0
+  preprocess:      
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
+      params:
+        min_z: 32
+
+model:
+  framework: FCN
+  net:
+    module_name: mmv_im2im.models.nets.fnet_nn_3d
+    func_name: Net
+    params:
+      depth: 4
+      mult_chan: 32
+      in_channels: 1
+      out_channels: 1
+  model_extra:
+    sliding_window_params:
+      roi_size: [32, 128, 128]
+      sw_batch_size: 4
+      overlap: 0.2
+      mode: "gaussian"
+trainer:
+  params:
+    gpus: 1
+    precision: 16
