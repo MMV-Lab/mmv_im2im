@@ -272,7 +272,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="n">my_func</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">my_func</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">my_func</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">my_func</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">my_func</span></div>
 
 
 <div class="viewcode-block" id="parse_config_func"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func">[docs]</a><span class="k">def</span> <span class="nf">parse_config_func</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
