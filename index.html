@@ -208,74 +208,65 @@
 <h1>MMV Im2Im Transformation<a class="headerlink" href="#mmv-im2im-transformation" title="Permalink to this heading">¶</a></h1>
 <a class="reference external image-reference" href="https://github.com/MMV-Lab/mmv_im2im/actions"><img alt="Build Status" src="https://github.com/MMV-Lab/mmv_im2im/workflows/Build%20Main/badge.svg" /></a>
 <a class="reference external image-reference" href="https://MMV-Lab.github.io/mmv_im2im/"><img alt="Documentation" src="https://github.com/MMV-Lab/mmv_im2im/workflows/Documentation/badge.svg" /></a>
-<a class="reference external image-reference" href="https://codecov.io/gh/MMV-Lab/mmv_im2im"><img alt="Code Coverage" src="https://codecov.io/gh/MMV-Lab/mmv_im2im/branch/main/graph/badge.svg" /></a>
-<p>A python package for deep learing based image to image transformation in biomedical applications</p>
+<p>A generic python package for deep learning based image-to-image transformation in biomedical applications</p>
+<p>(We are actively working on the documentation and tutorials. Submit a feature request if there is anything you need.)</p>
 <hr class="docutils" />
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<p>The overall package is designed with a generic image-to-image transformation framework, which could be directly used for semantic segmentation, instance segmentation, image restoration, image generation, labelfree prediction, staining transformation, etc.. The implementation takes advantage of the state-of-the-art ML engineering techniques for users to focus on researches without worrying about the engineering details. In our pre-print <a class="reference external" href="https://arxiv.org/abs/2209.02498">arxiv link</a>, we demonstrated the effectiveness of <em>MMV_Im2Im</em> in more than ten different biomedical problems/datasets.</p>
+<ul class="simple">
+<li><p>For biomedical machine learning researchers, we hope this new package could serve as the starting point for their specific problems to stimulate new biomedical image analysis or machine learning methods.</p></li>
+<li><p>For experimental biomedical researchers, we hope this work can provide a holistic view of the image-to-image transformation concept with diverse examples, so that deep learning based image-to-image transformation could be further integrated into the assay development process and permit new biomedical studies that can hardly be done only with traditional experimental methods</p></li>
+</ul>
+</section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
-<p>For users (only using the package, not planning to change any code):</p>
+<p>We recommend to <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands">create a new conda environment</a> or <a class="reference external" href="https://docs.python.org/3/library/venv.html">a virtual environment</a> with Python 3.9.</p>
+<section id="basic-installation">
+<h3>basic installation<a class="headerlink" href="#basic-installation" title="Permalink to this heading">¶</a></h3>
+<p>(for users only using this package, not planning to change any code or make any extension):</p>
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mmv_im2im</span></code><span class="raw-html-m2r"><br></span>
 <strong>Development Head:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/MMV-Lab/mmv_im2im.git</span></code></p>
-<p>For developers (planning to extend the package):</p>
+</section>
+<section id="build-from-source">
+<h3>build from source<a class="headerlink" href="#build-from-source" title="Permalink to this heading">¶</a></h3>
+<p>(for users planning to extend the methods or improve the code):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">MMV</span><span class="o">-</span><span class="n">Lab</span><span class="o">/</span><span class="n">mmv_im2im</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">mmv_im2im</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="nb">all</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>Note: The <code class="docutils literal notranslate"><span class="pre">-e</span></code> option is so-called “editable” mode. This will allow code changes taking effect immediately.</p>
+<p>Note: The <code class="docutils literal notranslate"><span class="pre">-e</span></code> option is the so-called “editable” mode. This will allow code changes taking effect immediately.</p>
 </section>
-<section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">¶</a></h2>
-<p>For full package documentation please visit <a class="reference external" href="https://MMV-Lab.github.io/mmv_im2im">MMV-Lab.github.io/mmv_im2im</a>.</p>
 </section>
-<section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading">¶</a></h2>
-<p>Here, we use a <a class="reference external" href="https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F">3D labelfree determination</a> as a test case.</p>
-<p>First, we pull 100 examples from the AllenCell quilt bucket by running the following. Make sure you change the <code class="docutils literal notranslate"><span class="pre">parent_path</span></code> before running.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python  scripts/generate_synthetic_data.py
+<section id="quick-start-try-out-on-a-simple-example">
+<h2>Quick start / Try out on a simple example<a class="headerlink" href="#quick-start-try-out-on-a-simple-example" title="Permalink to this heading">¶</a></h2>
+<p>Here, we use a <a class="reference external" href="https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F">3D labelfree prediction</a> as an example. (If you followed <a class="reference external" href="#basic-installation">basic installation</a>, you will need to install the <code class="docutils literal notranslate"><span class="pre">quilt3</span></code> package by <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">quilt3</span></code>, in order to download the data programmatically.)</p>
+<p><strong>step 1 (data preparation):</strong>, we pull 100 examples of lamin B1 images and the corresponding brightfield images from the AllenCell quilt bucket by running the following in the command line.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
+python  scripts/pull_labelfree_sample_data.py --download_path /path/to/save/the/downloaded/images/ --structure LMNB1 --num <span class="m">100</span>
 </pre></div>
 </div>
-<p>Then, we can train a labelfree model like this:</p>
-<div class="highlight-base notranslate"><div class="highlight"><pre><span></span>run_im2im --config train_labelfree_3d  --data.data_path /path/to/your/dataset
+<p><strong>step 2 (train):</strong> Now, we can train a labelfree model like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
+run_im2im --config train_labelfree_3d  --data.data_path /path/to/save/the/downloaded/train
 </pre></div>
 </div>
-<p>This will apply all the default settings on your data to train the 3D labelfree model.</p>
+<p>This will apply all the default settings to train the 3D labelfree model. The training will stop after 100 epochs,</p>
+<p><strong>step 3 (test):</strong></p>
+<p>Suppose you run the training under the root of mmv_im2im. Then you will find a folder <code class="docutils literal notranslate"><span class="pre">mmv_im2im/lightning_logs/checkpoints</span></code>, where you can find several trained model. Here, we test with the model after the full training <code class="docutils literal notranslate"><span class="pre">last.ckpt</span></code> (other models are intermediate results for debugging purpose) by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
+run_im2im --config inference_labelfree_3d --data.inference_input.dir /path/to/save/the/downloaded/holdout --data.inference_output.path /path/to/save/predictions/ --model.checkpoint lightning_logs/checkpoints/last.ckpt
+</pre></div>
+</div>
 </section>
-<section id="notes-on-the-package-design">
-<h2>Notes on the package design<a class="headerlink" href="#notes-on-the-package-design" title="Permalink to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>The four main packages we build upon: <a class="reference external" href="https://www.pytorchlightning.ai/">pytorch-lightning</a>, <a class="reference external" href="https://monai.io/">MONAI</a>, <a class="reference external" href="https://eladrich.github.io/pyrallis/">pyrallis</a>, and <a class="reference external" href="https://github.com/AllenCellModeling/aicsimageio">aicsimageio</a>.</p></li>
-</ol>
-<p>The whole package uses <a class="reference external" href="https://www.pytorchlightning.ai/">pytorch-lightning</a> as the core of its backend, in the sense that the package is implemented following the biolerplate components in pytorch-lightning, such as <code class="docutils literal notranslate"><span class="pre">LightningModule</span></code>, <code class="docutils literal notranslate"><span class="pre">DataModule</span></code> and <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. All small building blocks, like network architecture, optimizer, etc., can be swapped easily without changing the boilerplate.</p>
-<p>We adopt the <a class="reference external" href="https://docs.monai.io/en/stable/data.html#persistentdataset">PersistentDataset</a> in <a class="reference external" href="https://monai.io">MONAI</a> as the default dataloader, which combines the efficiency and flexibility in data handling for biomedical applications. E.g., able to efficiently handle: when any single file in training data is large, sampling mutiple patches from each of the large image in training data, and when there are a huge number of files and have to load a small portion to memory in each epoch and periodically refresh the data in memory, etc.</p>
-<p><a class="reference external" href="https://eladrich.github.io/pyrallis/">Pyrallis</a> provides a handy configuration system. Combining pyrallis and the boilerplate concepts in pytorch-lightning, it is very easy to configurate your method at any level of details (as high level as only providing the path to the training data, all the way to as low level as changing which type of normalization to use in the model).</p>
-<p>Finally, <a class="reference external" href="https://github.com/AllenCellModeling/aicsimageio">aicsimageio</a> is adopted for efficient data I/O, which not only supports all major bio-formats and OME-TIFF, but also makes it painless to handle hugh data by delayed loading.</p>
-<ol class="arabic simple">
-<li><p>There are three levels of abstraction:</p></li>
-</ol>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">mmv_im2im/proj_trainer.py</span></code> (main entry point to define data module, pytorch-lightning module, and trainer)</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">mmv_im2im/data_modules/data_loaders.py</span></code> (Currently, all 2D/3D paired/unpaired data loader can share the same universal dataloader. We may add other generic dataloaders when really needed, otherwise, the current one is general enough to cover current applications)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">mmv_im2im/models/pl_XYZ.py</span></code> (the middle level wrapper for different categories of models: FCN, pix2pix (conditional GAN), CycleGAN, embedseg. We can add more when needed, e.g., for denoising or cellpose. This is the pytorch-lightning module specific for this category of models. The specific model backbone, loss function, etc. can be easily specified via parameters in yaml config)</p>
-<ul>
-<li><p>Other scripts under <code class="docutils literal notranslate"><span class="pre">mmv_im2im/models/nets/</span></code> and <code class="docutils literal notranslate"><span class="pre">mmv_im2im/preprocessing</span></code>, as well as <code class="docutils literal notranslate"><span class="pre">mmv_im2im/utils</span></code>, are low level functions to instantiate the pytorch-lightining module defined in <code class="docutils literal notranslate"><span class="pre">pl_XYZ.py</span></code> or <code class="docutils literal notranslate"><span class="pre">data_loader.py</span></code></p></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<ol class="arabic simple">
-<li><p>Understand the configuration system and make customizations</p></li>
-</ol>
-<p><code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--help</span></code> can print out all the configuration details, including their default values. We pre-compiled a collection of configuration for various tasks, see <code class="docutils literal notranslate"><span class="pre">/mmv_im2im/configs/preset_XXYYZZ.yaml</span></code>. To use a preset configuration, one can simply do <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">XXYYZZ</span></code> Or, you can run on your customized configuration file <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">/full/path/to/your/config.yaml</span></code>. You can specify everything in the yaml file, or you can also pass in additional args via the command line. For example, we have a general configuration file at <code class="docutils literal notranslate"><span class="pre">/home/example/my_config.yaml</span></code>, which specific the model details and training details for one specific project. But, when you train different models for this same project with different data, you don’t have to change the yaml file. Instead, you can simply pass in the extra data path in command line, like <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">/home/example/my_config.yaml</span> <span class="pre">--data.data_path</span> <span class="pre">/path/to/my/data</span></code>. So, it is a good practice to make different generic configurations for different projects, and leave the runtime specific args, like data_path, to the command line.</p>
-<p>A special note on dictionary parameters. After printing out all the details from <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--help</span></code>, if you see one parameter is a Dict, for example <code class="docutils literal notranslate"><span class="pre">training.params</span></code>, you need to be careful if you want to overwrite the values specified in yaml by values passed in command line. Specifically, you have to overwrite the whole dictionary, and cannot overwrite only a specific key. In this situation, I would recommed to change the config file directly, instead of overwriting with command line args.</p>
-<ol class="arabic simple">
-<li><p>About the training data directory</p></li>
-</ol>
-<p>Currently, the package supports three types of training data organizations. First, one single folder with “X1_IM.tiff”, “X1_GT.tiff”, “X1_CM.tiff”, “X2_IM.tiff”, etc.. Second, one single folder with multiple sub-folders “IM”, “GT”, “CM” (optional), where the name of each file is exactly the same accross different subfolders. The first two scenario will incur a train/validatio split on all files. If you already have train/validation split done, then you can pass in the something like <code class="docutils literal notranslate"><span class="pre">--data.data_path</span> <span class="pre">&quot;{'train':</span> <span class="pre">'/path/to/train',</span> <span class="pre">'val':</span> <span class="pre">'/path/to/val'}&quot;</span></code>, where <code class="docutils literal notranslate"><span class="pre">/path/to/train</span></code> and <code class="docutils literal notranslate"><span class="pre">/path/to/val</span></code> are similar to the first scenario above.</p>
-<p><strong>preset keys</strong>: “IM” (raw images), “GT” (ground truth or training target), “CM” (costmap, e.g. to exclude certain pixels by setting corresponding value in costmap as 0)</p>
-<p><strong>Additional note for EmbedSeg</strong>: When doing <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">train_embedseg_3d</span> <span class="pre">--data.data_path</span> <span class="pre">/path/to/train</span></code>, we expect “IM” and “GT” in the folder <code class="docutils literal notranslate"><span class="pre">/path/to/train</span></code> (“CM” is optional). However, the program will automatically convert this dataset into a special format needed for EmbedSeg and save them at the folder specified by <code class="docutils literal notranslate"><span class="pre">data.cache_path</span></code> (default is <code class="docutils literal notranslate"><span class="pre">./tmp</span></code>). Two new types of files wil be created in the cache_path, including “CL” (CLass image) and “CE” (CEnter image). Since preparing this compatible dataset takes time, one can directly specify the cache_path to load without re-generating from original training data. Namely <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">train_embegseg_3d</span> <span class="pre">--data.cache_path</span> <span class="pre">./tmp/</span></code> even without passing the <code class="docutils literal notranslate"><span class="pre">data.data_path</span></code>.</p>
+<section id="walk-through-guide">
+<h2>Walk-through Guide<a class="headerlink" href="#walk-through-guide" title="Permalink to this heading">¶</a></h2>
+<p>We provide <a class="reference external" href="tutorials/README.md">a tutorial</a> for users to understand how to enjoy both the simplicity and the full flexibility of the package.</p>
+</section>
+<section id="api-documentation">
+<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">¶</a></h2>
+<p>For full package API (i.e., the technical details of each function), please visit <a class="reference external" href="https://MMV-Lab.github.io/mmv_im2im">MMV-Lab.github.io/mmv_im2im</a>.</p>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this heading">¶</a></h2>
