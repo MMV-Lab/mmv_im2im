@@ -263,6 +263,83 @@ run_im2im --config inference_labelfree_3d --data.inference_input.dir /path/to/sa
 <section id="walk-through-guide">
 <h2>Walk-through Guide<a class="headerlink" href="#walk-through-guide" title="Permalink to this heading">¶</a></h2>
 <p>We provide <a class="reference external" href="tutorials/README.md">a tutorial</a> for users to understand how to enjoy both the simplicity and the full flexibility of the package.</p>
+<p>The scripts and configurations for reproducing our experiments in the <a class="reference external" href="https://arxiv.org/abs/2209.02498">pre-print</a> can also be used as examples for walking through different applications.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Application</p></th>
+<th class="head"><p>data preparation</p></th>
+<th class="head"><p>training config</p></th>
+<th class="head"><p>inference config</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3D labelfree prediction</p></td>
+<td><p><a class="reference external" href="script/pull_labelfree_sample_data.py">script</a></p></td>
+<td><p><a href="#id4"><span class="problematic" id="id5">`supervisedFCN &lt;&gt;`_</span></a>, <a href="#id6"><span class="problematic" id="id7">`supervisedPix2pix &lt;&gt;`_</span></a>, <a href="#id8"><span class="problematic" id="id9">`unsupervised &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id10"><span class="problematic" id="id11">`supervisedFCN &lt;&gt;`_</span></a>, <a href="#id12"><span class="problematic" id="id13">`supervisedPix2pix &lt;&gt;`_</span></a>, <a href="#id14"><span class="problematic" id="id15">`unsupervised &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>2D labelfree prediction</p></td>
+<td><p><a href="#id16"><span class="problematic" id="id17">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id18"><span class="problematic" id="id19">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id20"><span class="problematic" id="id21">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>2D semantic segmentation</p></td>
+<td><p><a href="#id22"><span class="problematic" id="id23">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id24"><span class="problematic" id="id25">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id26"><span class="problematic" id="id27">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>3D semantic segmentation</p></td>
+<td><p><a href="#id28"><span class="problematic" id="id29">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id30"><span class="problematic" id="id31">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id32"><span class="problematic" id="id33">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>2D instance segmentation</p></td>
+<td><p><a href="#id34"><span class="problematic" id="id35">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id36"><span class="problematic" id="id37">`supervisedEmbedSeg &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id38"><span class="problematic" id="id39">`supervisedEmbedseg &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>3D instance segmentation</p></td>
+<td><p><a href="#id40"><span class="problematic" id="id41">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a class="reference external" href="./paper_configs/train_embedseg_3d.yaml">supervisedEmbedSeg_fluo</a>, <a class="reference external" href="./paper_configs/train_embedseg_3d_BF.yaml">supervisedEmbedSeg_bf</a></p></td>
+<td><p><a class="reference external" href="./paper_configs/inference_embedseg_3d.yaml">supervisedEmbedseg_fluo</a>, <a class="reference external" href="./paper_configs/inference_embedseg_3d_bf.yaml">supervisedEmbedSeg_bf</a></p></td>
+</tr>
+<tr class="row-even"><td><p>2D unsupervised segmentation</p></td>
+<td><p><a href="#id42"><span class="problematic" id="id43">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id44"><span class="problematic" id="id45">`unsupervised &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id46"><span class="problematic" id="id47">`unsupervised &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>3D unsupervised segmentation</p></td>
+<td><p><a href="#id48"><span class="problematic" id="id49">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id50"><span class="problematic" id="id51">`unsupervised &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id52"><span class="problematic" id="id53">`unsupervised &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>2D synthetic image generation</p></td>
+<td><p><a href="#id54"><span class="problematic" id="id55">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id56"><span class="problematic" id="id57">`supervisedPix2pix &lt;&gt;`_</span></a>, <a href="#id58"><span class="problematic" id="id59">`unsupervised &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id60"><span class="problematic" id="id61">`supervisedPix2pix &lt;&gt;`_</span></a>, <a href="#id62"><span class="problematic" id="id63">`unsupervised &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>3D synthetic image generation</p></td>
+<td><p><a href="#id64"><span class="problematic" id="id65">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id66"><span class="problematic" id="id67">`supervisedPix2pix &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id68"><span class="problematic" id="id69">`supervisedPix2pix &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>image restoration / denoising</p></td>
+<td><p><a href="#id70"><span class="problematic" id="id71">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id72"><span class="problematic" id="id73">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id74"><span class="problematic" id="id75">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>image modality transfer</p></td>
+<td><p><a href="#id76"><span class="problematic" id="id77">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id78"><span class="problematic" id="id79">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id80"><span class="problematic" id="id81">`supervisedFCN &lt;&gt;`_</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>staining transformation</p></td>
+<td><p><a href="#id82"><span class="problematic" id="id83">`script &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id84"><span class="problematic" id="id85">`supervisedPix2pix &lt;&gt;`_</span></a></p></td>
+<td><p><a href="#id86"><span class="problematic" id="id87">`supervisedPix2pix &lt;&gt;`_</span></a></p></td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="api-documentation">
 <h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">¶</a></h2>
