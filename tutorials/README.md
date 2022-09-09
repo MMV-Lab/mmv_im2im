@@ -34,34 +34,159 @@ There are four major parts in the configuration system: mode, data, model, train
 
 ### part 1: mode
 
-Currently, only supporting two values "train" or "inference". In our future version, we plan to add "evaluation", which can automatically generate evaluation reports for you. This will be useful for benchmarking different methods.
+Currently, only supporting two values "train" or "inference". In our future version, we plan to add an "evaluation" mode, which can automatically generate evaluation reports for you. This will be useful for benchmarking different methods.
 
 ### part 2: data
 
-All fields under `data` can be found [HERE](https://github.com/MMV-Lab/mmv_im2im/blob/main/mmv_im2im/configs/config_base.py#L250). The parts you may need to adjust for your problems are as follows.
+All fields under `data` can be found [HERE](https://github.com/MMV-Lab/mmv_im2im/blob/main/mmv_im2im/configs/config_base.py#L250). There are mainly four types of hyper-parameters: directory, transformation, dataloader, and extras. 
+
+#### About directory
 
 
-#### only for training
+##### training
 
 * data.category: You can specify your data are "paired" or "unpaired" (e.g. for CycleGAN), or "embedseg" (for instance segmentation).
 
-* data.data_path: the path to your training data. Currently, the package supports three types of training data organizations. First, one single folder with "X1_IM.tiff", "X1_GT.tiff", "X1_CM.tiff", "X2_IM.tiff", etc.. Second, one single folder with multiple sub-folders "IM", "GT", "CM" (optional), where the name of each file is exactly the same across different sub-folders. The first two scenario will incur a train/validation split on all files. If you already have train/validation split done, then you can pass in the something like `--data.data_path "{'train': '/path/to/train', 'val': '/path/to/val'}"`, where `/path/to/train` and `/path/to/val` are similar to the first scenario above. It is important to use the **preset keys** as in the examples above. "IM" (raw images), "GT" (ground truth or training target), "CM" (costmap, e.g. to exclude certain pixels by setting corresponding value in costmap as 0). The program relies on these keys to load the correct data.
+* `data.data_path`: the path to your training data. Currently, the package supports three types of training data organizations. First, one single folder with "X1_IM.tiff", "X1_GT.tiff", "X1_CM.tiff", "X2_IM.tiff", etc.. Second, one single folder with multiple sub-folders "IM", "GT", "CM" (optional), where the name of each file is exactly the same across different sub-folders. The first two scenario will incur a train/validation split on all files. If you already have train/validation split done, then you can pass in the something like `--data.data_path "{'train': '/path/to/train', 'val': '/path/to/val'}"`, where `/path/to/train` and `/path/to/val` are similar to the first scenario above. It is important to use the **preset keywords** as in the examples above. "IM" (raw images), "GT" (ground truth or training target), "CM" (costmap, e.g. to exclude certain pixels by setting corresponding value in costmap as 0). The program relies on these keywords to load the correct data.
 
-* data.cache_path: This is only used for instance segmentation. When doing `run_im2im --config train_embedseg_3d --data.data_path /path/to/train`, we expect "IM" and "GT" in the folder `/path/to/train` ("CM" is optional). However, the program will automatically convert this dataset into a special format needed for EmbedSeg and save them at the folder specified by `data.cache_path` (default is `./tmp`). Two new types of files wil be created in the cache_path, including "CL" (CLass image) and "CE" (CEnter image). Since preparing this compatible dataset takes time, one can directly specify the cache_path to load without re-generating from original training data. Namely `run_im2im --config train_embegseg_3d --data.cache_path ./tmp/` even without passing the `data.data_path`.  
+* `data.cache_path`: This is only used for instance segmentation. When doing `run_im2im --config train_embedseg_3d --data.data_path /path/to/train`, we expect "IM" and "GT" in the folder `/path/to/train` ("CM" is optional). However, the program will automatically convert this dataset into a special format needed for EmbedSeg and save them at the folder specified by `data.cache_path` (default is `./tmp`). Two new types of files wil be created in the cache_path, including "CL" (CLass image) and "CE" (CEnter image). Since preparing this compatible dataset takes time, one can directly specify the cache_path to load without re-generating from original training data. Namely `run_im2im --config train_embegseg_3d --data.cache_path ./tmp/` even without passing the `data.data_path`.  
 
 
-#### only for inference
+##### inference
 
-* data.inference_output: where to save the output
-* data.inference_input:
+* `data.inference_input`:
     * data.inference_input.dir: where to load the test data
     * data.inference_input.reader_params: how to read the data with aicsimageio, see [example configs](https://github.com/MMV-Lab/mmv_im2im/tree/main/paper_configs)
 
+* `data.inference_output`: where to save the prediction output
 
-#### Special note about preprocess, augmentation, postprocess
 
-TBA
+#### transformation
 
+##### training (`preprocess` and `augmentation`)
+
+For all transformations during training, we follow dictionary transforms syntax in [MONAI transforms](https://docs.monai.io/en/stable/transforms.html), but are not restricted to use the transforms in MONAI. (Recall the keywords explained in `data.data_path`. They correspond to the dictionary keys here.) 
+
+You can list as many operations as you want under `preprocess` and `augmentation` following the same syntax. The only difference is that all operations under `preprocess` will be applied to both training and validation data, but the operations under `validation` will only be used on training data.  Here is a typical example:
+
+```yaml
+preprocess:
+  - module_name: monai.transforms
+    func_name: LoadImaged
+    params:
+      keys: ["IM", "GT"]
+      dimension_order_out: "ZYX"
+      T: 0
+      C: 0
+    # Note: we wrote special bioformat reader with aicsimageio and wrapped it to be compatible with MONAI data reading
+    # The reading function above follows the parameter here: https://allencellmodeling.github.io/aicsimageio/aicsimageio.html?highlight=get_image_dask_data#aicsimageio.aics_image.AICSImage.get_image_dask_data
+  - module_name: monai.transforms
+    func_name: AddChanneld
+    params:
+      keys: ["IM", "GT"]  
+  - module_name: mmv_im2im.preprocessing.transforms
+    func_name: norm_around_center
+    params:
+      keys: ["IM"]
+      min_z: 32
+  # Note that by dictionary transforms, you can easily apply different operations on image and ground truth
+  - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
+      params:
+        keys: ["GT"]
+        lower: 0.1
+        upper: 99.9
+        b_min: 0
+        b_max: 1
+  # apply the same random sampling on both "IM" and "GT" so that their correspondence can be maintained. 
+  # When different cropping from "IM" and "CT" are needed, e.g. for CycleGAN, you can use two different samplers, each with a different key.
+  # You can also choose the put sampler in preprocess or in augmentation, depending on your use case. 
+  - module_name: monai.transforms
+    func_name: RandSpatialCropSamplesd
+    params:
+      keys: ["IM", "GT"]
+      random_size: False
+      num_samples: 4
+      roi_size: [32, 128, 128]
+  - module_name: monai.transforms
+    func_name: EnsureTyped
+    params:
+      keys: ["IM", "GT"]
+augmentation:
+  - module_name: monai.transforms
+    func_name: RandFlipd
+    params:
+      prob: 0.5
+      keys: ["IM", "GT"]
+  - module_name: monai.transforms
+    func_name: RandStdShiftIntensityd
+    params:
+      prob: 0.25
+      factors: 1.0
+      keys: ["IM", "GT"]
+```
+
+##### inference (`preprocess` and `postprocess`)
+
+For inference, we only need the input data (no ground truth), so we don't need to use the dictionary transforms. Usually, you need to use the same intensity normalization methods in inference as in training, unless you have special use case and you are sure about specific processing works better. For example, when `ScaleIntensityRangePercentilesd` from MONAI is used to preprocess your data in training, then you usually need to do `ScaleIntensityRangePercentiles` in inference (Note: be careful with the letter "d" at the end of the function name, if from MONAI, referring the "dictionary" version of a specific transform).
+
+For `postprocess`, one can use chain up a list of different operations as for `preprocess`, e.g., some [post-processing transforms from MONAI](https://docs.monai.io/en/stable/transforms.html#post-processing) or a few [more customized functions provided by **MMV_Im2IM**](https://mmv-lab.github.io/mmv_im2im/mmv_im2im.postprocessing.html).
+
+```yaml
+preprocess:      
+  - module_name: monai.transforms
+    func_name: NormalizeIntensity
+postprocess:
+  - module_name: mmv_im2im.postprocessing.embedseg_cluster
+    func_name: generate_instance_clusters
+    params:
+      grid_x: 1024
+      grid_y: 1024
+      grid_z: 128
+      pixel_x: 1
+      pixel_y: 1
+      pixel_z: 1
+      n_sigma: 3 
+      seed_thresh: 0.5
+      min_mask_sum: 2
+      min_unclustered_sum: 2
+      min_object_size: 2
+```
+
+#### data loaders
+
+The `dataloader` contains a hierarchy of multiple levels information. The top level contains three parameters: `dataloader.train`, `dataloader.val` and `dataloader.train_val_ratio`, which defines the training dataloader, validation dataloader, and how to split the data into train set and validation set (default 0.1). Both `dataloader.train` and `dataloader.val` have the following default setting:
+
+```yaml
+  dataloader_type:  # could be any dataload in [MONAI data](https://docs.monai.io/en/stable/data.html#generic-interfaces)
+    module_name: monai.data
+    func_name: PersistentDataset
+  dataloader_params:
+    batch_size: 1
+    pin_memory: True
+    num_workers: 2
+  dataset_params: # parameter for PersistentDataset (https://docs.monai.io/en/stable/data.html#persistentdataset) or any dataload you choose to use
+    cache_dir: "./tmp"
+    pickle_protocol: 5
+  partial_loader: 1.0  # only load certain percentage of the dataset, value between 0 and 1.0.
+```
+
+You can overwrite some of the default values like this:
+
+```yaml
+dataloader:
+  train:
+    dataloader_params:
+      batch_size: 2
+      pin_memory: True
+      num_workers: 4
+  train_val_ratio: 0.2
+```
+
+
+#### extras
+
+This is reserved for additional parameters for future extension, specially when needing to add special operations to customized the data loading process (e.g., extending [the current universal data module](https://github.com/MMV-Lab/mmv_im2im/blob/main/mmv_im2im/data_modules/data_loader_basic.py) with specific needs). 
 
 ### part 3: model
 
@@ -70,4 +195,25 @@ All fields under `model` can be found [HERE](https://github.com/MMV-Lab/mmv_im2i
 
 ### part 4: trainer
 
-We adopted the trainer from pytorch-lightning. You can find detailed API from [the official documentation](https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html#trainer-class-api). Then, you can find examples of how to pass in these parameters in our example configuration files.
+We adopted the trainer from pytorch-lightning. You can find detailed API from [the official documentation](https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html#trainer-class-api) and [the callbacks it supports](https://pytorch-lightning.readthedocs.io/en/latest/extensions/callbacks.html#built-in-callbacks). You can find examples of how to pass in these parameters in our example configuration files. A `verbose` option is available. When setting to `True`, one example data (e.g., input + output + ground truth) will be saved out in the lightning log folder at the beginning of each epoch. A typical setting for `trainer` is as follows:
+
+```yaml
+trainer:
+  verbose: True # or False
+  params:   # anything in pytorch-lightning trainer API
+    gpus: 1
+    precision: 16
+    max_epochs: 1000
+    detect_anomaly: True
+  callbacks:  # any callback for pytorch-lightning trainer
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 50 
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: 'best'
+```

@@ -73,6 +73,24 @@ run_im2im --config inference_labelfree_3d --data.inference_input.dir /path/to/sa
 
 We provide [a tutorial](tutorials/README.md) for users to understand how to enjoy both the simplicity and the full flexibility of the package. 
 
+The scripts and configurations for reproducing our experiments in the [pre-print](https://arxiv.org/abs/2209.02498) can also be used as examples for walking through different applications.
+
+| Application | data preparation | training config | inference config |
+| :---: |  :---: |  :---: |  :---: |
+| 3D labelfree prediction  | [script](script/pull_labelfree_sample_data.py) | [supervisedFCN](), [supervisedPix2pix](), [unsupervised]() |  [supervisedFCN](), [supervisedPix2pix](), [unsupervised]() |
+| 2D labelfree prediction  | [script]() | [supervisedFCN]() |  [supervisedFCN]() |
+| 2D semantic segmentation | [script]() | [supervisedFCN]() |  [supervisedFCN]() |
+| 3D semantic segmentation | [script]() | [supervisedFCN]() |  [supervisedFCN]() |
+| 2D instance segmentation | [script]() | [supervisedEmbedSeg]() |  [supervisedEmbedseg]() |
+| 3D instance segmentation | [script]() | [supervisedEmbedSeg_fluo](), [supervisedEmbedSeg_bf]() |  [supervisedEmbedseg_fluo](), [supervisedEmbedSeg_bf]() | 
+| 2D unsupervised segmentation | [script]() | [unsupervised]() |  [unsupervised]() | 
+| 3D unsupervised segmentation | [script]() | [unsupervised]() |  [unsupervised]() | 
+| 2D synthetic image generation | [script]() | [supervisedPix2pix](), [unsupervised]() | [supervisedPix2pix](), [unsupervised]() |
+| 3D synthetic image generation | [script]() | [supervisedPix2pix]() | [supervisedPix2pix]() |
+| image restoration / denoising  | [script]() | [supervisedFCN]() | [supervisedFCN]()  |
+| image modality transfer | [script]() | [supervisedFCN]() | [supervisedFCN]()  |
+| staining transformation | [script]() | [supervisedPix2pix]() | [supervisedPix2pix]() |
+
 
 ## API Documentation
 
