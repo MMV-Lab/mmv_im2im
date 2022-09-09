@@ -82,7 +82,7 @@ The scripts and configurations for reproducing our experiments in the [pre-print
 | 2D semantic segmentation | [script]() | [supervisedFCN]() |  [supervisedFCN]() |
 | 3D semantic segmentation | [script]() | [supervisedFCN]() |  [supervisedFCN]() |
 | 2D instance segmentation | [script]() | [supervisedEmbedSeg]() |  [supervisedEmbedseg]() |
-| 3D instance segmentation | [script]() | [supervisedEmbedSeg_fluo](), [supervisedEmbedSeg_bf]() |  [supervisedEmbedseg_fluo](), [supervisedEmbedSeg_bf]() | 
+| 3D instance segmentation | [script]() | [supervisedEmbedSeg_fluo](./paper_configs/train_embedseg_3d.yaml), [supervisedEmbedSeg_bf](./paper_configs/train_embedseg_3d_BF.yaml) |  [supervisedEmbedseg_fluo](./paper_configs/inference_embedseg_3d.yaml), [supervisedEmbedSeg_bf](./paper_configs/inference_embedseg_3d_bf.yaml) | 
 | 2D unsupervised segmentation | [script]() | [unsupervised]() |  [unsupervised]() | 
 | 3D unsupervised segmentation | [script]() | [unsupervised]() |  [unsupervised]() | 
 | 2D synthetic image generation | [script]() | [supervisedPix2pix](), [unsupervised]() | [supervisedPix2pix](), [unsupervised]() |

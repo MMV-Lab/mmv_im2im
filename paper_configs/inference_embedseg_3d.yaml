@@ -1,0 +1,80 @@
+mode: inference
+
+data:
+  inference_input:
+    #dir: "/mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/holdout_fluorescent/"
+    dir: "/mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/special_pair/raw_fluo"
+    reader_params:
+      dimension_order_out: "ZYX"
+      C: 0
+      T: 0
+  inference_output:
+    path: "/mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/special_pair/pred_from_fluo"
+  preprocess:      
+    - module_name: monai.transforms
+      func_name: NormalizeIntensity
+    #- module_name: mmv_im2im.preprocessing.transforms
+    #  func_name: norm_around_center
+    #  params:
+    #    min_z: 32  
+    #- module_name: monai.transforms
+    #  func_name: CenterSpatialCrop
+    #  params:
+    #    roi_size: [32, 624, 924]
+    #- module_name: mmv_im2im.preprocessing.transforms
+    #  func_name: pad_to_multiple
+    #  params:
+    #    multiple_base: [2, 32, 32]
+    #    pad_value: "mean"
+  postprocess:
+    - module_name: mmv_im2im.postprocessing.embedseg_cluster
+      func_name: generate_instance_clusters
+      params:
+        grid_x: 1024
+        grid_y: 1024
+        grid_z: 128
+        pixel_x: 1
+        pixel_y: 1
+        pixel_z: 1
+        n_sigma: 3
+        # grid_y: 624 #512
+        # grid_x: 924 #512
+        # grid_z: 70 #32
+        # pixel_y: 1
+        # pixel_x: 1
+        # pixel_z: 1
+        # n_sigma: 3        
+        seed_thresh: 0.5
+        min_mask_sum: 2
+        min_unclustered_sum: 2
+        min_object_size: 2
+
+model:
+  framework: embedseg
+  #net:
+  #  module_name: mmv_im2im.models.nets.fnet_nn_3d
+  #  func_name: Net
+  #  params:
+  #    depth: 4
+  #    mult_chan: 32
+  #    in_channels: 1
+  #    out_channels: 7
+  net:
+    module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+    func_name: UNet3D
+    params:
+      in_channel: 1
+      n_classes: 7
+      down_ratio: 4
+  checkpoint: "/mnt/eternus/users/Jianxu/projects/lightning_logs/version_24/checkpoints/last.ckpt"   #ADD-YOURS
+  model_extra:
+    sliding_window_params:
+        roi_size: [32, 512, 512]
+        sw_batch_size: 1
+        overlap: 0.6
+        mode: "gaussian"
+        # sigma_scale: 1
+trainer:
+  params:
+    gpus: 1
+    precision: 16
