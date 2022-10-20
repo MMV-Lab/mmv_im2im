@@ -37,6 +37,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -113,9 +114,18 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -222,6 +232,14 @@
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
 <p>We recommend to <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands">create a new conda environment</a> or <a class="reference external" href="https://docs.python.org/3/library/venv.html">a virtual environment</a> with Python 3.9.</p>
+<section id="install-pytorch-before-installing-our-package">
+<h3>Install PyTorch before installing our package<a class="headerlink" href="#install-pytorch-before-installing-our-package" title="Permalink to this heading">¶</a></h3>
+<p>Follow the instruction from the official website: <a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a>. E.g..</p>
+<p>To install the stable version (accessed on Oct 20, 2022) with conda for CUDA 11.3 (also, fine with 11.4), use the following command. Make sure check the website to find the command suitable for your system.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install pytorch torchvision torchaudio <span class="nv">cudatoolkit</span><span class="o">=</span><span class="m">11</span>.3 -c pytorch
+</pre></div>
+</div>
+</section>
 <section id="basic-installation">
 <h3>basic installation<a class="headerlink" href="#basic-installation" title="Permalink to this heading">¶</a></h3>
 <p>(for users only using this package, not planning to change any code or make any extension):</p>

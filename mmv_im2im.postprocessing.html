@@ -37,6 +37,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -114,9 +115,18 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -217,6 +227,8 @@
 <dt class="sig sig-object py" id="mmv_im2im.postprocessing.basic_collection.extract_segmentation">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.postprocessing.basic_collection.</span></span><span class="sig-name descname"><span class="pre">extract_segmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/mmv_im2im/postprocessing/basic_collection.html#extract_segmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.postprocessing.basic_collection.extract_segmentation" title="Permalink to this definition">¶</a></dt>
 <dd><p>extract segmentation from a prediction</p>
+<section id="parameters">
+<h3>Parameters:<a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>im: ndarray or torch.Tensor</dt><dd><p>the multi-class prediction (1, C, W, H) or (1, C, Z, Y, X)</p>
 </dd>
@@ -228,16 +240,20 @@ None (do not apply any cutoff)</p>
 <dt>batch_dim: bool</dt><dd><p>whether there is a batch dimension</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="mmv_im2im.postprocessing.basic_collection.generate_classmap">
 <span class="sig-prename descclassname"><span class="pre">mmv_im2im.postprocessing.basic_collection.</span></span><span class="sig-name descname"><span class="pre">generate_classmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">im</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/mmv_im2im/postprocessing/basic_collection.html#generate_classmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.postprocessing.basic_collection.generate_classmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>generate the segmentation classmap from model prediction</p>
+<section id="id1">
+<h3>Parameters:<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <dl class="simple">
 <dt>im: ndarray or torch.Tensor</dt><dd><p>the multi-class prediction (1, C, W, H) or (1, C, Z, Y, X)</p>
 </dd>
 </dl>
+</section>
 </dd></dl>
 
 </section>

@@ -37,6 +37,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -114,9 +115,18 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-mmv_im2im">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -212,55 +222,283 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.bin.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.bin.html#module-mmv_im2im.bin.run_im2im">mmv_im2im.bin.run_im2im module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.bin.html#module-mmv_im2im.bin.run_im2im">mmv_im2im.bin.run_im2im module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.bin.html#mmv_im2im.bin.run_im2im.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.bin.html#module-mmv_im2im.bin">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mmv_im2im.configs.html">mmv_im2im.configs package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.configs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.configs.html#module-mmv_im2im.configs.config_base">mmv_im2im.configs.config_base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.configs.html#module-mmv_im2im.configs.config_base">mmv_im2im.configs.config_base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ArgumentParser"><code class="docutils literal notranslate"><span class="pre">ArgumentParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ArgumentParser.parse_args"><code class="docutils literal notranslate"><span class="pre">ArgumentParser.parse_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ArgumentParser.parse_known_args"><code class="docutils literal notranslate"><span class="pre">ArgumentParser.parse_known_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ArgumentParser.print_help"><code class="docutils literal notranslate"><span class="pre">ArgumentParser.print_help()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ArgumentParser.set_dataclass"><code class="docutils literal notranslate"><span class="pre">ArgumentParser.set_dataclass()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig"><code class="docutils literal notranslate"><span class="pre">DataConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.augmentation"><code class="docutils literal notranslate"><span class="pre">DataConfig.augmentation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.cache_path"><code class="docutils literal notranslate"><span class="pre">DataConfig.cache_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.category"><code class="docutils literal notranslate"><span class="pre">DataConfig.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.data_path"><code class="docutils literal notranslate"><span class="pre">DataConfig.data_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.dataloader"><code class="docutils literal notranslate"><span class="pre">DataConfig.dataloader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.extra"><code class="docutils literal notranslate"><span class="pre">DataConfig.extra</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.inference_input"><code class="docutils literal notranslate"><span class="pre">DataConfig.inference_input</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.inference_output"><code class="docutils literal notranslate"><span class="pre">DataConfig.inference_output</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.patch_size"><code class="docutils literal notranslate"><span class="pre">DataConfig.patch_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.postprocess"><code class="docutils literal notranslate"><span class="pre">DataConfig.postprocess</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig.preprocess"><code class="docutils literal notranslate"><span class="pre">DataConfig.preprocess</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderConfig"><code class="docutils literal notranslate"><span class="pre">DataloaderConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderConfig.train"><code class="docutils literal notranslate"><span class="pre">DataloaderConfig.train</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderConfig.train_val_ratio"><code class="docutils literal notranslate"><span class="pre">DataloaderConfig.train_val_ratio</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderConfig.val"><code class="docutils literal notranslate"><span class="pre">DataloaderConfig.val</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderModuleConfig"><code class="docutils literal notranslate"><span class="pre">DataloaderModuleConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderModuleConfig.dataloader_params"><code class="docutils literal notranslate"><span class="pre">DataloaderModuleConfig.dataloader_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderModuleConfig.dataloader_type"><code class="docutils literal notranslate"><span class="pre">DataloaderModuleConfig.dataloader_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderModuleConfig.dataset_params"><code class="docutils literal notranslate"><span class="pre">DataloaderModuleConfig.dataset_params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderModuleConfig.partial_loader"><code class="docutils literal notranslate"><span class="pre">DataloaderModuleConfig.partial_loader</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferInConfig"><code class="docutils literal notranslate"><span class="pre">InferInConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferInConfig.data_type"><code class="docutils literal notranslate"><span class="pre">InferInConfig.data_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferInConfig.dir"><code class="docutils literal notranslate"><span class="pre">InferInConfig.dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferInConfig.reader_params"><code class="docutils literal notranslate"><span class="pre">InferInConfig.reader_params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferOutConfig"><code class="docutils literal notranslate"><span class="pre">InferOutConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferOutConfig.path"><code class="docutils literal notranslate"><span class="pre">InferOutConfig.path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferOutConfig.suffix"><code class="docutils literal notranslate"><span class="pre">InferOutConfig.suffix</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig"><code class="docutils literal notranslate"><span class="pre">ModelConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig.checkpoint"><code class="docutils literal notranslate"><span class="pre">ModelConfig.checkpoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig.criterion"><code class="docutils literal notranslate"><span class="pre">ModelConfig.criterion</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig.framework"><code class="docutils literal notranslate"><span class="pre">ModelConfig.framework</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig.model_extra"><code class="docutils literal notranslate"><span class="pre">ModelConfig.model_extra</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig.net"><code class="docutils literal notranslate"><span class="pre">ModelConfig.net</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig.optimizer"><code class="docutils literal notranslate"><span class="pre">ModelConfig.optimizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig.scheduler"><code class="docutils literal notranslate"><span class="pre">ModelConfig.scheduler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ProgramConfig"><code class="docutils literal notranslate"><span class="pre">ProgramConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ProgramConfig.data"><code class="docutils literal notranslate"><span class="pre">ProgramConfig.data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ProgramConfig.mode"><code class="docutils literal notranslate"><span class="pre">ProgramConfig.mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ProgramConfig.model"><code class="docutils literal notranslate"><span class="pre">ProgramConfig.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.ProgramConfig.trainer"><code class="docutils literal notranslate"><span class="pre">ProgramConfig.trainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.TrainerConfig"><code class="docutils literal notranslate"><span class="pre">TrainerConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.TrainerConfig.callbacks"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.callbacks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.TrainerConfig.gpus"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.gpus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.TrainerConfig.params"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.params</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.TrainerConfig.verbose"><code class="docutils literal notranslate"><span class="pre">TrainerConfig.verbose</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.configuration_validation"><code class="docutils literal notranslate"><span class="pre">configuration_validation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.configs.html#mmv_im2im.configs.config_base.parse_adaptor"><code class="docutils literal notranslate"><span class="pre">parse_adaptor()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.configs.html#module-mmv_im2im.configs">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.data_modules.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_basic">mmv_im2im.data_modules.data_loader_basic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules.data_loader_basic">mmv_im2im.data_modules.data_loader_basic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule"><code class="docutils literal notranslate"><span class="pre">Im2ImDataModule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data"><code class="docutils literal notranslate"><span class="pre">Im2ImDataModule.prepare_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup"><code class="docutils literal notranslate"><span class="pre">Im2ImDataModule.setup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.train_dataloader"><code class="docutils literal notranslate"><span class="pre">Im2ImDataModule.train_dataloader()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.val_dataloader"><code class="docutils literal notranslate"><span class="pre">Im2ImDataModule.val_dataloader()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.data_modules.html#module-mmv_im2im.data_modules">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.data_modules.html#mmv_im2im.data_modules.get_data_module"><code class="docutils literal notranslate"><span class="pre">get_data_module()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#module-mmv_im2im.models.pl_FCN">mmv_im2im.models.pl_FCN module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#module-mmv_im2im.models.pl_FCN">mmv_im2im.models.pl_FCN module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.configure_optimizers"><code class="docutils literal notranslate"><span class="pre">Model.configure_optimizers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.forward"><code class="docutils literal notranslate"><span class="pre">Model.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.prepare_batch"><code class="docutils literal notranslate"><span class="pre">Model.prepare_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.run_step"><code class="docutils literal notranslate"><span class="pre">Model.run_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.training"><code class="docutils literal notranslate"><span class="pre">Model.training</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.training_step"><code class="docutils literal notranslate"><span class="pre">Model.training_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.validation_step"><code class="docutils literal notranslate"><span class="pre">Model.validation_step()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#mmv-im2im-models-pl-cyclegan-module">mmv_im2im.models.pl_cyclegan module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#module-mmv_im2im.models.pl_embedseg">mmv_im2im.models.pl_embedseg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#module-mmv_im2im.models.pl_embedseg">mmv_im2im.models.pl_embedseg module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model"><code class="docutils literal notranslate"><span class="pre">Model</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.configure_optimizers"><code class="docutils literal notranslate"><span class="pre">Model.configure_optimizers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.forward"><code class="docutils literal notranslate"><span class="pre">Model.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.run_step"><code class="docutils literal notranslate"><span class="pre">Model.run_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.training"><code class="docutils literal notranslate"><span class="pre">Model.training</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.training_step"><code class="docutils literal notranslate"><span class="pre">Model.training_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.validation_step"><code class="docutils literal notranslate"><span class="pre">Model.validation_step()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#mmv-im2im-models-pl-pix2pix-module">mmv_im2im.models.pl_pix2pix module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.models.html#module-mmv_im2im.models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.postprocessing.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.basic_collection">mmv_im2im.postprocessing.basic_collection module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.embedseg_cluster">mmv_im2im.postprocessing.embedseg_cluster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.basic_collection">mmv_im2im.postprocessing.basic_collection module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.basic_collection.extract_segmentation"><code class="docutils literal notranslate"><span class="pre">extract_segmentation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.basic_collection.generate_classmap"><code class="docutils literal notranslate"><span class="pre">generate_classmap()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing.embedseg_cluster">mmv_im2im.postprocessing.embedseg_cluster module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d"><code class="docutils literal notranslate"><span class="pre">Cluster_2d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d.cluster"><code class="docutils literal notranslate"><span class="pre">Cluster_2d.cluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_2d.cluster_with_gt"><code class="docutils literal notranslate"><span class="pre">Cluster_2d.cluster_with_gt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d"><code class="docutils literal notranslate"><span class="pre">Cluster_3d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d.cluster"><code class="docutils literal notranslate"><span class="pre">Cluster_3d.cluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.Cluster_3d.cluster_with_gt"><code class="docutils literal notranslate"><span class="pre">Cluster_3d.cluster_with_gt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.degrid"><code class="docutils literal notranslate"><span class="pre">degrid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.postprocessing.html#mmv_im2im.postprocessing.embedseg_cluster.generate_instance_clusters"><code class="docutils literal notranslate"><span class="pre">generate_instance_clusters()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.postprocessing.html#module-mmv_im2im.postprocessing">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.preprocessing.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing.transforms">mmv_im2im.preprocessing.transforms module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing.transforms">mmv_im2im.preprocessing.transforms module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.norm_around_center"><code class="docutils literal notranslate"><span class="pre">norm_around_center()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.normalize_staining"><code class="docutils literal notranslate"><span class="pre">normalize_staining()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.pad_to_multiple"><code class="docutils literal notranslate"><span class="pre">pad_to_multiple()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.pad_z"><code class="docutils literal notranslate"><span class="pre">pad_z()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.preprocessing.html#module-mmv_im2im.preprocessing">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="mmv_im2im.utils.html">mmv_im2im.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedding_loss">mmv_im2im.utils.embedding_loss module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedseg_utils">mmv_im2im.utils.embedseg_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform">mmv_im2im.utils.for_transform module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.gan_losses">mmv_im2im.utils.gan_losses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.gan_utils">mmv_im2im.utils.gan_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.lovasz_losses">mmv_im2im.utils.lovasz_losses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.misc">mmv_im2im.utils.misc module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.model_utils">mmv_im2im.utils.model_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.piecewise_inference">mmv_im2im.utils.piecewise_inference module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedding_loss">mmv_im2im.utils.embedding_loss module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2d"><code class="docutils literal notranslate"><span class="pre">SpatialEmbLoss_2d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2d.forward"><code class="docutils literal notranslate"><span class="pre">SpatialEmbLoss_2d.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_2d.training"><code class="docutils literal notranslate"><span class="pre">SpatialEmbLoss_2d.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d"><code class="docutils literal notranslate"><span class="pre">SpatialEmbLoss_3d</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.forward"><code class="docutils literal notranslate"><span class="pre">SpatialEmbLoss_3d.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.SpatialEmbLoss_3d.training"><code class="docutils literal notranslate"><span class="pre">SpatialEmbLoss_3d.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedding_loss.calculate_iou"><code class="docutils literal notranslate"><span class="pre">calculate_iou()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.embedseg_utils">mmv_im2im.utils.embedseg_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.fill_label_holes"><code class="docutils literal notranslate"><span class="pre">fill_label_holes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image"><code class="docutils literal notranslate"><span class="pre">generate_center_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image_2d"><code class="docutils literal notranslate"><span class="pre">generate_center_image_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.generate_center_image_3d"><code class="docutils literal notranslate"><span class="pre">generate_center_image_3d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.pairwise_python"><code class="docutils literal notranslate"><span class="pre">pairwise_python()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.embedseg_utils.prepare_embedseg_cache"><code class="docutils literal notranslate"><span class="pre">prepare_embedseg_cache()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.for_transform">mmv_im2im.utils.for_transform module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.for_transform.center_crop"><code class="docutils literal notranslate"><span class="pre">center_crop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_monai_ops"><code class="docutils literal notranslate"><span class="pre">parse_monai_ops()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.for_transform.parse_monai_ops_vanilla"><code class="docutils literal notranslate"><span class="pre">parse_monai_ops_vanilla()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.gan_losses">mmv_im2im.utils.gan_losses module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD"><code class="docutils literal notranslate"><span class="pre">pix2pix_HD</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD.generator_step"><code class="docutils literal notranslate"><span class="pre">pix2pix_HD.generator_step()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original"><code class="docutils literal notranslate"><span class="pre">pix2pix_HD_original</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original.discriminator_step"><code class="docutils literal notranslate"><span class="pre">pix2pix_HD_original.discriminator_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original.feature_matching"><code class="docutils literal notranslate"><span class="pre">pix2pix_HD_original.feature_matching()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original.generator_step"><code class="docutils literal notranslate"><span class="pre">pix2pix_HD_original.generator_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original.multi_gan"><code class="docutils literal notranslate"><span class="pre">pix2pix_HD_original.multi_gan()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_basic"><code class="docutils literal notranslate"><span class="pre">pix2pix_basic</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_basic.discriminator_step"><code class="docutils literal notranslate"><span class="pre">pix2pix_basic.discriminator_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_basic.generator_step"><code class="docutils literal notranslate"><span class="pre">pix2pix_basic.generator_step()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.gan_utils">mmv_im2im.utils.gan_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_utils.ReplayBuffer"><code class="docutils literal notranslate"><span class="pre">ReplayBuffer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.gan_utils.ReplayBuffer.push_and_pop"><code class="docutils literal notranslate"><span class="pre">ReplayBuffer.push_and_pop()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.lovasz_losses">mmv_im2im.utils.lovasz_losses module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.StableBCELoss"><code class="docutils literal notranslate"><span class="pre">StableBCELoss</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.StableBCELoss.forward"><code class="docutils literal notranslate"><span class="pre">StableBCELoss.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.StableBCELoss.training"><code class="docutils literal notranslate"><span class="pre">StableBCELoss.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.binary_xloss"><code class="docutils literal notranslate"><span class="pre">binary_xloss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.flatten_binary_scores"><code class="docutils literal notranslate"><span class="pre">flatten_binary_scores()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.flatten_probas"><code class="docutils literal notranslate"><span class="pre">flatten_probas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou"><code class="docutils literal notranslate"><span class="pre">iou()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou_binary"><code class="docutils literal notranslate"><span class="pre">iou_binary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_grad"><code class="docutils literal notranslate"><span class="pre">lovasz_grad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_hinge"><code class="docutils literal notranslate"><span class="pre">lovasz_hinge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_hinge_flat"><code class="docutils literal notranslate"><span class="pre">lovasz_hinge_flat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_softmax"><code class="docutils literal notranslate"><span class="pre">lovasz_softmax()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_softmax_flat"><code class="docutils literal notranslate"><span class="pre">lovasz_softmax_flat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.mean"><code class="docutils literal notranslate"><span class="pre">mean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.xloss"><code class="docutils literal notranslate"><span class="pre">xloss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.misc">mmv_im2im.utils.misc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict"><code class="docutils literal notranslate"><span class="pre">generate_dataset_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_dataset_dict_monai"><code class="docutils literal notranslate"><span class="pre">generate_dataset_dict_monai()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.generate_test_dataset_dict"><code class="docutils literal notranslate"><span class="pre">generate_test_dataset_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.load_one_folder"><code class="docutils literal notranslate"><span class="pre">load_one_folder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.load_subfolders"><code class="docutils literal notranslate"><span class="pre">load_subfolders()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader"><code class="docutils literal notranslate"><span class="pre">monai_bio_reader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader.get_data"><code class="docutils literal notranslate"><span class="pre">monai_bio_reader.get_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader.read"><code class="docutils literal notranslate"><span class="pre">monai_bio_reader.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.monai_bio_reader.verify_suffix"><code class="docutils literal notranslate"><span class="pre">monai_bio_reader.verify_suffix()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config"><code class="docutils literal notranslate"><span class="pre">parse_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func"><code class="docutils literal notranslate"><span class="pre">parse_config_func()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_config_func_without_params"><code class="docutils literal notranslate"><span class="pre">parse_config_func_without_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.misc.parse_ops_list"><code class="docutils literal notranslate"><span class="pre">parse_ops_list()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.model_utils">mmv_im2im.utils.model_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.model_utils.init_weights"><code class="docutils literal notranslate"><span class="pre">init_weights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.model_utils.state_dict_simplification"><code class="docutils literal notranslate"><span class="pre">state_dict_simplification()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils.piecewise_inference">mmv_im2im.utils.piecewise_inference module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.utils.html#mmv_im2im.utils.piecewise_inference.predict_piecewise"><code class="docutils literal notranslate"><span class="pre">predict_piecewise()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mmv_im2im.utils.html#module-mmv_im2im.utils">Module contents</a></li>
 </ul>
 </li>

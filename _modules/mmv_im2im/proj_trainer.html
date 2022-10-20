@@ -36,6 +36,7 @@
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -111,9 +112,18 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -194,11 +204,13 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.data_modules</span> <span class="kn">import</span> <span class="n">get_data_module</span>
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">parse_ops_list</span>
+<span class="kn">import</span> <span class="nn">pyrallis</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
 
@@ -261,6 +273,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">callback_list</span> <span class="o">=</span> <span class="n">parse_ops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">callbacks</span><span class="p">)</span>
         <span class="n">trainer</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="n">callback_list</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="c1"># save the configuration in the log directory</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span>
+        <span class="n">save_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pyrallis</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;model_config.yaml&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">))</span>
+        <span class="n">pyrallis</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_cfg</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;train_config.yaml&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">))</span>
+        <span class="n">pyrallis</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data_config.yaml&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">))</span>
 
         <span class="c1"># start training</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start training ... &quot;</span><span class="p">)</span>

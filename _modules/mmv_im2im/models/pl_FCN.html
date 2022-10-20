@@ -36,6 +36,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -111,9 +112,18 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -223,6 +233,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span> <span class="o">=</span> <span class="n">model_info_xx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">masked_loss</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seg_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;use_costmap&quot;</span> <span class="ow">in</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span>
                 <span class="s2">&quot;params&quot;</span>
@@ -232,6 +243,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">model_info_xx</span><span class="o">.</span><span class="n">model_extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="s2">&quot;debug_segmentation&quot;</span> <span class="ow">in</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">model_extra</span>
+                <span class="ow">and</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">model_extra</span><span class="p">[</span><span class="s2">&quot;debug_segmentation&quot;</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">seg_flag</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="Model.configure_optimizers"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_FCN.Model.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501</span>
@@ -299,6 +317,13 @@
             <span class="c1"># check if the log path exists, if not create one</span>
             <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+            <span class="c1"># check if need to use softmax</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_flag</span><span class="p">:</span>
+                <span class="n">act_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Softmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">yhat_act</span> <span class="o">=</span> <span class="n">act_layer</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">yhat_act</span> <span class="o">=</span> <span class="n">y_hat</span>
+
             <span class="n">src_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span>
                 <span class="n">src</span><span class="p">[</span>
                     <span class="mi">0</span><span class="p">,</span>
@@ -316,7 +341,7 @@
                 <span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
             <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
             <span class="n">prd_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span>
-                <span class="n">y_hat</span><span class="p">[</span>
+                <span class="n">yhat_act</span><span class="p">[</span>
                     <span class="mi">0</span><span class="p">,</span>
                 <span class="p">]</span>
                 <span class="o">.</span><span class="n">detach</span><span class="p">()</span>
