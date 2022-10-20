@@ -30,6 +30,7 @@ class Model(pl.LightningModule):
         self.model_info = model_info_xx
         self.verbose = verbose
         self.masked_loss = False
+        self.seg_flag = False
         if train:
             if "use_costmap" in model_info_xx.criterion[
                 "params"
@@ -39,6 +40,13 @@ class Model(pl.LightningModule):
             else:
                 self.criterion = parse_config(model_info_xx.criterion)
             self.optimizer_func = parse_config_func(model_info_xx.optimizer)
+
+            if (
+                model_info_xx.model_extra is not None
+                and "debug_segmentation" in model_info_xx.model_extra
+                and model_info_xx.model_extra["debug_segmentation"]
+            ):
+                self.seg_flag = True
 
     def configure_optimizers(self):
         # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
@@ -106,6 +114,13 @@ class Model(pl.LightningModule):
             # check if the log path exists, if not create one
             Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
 
+            # check if need to use softmax
+            if self.seg_flag:
+                act_layer = torch.nn.Softmax(dim=1)
+                yhat_act = act_layer(y_hat)
+            else:
+                yhat_act = y_hat
+
             src_out = np.squeeze(
                 src[
                     0,
@@ -123,7 +138,7 @@ class Model(pl.LightningModule):
                 .numpy()
             ).astype(np.float)
             prd_out = np.squeeze(
-                y_hat[
+                yhat_act[
                     0,
                 ]
                 .detach()

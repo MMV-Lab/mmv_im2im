@@ -21,6 +21,16 @@ The overall package is designed with a generic image-to-image transformation fra
 
 We recommend to [create a new conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands) or [a virtual environment](https://docs.python.org/3/library/venv.html) with Python 3.9.
 
+### Install PyTorch before installing our package
+
+Follow the instruction from the official website: https://pytorch.org/get-started/locally/. E.g..
+
+To install the stable version (accessed on Oct 20, 2022) with conda for CUDA 11.3 (also, fine with 11.4), use the following command. Make sure check the website to find the command suitable for your system.
+
+```bash
+conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+```
+
 ### basic installation
 
 (for users only using this package, not planning to change any code or make any extension):
