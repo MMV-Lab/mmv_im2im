@@ -77,6 +77,8 @@ model:
     func_name: ExponentialLR
     params:
       gamma: 0.98
+  model_extra:
+    debug_segmentation: True
 trainer:
   verbose: True
   params:
