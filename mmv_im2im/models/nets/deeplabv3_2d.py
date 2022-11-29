@@ -12,7 +12,7 @@ class Net(torch.nn.Module):
         pretrained: bool = False,
         pretrained_backbone: bool = True,
         in_channels: int = 3,
-        num_classes: int = 0,
+        num_classes: int = 21,
         aux_loss: bool = None,
     ):
         super().__init__()        
