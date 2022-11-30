@@ -1,0 +1,921 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>mmv_im2im.models.nets package &mdash; MMV Im2Im Transformation 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="mmv_im2im.postprocessing package" href="mmv_im2im.postprocessing.html" />
+    <link rel="prev" title="mmv_im2im.models package" href="mmv_im2im.models.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MMV Im2Im Transformation
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="mmv_im2im.html">mmv_im2im package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="mmv_im2im.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.configs.html">mmv_im2im.configs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MMV Im2Im Transformation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">mmv_im2im</a> &raquo;</li>
+        
+          <li><a href="mmv_im2im.html">mmv_im2im package</a> &raquo;</li>
+        
+          <li><a href="mmv_im2im.models.html">mmv_im2im.models package</a> &raquo;</li>
+        
+      <li>mmv_im2im.models.nets package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/mmv_im2im.models.nets.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="mmv_im2im.postprocessing.html" class="btn btn-neutral float-right" title="mmv_im2im.postprocessing package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+      
+      
+        <a href="mmv_im2im.models.html" class="btn btn-neutral float-left" title="mmv_im2im.models package" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="mmv-im2im-models-nets-package">
+<h1>mmv_im2im.models.nets package<a class="headerlink" href="#mmv-im2im-models-nets-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-mmv_im2im.models.nets.BranchedERFNet_2d">
+<span id="mmv-im2im-models-nets-branchederfnet-2d-module"></span><h2>mmv_im2im.models.nets.BranchedERFNet_2d module<a class="headerlink" href="#module-mmv_im2im.models.nets.BranchedERFNet_2d" title="Permalink to this heading">¶</a></h2>
+<p>Author: Davy Neven
+Licensed under the CC BY-NC 4.0 license
+(<a class="reference external" href="https://creativecommons.org/licenses/by-nc/4.0/">https://creativecommons.org/licenses/by-nc/4.0/</a>)
+<a class="reference external" href="https://github.com/davyneven/SpatialEmbeddings">https://github.com/davyneven/SpatialEmbeddings</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.BranchedERFNet_2d.</span></span><span class="sig-name descname"><span class="pre">BranchedERFNet_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/BranchedERFNet_2d.html#BranchedERFNet_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_encode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/BranchedERFNet_2d.html#BranchedERFNet_2d.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d.init_output">
+<span class="sig-name descname"><span class="pre">init_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/BranchedERFNet_2d.html#BranchedERFNet_2d.init_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d.init_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_2d.BranchedERFNet_2d.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets.BranchedERFNet_3d">
+<span id="mmv-im2im-models-nets-branchederfnet-3d-module"></span><h2>mmv_im2im.models.nets.BranchedERFNet_3d module<a class="headerlink" href="#module-mmv_im2im.models.nets.BranchedERFNet_3d" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.BranchedERFNet_3d.</span></span><span class="sig-name descname"><span class="pre">BranchedERFNet_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/BranchedERFNet_3d.html#BranchedERFNet_3d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_encode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/BranchedERFNet_3d.html#BranchedERFNet_3d.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d.init_output">
+<span class="sig-name descname"><span class="pre">init_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/BranchedERFNet_3d.html#BranchedERFNet_3d.init_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d.init_output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.BranchedERFNet_3d.BranchedERFNet_3d.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets.deeplabv3_2d">
+<span id="mmv-im2im-models-nets-deeplabv3-2d-module"></span><h2>mmv_im2im.models.nets.deeplabv3_2d module<a class="headerlink" href="#module-mmv_im2im.models.nets.deeplabv3_2d" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.deeplabv3_2d.Net">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.deeplabv3_2d.</span></span><span class="sig-name descname"><span class="pre">Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backbone</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_backbone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">21</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aux_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/deeplabv3_2d.html#Net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.deeplabv3_2d.Net" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.deeplabv3_2d.Net.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/deeplabv3_2d.html#Net.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.deeplabv3_2d.Net.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.deeplabv3_2d.Net.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.deeplabv3_2d.Net.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets.erfnet">
+<span id="mmv-im2im-models-nets-erfnet-module"></span><h2>mmv_im2im.models.nets.erfnet module<a class="headerlink" href="#module-mmv_im2im.models.nets.erfnet" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Decoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet.</span></span><span class="sig-name descname"><span class="pre">Decoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#Decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Decoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#Decoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Decoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Decoder.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Decoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.DownsamplerBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet.</span></span><span class="sig-name descname"><span class="pre">DownsamplerBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ninput</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noutput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#DownsamplerBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.DownsamplerBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.DownsamplerBlock.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#DownsamplerBlock.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.DownsamplerBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.DownsamplerBlock.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.DownsamplerBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Encoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet.</span></span><span class="sig-name descname"><span class="pre">Encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_channels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#Encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Encoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#Encoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Encoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Encoder.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Encoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Net">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet.</span></span><span class="sig-name descname"><span class="pre">Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#Net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Net" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Net.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_encode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#Net.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Net.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.Net.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.Net.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.UpsamplerBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet.</span></span><span class="sig-name descname"><span class="pre">UpsamplerBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ninput</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noutput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#UpsamplerBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.UpsamplerBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.UpsamplerBlock.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#UpsamplerBlock.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.UpsamplerBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.UpsamplerBlock.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.UpsamplerBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.non_bottleneck_1d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet.</span></span><span class="sig-name descname"><span class="pre">non_bottleneck_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chann</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropprob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilated</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#non_bottleneck_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.non_bottleneck_1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.non_bottleneck_1d.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet.html#non_bottleneck_1d.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.non_bottleneck_1d.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet.non_bottleneck_1d.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet.non_bottleneck_1d.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets.erfnet_3d">
+<span id="mmv-im2im-models-nets-erfnet-3d-module"></span><h2>mmv_im2im.models.nets.erfnet_3d module<a class="headerlink" href="#module-mmv_im2im.models.nets.erfnet_3d" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Decoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet_3d.</span></span><span class="sig-name descname"><span class="pre">Decoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#Decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Decoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#Decoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Decoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Decoder.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Decoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.DownsamplerBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet_3d.</span></span><span class="sig-name descname"><span class="pre">DownsamplerBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ninput</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noutput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#DownsamplerBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.DownsamplerBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.DownsamplerBlock.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#DownsamplerBlock.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.DownsamplerBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.DownsamplerBlock.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.DownsamplerBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Encoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet_3d.</span></span><span class="sig-name descname"><span class="pre">Encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_channels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#Encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Encoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#Encoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Encoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Encoder.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Encoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Net">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet_3d.</span></span><span class="sig-name descname"><span class="pre">Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#Net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Net" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Net.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_encode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#Net.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Net.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.Net.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.Net.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.UpsamplerBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet_3d.</span></span><span class="sig-name descname"><span class="pre">UpsamplerBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ninput</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noutput</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#UpsamplerBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.UpsamplerBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.UpsamplerBlock.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#UpsamplerBlock.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.UpsamplerBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.UpsamplerBlock.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.UpsamplerBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.non_bottleneck_1d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.erfnet_3d.</span></span><span class="sig-name descname"><span class="pre">non_bottleneck_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chann</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropprob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilated</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#non_bottleneck_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.non_bottleneck_1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.non_bottleneck_1d.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/erfnet_3d.html#non_bottleneck_1d.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.non_bottleneck_1d.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.erfnet_3d.non_bottleneck_1d.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.erfnet_3d.non_bottleneck_1d.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets.fnet_nn_2d">
+<span id="mmv-im2im-models-nets-fnet-nn-2d-module"></span><h2>mmv_im2im.models.nets.fnet_nn_2d module<a class="headerlink" href="#module-mmv_im2im.models.nets.fnet_nn_2d" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_2d.Net">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.fnet_nn_2d.</span></span><span class="sig-name descname"><span class="pre">Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mult_chan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_2d.html#Net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_2d.Net" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_2d.Net.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_2d.html#Net.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_2d.Net.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_2d.Net.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_2d.Net.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_2d.SubNet2Conv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.fnet_nn_2d.</span></span><span class="sig-name descname"><span class="pre">SubNet2Conv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_2d.html#SubNet2Conv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_2d.SubNet2Conv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_2d.SubNet2Conv.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_2d.html#SubNet2Conv.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_2d.SubNet2Conv.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_2d.SubNet2Conv.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_2d.SubNet2Conv.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets.fnet_nn_3d">
+<span id="mmv-im2im-models-nets-fnet-nn-3d-module"></span><h2>mmv_im2im.models.nets.fnet_nn_3d module<a class="headerlink" href="#module-mmv_im2im.models.nets.fnet_nn_3d" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_3d.Net">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.fnet_nn_3d.</span></span><span class="sig-name descname"><span class="pre">Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mult_chan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_3d.html#Net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_3d.Net" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_3d.Net.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_3d.html#Net.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_3d.Net.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_3d.Net.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_3d.Net.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_3d.SubNet2Conv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.fnet_nn_3d.</span></span><span class="sig-name descname"><span class="pre">SubNet2Conv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_out</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_3d.html#SubNet2Conv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_3d.SubNet2Conv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_3d.SubNet2Conv.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/fnet_nn_3d.html#SubNet2Conv.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_3d.SubNet2Conv.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.fnet_nn_3d.SubNet2Conv.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.fnet_nn_3d.SubNet2Conv.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets.gans">
+<span id="mmv-im2im-models-nets-gans-module"></span><h2>mmv_im2im.models.nets.gans module<a class="headerlink" href="#module-mmv_im2im.models.nets.gans" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.define_discriminator">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.gans.</span></span><span class="sig-name descname"><span class="pre">define_discriminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#define_discriminator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.define_discriminator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.define_generator">
+<span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.gans.</span></span><span class="sig-name descname"><span class="pre">define_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#define_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.define_generator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.generator_encoder_decoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.gans.</span></span><span class="sig-name descname"><span class="pre">generator_encoder_decoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#generator_encoder_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.generator_encoder_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.generator_encoder_decoder.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#generator_encoder_decoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.generator_encoder_decoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.generator_encoder_decoder.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.gans.generator_encoder_decoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.multiscale_discriminator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.gans.</span></span><span class="sig-name descname"><span class="pre">multiscale_discriminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_discriminator</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#multiscale_discriminator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.multiscale_discriminator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.multiscale_discriminator.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#multiscale_discriminator.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.multiscale_discriminator.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.multiscale_discriminator.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.gans.multiscale_discriminator.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.patch_discriminator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.gans.</span></span><span class="sig-name descname"><span class="pre">patch_discriminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#patch_discriminator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.patch_discriminator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.patch_discriminator.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#patch_discriminator.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.patch_discriminator.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.patch_discriminator.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.gans.patch_discriminator.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.preset_generator_resent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.models.nets.gans.</span></span><span class="sig-name descname"><span class="pre">preset_generator_resent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_down_blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_res_blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nf</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INSTANCE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#preset_generator_resent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.preset_generator_resent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.preset_generator_resent.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/nets/gans.html#preset_generator_resent.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.nets.gans.preset_generator_resent.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mmv_im2im.models.nets.gans.preset_generator_resent.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.nets.gans.preset_generator_resent.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mmv_im2im.models.nets">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mmv_im2im.models.nets" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jianxu Chen.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

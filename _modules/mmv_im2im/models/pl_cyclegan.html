@@ -1,0 +1,568 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>mmv_im2im.models.pl_cyclegan &mdash; MMV Im2Im Transformation 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> MMV Im2Im Transformation
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../mmv_im2im.html">mmv_im2im package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.configs.html">mmv_im2im.configs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MMV Im2Im Transformation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../mmv_im2im.html">mmv_im2im</a> &raquo;</li>
+        
+      <li>mmv_im2im.models.pl_cyclegan</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmv_im2im.models.pl_cyclegan</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides lighting module for cycleGAN</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="n">parse_config</span><span class="p">,</span> <span class="n">parse_config_func</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.gan_utils</span> <span class="kn">import</span> <span class="n">ReplayBuffer</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.models.nets.gans</span> <span class="kn">import</span> <span class="n">define_generator</span><span class="p">,</span> <span class="n">define_discriminator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">tifffile</span> <span class="kn">import</span> <span class="n">imsave</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_info_xx</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">train</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Model</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_AtoB</span> <span class="o">=</span> <span class="n">define_generator</span><span class="p">(</span>
+            <span class="n">model_info_xx</span><span class="o">.</span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span> <span class="o">=</span> <span class="n">define_generator</span><span class="p">(</span>
+            <span class="n">model_info_xx</span><span class="o">.</span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_A</span> <span class="o">=</span> <span class="n">define_discriminator</span><span class="p">(</span>
+            <span class="n">model_info_xx</span><span class="o">.</span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;discriminator&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_B</span> <span class="o">=</span> <span class="n">define_discriminator</span><span class="p">(</span>
+            <span class="n">model_info_xx</span><span class="o">.</span><span class="n">net</span><span class="p">[</span><span class="s2">&quot;discriminator&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
+            <span class="c1"># buffer for fake images</span>
+            <span class="k">if</span> <span class="s2">&quot;fake_pool_size&quot;</span> <span class="ow">in</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">:</span>
+                <span class="n">max_fake_pool</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;fake_pool_size&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">max_fake_pool</span> <span class="o">=</span> <span class="mi">50</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fake_pool_A</span> <span class="o">=</span> <span class="n">ReplayBuffer</span><span class="p">(</span><span class="n">max_fake_pool</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fake_pool_B</span> <span class="o">=</span> <span class="n">ReplayBuffer</span><span class="p">(</span><span class="n">max_fake_pool</span><span class="p">)</span>
+
+            <span class="c1"># get loss functions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;gan_loss&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cycle_loss</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;cycle_loss&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identity_loss</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;identity_loss&quot;</span><span class="p">])</span>
+
+            <span class="c1"># get weights of different loss</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gan_w</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">][</span><span class="s2">&quot;gan_loss&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cycle_w</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">][</span><span class="s2">&quot;cycle_loss&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">identity_w</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">][</span><span class="s2">&quot;identity_loss&quot;</span><span class="p">]</span>
+
+            <span class="c1"># get info of optimizer and scheduler</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_info</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">optimizer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scheduler_info</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">scheduler</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">extra</span><span class="p">[</span><span class="s2">&quot;inference_direction&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Model.forward"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;AtoB&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_AtoB</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;BtoA&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.configure_optimizers"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">generator_optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_info</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">])</span>
+        <span class="n">generator_scheduler_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheduler_info</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">])</span>
+        <span class="n">generator_optimizer</span> <span class="o">=</span> <span class="n">generator_optimizer_func</span><span class="p">(</span>
+            <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_AtoB</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">generator_scheduler</span> <span class="o">=</span> <span class="n">generator_scheduler_func</span><span class="p">(</span><span class="n">generator_optimizer</span><span class="p">)</span>
+
+        <span class="n">discriminator_optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_info</span><span class="p">[</span><span class="s2">&quot;discriminator&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">discriminator_scheduler_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scheduler_info</span><span class="p">[</span><span class="s2">&quot;discriminator&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">discriminator_optimizer</span> <span class="o">=</span> <span class="n">discriminator_optimizer_func</span><span class="p">(</span>
+            <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_A</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_B</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">discriminator_scheduler</span> <span class="o">=</span> <span class="n">discriminator_scheduler_func</span><span class="p">(</span><span class="n">discriminator_optimizer</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">generator_optimizer</span><span class="p">,</span> <span class="n">discriminator_optimizer</span><span class="p">],</span>
+            <span class="p">[</span>
+                <span class="n">generator_scheduler</span><span class="p">,</span>
+                <span class="n">discriminator_scheduler</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span></div>
+
+    <span class="c1"># only for test or validation</span>
+<div class="viewcode-block" id="Model.run_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model.run_step">[docs]</a>    <span class="k">def</span> <span class="nf">run_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+        <span class="c1"># get the data</span>
+        <span class="n">image_A</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;IM&quot;</span><span class="p">]</span>
+        <span class="n">image_B</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span>
+
+        <span class="c1"># run generators and discriminators</span>
+        <span class="n">fake_B_from_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_AtoB</span><span class="p">(</span><span class="n">image_A</span><span class="p">)</span>
+        <span class="n">fake_A_from_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">image_B</span><span class="p">)</span>
+
+        <span class="n">predFakeA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_A</span><span class="p">(</span><span class="n">fake_A_from_B</span><span class="p">)</span>
+        <span class="n">predFakeB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_B</span><span class="p">(</span><span class="n">fake_B_from_A</span><span class="p">)</span>
+
+        <span class="n">pred_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">pred_fake</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># GAN loss</span>
+        <span class="n">gan_loss_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeB</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+        <span class="n">gan_loss_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+        <span class="n">gan_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">gan_loss_A</span> <span class="o">+</span> <span class="n">gan_loss_B</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="c1"># cycle loss</span>
+        <span class="n">cycle_loss_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle_loss</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">fake_B_from_A</span><span class="p">),</span> <span class="n">image_A</span>
+        <span class="p">)</span>
+        <span class="n">cycle_loss_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle_loss</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_AtoB</span><span class="p">(</span><span class="n">fake_A_from_B</span><span class="p">),</span> <span class="n">image_B</span>
+        <span class="p">)</span>
+        <span class="n">cycle_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">cycle_loss_A</span> <span class="o">+</span> <span class="n">cycle_loss_B</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="c1"># identity loss</span>
+        <span class="n">fake_A_from_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">image_A</span><span class="p">)</span>
+        <span class="n">fake_B_from_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">image_B</span><span class="p">)</span>
+        <span class="n">identity_loss_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identity_loss</span><span class="p">(</span><span class="n">fake_A_from_A</span><span class="p">,</span> <span class="n">image_A</span><span class="p">)</span>
+        <span class="n">identity_loss_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identity_loss</span><span class="p">(</span><span class="n">fake_B_from_B</span><span class="p">,</span> <span class="n">image_B</span><span class="p">)</span>
+        <span class="n">identity_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">identity_loss_A</span> <span class="o">+</span> <span class="n">identity_loss_B</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="c1"># weighted sum into generator loss</span>
+        <span class="n">G_loss</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">gan_loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_w</span>
+            <span class="o">+</span> <span class="n">cycle_loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle_w</span>
+            <span class="o">+</span> <span class="n">identity_loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">identity_w</span>
+        <span class="p">)</span>
+
+        <span class="c1"># discriminator on domain A</span>
+        <span class="n">predRealA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_A</span><span class="p">(</span><span class="n">image_A</span><span class="p">)</span>
+        <span class="n">dis_loss_A_real</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predRealA</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+        <span class="n">dis_loss_A_fake</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">pred_fake</span><span class="p">)</span>
+
+        <span class="c1"># discriminator on domain B</span>
+        <span class="n">predRealB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_B</span><span class="p">(</span><span class="n">image_B</span><span class="p">)</span>
+        <span class="n">dis_loss_B_real</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predRealB</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+        <span class="n">dis_loss_B_fake</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeB</span><span class="p">,</span> <span class="n">pred_fake</span><span class="p">)</span>
+
+        <span class="c1"># average over all dis loss</span>
+        <span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">dis_loss_A_fake</span> <span class="o">+</span> <span class="n">dis_loss_A_real</span> <span class="o">+</span> <span class="n">dis_loss_B_fake</span> <span class="o">+</span> <span class="n">dis_loss_B_real</span>
+        <span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">({</span><span class="s2">&quot;generator_loss&quot;</span><span class="p">:</span> <span class="n">G_loss</span><span class="p">,</span> <span class="s2">&quot;discriminator_loss&quot;</span><span class="p">:</span> <span class="n">D_loss</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="Model.training_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">optimizer_idx</span><span class="p">):</span>
+        <span class="c1"># get the batch</span>
+        <span class="n">image_A</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;IM&quot;</span><span class="p">]</span>
+        <span class="n">image_B</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span>
+
+        <span class="c1"># generate fake images</span>
+        <span class="n">fake_A_from_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">image_B</span><span class="p">)</span>
+        <span class="n">fake_B_from_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_AtoB</span><span class="p">(</span><span class="n">image_A</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">optimizer_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">############################</span>
+            <span class="c1"># train generators</span>
+            <span class="c1">############################</span>
+            <span class="c1"># GAN loss</span>
+            <span class="n">predFakeA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_A</span><span class="p">(</span><span class="n">fake_A_from_B</span><span class="p">)</span>
+            <span class="n">predFakeB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_B</span><span class="p">(</span><span class="n">fake_B_from_A</span><span class="p">)</span>
+
+            <span class="n">pred_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">gan_loss_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeB</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+            <span class="n">gan_loss_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+            <span class="n">gan_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">gan_loss_A</span> <span class="o">+</span> <span class="n">gan_loss_B</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+            <span class="c1"># cycle loss</span>
+            <span class="n">cycle_loss_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle_loss</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">fake_B_from_A</span><span class="p">),</span> <span class="n">image_A</span>
+            <span class="p">)</span>
+            <span class="n">cycle_loss_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle_loss</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_AtoB</span><span class="p">(</span><span class="n">fake_A_from_B</span><span class="p">),</span> <span class="n">image_B</span>
+            <span class="p">)</span>
+            <span class="n">cycle_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">cycle_loss_A</span> <span class="o">+</span> <span class="n">cycle_loss_B</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+            <span class="c1"># identity loss</span>
+            <span class="n">fake_A_from_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">image_A</span><span class="p">)</span>
+            <span class="n">fake_B_from_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator_model_image_BtoA</span><span class="p">(</span><span class="n">image_B</span><span class="p">)</span>
+            <span class="n">identity_loss_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identity_loss</span><span class="p">(</span><span class="n">fake_A_from_A</span><span class="p">,</span> <span class="n">image_A</span><span class="p">)</span>
+            <span class="n">identity_loss_B</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identity_loss</span><span class="p">(</span><span class="n">fake_B_from_B</span><span class="p">,</span> <span class="n">image_B</span><span class="p">)</span>
+            <span class="n">identity_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">identity_loss_A</span> <span class="o">+</span> <span class="n">identity_loss_B</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+            <span class="c1"># weighted sum into generator loss</span>
+            <span class="n">G_loss</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">gan_loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_w</span>
+                <span class="o">+</span> <span class="n">cycle_loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle_w</span>
+                <span class="o">+</span> <span class="n">identity_loss</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">identity_w</span>
+            <span class="p">)</span>
+            <span class="n">tqdm_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;g_loss&quot;</span><span class="p">:</span> <span class="n">G_loss</span><span class="p">,</span>
+                <span class="s2">&quot;validity&quot;</span><span class="p">:</span> <span class="n">gan_loss</span><span class="p">,</span>
+                <span class="s2">&quot;reconstr&quot;</span><span class="p">:</span> <span class="n">cycle_loss</span><span class="p">,</span>
+                <span class="s2">&quot;identity&quot;</span><span class="p">:</span> <span class="n">identity_loss</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">G_loss</span><span class="p">,</span> <span class="s2">&quot;progress_bar&quot;</span><span class="p">:</span> <span class="n">tqdm_dict</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="n">tqdm_dict</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Generator Loss&quot;</span><span class="p">,</span> <span class="n">tqdm_dict</span><span class="p">[</span><span class="s2">&quot;g_loss&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">and</span> <span class="n">batch_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># check if the log path exists, if not create one</span>
+                <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="n">fake_images_A</span> <span class="o">=</span> <span class="n">fake_A_from_B</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+                <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span>
+                    <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;_fake_A.tiff&quot;</span>
+                <span class="p">)</span>
+                <span class="n">imsave</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">fake_images_A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                <span class="n">fake_images_B</span> <span class="o">=</span> <span class="n">fake_B_from_A</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+                <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span>
+                    <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;_fake_B.tiff&quot;</span>
+                <span class="p">)</span>
+                <span class="n">imsave</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">fake_images_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span>
+                    <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;_real_B.tiff&quot;</span>
+                <span class="p">)</span>
+                <span class="n">imsave</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">image_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span>
+                    <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;_real_A.tiff&quot;</span>
+                <span class="p">)</span>
+                <span class="n">imsave</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">image_A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+
+            <span class="k">return</span> <span class="n">output</span>
+
+        <span class="k">elif</span> <span class="n">optimizer_idx</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1">############################</span>
+            <span class="c1"># train discriminators</span>
+            <span class="c1">############################</span>
+            <span class="n">fakeA_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fake_pool_A</span><span class="o">.</span><span class="n">push_and_pop</span><span class="p">(</span><span class="n">fake_A_from_B</span><span class="p">)</span>
+            <span class="n">fakeB_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fake_pool_B</span><span class="o">.</span><span class="n">push_and_pop</span><span class="p">(</span><span class="n">fake_B_from_A</span><span class="p">)</span>
+            <span class="n">predFakeA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_A</span><span class="p">(</span><span class="n">fakeA_sample</span><span class="p">)</span>
+            <span class="n">predFakeB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_B</span><span class="p">(</span><span class="n">fakeB_sample</span><span class="p">)</span>
+
+            <span class="n">pred_real</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">pred_fake</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># discriminator on domain A</span>
+            <span class="n">predRealA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_A</span><span class="p">(</span><span class="n">image_A</span><span class="p">)</span>
+            <span class="n">dis_loss_A_real</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predRealA</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+            <span class="n">dis_loss_A_fake</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeA</span><span class="p">,</span> <span class="n">pred_fake</span><span class="p">)</span>
+
+            <span class="c1"># discriminator on domain B</span>
+            <span class="n">predRealB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">discriminator_model_image_B</span><span class="p">(</span><span class="n">image_B</span><span class="p">)</span>
+            <span class="n">dis_loss_B_real</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predRealB</span><span class="p">,</span> <span class="n">pred_real</span><span class="p">)</span>
+            <span class="n">dis_loss_B_fake</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span><span class="p">(</span><span class="n">predFakeB</span><span class="p">,</span> <span class="n">pred_fake</span><span class="p">)</span>
+
+            <span class="c1"># average over all dis loss</span>
+            <span class="n">D_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">dis_loss_A_fake</span> <span class="o">+</span> <span class="n">dis_loss_A_real</span> <span class="o">+</span> <span class="n">dis_loss_B_fake</span> <span class="o">+</span> <span class="n">dis_loss_B_real</span>
+            <span class="p">)</span>
+            <span class="n">tqdm_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;d_loss&quot;</span><span class="p">:</span> <span class="n">D_loss</span><span class="p">}</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">D_loss</span><span class="p">,</span> <span class="s2">&quot;progress_bar&quot;</span><span class="p">:</span> <span class="n">tqdm_dict</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="n">tqdm_dict</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                <span class="s2">&quot;Discriminator Loss&quot;</span><span class="p">,</span> <span class="n">tqdm_dict</span><span class="p">[</span><span class="s2">&quot;d_loss&quot;</span><span class="p">]</span>
+            <span class="p">)</span>  <span class="c1"># on_step=True, on_epoch=True, prog_bar=True, logger=True)</span>
+            <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="Model.training_epoch_end"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model.training_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">training_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+        <span class="n">avg_loss</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">G_mean_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">D_mean_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Average Loss&quot;</span><span class="p">,</span> <span class="n">avg_loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Generator Loss&quot;</span><span class="p">,</span> <span class="n">G_mean_loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;Discriminator Loss&quot;</span><span class="p">,</span> <span class="n">D_mean_loss</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Model.validation_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+        <span class="n">loss_dictionary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss_dictionary</span></div>
+
+<div class="viewcode-block" id="Model.validation_epoch_end"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_cyclegan.Model.validation_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validation_step_outputs</span><span class="p">):</span>
+        <span class="n">validation_generator_loss</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;generator_loss&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">validation_step_outputs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">validation_discriminator_loss</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;discriminator_loss&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">validation_step_outputs</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;val_loss_generator&quot;</span><span class="p">,</span> <span class="n">validation_generator_loss</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;val_loss_discriminator&quot;</span><span class="p">,</span> <span class="n">validation_discriminator_loss</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jianxu Chen.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

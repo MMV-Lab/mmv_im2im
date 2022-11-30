@@ -1,0 +1,544 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>mmv_im2im.models.nets.gans &mdash; MMV Im2Im Transformation 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MMV Im2Im Transformation
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../mmv_im2im.html">mmv_im2im package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.configs.html">mmv_im2im.configs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MMV Im2Im Transformation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../mmv_im2im.html">mmv_im2im</a> &raquo;</li>
+        
+      <li>mmv_im2im.models.nets.gans</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmv_im2im.models.nets.gans</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">from</span> <span class="nn">monai.networks.blocks</span> <span class="kn">import</span> <span class="n">ResidualUnit</span><span class="p">,</span> <span class="n">Convolution</span>
+<span class="kn">from</span> <span class="nn">monai.networks.nets</span> <span class="kn">import</span> <span class="n">UNet</span>
+
+<span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">parse_config_func_without_params</span><span class="p">,</span>
+    <span class="n">parse_config_func</span><span class="p">,</span>
+    <span class="n">parse_config</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="preset_generator_resent"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.preset_generator_resent">[docs]</a><span class="k">class</span> <span class="nc">preset_generator_resent</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">spatial_dims</span><span class="p">,</span>
+        <span class="n">in_channels</span><span class="p">,</span>
+        <span class="n">out_channels</span><span class="p">,</span>
+        <span class="n">n_down_blocks</span><span class="p">,</span>
+        <span class="n">n_res_blocks</span><span class="p">,</span>
+        <span class="n">nf</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">norm_layer</span><span class="o">=</span><span class="s2">&quot;INSTANCE&quot;</span><span class="p">,</span>
+        <span class="n">use_dropout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">first_layer</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReflectionPad2d</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">first_layer</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReplicationPad3d</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;only 2d and 3d data are supported&quot;</span><span class="p">)</span>
+
+        <span class="n">model</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">first_layer</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">Convolution</span><span class="p">(</span>
+                <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">nf</span><span class="p">,</span>
+                <span class="n">norm</span><span class="o">=</span><span class="n">norm_layer</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+                <span class="n">act</span><span class="o">=</span><span class="s2">&quot;RELU&quot;</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="c1"># add downsampling layers</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_down_blocks</span><span class="p">):</span>
+            <span class="n">mult</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span>
+            <span class="n">model</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">Convolution</span><span class="p">(</span>
+                    <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">mult</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">mult</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+                    <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">norm</span><span class="o">=</span><span class="n">norm_layer</span><span class="p">,</span>
+                    <span class="n">act</span><span class="o">=</span><span class="s2">&quot;RELU&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="c1"># add ResNet blocks</span>
+        <span class="n">mult</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">n_down_blocks</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_res_blocks</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">ResidualUnit</span><span class="p">(</span>
+                    <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">mult</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">mult</span><span class="p">,</span>
+                    <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">strides</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">norm</span><span class="o">=</span><span class="n">norm_layer</span><span class="p">,</span>
+                    <span class="n">dropout</span><span class="o">=</span><span class="n">use_dropout</span><span class="p">,</span>
+                    <span class="n">act</span><span class="o">=</span><span class="s2">&quot;RELU&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="c1"># add upsampling blocks</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_down_blocks</span><span class="p">):</span>
+            <span class="n">mult</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">n_down_blocks</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">Convolution</span><span class="p">(</span>
+                    <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">mult</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">nf</span> <span class="o">*</span> <span class="n">mult</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">output_padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">norm</span><span class="o">=</span><span class="n">norm_layer</span><span class="p">,</span>
+                    <span class="n">act</span><span class="o">=</span><span class="s2">&quot;RELU&quot;</span><span class="p">,</span>
+                    <span class="n">is_transposed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="c1"># add final layer</span>
+        <span class="n">model</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="n">first_layer</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">Convolution</span><span class="p">(</span>
+                <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">nf</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+                <span class="n">conv_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">model</span><span class="p">)</span>
+
+<div class="viewcode-block" id="preset_generator_resent.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.preset_generator_resent.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="generator_encoder_decoder"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.generator_encoder_decoder">[docs]</a><span class="k">class</span> <span class="nc">generator_encoder_decoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_info</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># initial block</span>
+        <span class="n">init_block</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;init_block&quot;</span><span class="p">])</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="p">[</span><span class="n">init_block</span><span class="p">]</span>
+
+        <span class="c1"># downsampling blocks</span>
+        <span class="n">down_block</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;down_block&quot;</span><span class="p">])</span>
+        <span class="n">down_channels</span> <span class="o">=</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;down_block&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">)</span>
+        <span class="n">prev_channel</span> <span class="o">=</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;init_block&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">][</span><span class="s2">&quot;out_channel&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">this_channel</span> <span class="ow">in</span> <span class="n">down_channels</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">down_block</span><span class="p">(</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="n">prev_channel</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="n">this_channel</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;down_block&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># residual block</span>
+        <span class="n">res_block</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;res_block&quot;</span><span class="p">])</span>
+        <span class="n">prev_channel</span> <span class="o">=</span> <span class="n">down_channels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">res_channels</span> <span class="o">=</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;res_block&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">this_channel</span> <span class="ow">in</span> <span class="n">res_channels</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">res_block</span><span class="p">(</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="n">prev_channel</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="n">this_channel</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;res_block&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># up blocks</span>
+        <span class="n">up_block</span> <span class="o">=</span> <span class="n">parse_config_func_without_params</span><span class="p">(</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;up_block&quot;</span><span class="p">])</span>
+        <span class="n">prev_channel</span> <span class="o">=</span> <span class="n">res_channels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">up_channels</span> <span class="o">=</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;up_block&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;channels&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">this_channel</span> <span class="ow">in</span> <span class="n">up_channels</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">up_block</span><span class="p">(</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="n">prev_channel</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="n">this_channel</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;up_block&quot;</span><span class="p">][</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># final block</span>
+        <span class="n">final_block</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;final_block&quot;</span><span class="p">])</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">final_block</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">model</span><span class="p">)</span>
+
+<div class="viewcode-block" id="generator_encoder_decoder.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.generator_encoder_decoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="define_generator"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.define_generator">[docs]</a><span class="k">def</span> <span class="nf">define_generator</span><span class="p">(</span><span class="n">model_info</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">model_info</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;predefined_resnet&quot;</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">preset_generator_resent</span><span class="p">(</span><span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;predefined_unet&quot;</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">UNet</span><span class="p">(</span><span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;generic_encoder_decoder&quot;</span><span class="p">:</span>
+            <span class="n">net</span> <span class="o">=</span> <span class="n">generator_encoder_decoder</span><span class="p">(</span><span class="o">**</span><span class="n">model_info</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">net</span></div>
+
+
+<div class="viewcode-block" id="patch_discriminator"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.patch_discriminator">[docs]</a><span class="k">class</span> <span class="nc">patch_discriminator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">spatial_dims</span><span class="p">,</span>
+        <span class="n">in_channels</span><span class="p">,</span>
+        <span class="n">nf</span><span class="p">,</span>
+        <span class="n">n_layers</span><span class="p">,</span>
+        <span class="n">norm_layer</span><span class="p">,</span>
+        <span class="n">return_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Convolution</span><span class="p">(</span>
+                <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">nf</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">conv_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>  <span class="c1"># no norm for first layer</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="n">nf_mult</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">nf_mult_prev</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">):</span>  <span class="c1"># gradually increase the number of filters</span>
+            <span class="n">nf_mult_prev</span> <span class="o">=</span> <span class="n">nf_mult</span>
+            <span class="n">nf_mult</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="n">blocks</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="n">Convolution</span><span class="p">(</span>
+                    <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                    <span class="n">in_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">nf_mult_prev</span><span class="p">,</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">nf_mult</span><span class="p">,</span>
+                    <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                    <span class="n">strides</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">norm</span><span class="o">=</span><span class="n">norm_layer</span><span class="p">,</span>
+                    <span class="n">act</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;leakyrelu&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;negative_slope&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;inplace&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}),</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="n">blocks</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="n">Convolution</span><span class="p">(</span>
+                <span class="n">spatial_dims</span><span class="o">=</span><span class="n">spatial_dims</span><span class="p">,</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">nf</span> <span class="o">*</span> <span class="n">nf_mult</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                <span class="n">strides</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">conv_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">return_features</span> <span class="o">=</span> <span class="n">return_features</span>
+        <span class="k">if</span> <span class="n">return_features</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_blocks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_blocks</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;block_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">blocks</span><span class="p">)</span>
+
+<div class="viewcode-block" id="patch_discriminator.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.patch_discriminator.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_features</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_blocks</span><span class="p">):</span>
+                <span class="n">block</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;block_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+            <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># except for the input</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="multiscale_discriminator"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.multiscale_discriminator">[docs]</a><span class="k">class</span> <span class="nc">multiscale_discriminator</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_discriminator</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_discriminator</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Scale_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)),</span> <span class="n">patch_discriminator</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_D</span> <span class="o">=</span> <span class="n">num_discriminator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dimenstion</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;spatial_dims&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="multiscale_discriminator.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.multiscale_discriminator.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_D</span><span class="p">):</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Scale_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))(</span><span class="n">x</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_D</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dimenstion</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">AvgPool2d</span><span class="p">(</span>
+                        <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">count_include_pad</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dimenstion</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">AvgPool3d</span><span class="p">(</span>
+                        <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">count_include_pad</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+
+
+<div class="viewcode-block" id="define_discriminator"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.define_discriminator">[docs]</a><span class="k">def</span> <span class="nf">define_discriminator</span><span class="p">(</span><span class="n">model_info</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;predefined_basic&quot;</span><span class="p">:</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">patch_discriminator</span><span class="p">(</span><span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;predefined_multiscale&quot;</span><span class="p">:</span>
+        <span class="n">net</span> <span class="o">=</span> <span class="n">multiscale_discriminator</span><span class="p">(</span><span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;only predefined discriminator is supported&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">net</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jianxu Chen.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

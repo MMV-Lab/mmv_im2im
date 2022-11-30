@@ -1,6 +1,14 @@
 mmv\_im2im.models package
 =========================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mmv_im2im.models.nets
+
 Submodules
 ----------
 

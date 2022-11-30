@@ -1,0 +1,77 @@
+mmv\_im2im.models.nets package
+==============================
+
+Submodules
+----------
+
+mmv\_im2im.models.nets.BranchedERFNet\_2d module
+------------------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.BranchedERFNet_2d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.nets.BranchedERFNet\_3d module
+------------------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.BranchedERFNet_3d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.nets.deeplabv3\_2d module
+-------------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.deeplabv3_2d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.nets.erfnet module
+------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.erfnet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.nets.erfnet\_3d module
+----------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.erfnet_3d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.nets.fnet\_nn\_2d module
+------------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.fnet_nn_2d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.nets.fnet\_nn\_3d module
+------------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.fnet_nn_3d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mmv\_im2im.models.nets.gans module
+----------------------------------
+
+.. automodule:: mmv_im2im.models.nets.gans
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mmv_im2im.models.nets
+   :members:
+   :undoc-members:
+   :show-inheritance:

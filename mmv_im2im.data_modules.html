@@ -227,6 +227,17 @@
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mmv_im2im.data_modules.data_loader_basic.</span></span><span class="sig-name descname"><span class="pre">Im2ImDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningDataModule</span></code></p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><dl class="simple">
+<dt>prepare_data_per_node:</dt><dd><p>If True, each LOCAL_RANK=0 will call prepare data.
+Otherwise only NODE_RANK=0, LOCAL_RANK=0 will prepare data.</p>
+</dd>
+<dt>allow_zero_length_dataloader_with_multiple_devices:</dt><dd><p>If True, dataloader with zero length within local rank is allowed.
+Default value is False.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data">
 <span class="sig-name descname"><span class="pre">prepare_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule.prepare_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data" title="Permalink to this definition">¶</a></dt>
