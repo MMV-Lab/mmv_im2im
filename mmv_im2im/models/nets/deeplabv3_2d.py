@@ -22,7 +22,7 @@ class Net(torch.nn.Module):
             "aux_loss": aux_loss, 
             "pretrained": pretrained, 
             "pretrained_backbone": pretrained_backbone
-            }
+        }
         info = {"module_name": "torchvision.models.segmentation", "params": params}
         if backbone == "deeplabv3_resnet50":
             info["func_name"] = "deeplabv3_resnet50"
