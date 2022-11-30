@@ -16,7 +16,13 @@ class Net(torch.nn.Module):
         aux_loss: bool = None,
     ):
         super().__init__()        
-        params = {"progress": False, "num_classes": num_classes, "aux_loss": aux_loss, "pretrained": pretrained, "pretrained_backbone": pretrained_backbone}
+        params = {
+            "progress": False, 
+            "num_classes": num_classes, 
+            "aux_loss": aux_loss, 
+            "pretrained": pretrained, 
+            "pretrained_backbone": pretrained_backbone
+            }
         info = {"module_name": "torchvision.models.segmentation", "params": params}
         if backbone == "deeplabv3_resnet50":
             info["func_name"] = "deeplabv3_resnet50"
