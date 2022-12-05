@@ -70,9 +70,7 @@ class Model(pl.LightningModule):
             center_images = batch["CE"]
         else:
             class_labels, center_images = prepare_embedseg_tensor(
-                instances,
-                spatial_dim,
-                self.model_info.model_extra["center_method"]
+                instances, spatial_dim, self.model_info.model_extra["center_method"]
             )
 
         use_costmap = False
