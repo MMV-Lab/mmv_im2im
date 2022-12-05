@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Union, Tuple, List, Optional
+from typing import Union, Tuple, List
 from numba import jit
 from scipy.ndimage.measurements import find_objects
 from scipy.ndimage.morphology import binary_fill_holes

@@ -1,4 +1,3 @@
-from pathlib import Path
 from mmv_im2im.data_modules.data_loader_basic import Im2ImDataModule as dm_basic
 from mmv_im2im.utils.embedseg_utils import prepare_embedseg_cache
 
