@@ -8,6 +8,8 @@ from aicsimageio import AICSImage
 from tqdm import tqdm
 from pathlib import Path
 import warnings
+from torch import from_numpy
+from monai.data.meta_tensor import MetaTensor
 
 from mmv_im2im.utils.misc import generate_dataset_dict
 
@@ -344,3 +346,59 @@ def prepare_embedseg_cache(
                     cache_path / f"{fn_base}_{j:04d}_CM.tiff",
                     dim_order=dim_order,
                 )
+
+
+def prepare_embedseg_tensor(
+    instance_batch: MetaTensor,
+    spatial_dim: int,
+    center_method: str = "centroid",
+):
+    """
+    Parameters:
+    ------------
+        instance: instance segmentation masks of shape BYX or BZYX
+        spatial_dim: 2 or 3
+        crop_size: values from cropping of shape YX or ZYX
+
+    Return:
+    ----------
+        class_labels: MetaTensor
+        center_images: MetaTensor
+    """
+
+    assert instance_batch.is_batch, "only batch is supported currently"
+    num_samples = instance_batch.size()[0]
+
+    center_images_list = []
+    class_labels_list = []
+    for sample_idx in range(num_samples):
+        instance = instance_batch[sample_idx].detach().cpu().numpy()
+
+        assert instance.shape[0] == 1, "ground truth has more than 1 channel"
+        instance = np.squeeze(instance, axis=0)
+        instance_np = np.array(instance, copy=False)
+
+        class_image = instance_np > 0
+        ids = np.unique(instance_np[class_image])
+        ids = ids[ids != 0]
+        center_image = generate_center_image(instance, center_method, ids)
+
+        class_image = np.expand_dims(class_image, axis=0)
+        class_labels_list.append(class_image.astype(np.ubyte))
+        center_image = np.expand_dims(center_image, axis=0)
+        center_images_list.append(center_image.astype(np.bool))
+
+    # stack into batch and covert to MetaTensor
+    center_images = from_numpy(np.stack(center_images_list, axis=0))
+    class_labels = from_numpy(np.stack(class_labels_list, axis=0))
+
+    center_images = MetaTensor(center_images)
+    class_labels = MetaTensor(class_labels)
+
+    # move to proer device
+    if instance_batch.is_cuda:
+        current_device = instance_batch.get_device()
+        center_images = center_images.to(current_device)
+        class_labels = class_labels.to(current_device)
+
+    return class_labels, center_images

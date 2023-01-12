@@ -3,6 +3,7 @@ from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
 import pytorch_lightning as pl
 from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
+from mmv_im2im.utils.embedseg_utils import prepare_embedseg_tensor
 from mmv_im2im.utils.model_utils import init_weights
 
 from mmv_im2im.utils.misc import (
@@ -57,8 +58,20 @@ class Model(pl.LightningModule):
     def run_step(self, batch, validation_stage, save_path: str = None):
         im = batch["IM"]
         instances = batch["GT"]
-        class_labels = batch["CL"]
-        center_images = batch["CE"]
+
+        if len(im.size()) == 4:  # "BCYX"
+            spatial_dim = 2
+        elif len(im.size()) == 5:  # "BCZYX"
+            spatial_dim = 3
+
+        # decide if CL and CE are already generated
+        if "CL" in batch and "CE" in batch:
+            class_labels = batch["CL"]
+            center_images = batch["CE"]
+        else:
+            class_labels, center_images = prepare_embedseg_tensor(
+                instances, spatial_dim, self.model_info.model_extra["center_method"]
+            )
 
         use_costmap = False
         if "CM" in batch:
