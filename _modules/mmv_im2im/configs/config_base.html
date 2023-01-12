@@ -32,9 +32,6 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -234,7 +231,7 @@
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates an ArgumentParser instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an ArgumentParser instance.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;formatter_class&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formatter_class</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -262,7 +259,7 @@
         <span class="n">default</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dataclass</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dataclass_wrapper_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">DataclassWrapper</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataclassWrapper</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Adds command-line arguments for the fields of `dataclass`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds command-line arguments for the fields of `dataclass`.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataclass</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
             <span class="n">default</span> <span class="o">=</span> <span class="n">dataclass</span> <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default</span>
             <span class="n">dataclass</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dataclass</span><span class="p">)</span>
@@ -279,7 +276,7 @@
             <span class="n">wrapper</span><span class="o">.</span><span class="n">add_arguments</span><span class="p">(</span><span class="n">parser</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_assert_no_conflicts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Checks for a field name that conflicts with utils.CONFIG_ARG&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks for a field name that conflicts with utils.CONFIG_ARG&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">CONFIG_ARG</span> <span class="ow">in</span> <span class="p">[</span>
             <span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_class</span><span class="p">)</span>
         <span class="p">]:</span>
@@ -379,7 +376,7 @@
 
 <div class="viewcode-block" id="DataloaderModuleConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderModuleConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">DataloaderModuleConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;low-level config for data: specifically about the dataloader&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;low-level config for data: specifically about the dataloader&quot;&quot;&quot;</span>
 
     <span class="c1"># which dataset module to use: default is PersistentDataset</span>
     <span class="n">dataloader_type</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
@@ -412,7 +409,7 @@
 
 <div class="viewcode-block" id="DataloaderConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataloaderConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">DataloaderConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Mid-level config for data: about dataloader module&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mid-level config for data: about dataloader module&quot;&quot;&quot;</span>
 
     <span class="c1"># The ratio of train/validation split</span>
     <span class="n">train_val_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
@@ -426,7 +423,7 @@
 
 <div class="viewcode-block" id="InferOutConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferOutConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">InferOutConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;config for the output of inference&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;config for the output of inference&quot;&quot;&quot;</span>
 
     <span class="c1"># The path to save output</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -437,7 +434,7 @@
 
 <div class="viewcode-block" id="InferInConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.InferInConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">InferInConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;config for the input to inference&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;config for the input to inference&quot;&quot;&quot;</span>
 
     <span class="c1"># The path to apply the model</span>
     <span class="nb">dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -451,7 +448,7 @@
 
 <div class="viewcode-block" id="DataConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.DataConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">DataConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Top-level config for data: major components&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Top-level config for data: major components&quot;&quot;&quot;</span>
 
     <span class="c1"># The type of data: &quot;pair&quot; | &quot;unpair&quot; | &quot;embedseg&quot;</span>
     <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -489,7 +486,7 @@
 
 <div class="viewcode-block" id="ModelConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.ModelConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ModelConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Config for model&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Config for model&quot;&quot;&quot;</span>
 
     <span class="c1"># the type of model: FCN | pix2pix | cyclegan | embedseg</span>
     <span class="n">framework</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -515,7 +512,7 @@
 
 <div class="viewcode-block" id="TrainerConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.TrainerConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">TrainerConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Config for how to run the training&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Config for how to run the training&quot;&quot;&quot;</span>
 
     <span class="c1"># whether to save sample outputs at the beginning of each epoch</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -541,7 +538,7 @@
 
 <div class="viewcode-block" id="ProgramConfig"><a class="viewcode-back" href="../../../mmv_im2im.configs.html#mmv_im2im.configs.config_base.ProgramConfig">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">ProgramConfig</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;the main configuration for the whole program&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;the main configuration for the whole program&quot;&quot;&quot;</span>
 
     <span class="c1"># mode: &quot;train&quot; | &quot;infernece&quot; (#TODO future version will add &quot;evaluation&quot;)</span>
     <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>

@@ -33,9 +33,6 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
     
@@ -236,7 +233,7 @@
 <h3>Install PyTorch before installing our package<a class="headerlink" href="#install-pytorch-before-installing-our-package" title="Permalink to this heading">¶</a></h3>
 <p>Follow the instruction from the official website: <a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a>. E.g..</p>
 <p>To install the stable version (accessed on Oct 20, 2022) with conda for CUDA 11.3 (also, fine with 11.4), use the following command. Make sure check the website to find the command suitable for your system.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install pytorch torchvision torchaudio <span class="nv">cudatoolkit</span><span class="o">=</span><span class="m">11</span>.3 -c pytorch
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pytorch<span class="w"> </span>torchvision<span class="w"> </span>torchaudio<span class="w"> </span><span class="nv">cudatoolkit</span><span class="o">=</span><span class="m">11</span>.3<span class="w"> </span>-c<span class="w"> </span>pytorch
 </pre></div>
 </div>
 </section>
@@ -262,19 +259,19 @@
 <p>Here, we use a <a class="reference external" href="https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F">3D labelfree prediction</a> as an example. (If you followed <a class="reference external" href="#basic-installation">basic installation</a>, you will need to install the <code class="docutils literal notranslate"><span class="pre">quilt3</span></code> package by <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">quilt3</span></code>, in order to download the data programmatically.)</p>
 <p><strong>step 1 (data preparation):</strong>, we pull 100 examples of lamin B1 images and the corresponding brightfield images from the AllenCell quilt bucket by running the following in the command line.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
-python  scripts/pull_labelfree_sample_data.py --download_path /path/to/save/the/downloaded/images/ --structure LMNB1 --num <span class="m">100</span>
+python<span class="w">  </span>scripts/pull_labelfree_sample_data.py<span class="w"> </span>--download_path<span class="w"> </span>/path/to/save/the/downloaded/images/<span class="w"> </span>--structure<span class="w"> </span>LMNB1<span class="w"> </span>--num<span class="w"> </span><span class="m">100</span>
 </pre></div>
 </div>
 <p><strong>step 2 (train):</strong> Now, we can train a labelfree model like this:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
-run_im2im --config train_labelfree_3d  --data.data_path /path/to/save/the/downloaded/train
+run_im2im<span class="w"> </span>--config<span class="w"> </span>train_labelfree_3d<span class="w">  </span>--data.data_path<span class="w"> </span>/path/to/save/the/downloaded/train
 </pre></div>
 </div>
 <p>This will apply all the default settings to train the 3D labelfree model. The training will stop after 100 epochs,</p>
 <p><strong>step 3 (test):</strong></p>
 <p>Suppose you run the training under the root of mmv_im2im. Then you will find a folder <code class="docutils literal notranslate"><span class="pre">mmv_im2im/lightning_logs/checkpoints</span></code>, where you can find several trained model. Here, we test with the model after the full training <code class="docutils literal notranslate"><span class="pre">last.ckpt</span></code> (other models are intermediate results for debugging purpose) by running:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
-run_im2im --config inference_labelfree_3d --data.inference_input.dir /path/to/save/the/downloaded/holdout --data.inference_output.path /path/to/save/predictions/ --model.checkpoint lightning_logs/checkpoints/last.ckpt
+run_im2im<span class="w"> </span>--config<span class="w"> </span>inference_labelfree_3d<span class="w"> </span>--data.inference_input.dir<span class="w"> </span>/path/to/save/the/downloaded/holdout<span class="w"> </span>--data.inference_output.path<span class="w"> </span>/path/to/save/predictions/<span class="w"> </span>--model.checkpoint<span class="w"> </span>lightning_logs/checkpoints/last.ckpt
 </pre></div>
 </div>
 </section>

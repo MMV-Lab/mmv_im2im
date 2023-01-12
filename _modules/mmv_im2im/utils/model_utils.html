@@ -32,9 +32,6 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -205,7 +202,7 @@
 
 
 <div class="viewcode-block" id="init_weights"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.model_utils.init_weights">[docs]</a><span class="k">def</span> <span class="nf">init_weights</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">init_type</span><span class="o">=</span><span class="s2">&quot;kaiming&quot;</span><span class="p">,</span> <span class="n">init_gain</span><span class="o">=</span><span class="mf">0.02</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Initialize network weights.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize network weights.</span>
 <span class="sd">    Parameters:</span>
 <span class="sd">        net (network)   -- network to be initialized</span>
 <span class="sd">        init_type (str) -- the name of an initialization method:</span>
@@ -243,7 +240,7 @@
 
 
 <div class="viewcode-block" id="state_dict_simplification"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.model_utils.state_dict_simplification">[docs]</a><span class="k">def</span> <span class="nf">state_dict_simplification</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">cut</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;net.&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;remove the prefix in all keys of state_dict&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;remove the prefix in all keys of state_dict&quot;&quot;&quot;</span>
     <span class="n">state_dict_copy</span> <span class="o">=</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">old_key</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">new_key</span> <span class="o">=</span> <span class="n">old_key</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span>

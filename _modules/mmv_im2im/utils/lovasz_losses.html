@@ -32,9 +32,6 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -217,7 +214,7 @@
 
 
 <div class="viewcode-block" id="lovasz_grad"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_grad">[docs]</a><span class="k">def</span> <span class="nf">lovasz_grad</span><span class="p">(</span><span class="n">gt_sorted</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes gradient of the Lovasz extension w.r.t sorted errors</span>
 <span class="sd">    See Alg. 1 in paper</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -233,7 +230,7 @@
 
 
 <div class="viewcode-block" id="iou_binary"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou_binary">[docs]</a><span class="k">def</span> <span class="nf">iou_binary</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">EMPTY</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">per_image</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    IoU for foreground class</span>
 <span class="sd">    binary: 1 foreground, 0 background</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -253,7 +250,7 @@
 
 
 <div class="viewcode-block" id="iou"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.iou">[docs]</a><span class="k">def</span> <span class="nf">iou</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">EMPTY</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">per_image</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Array of IoU for each (non ignored) class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">per_image</span><span class="p">:</span>
@@ -279,7 +276,7 @@
 
 
 <div class="viewcode-block" id="lovasz_hinge"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_hinge">[docs]</a><span class="k">def</span> <span class="nf">lovasz_hinge</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">per_image</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Binary Lovasz hinge loss</span>
 <span class="sd">      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)  # noqa W605</span>
 <span class="sd">      labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)</span>
@@ -299,7 +296,7 @@
 
 
 <div class="viewcode-block" id="lovasz_hinge_flat"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_hinge_flat">[docs]</a><span class="k">def</span> <span class="nf">lovasz_hinge_flat</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Binary Lovasz hinge loss</span>
 <span class="sd">      logits: [P] Variable, logits at each prediction (between -\infty and +\infty)  # noqa W605</span>
 <span class="sd">      labels: [P] Tensor, binary ground truth labels (0 or 1)</span>
@@ -319,7 +316,7 @@
 
 
 <div class="viewcode-block" id="flatten_binary_scores"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.flatten_binary_scores">[docs]</a><span class="k">def</span> <span class="nf">flatten_binary_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Flattens predictions in the batch (binary case)</span>
 <span class="sd">    Remove labels equal to &#39;ignore&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -344,7 +341,7 @@
 
 
 <div class="viewcode-block" id="binary_xloss"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.binary_xloss">[docs]</a><span class="k">def</span> <span class="nf">binary_xloss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Binary Cross entropy loss</span>
 <span class="sd">      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)  # noqa W605</span>
 <span class="sd">      labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)</span>
@@ -359,7 +356,7 @@
 
 
 <div class="viewcode-block" id="lovasz_softmax"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_softmax">[docs]</a><span class="k">def</span> <span class="nf">lovasz_softmax</span><span class="p">(</span><span class="n">probas</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">only_present</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">per_image</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multi-class Lovasz-Softmax loss</span>
 <span class="sd">      probas: [B, C, H, W] Variable, class probabilities at each prediction</span>
 <span class="sd">            (between 0 and 1)</span>
@@ -384,7 +381,7 @@
 
 
 <div class="viewcode-block" id="lovasz_softmax_flat"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.lovasz_softmax_flat">[docs]</a><span class="k">def</span> <span class="nf">lovasz_softmax_flat</span><span class="p">(</span><span class="n">probas</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">only_present</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multi-class Lovasz-Softmax loss</span>
 <span class="sd">      probas: [P, C] Variable, class probabilities at each prediction (between 0 and 1)</span>
 <span class="sd">      labels: [P] Tensor, ground truth labels (between 0 and C - 1)</span>
@@ -405,7 +402,7 @@
 
 
 <div class="viewcode-block" id="flatten_probas"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.flatten_probas">[docs]</a><span class="k">def</span> <span class="nf">flatten_probas</span><span class="p">(</span><span class="n">probas</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Flattens predictions in the batch</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">probas</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
@@ -420,7 +417,7 @@
 
 
 <div class="viewcode-block" id="xloss"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.xloss">[docs]</a><span class="k">def</span> <span class="nf">xloss</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cross entropy loss</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">Variable</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span></div>
@@ -430,7 +427,7 @@
 
 
 <div class="viewcode-block" id="mean"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.lovasz_losses.mean">[docs]</a><span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">ignore_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">empty</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>  <span class="c1"># noqa E741</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    nanmean compatible with generators.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">l</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>  <span class="c1"># noqa E741</span>

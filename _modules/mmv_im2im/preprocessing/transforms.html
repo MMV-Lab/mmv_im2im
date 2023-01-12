@@ -32,9 +32,6 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/sphinx_highlight.js"></script>
     
@@ -210,7 +207,7 @@
 
 
 <div class="viewcode-block" id="norm_around_center"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.norm_around_center">[docs]</a><span class="k">def</span> <span class="nf">norm_around_center</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">z_center</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">min_z</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns normalized version of input img.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns normalized version of input img.</span>
 <span class="sd">    img will be normalized with respect to the mean, std pixel intensity</span>
 <span class="sd">    of the sub-array of length 32 in the z-dimension centered around the</span>
 <span class="sd">    img&#39;s &quot;z_center&quot;.</span>
@@ -260,7 +257,7 @@
     <span class="n">multiple_base</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
     <span class="n">pad_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns padded image.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns padded image.</span>
 <span class="sd">    img will be padded to the size of multiple of &quot;multiple_base&quot;.</span>
 
 <span class="sd">    Parameters</span>
@@ -347,7 +344,7 @@
 
 
 <div class="viewcode-block" id="pad_z"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.pad_z">[docs]</a><span class="k">def</span> <span class="nf">pad_z</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">target_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span> <span class="n">pad_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns padded image.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns padded image.</span>
 <span class="sd">    img will be padded along z to the size of &quot;target_size&quot;.</span>
 
 <span class="sd">    Parameters</span>
@@ -399,7 +396,7 @@
 <div class="viewcode-block" id="normalize_staining"><a class="viewcode-back" href="../../../mmv_im2im.preprocessing.html#mmv_im2im.preprocessing.transforms.normalize_staining">[docs]</a><span class="k">def</span> <span class="nf">normalize_staining</span><span class="p">(</span>
     <span class="n">img</span><span class="p">,</span> <span class="n">Io</span><span class="o">=</span><span class="mi">240</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">return_unmix_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Normalize staining appearence of H&amp;E stained images</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize staining appearence of H&amp;E stained images</span>
 
 <span class="sd">    Input:</span>
 <span class="sd">        I: RGB input image (we assume channel order CYX), numpy array or torch.tensor</span>
