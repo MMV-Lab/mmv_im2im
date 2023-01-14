@@ -154,7 +154,7 @@ class Model(pl.LightningModule):
         return loss
 
     def training_epoch_end(self, training_step_outputs):
-        # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968
+        # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968   # noqa E501
         training_step_outputs = [d["loss"] for d in training_step_outputs]
         loss_ave = torch.stack(training_step_outputs).mean().item()
         self.log("train_loss", loss_ave)
