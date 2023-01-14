@@ -43,7 +43,7 @@ data_requirements = [
 
 requirements = [
     "pytorch-lightning",
-    "monai",
+    "monai>=1.1.0",
     "aicsimageio",
     "pandas",
     "scikit-image",
