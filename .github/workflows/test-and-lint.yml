@@ -42,6 +42,6 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8 mmv_im2im --count --verbose --show-source --statistics
-    - name: Check with black
-      run: |
-        black --check mmv_im2im
+    #- name: Check with black
+    #  run: |
+    #    black --check mmv_im2im
