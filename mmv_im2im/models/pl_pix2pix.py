@@ -29,6 +29,7 @@ class Model(pl.LightningModule):
             # initialize model weights
             if gen_init is not None:
                 if Path(gen_init).is_file:
+                    print(f"loading pre-train from {gen_init}")
                     pre_train = torch.load(Path(gen_init))
                     try:
                         self.generator.load_state_dict(pre_train["state_dict"])
