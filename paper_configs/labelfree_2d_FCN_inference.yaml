@@ -3,6 +3,7 @@ mode: inference
 data:
   inference_input:
     dir: ./data/labelfree2D/test
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "YX"
       C: 0
