@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: "/PATH/TO/DATA"   #ADD-YOURS
+  data_path: ./data/labelfree3D/FBL/train
   dataloader:
     train:
       dataloader_params:
