@@ -8,7 +8,7 @@ def extract_segmentation(
     im: Union[np.ndarray, torch.Tensor],
     channel: int,
     cutoff: Union[float, str] = None,
-    batch_dim: bool = False,
+    batch_dim: bool = True,
 ) -> np.ndarray:
     """extract segmentation from a prediction
 
@@ -22,7 +22,7 @@ def extract_segmentation(
         either a fixed cutoff value or a segmentation method from skimage, default is
         None (do not apply any cutoff)
     batch_dim: bool
-        whether there is a batch dimension
+        whether there is a batch dimension (default is True)
     """
 
     # convert tensor to numpy
