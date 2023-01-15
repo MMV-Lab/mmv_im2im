@@ -2,8 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: "/PATH/TO/DATA/"   #ADD-YOURS
-  cache_path: "/PATH/TO/TEMP/FOLDER/FOR/CROPPED/DATA/"   #ADD-YOURS
+  data_path: "./data/instance2D/train"
+  cache_path: "./data/instance2D/cache"
   extra:
     center_method: "medoid"
   dataloader:
@@ -18,7 +18,7 @@ data:
       func_name: LoadImaged
       params:
         keys: ["IM"]
-        dtype: float
+        dtype: float32 # set as "float" if not using half-precision training
         dimension_order_out: "YX"
         C: 0
         T: 0
