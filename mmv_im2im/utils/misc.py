@@ -315,8 +315,8 @@ def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
     if isinstance(data, str):
         try:
             data = eval(data)
-        except SyntaxError:
-            print("data path is recognized as a string ...")
+        except Exception as e:
+            print(f"data path is recognized as a string ... due to {e}")
     dataset_list = []
     if isinstance(data, str) or isinstance(data, Path):
         data = Path(data).expanduser()
