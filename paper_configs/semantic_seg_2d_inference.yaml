@@ -1,0 +1,57 @@
+mode: inference
+
+data:
+  inference_input:
+    dir: ./data/semantic2D/testA
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
+    reader_params:
+      dimension_order_out: "SYX"
+      C: 0
+      T: 0
+      Z: 0
+  inference_output:
+    path: ./data/semantic2D/testA_pred   
+
+  preprocess:
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: normalize_staining
+  postprocess:
+    - module_name: mmv_im2im.postprocessing.basic_collection
+      func_name: extract_segmentation
+      params:
+        channel: 1
+        batch_dim: True
+
+model:
+  framework: FCN
+  net:
+    #module_name: mmv_im2im.models.nets.SA_2d
+    #func_name: SuggestiveAnnotationModel
+    #params:
+    #  in_channels: 3
+    #  out_channels: 2
+    #  num_feature: 32
+    module_name: monai.networks.nets
+    func_name: SwinUNETR
+    params:
+      spatial_dims: 2
+      in_channels: 3
+      out_channels: 2
+      img_size: [512, 512]
+      feature_size: 24
+      num_heads: [3, 6, 12, 24, 24, 24]
+      depths: [2, 2, 2, 2, 2, 2]
+      norm_name: "batch"
+      use_checkpoint: False
+  checkpoint: ./lightning_logs/version_2/checkpoints/best.ckpt
+  model_extra:
+    sliding_window_params:
+      roi_size: [512, 512]
+      sw_batch_size: 4
+      overlap: 0.2
+      mode: "gaussian"
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 16
