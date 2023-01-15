@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: "/PATH/TO/DATA/"   #ADD-YOURS
+    dir: ./data/labelfree2D/test
     reader_params:
       dimension_order_out: "YX"
       C: 0
       T: 0
       Z: 0
   inference_output:
-    path: "/OUTPUT/PATH/"   #ADD-YOURS    
+    path: ./data/labelfree2D/pred   
 
   preprocess:
     - module_name: monai.transforms
@@ -30,7 +30,7 @@ model:
     params:
       depth: 4
       mult_chan: 32
-  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"    #ADD-YOURS 
+  checkpoint: ./lightning_logs/version_0/checkpoints/best.ckpt
   model_extra:
     sliding_window_params:
       roi_size: [512, 512]
