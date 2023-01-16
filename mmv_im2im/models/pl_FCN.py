@@ -105,7 +105,7 @@ class Model(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss, y_hat = self.run_step(batch, validation_stage=False)
-        self.log("train_loss", loss, prog_bar=True)
+        self.log("train_loss_step", loss, prog_bar=True)
 
         if self.verbose and batch_idx == 0:
             src = batch["IM"]
@@ -190,6 +190,16 @@ class Model(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         loss, y_hat = self.run_step(batch, validation_stage=True)
-        self.log("val_loss", loss)
+        self.log("val_loss_step", loss)
 
         return loss
+
+    def training_epoch_end(self, training_step_outputs):
+        # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968   # noqa E501
+        training_step_outputs = [d["loss"] for d in training_step_outputs]
+        loss_ave = torch.stack(training_step_outputs).mean().item()
+        self.log("train_loss", loss_ave)
+
+    def validation_epoch_end(self, validation_step_outputs):
+        loss_ave = torch.stack(validation_step_outputs).mean().item()
+        self.log("val_loss", loss_ave)
