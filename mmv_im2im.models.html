@@ -549,6 +549,39 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.pl_FCN.Model.training_epoch_end">
+<span class="sig-name descname"><span class="pre">training_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_step_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_FCN.html#Model.training_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model.training_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the end of the training epoch with the outputs of all training steps. Use this in case you
+need to do something with all the outputs returned by <a class="reference internal" href="#mmv_im2im.models.pl_FCN.Model.training_step" title="mmv_im2im.models.pl_FCN.Model.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># the pseudocode for these calls</span>
+<span class="n">train_outs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">train_batch</span> <span class="ow">in</span> <span class="n">train_data</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">training_step</span><span class="p">(</span><span class="n">train_batch</span><span class="p">)</span>
+    <span class="n">train_outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="n">training_epoch_end</span><span class="p">(</span><span class="n">train_outs</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>outputs: List of outputs you defined in <a class="reference internal" href="#mmv_im2im.models.pl_FCN.Model.training_step" title="mmv_im2im.models.pl_FCN.Model.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a>. If there are multiple optimizers or when</dt><dd><p>using <code class="docutils literal notranslate"><span class="pre">truncated_bptt_steps</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>, the lists have the dimensions
+(n_batches, tbptt_steps, n_optimizers). Dimensions of length 1 are squeezed.</p>
+</dd>
+</dl>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+<dt>Note:</dt><dd><p>If this method is not overridden, this won’t be called.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_step_outputs</span><span class="p">):</span>
+    <span class="c1"># do something with all training_step outputs</span>
+    <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">training_step_outputs</span><span class="p">:</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_FCN.Model.training_step">
 <span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_FCN.html#Model.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model.training_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Here you compute and return the training loss and some additional metrics for e.g.
@@ -615,6 +648,48 @@ so it differs from the actual loss returned in train/validation step.</p>
 </dd>
 <dt>Note:</dt><dd><p>When <code class="docutils literal notranslate"><span class="pre">accumulate_grad_batches</span></code> &gt; 1, the loss returned here will be automatically
 normalized by <code class="docutils literal notranslate"><span class="pre">accumulate_grad_batches</span></code> internally.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.pl_FCN.Model.validation_epoch_end">
+<span class="sig-name descname"><span class="pre">validation_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validation_step_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_FCN.html#Model.validation_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model.validation_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the end of the validation epoch with the outputs of all validation steps.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># the pseudocode for these calls</span>
+<span class="n">val_outs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">val_batch</span> <span class="ow">in</span> <span class="n">val_data</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">validation_step</span><span class="p">(</span><span class="n">val_batch</span><span class="p">)</span>
+    <span class="n">val_outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="n">validation_epoch_end</span><span class="p">(</span><span class="n">val_outs</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>outputs: List of outputs you defined in <a class="reference internal" href="#mmv_im2im.models.pl_FCN.Model.validation_step" title="mmv_im2im.models.pl_FCN.Model.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a>, or if there</dt><dd><p>are multiple dataloaders, a list containing a list of outputs for each dataloader.</p>
+</dd>
+</dl>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+<dt>Note:</dt><dd><p>If you didn’t define a <a class="reference internal" href="#mmv_im2im.models.pl_FCN.Model.validation_step" title="mmv_im2im.models.pl_FCN.Model.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a>, this won’t be called.</p>
+</dd>
+<dt>Examples:</dt><dd><p>With a single dataloader:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val_step_outputs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">val_step_outputs</span><span class="p">:</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>With multiple dataloaders, <cite>outputs</cite> will be a list of lists. The outer list contains
+one entry per dataloader, while the inner list contains the individual outputs of
+each validation step for that dataloader.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">dataloader_output_result</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+        <span class="n">dataloader_outs</span> <span class="o">=</span> <span class="n">dataloader_output_result</span><span class="o">.</span><span class="n">dataloader_i_outputs</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;final_metric&quot;</span><span class="p">,</span> <span class="n">final_value</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 </dd></dl>
@@ -1289,6 +1364,39 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.pl_embedseg.Model.training_epoch_end">
+<span class="sig-name descname"><span class="pre">training_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_step_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_embedseg.html#Model.training_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model.training_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the end of the training epoch with the outputs of all training steps. Use this in case you
+need to do something with all the outputs returned by <a class="reference internal" href="#mmv_im2im.models.pl_embedseg.Model.training_step" title="mmv_im2im.models.pl_embedseg.Model.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># the pseudocode for these calls</span>
+<span class="n">train_outs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">train_batch</span> <span class="ow">in</span> <span class="n">train_data</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">training_step</span><span class="p">(</span><span class="n">train_batch</span><span class="p">)</span>
+    <span class="n">train_outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="n">training_epoch_end</span><span class="p">(</span><span class="n">train_outs</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>outputs: List of outputs you defined in <a class="reference internal" href="#mmv_im2im.models.pl_embedseg.Model.training_step" title="mmv_im2im.models.pl_embedseg.Model.training_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">training_step()</span></code></a>. If there are multiple optimizers or when</dt><dd><p>using <code class="docutils literal notranslate"><span class="pre">truncated_bptt_steps</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>, the lists have the dimensions
+(n_batches, tbptt_steps, n_optimizers). Dimensions of length 1 are squeezed.</p>
+</dd>
+</dl>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+<dt>Note:</dt><dd><p>If this method is not overridden, this won’t be called.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">training_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">training_step_outputs</span><span class="p">):</span>
+    <span class="c1"># do something with all training_step outputs</span>
+    <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">training_step_outputs</span><span class="p">:</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_embedseg.Model.training_step">
 <span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_embedseg.html#Model.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model.training_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Here you compute and return the training loss and some additional metrics for e.g.
@@ -1355,6 +1463,48 @@ so it differs from the actual loss returned in train/validation step.</p>
 </dd>
 <dt>Note:</dt><dd><p>When <code class="docutils literal notranslate"><span class="pre">accumulate_grad_batches</span></code> &gt; 1, the loss returned here will be automatically
 normalized by <code class="docutils literal notranslate"><span class="pre">accumulate_grad_batches</span></code> internally.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.pl_embedseg.Model.validation_epoch_end">
+<span class="sig-name descname"><span class="pre">validation_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validation_step_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_embedseg.html#Model.validation_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model.validation_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the end of the validation epoch with the outputs of all validation steps.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># the pseudocode for these calls</span>
+<span class="n">val_outs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">val_batch</span> <span class="ow">in</span> <span class="n">val_data</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">validation_step</span><span class="p">(</span><span class="n">val_batch</span><span class="p">)</span>
+    <span class="n">val_outs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="n">validation_epoch_end</span><span class="p">(</span><span class="n">val_outs</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>outputs: List of outputs you defined in <a class="reference internal" href="#mmv_im2im.models.pl_embedseg.Model.validation_step" title="mmv_im2im.models.pl_embedseg.Model.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a>, or if there</dt><dd><p>are multiple dataloaders, a list containing a list of outputs for each dataloader.</p>
+</dd>
+</dl>
+</dd>
+<dt>Return:</dt><dd><p>None</p>
+</dd>
+<dt>Note:</dt><dd><p>If you didn’t define a <a class="reference internal" href="#mmv_im2im.models.pl_embedseg.Model.validation_step" title="mmv_im2im.models.pl_embedseg.Model.validation_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code></a>, this won’t be called.</p>
+</dd>
+<dt>Examples:</dt><dd><p>With a single dataloader:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val_step_outputs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">val_step_outputs</span><span class="p">:</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>With multiple dataloaders, <cite>outputs</cite> will be a list of lists. The outer list contains
+one entry per dataloader, while the inner list contains the individual outputs of
+each validation step for that dataloader.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">dataloader_output_result</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+        <span class="n">dataloader_outs</span> <span class="o">=</span> <span class="n">dataloader_output_result</span><span class="o">.</span><span class="n">dataloader_i_outputs</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;final_metric&quot;</span><span class="p">,</span> <span class="n">final_value</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd>
 </dl>
 </dd></dl>
