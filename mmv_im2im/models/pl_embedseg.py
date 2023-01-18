@@ -31,7 +31,9 @@ class Model(pl.LightningModule):
         self.net = parse_config(model_info_xx.net)
 
         if model_info_xx.net["func_name"].startswith("BranchedERFNet"):
-            self.net.init_output(model_info_xx.criterion["params"]["n_sigma"])
+            if train:
+                # if not train, not need to init
+                self.net.init_output(model_info_xx.criterion["params"]["n_sigma"])
         else:
             init_weights(self.net, init_type="kaiming")
 
