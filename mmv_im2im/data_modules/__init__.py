@@ -7,10 +7,11 @@ def get_data_module(cfg):
         # if no cache_path, use random patch generation on-the-fly
         if cfg.cache_path is None:
             return dm_basic(cfg)
+
         # if cache_path is set, but empty, then generate pre-cropped patches
-        elif not any(cfg.cache_path.iterdir()):
+        if not any(cfg.cache_path.iterdir()):
             print("cache for embedseg is empty, start generating ...")
             prepare_embedseg_cache(cfg.data_path, cfg.cache_path, cfg)
-        return dm_basic(cfg, cache_path=cfg.cache_path)
-    else:
-        return dm_basic(cfg)
+        cfg.data_path = cfg.cache_path
+
+    return dm_basic(cfg)
