@@ -26,15 +26,9 @@ from monai.data import list_data_collate
 
 
 class Im2ImDataModule(pl.LightningDataModule):
-    def __init__(self, data_cfg, cache_path: Union[str, Path] = None):
+    def __init__(self, data_cfg):
         super().__init__()
-
-        if cache_path is None:
-            self.data_path = data_cfg.data_path
-        else:
-            # use the cache path as the directory to load data
-            self.data_path = str(cache_path)
-
+        self.data_path = data_cfg.data_path
         self.category = data_cfg.category
 
         # train/val split
@@ -65,6 +59,9 @@ class Im2ImDataModule(pl.LightningDataModule):
         self.dataloader_info = data_cfg.dataloader
 
     def prepare_data(self):
+        pass
+
+    def setup(self, stage=None):
         dataset_list = generate_dataset_dict_monai(self.data_path)
 
         if self.category == "unpair":
@@ -79,8 +76,6 @@ class Im2ImDataModule(pl.LightningDataModule):
                 dataset_list[i]["GT"] = shuffled_ds["GT"]
 
         self.data = dataset_list
-
-    def setup(self, stage=None):
 
         if "train" in self.data and "val" in self.data:
             train_subjects = self.data["train"]
