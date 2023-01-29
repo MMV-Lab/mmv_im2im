@@ -45,7 +45,6 @@ class Model(pl.LightningModule):
     def configure_optimizers(self):
         # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
         optimizer = self.optimizer_func(self.parameters())
-        print("optim done")
         if self.model_info.scheduler is None:
             return optimizer
         else:
@@ -146,12 +145,12 @@ class Model(pl.LightningModule):
         else:
             loss = self.run_step(batch, validation_stage=False)
 
-        self.log("train_loss_step", loss, prog_bar=True)
+        self.log("train_loss_iter", loss, on_step=True, on_epoch=True, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         loss = self.run_step(batch, validation_stage=True)
-        self.log("val_loss_step", loss)
+        self.log("val_loss_iter", loss, on_step=True, on_epoch=True, sync_dist=True)
 
         return loss
 
@@ -163,4 +162,4 @@ class Model(pl.LightningModule):
 
     def validation_epoch_end(self, validation_step_outputs):
         loss_ave = torch.stack(validation_step_outputs).mean().item()
-        self.log("val_loss", loss_ave)
+        self.log("val_loss", loss_ave, sync_dist=True)
