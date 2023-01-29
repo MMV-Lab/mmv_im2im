@@ -53,7 +53,7 @@ class Model(pl.LightningModule):
             self.optimizer_info = model_info_xx.optimizer
             self.scheduler_info = model_info_xx.scheduler
         else:
-            self.direction = model_info_xx.extra["inference_direction"]
+            self.direction = model_info_xx.model_extra["inference_direction"]
 
     def forward(self, x):
         if self.direction == "AtoB":
