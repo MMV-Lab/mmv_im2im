@@ -114,7 +114,7 @@ class pix2pix_HD(pix2pix_HD_original):
 
 
 class pix2pix_basic:
-    def __init__(self, gan_loss, reconstruction_loss, fm_loss, weights):
+    def __init__(self, gan_loss, reconstruction_loss, weights):
         super().__init__()
         self.gan_loss = parse_config(gan_loss)
         self.recon_loss = parse_config(reconstruction_loss)
