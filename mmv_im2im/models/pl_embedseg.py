@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from typing import Dict
 from aicsimageio.writers import OmeTiffWriter
 import pytorch_lightning as pl
@@ -6,12 +7,14 @@ from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 from mmv_im2im.utils.embedseg_utils import prepare_embedseg_tensor
 from mmv_im2im.utils.model_utils import init_weights
 import torch
+from monai.inferers import sliding_window_inference
 
 from mmv_im2im.utils.misc import (
     parse_config,
     parse_config_func,
     parse_config_func_without_params,
 )
+from mmv_im2im.utils.metrics import simplified_instance_IoU_3D
 
 
 class Model(pl.LightningModule):
@@ -66,38 +69,72 @@ class Model(pl.LightningModule):
         elif len(im.size()) == 5:  # "BCZYX"
             spatial_dim = 3
 
-        # decide if CL and CE are already generated
-        if "CL" in batch and "CE" in batch:
-            class_labels = batch["CL"]
-            center_images = batch["CE"]
-        else:
-            class_labels, center_images = prepare_embedseg_tensor(
-                instances, spatial_dim, self.model_info.model_extra["center_method"]
-            )
-
         use_costmap = False
         if "CM" in batch:
             use_costmap = True
             costmap = batch["CM"]
-        output = self(im)
 
-        if use_costmap:
-            loss = self.criterion(
-                output, instances, class_labels, center_images, costmap
-            )
-        else:
-            loss = self.criterion(output, instances, class_labels, center_images)
-        loss = loss.mean()
-
+        # forward
         if validation_stage:
-            # TODO: add validation step
-            pass
-        if save_path is not None:
+            output = sliding_window_inference(
+                inputs=im,
+                predictor=self.net,
+                device=torch.device("cpu"),
+                **self.model_info.model_extra["validation_sliding_windows"],
+            )
+            # move back to CUDA
+            output = output.cuda()
+
+            # generate instance segmentation
             instances_map = generate_instance_clusters(output, **self.clustering_params)
+
+            instances = instances.detach().cpu().numpy()
+            if len(instances.shape) > spatial_dim:
+                instances = np.squeeze(instances)
+
+            if use_costmap:
+                sIoU = simplified_instance_IoU_3D(instances, instances_map, costmap)
+            else:
+                sIoU = simplified_instance_IoU_3D(instances, instances_map)
+
+            loss = {"sIoU": sIoU}
+        else:
+            output = self(im)
+
+            # decide if CL and CE are already generated
+            if "CL" in batch and "CE" in batch:
+                class_labels = batch["CL"]
+                center_images = batch["CE"]
+            else:
+                class_labels, center_images = prepare_embedseg_tensor(
+                    instances, spatial_dim, self.model_info.model_extra["center_method"]
+                )
+
+            if use_costmap:
+                loss = self.criterion(
+                    output, instances, class_labels, center_images, costmap
+                )
+            else:
+                loss = self.criterion(output, instances, class_labels, center_images)
+            loss = loss.mean()
+
+        if save_path is not None:
+            # get instance segmentation if not yet
+            if not validation_stage:
+                instances_map = generate_instance_clusters(
+                    output, **self.clustering_params
+                )
+                # remove the batch dimension
+                gt = instances.detach().cpu().numpy()[0,]
+            else:
+                # add back the C dimension
+                gt = np.expand_dims(instances, axis=0)
             if len(im.size()) == 4:
                 dim_order = "CYX"
             elif len(im.size()) == 5:
                 dim_order = "CZYX"
+
+            # save raw image
             out_fn = save_path + "_raw.tiff"
             OmeTiffWriter.save(
                 im.detach()
@@ -108,37 +145,35 @@ class Model(pl.LightningModule):
                 out_fn,
                 dim_order=dim_order,
             )
+
+            # save ground truth
             out_fn = save_path + "_gt.tiff"
-            OmeTiffWriter.save(
-                instances.detach()
-                .cpu()
-                .numpy()[
-                    0,
-                ],
-                out_fn,
-                dim_order=dim_order,
-            )
+            OmeTiffWriter.save(gt, out_fn, dim_order=dim_order)
+
+            # save instance segmentation
             out_fn = save_path + "_pred.tiff"
             OmeTiffWriter.save(instances_map, out_fn, dim_order=dim_order[1:])
-            out_fn = save_path + "_out.tiff"
-            OmeTiffWriter.save(
-                output.detach()
-                .cpu()
-                .numpy()[
-                    0,
-                ]
-                .astype(float),
-                out_fn,
-                dim_order=dim_order,
-            )
 
+            # out_fn = save_path + "_out.tiff"
+            # OmeTiffWriter.save(
+            #     output.detach()
+            #     .cpu()
+            #     .numpy()[
+            #         0,
+            #     ]
+            #     .astype(float),
+            #     out_fn,
+            #     dim_order=dim_order,
+            # )
         return loss
 
     def training_step(self, batch, batch_idx):
         if self.verbose and batch_idx == 0:
             if not os.path.exists(self.trainer.log_dir):
                 os.mkdir(self.trainer.log_dir)
-            save_path_base = self.trainer.log_dir + os.sep + str(self.current_epoch)
+            save_path_base = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_train_"
+            )
             loss = self.run_step(
                 batch, validation_stage=False, save_path=save_path_base
             )
@@ -149,7 +184,15 @@ class Model(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
-        loss = self.run_step(batch, validation_stage=True)
+        if self.verbose and batch_idx == 0:
+            if not os.path.exists(self.trainer.log_dir):
+                os.mkdir(self.trainer.log_dir)
+            save_path_base = (
+                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_val_"
+            )
+            loss = self.run_step(batch, validation_stage=True, save_path=save_path_base)
+        else:
+            loss = self.run_step(batch, validation_stage=True)
         self.log("val_loss_iter", loss, on_step=True, on_epoch=True, sync_dist=True)
 
         return loss
@@ -161,5 +204,6 @@ class Model(pl.LightningModule):
         self.log("train_loss", loss_ave)
 
     def validation_epoch_end(self, validation_step_outputs):
-        loss_ave = torch.stack(validation_step_outputs).mean().item()
+        validation_step_outputs = [d["sIoU"] for d in validation_step_outputs]
+        loss_ave = np.stack(validation_step_outputs).mean()
         self.log("val_loss", loss_ave, sync_dist=True)
