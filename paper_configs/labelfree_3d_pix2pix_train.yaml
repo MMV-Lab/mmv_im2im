@@ -71,7 +71,6 @@ model:
       #  n_res_blocks: 9
       #  nf: 64
       #  norm_layer: "BATCH"
-      init_weight: ./lightning_logs/version_1/checkpoints/best.ckpt
       module_name: mmv_im2im.models.nets.fnet_nn_3d
       func_name: Net
       params:
