@@ -1,0 +1,56 @@
+mode: inference
+
+data:
+  inference_input:
+    dir: ./data/synthetic2D/NPM1/holdout   #ADD-YOURS
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
+    reader_params:
+      dimension_order_out: "YX"
+      C: 0
+      T: 0
+      Z: 0
+  inference_output:
+    path: ./data/synthetic2D/NPM1/pred   #ADD-YOURS
+  preprocess:            
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentiles
+      params:
+        lower: 0
+        upper: 100
+        b_min: -1
+        b_max: 1
+
+
+model:
+  framework: pix2pix
+  net:
+    generator:
+      module_name: monai.networks.nets
+      func_name: AttentionUnet
+      params:
+        spatial_dims: 2
+        in_channels: 1
+        out_channels: 1
+        channels: [32, 64, 128, 256, 512]
+        strides: [2, 2, 2, 2]
+    discriminator:
+      type: predefined_multiscale
+      params:
+        num_discriminator: 2
+        spatial_dims: 2
+        in_channels: 2
+        n_layers: 4
+        nf: 64
+        norm_layer: "INSTANCE"
+  checkpoint: ./lightning_logs/version_72/checkpoints/last.ckpt   #ADD-YOURS
+  model_extra:
+    sliding_window_params:
+      roi_size: [512, 512]
+      sw_batch_size: 2
+      overlap: 0.2
+      mode: "gaussian"
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 16
