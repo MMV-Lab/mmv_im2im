@@ -1,0 +1,155 @@
+mode: train
+
+data:
+  category: "pair"
+  data_path: ./data/modalityTransfer/train/Microtubule
+  dataloader:
+    train:
+      dataloader_params:
+        batch_size: 4
+        pin_memory: True
+        num_workers: 4
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["IM", "GT"]
+        dimension_order_out: "ZYX"
+        T: 0
+        C: 0
+    - module_name: monai.transforms
+      func_name: AddChanneld
+      params:
+        keys: ["IM", "GT"]
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
+      params:
+        keys: ["IM", "GT"]
+        lower: 0.01
+        upper: 99.99
+        b_min: -1
+        b_max: 1
+    - module_name: monai.transforms
+      func_name: RandSpatialCropSamplesd
+      params:
+        keys: ["IM", "GT"]
+        random_size: False
+        num_samples: 2
+        roi_size: [6, 512, 512]
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT"]
+  augmentation:
+    - module_name: monai.transforms
+      func_name: RandFlipd
+      params:
+        prob: 0.5
+        keys: ["IM", "GT"]
+
+model:
+  # framework: pix2pix
+  # net:
+  #   generator:
+  #     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+  #     func_name: UNet3D
+  #     params:
+  #       in_channel: 1
+  #       n_classes: 1 # out_channels
+  #       down_ratio: 2
+  #   discriminator:
+  #     type: predefined_basic
+  #     params:
+  #       spatial_dims: 3
+  #       in_channels: 2
+  #       n_layers: 1
+  #       nf: 128
+  #       norm_layer: "INSTANCE"
+  # criterion:
+  #   loss_type: pix2pix_basic  # pix2pix_HD_original | pix2pix_HD  |  pix2pix_basic
+  #   gan_loss:
+  #     module_name: torch.nn
+  #     func_name: BCEWithLogitsLoss  # MSELoss
+  #     params:
+  #       reduction: 'mean'
+  #   reconstruction_loss:
+  #     module_name: torch.nn
+  #     func_name: MSELoss
+  #     params:
+  #       reduction: 'mean'
+  #   weights:
+  #     gan_loss: 1
+  #     reconstruction_loss: 10
+  # optimizer:
+  #   generator:
+  #     module_name: torch.optim
+  #     func_name: Adam  # AdamW
+  #     params:
+  #       lr: 0.00002 # larger, e.g. 0.002, if train from scratch
+  #       betas: [0.5, 0.999]
+  #       weight_decay: 0.0005
+  #   discriminator:
+  #     module_name: torch.optim
+  #     func_name: Adam  # AdamW
+  #     params:
+  #       lr: 0.0002
+  #       betas: [0.5, 0.999]
+  #       weight_decay: 0.0005
+  # scheduler:
+  #   generator:
+  #     module_name: torch.optim.lr_scheduler
+  #     func_name: ExponentialLR
+  #     params:
+  #       gamma: 0.999
+  #   discriminator:
+  #     module_name: torch.optim.lr_scheduler
+  #     func_name: ExponentialLR
+  #     params:
+  #       gamma: 0.999
+  framework: FCN
+  net:
+    module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+    func_name: UNet3D
+    params:
+      in_channel: 1
+      n_classes: 1 # out_channels
+      down_ratio: 2
+  criterion:
+    module_name: torch.nn
+    func_name: MSELoss
+    params:
+      reduction: 'mean'
+  optimizer:
+    module_name: torch.optim
+    func_name: Adam  # AdamW
+    params:
+      lr: 0.001
+      weight_decay: 0.0005
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    func_name: ExponentialLR
+    params:
+      gamma: 0.99
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 16
+    max_epochs: 10000
+    terminate_on_nan: True
+  callbacks:
+    # - module_name: pytorch_lightning.callbacks.early_stopping
+    #   func_name: EarlyStopping
+    #   params:
+    #     monitor: 'val_loss_discriminator'
+    #     patience: 50 
+    #     verbose: True
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: '{epoch}-{val_loss:.5f}'
+        save_top_k: 2
+        save_last: True
+        save_weights_only: True 
