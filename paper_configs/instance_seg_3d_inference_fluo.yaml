@@ -1,0 +1,57 @@
+mode: inference
+
+data:
+  inference_input:
+    dir:  "./data/instance3D/holdout_fluo"   #ADD-YOURS
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
+    reader_params:
+      dimension_order_out: "ZYX"
+      C: 0
+      T: 0
+  inference_output:
+    path:  "./data/instance3D/pred_fluo"   #ADD-YOURS
+  preprocess:
+    - module_name: monai.transforms
+      func_name: NormalizeIntensity
+    - module_name: monai.transforms
+      func_name: DivisiblePad
+      params:
+        k: 8
+
+  postprocess:
+    - module_name: mmv_im2im.postprocessing.embedseg_cluster
+      func_name: generate_instance_clusters
+      params:
+        grid_y: 1024
+        grid_x: 1024
+        grid_z: 128
+        pixel_y: 1
+        pixel_x: 1
+        pixel_z: 1
+        n_sigma: 3
+        seed_thresh: 0.5
+        min_mask_sum: 2
+        min_unclustered_sum: 20
+        min_object_size: 20
+
+model:
+  framework: embedseg
+  checkpoint: ./lightning_logs/version_27/checkpoints/last.ckpt
+  net:
+    module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+    func_name: UNet3D
+    params:
+      in_channel: 1
+      n_classes: 7
+      down_ratio: 4
+  model_extra:
+    sliding_window_params:
+      roi_size: [32, 512, 512]
+      sw_batch_size: 1
+      overlap: 0.6
+      mode: "gaussian"
+trainer:
+  params:
+    gpus: 1
+    precision: 16
+ 
