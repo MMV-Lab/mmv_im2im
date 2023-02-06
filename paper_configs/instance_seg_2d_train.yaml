@@ -87,6 +87,12 @@ model:
     params:
       num_classes: [4, 1]
       input_channels: 1
+  # model_extra:
+  #   validation_sliding_windows:
+  #     roi_size: [512, 512]
+  #     sw_batch_size: 1
+  #     overlap: 0.6
+  #     mode: "gaussian"
   criterion:
     module_name: mmv_im2im.utils.embedding_loss
     func_name: SpatialEmbLoss_2d
@@ -123,7 +129,7 @@ trainer:
         monitor: 'val_loss'
         patience: 50
         verbose: True
-        min_delta: 0.0001
+        mode: "max"
     - module_name: pytorch_lightning.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
@@ -132,9 +138,5 @@ trainer:
         save_top_k: 2
         save_last: True
         save_weights_only: True 
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
-      func_name: ModelCheckpoint
-      params:
-        monitor: 'val_loss'
-        filename: 'best'
+        mode: "max"
 

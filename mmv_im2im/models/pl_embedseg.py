@@ -76,12 +76,15 @@ class Model(pl.LightningModule):
 
         # forward
         if validation_stage:
-            output = sliding_window_inference(
-                inputs=im,
-                predictor=self.net,
-                device=torch.device("cpu"),
-                **self.model_info.model_extra["validation_sliding_windows"],
-            )
+            if "validation_sliding_windows" in self.model_info.model_extra:
+                output = sliding_window_inference(
+                    inputs=im,
+                    predictor=self.net,
+                    device=torch.device("cpu"),
+                    **self.model_info.model_extra["validation_sliding_windows"],
+                )
+            else:
+                output = self.net(im)
             # move back to CUDA
             output = output.cuda()
 
