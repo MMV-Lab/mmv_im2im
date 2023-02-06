@@ -1,7 +1,6 @@
 """
 This module provides lighting module for cycleGAN
 """
-import os
 import torch
 import pytorch_lightning as pl
 from pathlib import Path
@@ -103,7 +102,9 @@ class Model(pl.LightningModule):
             ],
         )
 
-    def save_cyclegan_output(self, image_A, image_B, fake_A_from_B, fake_B_from_A, current_stage):
+    def save_cyclegan_output(
+        self, image_A, image_B, fake_A_from_B, fake_B_from_A, current_stage
+    ):
 
         # check if the log path exists, if not create one
         log_dir = Path(self.trainer.log_dir)
