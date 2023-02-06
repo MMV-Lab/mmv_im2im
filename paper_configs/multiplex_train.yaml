@@ -1,0 +1,141 @@
+mode: train
+
+data:
+  category: "pair"
+  data_path:  ./data/multiplex/train/trans1
+  dataloader:
+    train:
+      dataloader_params:
+        batch_size: 32
+        pin_memory: True
+        num_workers: 8
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["IM"]
+        dimension_order_out: "SYX"  # S is for RGB image
+        C: 0
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["GT"]
+        dimension_order_out: "CYX"  # C=1
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: NormalizeIntensityd
+      params:
+        keys: ["IM"]
+        channel_wise: True
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
+      params:
+        keys: ["GT"]
+        lower: 0.01
+        upper: 99.99
+        b_min: -1
+        b_max: 1    
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT"]
+  augmentation:
+    - module_name: monai.transforms
+      func_name: RandFlipd
+      params:
+        prob: 0.5
+        keys: ["IM", "GT"]
+
+model:
+  framework: pix2pix
+  net:
+    generator:
+      type: predefined_unet
+      params:
+        spatial_dims: 2
+        in_channels: 3
+        out_channels: 1
+        channels: [64, 128, 256, 512, 512]
+        strides: [2, 2, 2, 2]
+    discriminator:
+      type: predefined_multiscale
+      params:
+        num_discriminator: 2
+        spatial_dims: 2
+        in_channels: 4
+        n_layers: 4
+        nf: 64
+        norm_layer: "INSTANCE"
+  criterion:
+    loss_type: pix2pix_HD  # pix2pix_HD_original  |  pix2pix_basic
+    gan_loss:
+      module_name: torch.nn
+      func_name: BCEWithLogitsLoss  # MSELoss
+      params:
+        reduction: 'mean'
+    reconstruction_loss:
+      module_name: torch.nn
+      func_name: MSELoss
+      params:
+        reduction: 'mean'
+    fm_loss:  # feature matching loss
+      module_name: torch.nn
+      func_name: L1Loss
+      params:
+        reduction: 'mean'
+    weights:
+      gan_loss: 1
+      fm_loss: 10
+      reconstruction_loss: 100
+  optimizer:
+    generator:
+      module_name: torch.optim
+      func_name: Adam  # AdamW
+      params:
+        lr: 0.0002
+        betas: [0.5, 0.999]
+        weight_decay: 0.0005
+    discriminator:
+      module_name: torch.optim
+      func_name: Adam  # AdamW
+      params:
+        lr: 0.0002
+        betas: [0.5, 0.999]
+        weight_decay: 0.0005
+  scheduler:
+    generator:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.999
+    discriminator:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.999
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 16
+    max_epochs: 3000
+    terminate_on_nan: True
+  callbacks:
+    # - module_name: pytorch_lightning.callbacks.early_stopping
+    #   func_name: EarlyStopping
+    #   params:
+    #     monitor: 'val_loss_discriminator'
+    #     patience: 50
+    #     verbose: True
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss_discriminator'
+        filename: '{epoch}-{val_loss_discriminator:.5f}'
+        save_top_k: 2
+        save_last: True
+        save_weights_only: True
