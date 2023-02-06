@@ -5,7 +5,6 @@ from pathlib import Path
 import pytorch_lightning as pl
 import torch
 import monai
-from monai.losses import MaskedLoss
 from aicsimageio.writers import OmeTiffWriter
 
 from mmv_im2im.utils.misc import (
@@ -29,16 +28,14 @@ class Model(pl.LightningModule):
 
         self.model_info = model_info_xx
         self.verbose = verbose
-        self.masked_loss = False
+        self.weighted_loss = False
         self.seg_flag = False
         if train:
             if "use_costmap" in model_info_xx.criterion[
                 "params"
             ] and model_info_xx.criterion["params"].pop("use_costmap"):
-                self.criterion = MaskedLoss(parse_config(model_info_xx.criterion))
-                self.masked_loss = True
-            else:
-                self.criterion = parse_config(model_info_xx.criterion)
+                self.weighted_loss = True
+            self.criterion = parse_config(model_info_xx.criterion)
             self.optimizer_func = parse_config_func(model_info_xx.optimizer)
 
             if (
@@ -71,8 +68,8 @@ class Model(pl.LightningModule):
         y = batch["GT"]
         if "CM" in batch.keys():
             assert (
-                self.masked_loss
-            ), "Costmap is detected in training data, but not set up in criterion"
+                self.weighted_loss
+            ), "Costmap is detected, but no use_costmap param in criterion"
             cm = batch["CM"]
 
         # only for badly formated data file
@@ -86,17 +83,8 @@ class Model(pl.LightningModule):
             # in case of CrossEntropy related error
             # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
             y = torch.squeeze(y, dim=1)  # remove C dimension
-        elif isinstance(self.criterion, monai.losses.MaskedLoss) and isinstance(
-            self.criterion.loss, torch.nn.CrossEntropyLoss
-        ):
-            y = torch.squeeze(y, dim=1)
 
-        # if costmap is None:
-        #    loss = self.criterion(y_hat, y)
-        # else:
-        #    loss = self.criterion(y_hat, y, costmap)
-
-        if self.masked_loss:
+        if self.weighted_loss:
             loss = self.criterion(y_hat, y, cm)
         else:
             loss = self.criterion(y_hat, y)
