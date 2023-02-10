@@ -5,7 +5,6 @@ import numpy as np
 def simplified_instance_IoU_3D(
     mask: np.ndarray, pred: np.ndarray, costmap: Optional[np.ndarray]
 ):
-
     # clean up ground truth by removing all objects touching boundary
     # also, boudary is defined by 5 pixels within the actual border
     boundary_template = np.zeros_like(mask)

@@ -109,7 +109,6 @@ def parse_ops_list(trans_func: List[Dict]):
 
 
 def generate_test_dataset_dict(data: Union[str, Path], data_type: str = None) -> List:
-
     """
     different options for "data":
     - one CSV

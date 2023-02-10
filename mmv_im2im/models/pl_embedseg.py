@@ -140,11 +140,7 @@ class Model(pl.LightningModule):
             # save raw image
             out_fn = save_path + "_raw.tiff"
             OmeTiffWriter.save(
-                im.detach()
-                .cpu()
-                .numpy()[
-                    0,
-                ],
+                im.detach().cpu().numpy()[0,],
                 out_fn,
                 dim_order=dim_order,
             )

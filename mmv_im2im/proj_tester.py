@@ -45,7 +45,6 @@ class ProjectTester(object):
         self.pre_process = None
 
     def process_one_image(self, img, out_fn):
-
         # TODO: adjust/double_check for MONAI
         # record the input dimension
         # original_size = x.size()
@@ -156,23 +155,23 @@ class ProjectTester(object):
                             save_rgb(
                                 out_fn,
                                 np.moveaxis(
-                                    pred[
-                                        0,
-                                    ],
+                                    pred[0,],
                                     0,
                                     -1,
                                 ),
                             )
                         else:
-                            OmeTiffWriter.save(pred[0, ], out_fn, dim_order="CYX")
+                            OmeTiffWriter.save(
+                                pred[0,],
+                                out_fn,
+                                dim_order="CYX",
+                            )
                     else:
                         raise ValueError("invalid 4D output for 2d data")
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "error, found non-trivial batch dimension"
                 OmeTiffWriter.save(
-                    pred[
-                        0,
-                    ],
+                    pred[0,],
                     out_fn,
                     dim_order="CZYX",
                 )
@@ -180,7 +179,6 @@ class ProjectTester(object):
                 raise ValueError("error in prediction output shape")
 
     def run_inference(self):
-
         # set up model
         model_category = self.model_cfg.framework
         model_module = import_module(f"mmv_im2im.models.pl_{model_category}")

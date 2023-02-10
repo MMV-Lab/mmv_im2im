@@ -105,7 +105,6 @@ class Model(pl.LightningModule):
     def save_cyclegan_output(
         self, image_A, image_B, fake_A_from_B, fake_B_from_A, current_stage
     ):
-
         # check if the log path exists, if not create one
         log_dir = Path(self.trainer.log_dir)
         log_dir.mkdir(parents=True, exist_ok=True)
@@ -204,7 +203,7 @@ class Model(pl.LightningModule):
                 image_B[0].detach().cpu().numpy(),
                 fake_A_from_B[0].detach().cpu().numpy(),
                 fake_B_from_A[0].detach().cpu().numpy(),
-                "val"
+                "val",
             )
         return output
 
@@ -270,7 +269,7 @@ class Model(pl.LightningModule):
                     image_B[0].detach().cpu().numpy(),
                     fake_A_from_B[0].detach().cpu().numpy(),
                     fake_B_from_A[0].detach().cpu().numpy(),
-                    "train"
+                    "train",
                 )
             return output
 
