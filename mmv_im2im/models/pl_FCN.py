@@ -4,7 +4,6 @@ from typing import Dict
 from pathlib import Path
 import pytorch_lightning as pl
 import torch
-import monai
 from aicsimageio.writers import OmeTiffWriter
 
 from mmv_im2im.utils.misc import (

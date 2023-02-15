@@ -55,10 +55,13 @@ class PixelWiseCrossEntropyLoss(nn.Module):
         self.log_softmax = nn.LogSoftmax(dim=1)
         self.one_hot = one_hot_gt
 
-    def forward(self, input, target, weights):
+    def forward(self, input, target, weights=None):
         # input: N x C x Spatial
         # target: N x 1 x Spatial (not one hot) or N x C x Spatial (one_hot)
-        # weight: N x 1 x Spatial
+        # weights: N x 1 x Spatial
+
+        if weights is None:
+            weights = torch.ones_like(target)
 
         # normalize the input
         log_probabilities = self.log_softmax(input)
