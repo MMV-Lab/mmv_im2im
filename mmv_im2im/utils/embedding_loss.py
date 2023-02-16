@@ -58,7 +58,6 @@ class SpatialEmbLoss_3d(nn.Module):
         w_var=10,
         w_seed=1,
     ):
-
         # instances B 1 Z Y X
         batch_size, depth, height, width = (
             prediction.size(0),
@@ -115,7 +114,6 @@ class SpatialEmbLoss_3d(nn.Module):
                     seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 
             for id in instance_ids:
-
                 # use the original instance without costmap adjustment to fetch
                 # instance mask, since the costmap may partial cut some instances
                 # and alter the ground truth only use the costmap to adjust the
@@ -230,7 +228,6 @@ class SpatialEmbLoss_2d(nn.Module):
         w_var=10,
         w_seed=1,
     ):
-
         # instances B C Y X
         batch_size, height, width = (
             prediction.size(0),
@@ -249,7 +246,6 @@ class SpatialEmbLoss_2d(nn.Module):
         loss = 0
 
         for b in range(0, batch_size):
-
             spatial_emb = torch.tanh(prediction[b, 0:2]) + xym_s  # 2 x h x w #TODO
             sigma = prediction[b, 2 : 2 + self.n_sigma]  # n_sigma x h x w
             seed_map = torch.sigmoid(

@@ -170,7 +170,6 @@ class generator_encoder_decoder(nn.Module):
 
 
 def define_generator(model_info):
-
     if "type" in model_info:
         if model_info["type"] == "predefined_resnet":
             net = preset_generator_resent(**model_info["params"])

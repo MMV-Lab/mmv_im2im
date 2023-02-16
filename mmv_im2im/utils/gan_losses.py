@@ -50,8 +50,8 @@ class pix2pix_HD_original:
 
     def discriminator_step(self, discriminator, image_A, image_B, fake_B):
         # fake_B has been detached!!!!
-
-        assert image_A.size() == image_B.size()
+        # note: here, A and B could have different number of channels
+        assert image_A.size()[2:] == image_B.size()[2:]
         loss_D = 0
         n_D = discriminator.n_D
         real_features = discriminator(torch.cat((image_A, image_B), dim=1))
@@ -86,7 +86,8 @@ class pix2pix_HD(pix2pix_HD_original):
         self.recon_weight = weights["reconstruction_loss"]
 
     def generator_step(self, discriminator, image_A, image_B, fake_B):
-        assert image_A.size() == image_B.size()
+        # note: A and B could have different numbers of channels
+        assert image_A.size()[2:] == image_B.size()[2:]
 
         n_D = discriminator.n_D
         real_features = discriminator(torch.cat((image_A, image_B), dim=1))
@@ -114,7 +115,7 @@ class pix2pix_HD(pix2pix_HD_original):
 
 
 class pix2pix_basic:
-    def __init__(self, gan_loss, reconstruction_loss, fm_loss, weights):
+    def __init__(self, gan_loss, reconstruction_loss, weights):
         super().__init__()
         self.gan_loss = parse_config(gan_loss)
         self.recon_loss = parse_config(reconstruction_loss)

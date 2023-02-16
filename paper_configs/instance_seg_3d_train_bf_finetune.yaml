@@ -2,16 +2,13 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/train_brightfield
-  cache_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/cache_bf
-  extra:
-    center_method: "centroid"
+  data_path: ./data/instance3D/train_bf
   dataloader:
     train:
       dataloader_params:
         batch_size: 1
         pin_memory: True
-        num_workers: 4 #4
+        num_workers: 4 
         persistent_workers: True
 
   preprocess:
@@ -32,60 +29,60 @@ data:
         C: 0
         T: 0
     - module_name: monai.transforms
-      func_name: LoadImaged
-      params:
-        keys: ["CL"]
-        dtype: ubyte
-        dimension_order_out: "ZYX"
-        C: 0
-        T: 0
-    - module_name: monai.transforms
-      func_name: LoadImaged
-      params:
-        keys: ["CE"]
-        dtype: bool
-        dimension_order_out: "ZYX"
-        C: 0
-        T: 0
-    - module_name: monai.transforms
       func_name: AddChanneld
       params:
-        keys: ["IM", "GT", "CE", "CL", "CM"]
+        keys: ["IM", "GT", "CM"]
     - module_name: mmv_im2im.preprocessing.transforms
       func_name: norm_around_center
       params:
         keys: ["IM"]
-        min_z: 32  
+        min_z: 32
+    - module_name: monai.transforms
+      func_name: DivisiblePadd
+      params:
+        keys: ["IM", "GT", "CM"]
+        k: 8
     - module_name: monai.transforms
       func_name: EnsureTyped
       params:
-        keys: ["IM", "GT", "CE", "CL", "CM"]
+        keys: ["IM", "GT", "CM"]
   augmentation:
+    - module_name: monai.transforms
+      func_name: RandSpatialCropSamplesd
+      params:
+        keys: ["IM", "GT", "CM"]
+        random_size: False
+        num_samples: 1
+        roi_size: [32, 512, 512]
     - module_name: monai.transforms
       func_name: RandFlipd
       params:
         prob: 0.5
-        keys: ["IM", "GT", "CE", "CL", "CM"]
+        keys: ["IM", "GT", "CM"]
+    # - module_name: monai.transforms
+    #   func_name: RandHistogramShiftd
+    #   params:
+    #     prob: 0.25
+    #     keys: ["IM"]
+    #     num_control_points: [3,6]
    
 model:
   framework: embedseg
-  #model_extra:
-  #  pre-train: /mnt/eternus/users/Jianxu/projects/lightning_logs/version_12/checkpoints/last.ckpt
+  model_extra:
+    center_method: "centroid"
+    pre-train: ./lightning_logs/version_74/checkpoints/last.ckpt  #26 # 50
+    validation_sliding_windows:
+      roi_size: [32, 512, 512]
+      sw_batch_size: 1
+      overlap: 0.6
+      mode: "gaussian"
   net:
-    module_name: mmv_im2im.models.nets.fnet_nn_3d
-    func_name: Net
+    module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+    func_name: UNet3D
     params:
-      depth: 4
-      mult_chan: 32
-      in_channels: 1
-      out_channels: 7
-  #net:
-  #  module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
-  #  func_name: UNet3D
-  #  params:
-  #    in_channel: 1
-  #    n_classes: 7
-  #    down_ratio: 4
+      in_channel: 1
+      n_classes: 7
+      down_ratio: 4
   criterion:
     module_name: mmv_im2im.utils.embedding_loss
     func_name: SpatialEmbLoss_3d
@@ -108,22 +105,24 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.98
+        gamma: 0.99
 trainer:
   verbose: True
   params:
-    gpus: 6
+    gpus: 3
     precision: 16
-    max_epochs: 1
-    #terminate_on_nan: True
+    max_epochs: 1000
     detect_anomaly: True
     gradient_clip_val: 0.8
+    check_val_every_n_epoch: 3
   callbacks:
     - module_name: pytorch_lightning.callbacks.early_stopping
       func_name: EarlyStopping
       params:
         monitor: 'val_loss'
         patience: 50
+        verbose: True
+        mode: 'max'
     - module_name: pytorch_lightning.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
@@ -132,8 +131,4 @@ trainer:
         save_top_k: 2
         save_last: True
         save_weights_only: True 
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
-      func_name: ModelCheckpoint
-      params:
-        monitor: 'val_loss'
-        filename: 'best'
+        mode: 'max'

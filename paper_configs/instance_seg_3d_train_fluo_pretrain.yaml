@@ -2,7 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
-  cache_path: /mnt/eternus/users/Justin/im2im_paper/embedseg_new/cache_3d_fluorescent  
+  data_path: ./data/instance3D/train_fluo
+  cache_path: ./data/instance3D/cache_fluo
   extra:
     center_method: "centroid"
   dataloader:
@@ -14,13 +15,6 @@ data:
         persistent_workers: True
 
   preprocess:
-    #- module_name: monai.transforms
-    #  func_name: LoadImaged
-    #  params:
-    #    keys: ["IM", "GT", "CE", "CL", "CM"]
-    #    dimension_order_out: "ZYX"
-    #    C: 0
-    #    T: 0
     - module_name: monai.transforms
       func_name: LoadImaged
       params:
@@ -80,8 +74,6 @@ data:
    
 model:
   framework: embedseg
-  #model_extra:
-  #  pre-train: /mnt/eternus/users/Jianxu/projects/lightning_logs/version_12/checkpoints/last.ckpt
   net:
     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
     func_name: UNet3D
@@ -118,7 +110,6 @@ trainer:
     gpus: 3
     precision: 16
     max_epochs: 50
-    #terminate_on_nan: True
     detect_anomaly: True
     gradient_clip_val: 0.8
   callbacks:
@@ -127,6 +118,8 @@ trainer:
       params:
         monitor: 'val_loss'
         patience: 50
+        verbose: True
+        mode: 'max'
     - module_name: pytorch_lightning.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
@@ -135,8 +128,4 @@ trainer:
         save_top_k: 2
         save_last: True
         save_weights_only: True 
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
-      func_name: ModelCheckpoint
-      params:
-        monitor: 'val_loss'
-        filename: 'best'
+        mode: 'max'

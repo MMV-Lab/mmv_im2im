@@ -2,11 +2,11 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: /mnt/eternus/project_data/im2im_paper/instance_segmentation_3D/flo_small  
+  data_path: ./data/instance3D/train_fluo
   dataloader:
     train:
       dataloader_params:
-        batch_size: 2
+        batch_size: 1
         pin_memory: True
         num_workers: 4 #4
         persistent_workers: True
@@ -41,8 +41,8 @@ data:
       params:
         keys: ["IM", "GT", "CM"]
         random_size: False
-        num_samples: 4
-        roi_size: [32, 128, 128]
+        num_samples: 1
+        roi_size: [32, 512, 512]
     - module_name: monai.transforms
       func_name: EnsureTyped
       params:
@@ -64,8 +64,7 @@ model:
   framework: embedseg
   model_extra:
     center_method: "centroid"
-  #model_extra:
-  #  pre-train: /mnt/eternus/users/Jianxu/projects/lightning_logs/version_12/checkpoints/last.ckpt
+    pre-train: "./lightning_logs/version_21/checkpoints/last.ckpt"
   net:
     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
     func_name: UNet3D
@@ -95,12 +94,29 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.99
+        gamma: 0.98
 trainer:
   verbose: True
   params:
-    gpus: 1
+    gpus: 3
     precision: 16
-    max_epochs: 500
+    max_epochs: 50
     detect_anomaly: True
     gradient_clip_val: 0.8
+  callbacks:
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 5
+        verbose: True
+        mode: 'max'
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: '{epoch}-{val_loss:.5f}'
+        save_top_k: 2
+        save_last: True
+        save_weights_only: True 
+        mode: 'max'

@@ -1,0 +1,54 @@
+mode: inference
+
+data:
+  inference_input:
+    dir: ./data/synthetic3D/HIST1H2BJ/holdout   #ADD-YOURS
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
+    reader_params:
+      dimension_order_out: "ZYX"
+      C: 0
+      T: 0
+  inference_output:
+    path: ./data/synthetic3D/HIST1H2BJ/pred   #ADD-YOURS
+  preprocess:            
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentiles
+      params:
+        lower: 0
+        upper: 100
+        b_min: -1
+        b_max: 1
+
+
+model:
+  framework: pix2pix
+  net:
+    generator:
+      module_name: mmv_im2im.models.nets.fnet_nn_3d
+      func_name: Net
+      params:
+        depth: 4
+        mult_chan: 32
+        in_channels: 1
+        out_channels: 1
+    discriminator:
+      type: predefined_multiscale
+      params:
+        num_discriminator: 2
+        spatial_dims: 3
+        in_channels: 2
+        n_layers: 3
+        nf: 64
+        norm_layer: "INSTANCE"
+  checkpoint: ./lightning_logs/version_54/checkpoints/last.ckpt   #ADD-YOURS
+  model_extra:
+    sliding_window_params:
+      roi_size: [32, 256, 256]
+      sw_batch_size: 2
+      overlap: 0.2
+      mode: "gaussian"
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 16

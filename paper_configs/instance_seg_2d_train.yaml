@@ -2,8 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: "/PATH/TO/DATA/"   #ADD-YOURS
-  cache_path: "/PATH/TO/TEMP/FOLDER/FOR/CROPPED/DATA/"   #ADD-YOURS
+  data_path: "./data/instance2D/train"
+  cache_path: "./data/instance2D/cache"
   extra:
     center_method: "medoid"
   dataloader:
@@ -18,7 +18,7 @@ data:
       func_name: LoadImaged
       params:
         keys: ["IM"]
-        dtype: float
+        dtype: float32 # set as "float" if not using half-precision training
         dimension_order_out: "YX"
         C: 0
         T: 0
@@ -87,6 +87,12 @@ model:
     params:
       num_classes: [4, 1]
       input_channels: 1
+  # model_extra:
+  #   validation_sliding_windows:
+  #     roi_size: [512, 512]
+  #     sw_batch_size: 1
+  #     overlap: 0.6
+  #     mode: "gaussian"
   criterion:
     module_name: mmv_im2im.utils.embedding_loss
     func_name: SpatialEmbLoss_2d
@@ -116,3 +122,21 @@ trainer:
     max_epochs: 10000
     terminate_on_nan: True
     num_sanity_val_steps: 0
+  callbacks:
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 50
+        verbose: True
+        mode: "max"
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: '{epoch}-{train_loss:.5f}'
+        save_top_k: 2
+        save_last: True
+        save_weights_only: True 
+        mode: "max"
+

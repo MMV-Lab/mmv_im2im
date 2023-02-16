@@ -2,13 +2,13 @@ mode: inference
 
 data:
   inference_input:
-    dir: "/PATH/TO/DATA/"   #ADD-YOURS
+    dir: ./data/unsupervise3D/TOMM20/holdout  #ADD-YOURS
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: "/OUTPUT/PATH/"   #ADD-YOURS
+    path: ./data/unsupervise3D/TOMM20/pred   #ADD-YOURS
 
   preprocess:
     - module_name: monai.transforms
@@ -19,11 +19,7 @@ data:
         b_min: -1
         b_max: 1
     # - module_name: monai.transforms
-    #   func_name: NormalizeIntensity
-    # - module_name: mmv_im2im.preprocessing.transforms
-    #   func_name: norm_around_center
-    #   params:
-    #     min_z: 32                 
+    #   func_name: NormalizeIntensity                
   postprocess:
     - module_name: mmv_im2im.postprocessing.basic_collection
       func_name: extract_segmentation
@@ -51,7 +47,7 @@ model:
         n_layers: 4
         nf: 64
         norm_layer: "INSTANCE"  
-  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt" #ADD-YOURS
+  checkpoint: ./lightning_logs/version_34/checkpoints/best.ckpt  #ADD-YOURS
   model_extra:
     inference_direction: "AtoB"   # IM => GT. For GT => IM set inference_direction: "BtoA"
     sliding_window_params:

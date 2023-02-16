@@ -33,7 +33,6 @@ def center_crop(img, target_shape):
 
 
 def parse_monai_ops(trans_func: List[Dict]):
-
     # Here, we will use the Compose function in MONAI to merge
     # all transformations. If any trnasformation not from MONAI,
     # a MONAI Lambda function will be used to wrap around it.
@@ -72,7 +71,6 @@ def parse_monai_ops(trans_func: List[Dict]):
 
 
 def parse_monai_ops_vanilla(trans_func: List[Dict]):
-
     # Here, we will use the Compose function in MONAI to merge
     # all transformations. If any trnasformation not from MONAI,
     # a MONAI Lambda function will be used to wrap around it.

@@ -63,7 +63,6 @@ class non_bottleneck_1d(nn.Module):
         self.dropout = nn.Dropout2d(dropprob)
 
     def forward(self, input):
-
         output = self.conv3x1_1(input)
         output = F.relu(output)
         output = self.conv1x3_1(output)

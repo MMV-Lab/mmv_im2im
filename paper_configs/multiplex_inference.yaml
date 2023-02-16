@@ -2,37 +2,43 @@ mode: inference
 
 data:
   inference_input:
-    dir: "/PATH/TO/TEST/DATA/"  #ADD-YOURS
+    dir: ./data/multiplex/test/trans2  #ADD-YOURS
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
-      dimension_order_out: "SYX"  # S is for RGB images
+      dimension_order_out: "SYX"
       C: 0
+      T: 0
       Z: 0
   inference_output:
-    path: "/OUTPUT/PATH/"       #ADD-YOURS
+    path: ./data/multiplex/test/pred2   #ADD-YOURS
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: NormalizeIntensity       # Applying the same normalization as for IM in cyclegan_3d_train.yaml
+      params:
+        channel_wise: True
 
 model:
   framework: pix2pix
   net:
     generator:
-      type: predefined_resnet
+      type: predefined_unet
       params:
         spatial_dims: 2
         in_channels: 3
-        out_channels: 3
-        n_down_blocks: 4
-        n_res_blocks: 9
-        nf: 64
-        norm_layer: "BATCH"
+        out_channels: 1
+        channels: [64, 128, 256, 512, 512]
+        strides: [2, 2, 2, 2]
     discriminator:
       type: predefined_multiscale
       params:
         num_discriminator: 2
         spatial_dims: 2
-        in_channels: 6
+        in_channels: 4
         n_layers: 4
         nf: 64
-        norm_layer: "INSTANCE"
-  checkpoint:  "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"  #ADD-YOURS
+        norm_layer: "INSTANCE"  
+  checkpoint: ./lightning_logs/version_103/checkpoints/last.ckpt  #ADD-YOURS
 trainer:
   params:
     gpus: 1

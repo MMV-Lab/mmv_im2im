@@ -30,7 +30,6 @@ class ProjectTrainer(object):
     """
 
     def __init__(self, cfg):
-
         # seed everything before start
         pl.seed_everything(123, workers=True)
 

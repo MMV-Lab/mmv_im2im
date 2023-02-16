@@ -1,17 +1,19 @@
 """
 This module provides lighting module for cycleGAN
 """
-import os
 import torch
 import pytorch_lightning as pl
 from pathlib import Path
+import numpy as np
 from mmv_im2im.utils.misc import parse_config, parse_config_func
 from mmv_im2im.utils.gan_utils import ReplayBuffer
 from mmv_im2im.models.nets.gans import define_generator, define_discriminator
+from mmv_im2im.utils.model_utils import init_weights
 from typing import Dict
 from collections import OrderedDict
 import itertools
 from tifffile import imsave
+from skimage.io import imsave as save_rgb
 
 
 class Model(pl.LightningModule):
@@ -31,6 +33,12 @@ class Model(pl.LightningModule):
             model_info_xx.net["discriminator"]
         )
         if train:
+            # init weight
+            init_weights(self.generator_model_image_AtoB, init_type="kaiming")
+            init_weights(self.generator_model_image_BtoA, init_type="kaiming")
+            init_weights(self.discriminator_model_image_A, init_type="kaiming")
+            init_weights(self.discriminator_model_image_B, init_type="kaiming")
+
             # buffer for fake images
             if "fake_pool_size" in model_info_xx.criterion:
                 max_fake_pool = model_info_xx.criterion["fake_pool_size"]
@@ -53,7 +61,7 @@ class Model(pl.LightningModule):
             self.optimizer_info = model_info_xx.optimizer
             self.scheduler_info = model_info_xx.scheduler
         else:
-            self.direction = model_info_xx.extra["inference_direction"]
+            self.direction = model_info_xx.model_extra["inference_direction"]
 
     def forward(self, x):
         if self.direction == "AtoB":
@@ -93,6 +101,40 @@ class Model(pl.LightningModule):
                 discriminator_scheduler,
             ],
         )
+
+    def save_cyclegan_output(
+        self, image_A, image_B, fake_A_from_B, fake_B_from_A, current_stage
+    ):
+        # check if the log path exists, if not create one
+        log_dir = Path(self.trainer.log_dir)
+        log_dir.mkdir(parents=True, exist_ok=True)
+
+        current_epoch = self.current_epoch
+
+        if len(fake_A_from_B.shape) == 3 and fake_A_from_B.shape[0] == 3:
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_fake_A.png"
+            save_rgb(out_fn, np.moveaxis(fake_A_from_B, 0, -1))
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_fake_B.png"
+            save_rgb(out_fn, np.moveaxis(fake_B_from_A, 0, -1))
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_B.png"
+            save_rgb(out_fn, np.moveaxis(image_B, 0, -1))
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_A.png"
+            save_rgb(out_fn, np.moveaxis(image_A, 0, -1))
+        else:
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_fake_A.tiff"
+            imsave(out_fn, fake_A_from_B)
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_fake_B.tiff"
+            imsave(out_fn, fake_B_from_A)
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_B.tiff"
+            imsave(out_fn, image_B)
+
+            out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_A.tiff"
+            imsave(out_fn, image_A)
 
     # only for test or validation
     def run_step(self, batch, batch_idx):
@@ -154,6 +196,15 @@ class Model(pl.LightningModule):
         )
 
         output = OrderedDict({"generator_loss": G_loss, "discriminator_loss": D_loss})
+
+        if self.verbose and batch_idx == 0:
+            self.save_cyclegan_output(
+                image_A[0].detach().cpu().numpy(),
+                image_B[0].detach().cpu().numpy(),
+                fake_A_from_B[0].detach().cpu().numpy(),
+                fake_B_from_A[0].detach().cpu().numpy(),
+                "val",
+            )
         return output
 
     def training_step(self, batch, batch_idx, optimizer_idx):
@@ -213,40 +264,13 @@ class Model(pl.LightningModule):
             self.log("Generator Loss", tqdm_dict["g_loss"])
 
             if self.verbose and batch_idx == 0:
-                # check if the log path exists, if not create one
-                Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
-
-                fake_images_A = fake_A_from_B.detach()
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_fake_A.tiff"
+                self.save_cyclegan_output(
+                    image_A[0].detach().cpu().numpy(),
+                    image_B[0].detach().cpu().numpy(),
+                    fake_A_from_B[0].detach().cpu().numpy(),
+                    fake_B_from_A[0].detach().cpu().numpy(),
+                    "train",
                 )
-                imsave(out_fn, fake_images_A[0].detach().cpu().numpy())
-                fake_images_B = fake_B_from_A.detach()
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_fake_B.tiff"
-                )
-                imsave(out_fn, fake_images_B[0].detach().cpu().numpy())
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_real_B.tiff"
-                )
-                imsave(out_fn, image_B[0].detach().cpu().numpy())
-                out_fn = (
-                    self.trainer.log_dir
-                    + os.sep
-                    + str(self.current_epoch)
-                    + "_real_A.tiff"
-                )
-                imsave(out_fn, image_A[0].detach().cpu().numpy())
-
             return output
 
         elif optimizer_idx == 1:

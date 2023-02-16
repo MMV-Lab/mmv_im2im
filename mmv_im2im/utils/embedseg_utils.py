@@ -313,9 +313,7 @@ def prepare_embedseg_cache(
 
             if im_crop.shape[0] == 1:
                 OmeTiffWriter.save(
-                    im_crop[
-                        0,
-                    ],
+                    im_crop[0,],
                     cache_path / f"{fn_base}_{j:04d}_IM.tiff",
                     dim_order=dim_order,
                 )

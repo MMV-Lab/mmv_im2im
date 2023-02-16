@@ -2,13 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: "/PATH/TO/DATA/" 
+    dir: ./data/modalityTransfer/test/Microtubule
+    data_type: tif
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: "/OUTPUT/PATH/"    
+    path: ./data/modalityTransfer/test/Microtubule/pred    
   preprocess:      
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -33,9 +34,9 @@ model:
     func_name: UNet3D
     params:
       in_channel: 1
-      n_classes: 1
+      n_classes: 1 # out_channels
       down_ratio: 2
-  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"
+  checkpoint: ./lightning_logs/version_68/checkpoints/last.ckpt
   model_extra:
     sliding_window_params:
       roi_size: [6, 512, 512]   # Has to be the same as in RandSpatialCropd in modality_transfer_3d_train.yaml 

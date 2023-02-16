@@ -169,7 +169,6 @@ def parse_adaptor(
     config: Optional[Union[Path, str]] = None,
     args: Optional[Sequence[str]] = None,
 ) -> T:
-
     parser = ArgumentParser(config_class=config_class, config=config)
     return parser.parse_args(args)
 

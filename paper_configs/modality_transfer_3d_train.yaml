@@ -2,11 +2,11 @@ mode: train
 
 data:
   category: "pair"
-  data_path: "/PATH/TO/DATA/"      
+  data_path: ./data/modalityTransfer/train/Microtubule
   dataloader:
     train:
       dataloader_params:
-        batch_size: 2
+        batch_size: 4
         pin_memory: True
         num_workers: 4
 
@@ -30,15 +30,6 @@ data:
         upper: 99.99
         b_min: -1
         b_max: 1
-    # - module_name: mmv_im2im.preprocessing.transforms
-    #   func_name: norm_around_center
-    #   params:
-    #     keys: ["IM","GT"]
-    #     min_z: 32  
-    # - module_name: monai.transforms
-    #   func_name: NormalizeIntensityd
-    #   params:
-    #     keys: ["IM", "GT"]               
     - module_name: monai.transforms
       func_name: RandSpatialCropSamplesd
       params:
@@ -58,6 +49,64 @@ data:
         keys: ["IM", "GT"]
 
 model:
+  # framework: pix2pix
+  # net:
+  #   generator:
+  #     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
+  #     func_name: UNet3D
+  #     params:
+  #       in_channel: 1
+  #       n_classes: 1 # out_channels
+  #       down_ratio: 2
+  #   discriminator:
+  #     type: predefined_basic
+  #     params:
+  #       spatial_dims: 3
+  #       in_channels: 2
+  #       n_layers: 1
+  #       nf: 128
+  #       norm_layer: "INSTANCE"
+  # criterion:
+  #   loss_type: pix2pix_basic  # pix2pix_HD_original | pix2pix_HD  |  pix2pix_basic
+  #   gan_loss:
+  #     module_name: torch.nn
+  #     func_name: BCEWithLogitsLoss  # MSELoss
+  #     params:
+  #       reduction: 'mean'
+  #   reconstruction_loss:
+  #     module_name: torch.nn
+  #     func_name: MSELoss
+  #     params:
+  #       reduction: 'mean'
+  #   weights:
+  #     gan_loss: 1
+  #     reconstruction_loss: 10
+  # optimizer:
+  #   generator:
+  #     module_name: torch.optim
+  #     func_name: Adam  # AdamW
+  #     params:
+  #       lr: 0.00002 # larger, e.g. 0.002, if train from scratch
+  #       betas: [0.5, 0.999]
+  #       weight_decay: 0.0005
+  #   discriminator:
+  #     module_name: torch.optim
+  #     func_name: Adam  # AdamW
+  #     params:
+  #       lr: 0.0002
+  #       betas: [0.5, 0.999]
+  #       weight_decay: 0.0005
+  # scheduler:
+  #   generator:
+  #     module_name: torch.optim.lr_scheduler
+  #     func_name: ExponentialLR
+  #     params:
+  #       gamma: 0.999
+  #   discriminator:
+  #     module_name: torch.optim.lr_scheduler
+  #     func_name: ExponentialLR
+  #     params:
+  #       gamma: 0.999
   framework: FCN
   net:
     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
@@ -81,7 +130,7 @@ model:
     module_name: torch.optim.lr_scheduler
     func_name: ExponentialLR
     params:
-      gamma: 0.98
+      gamma: 0.99
 trainer:
   verbose: True
   params:
@@ -90,13 +139,17 @@ trainer:
     max_epochs: 10000
     terminate_on_nan: True
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_loss'
-        patience: 50 
+    # - module_name: pytorch_lightning.callbacks.early_stopping
+    #   func_name: EarlyStopping
+    #   params:
+    #     monitor: 'val_loss_discriminator'
+    #     patience: 50 
+    #     verbose: True
     - module_name: pytorch_lightning.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         monitor: 'val_loss'
-        filename: 'best'
+        filename: '{epoch}-{val_loss:.5f}'
+        save_top_k: 2
+        save_last: True
+        save_weights_only: True 

@@ -2,14 +2,15 @@ mode: inference
 
 data:
   inference_input:
-    dir:  "/PATH/TO/DATA/"   #ADD-YOURS
+    dir:  "./data/instance2D/test"   #ADD-YOURS
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "YX"
       C: 0
       T: 0
       Z: 0
   inference_output:
-    path:  "/OUTPUT/PATH/"   #ADD-YOURS
+    path:  "./data/instance2D/pred"   #ADD-YOURS
   preprocess:      
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -45,7 +46,7 @@ model:
     params:
       num_classes: [4, 1]
       input_channels: 1
-  checkpoint: "/PATH/TO/LOGS/FOLDER/lightning_logs/version_0/checkpoints/best.ckpt"   #ADD-YOURS
+  checkpoint: ./lightning_logs/version_17/checkpoints/best.ckpt   #ADD-YOURS
 trainer:
   params:
     gpus: 1

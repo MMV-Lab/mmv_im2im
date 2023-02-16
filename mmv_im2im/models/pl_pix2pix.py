@@ -29,6 +29,7 @@ class Model(pl.LightningModule):
             # initialize model weights
             if gen_init is not None:
                 if Path(gen_init).is_file:
+                    print(f"loading pre-train from {gen_init}")
                     pre_train = torch.load(Path(gen_init))
                     try:
                         self.generator.load_state_dict(pre_train["state_dict"])
@@ -92,7 +93,6 @@ class Model(pl.LightningModule):
         )
 
     def save_pix2pix_output(self, image_A, image_B, fake_image, current_stage):
-
         # check if the log path exists, if not create one
         log_dir = Path(self.trainer.log_dir)
         log_dir.mkdir(parents=True, exist_ok=True)
@@ -119,7 +119,6 @@ class Model(pl.LightningModule):
             imsave(out_fn, image_A)
 
     def training_step(self, batch, batch_idx, optimizer_idx):
-
         # imageB : real image
         # imageA : condition image
         # conditional GAN refers generating a realistic image (image B as ground truth),

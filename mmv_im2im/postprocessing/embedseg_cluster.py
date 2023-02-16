@@ -9,7 +9,6 @@ def degrid(meter, grid_size, pixel_size):
 
 class Cluster_2d:
     def __init__(self, grid_y, grid_x, pixel_y, pixel_x):
-
         xm = torch.linspace(0, pixel_x, grid_x).view(1, 1, -1).expand(1, grid_y, grid_x)
         ym = torch.linspace(0, pixel_y, grid_y).view(1, -1, 1).expand(1, grid_y, grid_x)
         xym = torch.cat((xm, ym), 0)
@@ -71,7 +70,6 @@ class Cluster_2d:
         min_unclustered_sum=0,
         min_object_size=5,
     ):
-
         height, width = prediction.size(1), prediction.size(2)
         xym_s = self.xym[:, 0:height, 0:width]
 
@@ -87,7 +85,6 @@ class Cluster_2d:
         mask = seed_map > 0.5
 
         if mask.sum() > min_mask_sum:
-
             spatial_emb_masked = spatial_emb[mask.expand_as(spatial_emb)].view(
                 n_sigma, -1
             )
@@ -161,7 +158,6 @@ class Cluster_3d:
     def __init__(
         self, grid_z, grid_y, grid_x, pixel_z, pixel_y, pixel_x, one_hot=False
     ):
-
         xm = (
             torch.linspace(0, pixel_x, grid_x)
             .view(1, 1, 1, -1)
@@ -194,7 +190,6 @@ class Cluster_3d:
         instance,
         n_sigma=1,
     ):
-
         depth, height, width = (
             prediction.size(1),
             prediction.size(2),
@@ -239,7 +234,6 @@ class Cluster_3d:
         min_unclustered_sum=0,
         min_object_size=36,
     ):
-
         depth, height, width = (
             prediction.size(1),
             prediction.size(2),

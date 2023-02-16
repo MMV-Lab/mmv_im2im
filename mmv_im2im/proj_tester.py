@@ -45,7 +45,6 @@ class ProjectTester(object):
         self.pre_process = None
 
     def process_one_image(self, img, out_fn):
-
         # TODO: adjust/double_check for MONAI
         # record the input dimension
         # original_size = x.size()
@@ -130,19 +129,23 @@ class ProjectTester(object):
             if len(pred.shape) == 2:
                 OmeTiffWriter.save(pred, out_fn, dim_order="YX")
             elif len(pred.shape) == 3:
+                # 3D output, for 2D data
                 if self.spatial_dims == 2:
+                    # save as RGB or multi-channel 2D
                     if pred.shape[0] == 3:
                         if out_fn.suffix != ".png":
                             out_fn = out_fn.with_suffix(".png")
                         save_rgb(out_fn, np.moveaxis(pred, 0, -1))
                     else:
                         OmeTiffWriter.save(pred, out_fn, dim_order="CYX")
-                else:
+                elif self.spatial_dims == 3:
                     OmeTiffWriter.save(pred, out_fn, dim_order="ZYX")
+                else:
+                    raise ValueError("Invalid spatial dimension of pred")
             elif len(pred.shape) == 4:
                 if self.spatial_dims == 3:
                     OmeTiffWriter.save(pred, out_fn, dim_order="CZYX")
-                else:
+                elif self.spatial_dims == 2:
                     if pred.shape[0] == 1:
                         if pred.shape[1] == 1:
                             OmeTiffWriter.save(pred[0, 0], out_fn, dim_order="YX")
@@ -152,23 +155,23 @@ class ProjectTester(object):
                             save_rgb(
                                 out_fn,
                                 np.moveaxis(
-                                    pred[
-                                        0,
-                                    ],
+                                    pred[0,],
                                     0,
                                     -1,
                                 ),
                             )
+                        else:
+                            OmeTiffWriter.save(
+                                pred[0,],
+                                out_fn,
+                                dim_order="CYX",
+                            )
                     else:
-                        raise ValueError(
-                            "4D output for 2d problem with non-trivil or RGB dims"
-                        )
+                        raise ValueError("invalid 4D output for 2d data")
             elif len(pred.shape) == 5:
-                assert pred.shape[0] == 1, "find non-trivial batch dimension"
+                assert pred.shape[0] == 1, "error, found non-trivial batch dimension"
                 OmeTiffWriter.save(
-                    pred[
-                        0,
-                    ],
+                    pred[0,],
                     out_fn,
                     dim_order="CZYX",
                 )
@@ -176,7 +179,6 @@ class ProjectTester(object):
                 raise ValueError("error in prediction output shape")
 
     def run_inference(self):
-
         # set up model
         model_category = self.model_cfg.framework
         model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
@@ -221,6 +223,7 @@ class ProjectTester(object):
             suffix = self.data_cfg.inference_output.suffix
 
             timelapse_data = 0
+            # if timelapse ...
             if (
                 "T"
                 in self.data_cfg.inference_input.reader_params["dimension_order_out"]
@@ -280,7 +283,6 @@ class ProjectTester(object):
                 )
 
                 # prepare output filename
-
                 out_fn = (
                     Path(self.data_cfg.inference_output.path)
                     / f"{fn_core}_{suffix}.tiff"
