@@ -245,7 +245,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pre_process</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="ProjectTester.process_one_image"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.process_one_image">[docs]</a>    <span class="k">def</span> <span class="nf">process_one_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">):</span>
-
         <span class="c1"># TODO: adjust/double_check for MONAI</span>
         <span class="c1"># record the input dimension</span>
         <span class="c1"># original_size = x.size()</span>
@@ -330,19 +329,23 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="c1"># 3D output, for 2D data</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="c1"># save as RGB or multi-channel 2D</span>
                     <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">out_fn</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s2">&quot;.png&quot;</span><span class="p">:</span>
                             <span class="n">out_fn</span> <span class="o">=</span> <span class="n">out_fn</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span>
                         <span class="n">save_rgb</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CYX&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;ZYX&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid spatial dimension of pred&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CZYX&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">spatial_dims</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                             <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
@@ -352,23 +355,23 @@
                             <span class="n">save_rgb</span><span class="p">(</span>
                                 <span class="n">out_fn</span><span class="p">,</span>
                                 <span class="n">np</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span>
-                                    <span class="n">pred</span><span class="p">[</span>
-                                        <span class="mi">0</span><span class="p">,</span>
-                                    <span class="p">],</span>
+                                    <span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,],</span>
                                     <span class="mi">0</span><span class="p">,</span>
                                     <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
                                 <span class="p">),</span>
                             <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                                <span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,],</span>
+                                <span class="n">out_fn</span><span class="p">,</span>
+                                <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CYX&quot;</span><span class="p">,</span>
+                            <span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;4D output for 2d problem with non-trivil or RGB dims&quot;</span>
-                        <span class="p">)</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid 4D output for 2d data&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;find non-trivial batch dimension&quot;</span>
+                <span class="k">assert</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;error, found non-trivial batch dimension&quot;</span>
                 <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-                    <span class="n">pred</span><span class="p">[</span>
-                        <span class="mi">0</span><span class="p">,</span>
-                    <span class="p">],</span>
+                    <span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">,],</span>
                     <span class="n">out_fn</span><span class="p">,</span>
                     <span class="n">dim_order</span><span class="o">=</span><span class="s2">&quot;CZYX&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
@@ -376,7 +379,6 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;error in prediction output shape&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProjectTester.run_inference"><a class="viewcode-back" href="../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester.run_inference">[docs]</a>    <span class="k">def</span> <span class="nf">run_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="c1"># set up model</span>
         <span class="n">model_category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_cfg</span><span class="o">.</span><span class="n">framework</span>
         <span class="n">model_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mmv_im2im.models.pl_</span><span class="si">{</span><span class="n">model_category</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -421,6 +423,7 @@
             <span class="n">suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_output</span><span class="o">.</span><span class="n">suffix</span>
 
             <span class="n">timelapse_data</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="c1"># if timelapse ...</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="s2">&quot;T&quot;</span>
                 <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_input</span><span class="o">.</span><span class="n">reader_params</span><span class="p">[</span><span class="s2">&quot;dimension_order_out&quot;</span><span class="p">]</span>
@@ -480,7 +483,6 @@
                 <span class="p">)</span>
 
                 <span class="c1"># prepare output filename</span>
-
                 <span class="n">out_fn</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_cfg</span><span class="o">.</span><span class="n">inference_output</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
                     <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_core</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.tiff&quot;</span>

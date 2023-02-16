@@ -543,11 +543,6 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 <span class="sig-name descname"><span class="pre">run_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_stage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_FCN.html#Model.run_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model.run_step" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="mmv_im2im.models.pl_FCN.Model.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model.training" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_FCN.Model.training_epoch_end">
 <span class="sig-name descname"><span class="pre">training_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_step_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_FCN.html#Model.training_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_FCN.Model.training_epoch_end" title="Permalink to this definition">¶</a></dt>
@@ -951,9 +946,9 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 <span class="sig-name descname"><span class="pre">run_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_cyclegan.html#Model.run_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_cyclegan.Model.run_step" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="mmv_im2im.models.pl_cyclegan.Model.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.pl_cyclegan.Model.training" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="mmv_im2im.models.pl_cyclegan.Model.save_cyclegan_output">
+<span class="sig-name descname"><span class="pre">save_cyclegan_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_A_from_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_B_from_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_stage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_cyclegan.html#Model.save_cyclegan_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_cyclegan.Model.save_cyclegan_output" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1358,11 +1353,6 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 <span class="sig-name descname"><span class="pre">run_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_stage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_embedseg.html#Model.run_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model.run_step" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="mmv_im2im.models.pl_embedseg.Model.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model.training" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_embedseg.Model.training_epoch_end">
 <span class="sig-name descname"><span class="pre">training_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">training_step_outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_embedseg.html#Model.training_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_embedseg.Model.training_epoch_end" title="Permalink to this definition">¶</a></dt>
@@ -1763,11 +1753,6 @@ override the <code class="xref py py-meth docutils literal notranslate"><span cl
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.models.pl_pix2pix.Model.save_pix2pix_output">
 <span class="sig-name descname"><span class="pre">save_pix2pix_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_stage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/models/pl_pix2pix.html#Model.save_pix2pix_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.models.pl_pix2pix.Model.save_pix2pix_output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="mmv_im2im.models.pl_pix2pix.Model.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#mmv_im2im.models.pl_pix2pix.Model.training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

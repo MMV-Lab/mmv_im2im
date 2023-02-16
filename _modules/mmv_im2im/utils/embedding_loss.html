@@ -258,7 +258,6 @@
         <span class="n">w_var</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">w_seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">):</span>
-
         <span class="c1"># instances B 1 Z Y X</span>
         <span class="n">batch_size</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">prediction</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
@@ -315,7 +314,6 @@
                     <span class="n">seed_loss</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">seed_map</span><span class="p">[</span><span class="n">bg_mask</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
             <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">instance_ids</span><span class="p">:</span>
-
                 <span class="c1"># use the original instance without costmap adjustment to fetch</span>
                 <span class="c1"># instance mask, since the costmap may partial cut some instances</span>
                 <span class="c1"># and alter the ground truth only use the costmap to adjust the</span>
@@ -430,7 +428,6 @@
         <span class="n">w_var</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
         <span class="n">w_seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="p">):</span>
-
         <span class="c1"># instances B C Y X</span>
         <span class="n">batch_size</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">prediction</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
@@ -449,7 +446,6 @@
         <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
-
             <span class="n">spatial_emb</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">prediction</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="n">xym_s</span>  <span class="c1"># 2 x h x w #TODO</span>
             <span class="n">sigma</span> <span class="o">=</span> <span class="n">prediction</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="mi">2</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sigma</span><span class="p">]</span>  <span class="c1"># n_sigma x h x w</span>
             <span class="n">seed_map</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span>

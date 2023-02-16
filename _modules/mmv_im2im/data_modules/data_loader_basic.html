@@ -212,8 +212,6 @@
 <span class="c1"># can be optional. Note that image_target could be masks</span>
 <span class="c1"># (e.g. for segmentation) or images (e.g. for labelfree)</span>
 <span class="c1">########################################################</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">random_split</span>
 <span class="kn">from</span> <span class="nn">monai.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
@@ -228,15 +226,9 @@
 
 
 <div class="viewcode-block" id="Im2ImDataModule"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule">[docs]</a><span class="k">class</span> <span class="nc">Im2ImDataModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_cfg</span><span class="p">,</span> <span class="n">cache_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_cfg</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">cache_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">data_path</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># use the cache path as the directory to load data</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">data_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">category</span>
 
         <span class="c1"># train/val split</span>
@@ -267,6 +259,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_info</span> <span class="o">=</span> <span class="n">data_cfg</span><span class="o">.</span><span class="n">dataloader</span>
 
 <div class="viewcode-block" id="Im2ImDataModule.prepare_data"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.prepare_data">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Im2ImDataModule.setup"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">dataset_list</span> <span class="o">=</span> <span class="n">generate_dataset_dict_monai</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="s2">&quot;unpair&quot;</span><span class="p">:</span>
@@ -280,9 +275,7 @@
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">shuffled_ds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shuffled_dataset_list</span><span class="p">):</span>
                 <span class="n">dataset_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shuffled_ds</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">dataset_list</span></div>
-
-<div class="viewcode-block" id="Im2ImDataModule.setup"><a class="viewcode-back" href="../../../mmv_im2im.data_modules.html#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">dataset_list</span>
 
         <span class="k">if</span> <span class="s2">&quot;train&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="ow">and</span> <span class="s2">&quot;val&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
             <span class="n">train_subjects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span>

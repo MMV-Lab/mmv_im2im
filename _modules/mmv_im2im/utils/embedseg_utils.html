@@ -513,9 +513,7 @@
 
             <span class="k">if</span> <span class="n">im_crop</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-                    <span class="n">im_crop</span><span class="p">[</span>
-                        <span class="mi">0</span><span class="p">,</span>
-                    <span class="p">],</span>
+                    <span class="n">im_crop</span><span class="p">[</span><span class="mi">0</span><span class="p">,],</span>
                     <span class="n">cache_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fn_base</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">04d</span><span class="si">}</span><span class="s2">_IM.tiff&quot;</span><span class="p">,</span>
                     <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
                 <span class="p">)</span>

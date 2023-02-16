@@ -370,7 +370,6 @@
 
 
 <div class="viewcode-block" id="define_generator"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.gans.define_generator">[docs]</a><span class="k">def</span> <span class="nf">define_generator</span><span class="p">(</span><span class="n">model_info</span><span class="p">):</span>
-
     <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">model_info</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;predefined_resnet&quot;</span><span class="p">:</span>
             <span class="n">net</span> <span class="o">=</span> <span class="n">preset_generator_resent</span><span class="p">(</span><span class="o">**</span><span class="n">model_info</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">])</span>

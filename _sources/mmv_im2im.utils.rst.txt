@@ -4,6 +4,14 @@ mmv\_im2im.utils package
 Submodules
 ----------
 
+mmv\_im2im.utils.basic\_losses module
+-------------------------------------
+
+.. automodule:: mmv_im2im.utils.basic_losses
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mmv\_im2im.utils.embedding\_loss module
 ---------------------------------------
 
@@ -52,6 +60,14 @@ mmv\_im2im.utils.lovasz\_losses module
    :undoc-members:
    :show-inheritance:
 
+mmv\_im2im.utils.metrics module
+-------------------------------
+
+.. automodule:: mmv_im2im.utils.metrics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mmv\_im2im.utils.misc module
 ----------------------------
 
@@ -64,14 +80,6 @@ mmv\_im2im.utils.model\_utils module
 ------------------------------------
 
 .. automodule:: mmv_im2im.utils.model_utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-mmv\_im2im.utils.piecewise\_inference module
---------------------------------------------
-
-.. automodule:: mmv_im2im.utils.piecewise_inference
    :members:
    :undoc-members:
    :show-inheritance:

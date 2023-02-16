@@ -250,8 +250,8 @@
 
 <div class="viewcode-block" id="pix2pix_HD_original.discriminator_step"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD_original.discriminator_step">[docs]</a>    <span class="k">def</span> <span class="nf">discriminator_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">,</span> <span class="n">image_A</span><span class="p">,</span> <span class="n">image_B</span><span class="p">,</span> <span class="n">fake_B</span><span class="p">):</span>
         <span class="c1"># fake_B has been detached!!!!</span>
-
-        <span class="k">assert</span> <span class="n">image_A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">image_B</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="c1"># note: here, A and B could have different number of channels</span>
+        <span class="k">assert</span> <span class="n">image_A</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="n">image_B</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span>
         <span class="n">loss_D</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">n_D</span> <span class="o">=</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">n_D</span>
         <span class="n">real_features</span> <span class="o">=</span> <span class="n">discriminator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">image_A</span><span class="p">,</span> <span class="n">image_B</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
@@ -286,7 +286,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">recon_weight</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="s2">&quot;reconstruction_loss&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="pix2pix_HD.generator_step"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_HD.generator_step">[docs]</a>    <span class="k">def</span> <span class="nf">generator_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">,</span> <span class="n">image_A</span><span class="p">,</span> <span class="n">image_B</span><span class="p">,</span> <span class="n">fake_B</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">image_A</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="n">image_B</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="c1"># note: A and B could have different numbers of channels</span>
+        <span class="k">assert</span> <span class="n">image_A</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="n">image_B</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">2</span><span class="p">:]</span>
 
         <span class="n">n_D</span> <span class="o">=</span> <span class="n">discriminator</span><span class="o">.</span><span class="n">n_D</span>
         <span class="n">real_features</span> <span class="o">=</span> <span class="n">discriminator</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">image_A</span><span class="p">,</span> <span class="n">image_B</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
@@ -314,7 +315,7 @@
 
 
 <div class="viewcode-block" id="pix2pix_basic"><a class="viewcode-back" href="../../../mmv_im2im.utils.html#mmv_im2im.utils.gan_losses.pix2pix_basic">[docs]</a><span class="k">class</span> <span class="nc">pix2pix_basic</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gan_loss</span><span class="p">,</span> <span class="n">reconstruction_loss</span><span class="p">,</span> <span class="n">fm_loss</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gan_loss</span><span class="p">,</span> <span class="n">reconstruction_loss</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gan_loss</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">gan_loss</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recon_loss</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">reconstruction_loss</span><span class="p">)</span>

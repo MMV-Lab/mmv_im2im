@@ -204,8 +204,6 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">monai</span>
-<span class="kn">from</span> <span class="nn">monai.losses</span> <span class="kn">import</span> <span class="n">MaskedLoss</span>
 <span class="kn">from</span> <span class="nn">aicsimageio.writers</span> <span class="kn">import</span> <span class="n">OmeTiffWriter</span>
 
 <span class="kn">from</span> <span class="nn">mmv_im2im.utils.misc</span> <span class="kn">import</span> <span class="p">(</span>
@@ -229,16 +227,14 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span> <span class="o">=</span> <span class="n">model_info_xx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">masked_loss</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weighted_loss</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seg_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;use_costmap&quot;</span> <span class="ow">in</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span>
                 <span class="s2">&quot;params&quot;</span>
             <span class="p">]</span> <span class="ow">and</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;use_costmap&quot;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">MaskedLoss</span><span class="p">(</span><span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">masked_loss</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weighted_loss</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="p">(</span>
@@ -271,8 +267,8 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;GT&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="s2">&quot;CM&quot;</span> <span class="ow">in</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">assert</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">masked_loss</span>
-            <span class="p">),</span> <span class="s2">&quot;Costmap is detected in training data, but not set up in criterion&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">weighted_loss</span>
+            <span class="p">),</span> <span class="s2">&quot;Costmap is detected, but no use_costmap param in criterion&quot;</span>
             <span class="n">cm</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;CM&quot;</span><span class="p">]</span>
 
         <span class="c1"># only for badly formated data file</span>
@@ -286,17 +282,8 @@
             <span class="c1"># in case of CrossEntropy related error</span>
             <span class="c1"># see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># remove C dimension</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">,</span> <span class="n">monai</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">MaskedLoss</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span>
-        <span class="p">):</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="c1"># if costmap is None:</span>
-        <span class="c1">#    loss = self.criterion(y_hat, y)</span>
-        <span class="c1"># else:</span>
-        <span class="c1">#    loss = self.criterion(y_hat, y, costmap)</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">masked_loss</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weighted_loss</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cm</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -321,30 +308,9 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">yhat_act</span> <span class="o">=</span> <span class="n">y_hat</span>
 
-            <span class="n">src_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span>
-                <span class="n">src</span><span class="p">[</span>
-                    <span class="mi">0</span><span class="p">,</span>
-                <span class="p">]</span>
-                <span class="o">.</span><span class="n">detach</span><span class="p">()</span>
-                <span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
-                <span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
-            <span class="n">tar_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span>
-                <span class="n">tar</span><span class="p">[</span>
-                    <span class="mi">0</span><span class="p">,</span>
-                <span class="p">]</span>
-                <span class="o">.</span><span class="n">detach</span><span class="p">()</span>
-                <span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
-                <span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
-            <span class="n">prd_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span>
-                <span class="n">yhat_act</span><span class="p">[</span>
-                    <span class="mi">0</span><span class="p">,</span>
-                <span class="p">]</span>
-                <span class="o">.</span><span class="n">detach</span><span class="p">()</span>
-                <span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
-                <span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+            <span class="n">src_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">,]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+            <span class="n">tar_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tar</span><span class="p">[</span><span class="mi">0</span><span class="p">,]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+            <span class="n">prd_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">yhat_act</span><span class="p">[</span><span class="mi">0</span><span class="p">,]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">src_out</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">src_order</span> <span class="o">=</span> <span class="s2">&quot;YX&quot;</span>

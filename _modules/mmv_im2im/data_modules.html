@@ -207,13 +207,14 @@
         <span class="c1"># if no cache_path, use random patch generation on-the-fly</span>
         <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">cache_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">dm_basic</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
         <span class="c1"># if cache_path is set, but empty, then generate pre-cropped patches</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cache for embedseg is empty, start generating ...&quot;</span><span class="p">)</span>
             <span class="n">prepare_embedseg_cache</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">cache_path</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">dm_basic</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">cache_path</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_path</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">dm_basic</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></div>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">cache_path</span>
+
+    <span class="k">return</span> <span class="n">dm_basic</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

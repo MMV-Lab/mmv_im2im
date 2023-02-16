@@ -229,6 +229,7 @@
             <span class="c1"># initialize model weights</span>
             <span class="k">if</span> <span class="n">gen_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">gen_init</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loading pre-train from </span><span class="si">{</span><span class="n">gen_init</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="n">pre_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">gen_init</span><span class="p">))</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">pre_train</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
@@ -292,7 +293,6 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.save_pix2pix_output"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_pix2pix.Model.save_pix2pix_output">[docs]</a>    <span class="k">def</span> <span class="nf">save_pix2pix_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_A</span><span class="p">,</span> <span class="n">image_B</span><span class="p">,</span> <span class="n">fake_image</span><span class="p">,</span> <span class="n">current_stage</span><span class="p">):</span>
-
         <span class="c1"># check if the log path exists, if not create one</span>
         <span class="n">log_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">log_dir</span><span class="p">)</span>
         <span class="n">log_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -319,7 +319,6 @@
             <span class="n">imsave</span><span class="p">(</span><span class="n">out_fn</span><span class="p">,</span> <span class="n">image_A</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Model.training_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_pix2pix.Model.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">optimizer_idx</span><span class="p">):</span>
-
         <span class="c1"># imageB : real image</span>
         <span class="c1"># imageA : condition image</span>
         <span class="c1"># conditional GAN refers generating a realistic image (image B as ground truth),</span>

@@ -263,7 +263,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout2d</span><span class="p">(</span><span class="n">dropprob</span><span class="p">)</span>
 
 <div class="viewcode-block" id="non_bottleneck_1d.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.erfnet.non_bottleneck_1d.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
-
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv3x1_1</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1x3_1</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
