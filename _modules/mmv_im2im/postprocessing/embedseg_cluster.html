@@ -430,9 +430,9 @@
         <span class="n">prediction</span><span class="p">,</span>
         <span class="n">n_sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">seed_thresh</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-        <span class="n">min_mask_sum</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">min_mask_sum</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
         <span class="n">min_unclustered_sum</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">min_object_size</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span>
+        <span class="n">min_object_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">depth</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">prediction</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
@@ -453,8 +453,8 @@
         <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">seed_map</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
         <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">min_mask_sum</span><span class="p">:</span>
-            <span class="c1"># top level decision: only start creating instances, if there are atleast</span>
-            <span class="c1"># 128 pixels in foreground!</span>
+            <span class="c1"># top level decision: only start creating instances, if there are at least</span>
+            <span class="c1"># min_mask_sum pixels in foreground!</span>
 
             <span class="n">spatial_emb_masked</span> <span class="o">=</span> <span class="n">spatial_emb</span><span class="p">[</span><span class="n">mask</span><span class="o">.</span><span class="n">expand_as</span><span class="p">(</span><span class="n">spatial_emb</span><span class="p">)]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
                 <span class="n">n_sigma</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
@@ -467,7 +467,7 @@
 
             <span class="k">while</span> <span class="p">(</span>
                 <span class="n">unclustered</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">min_unclustered_sum</span>
-            <span class="p">):</span>  <span class="c1"># stop when the seed candidates are less than 128</span>
+            <span class="p">):</span>  <span class="c1"># stop when the seed candidates are less than min_clustered_sum</span>
                 <span class="n">seed</span> <span class="o">=</span> <span class="p">(</span><span class="n">seed_map_masked</span> <span class="o">*</span> <span class="n">unclustered</span><span class="o">.</span><span class="n">float</span><span class="p">())</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
                 <span class="n">seed_score</span> <span class="o">=</span> <span class="p">(</span><span class="n">seed_map_masked</span> <span class="o">*</span> <span class="n">unclustered</span><span class="o">.</span><span class="n">float</span><span class="p">())</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">seed_score</span> <span class="o">&lt;</span> <span class="n">seed_thresh</span><span class="p">:</span>

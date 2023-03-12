@@ -226,7 +226,7 @@
         <span class="c1"># the same set of parameters as in the criterion, except &quot;foreground_weight&quot;, so</span>
         <span class="c1"># pop it out</span>
         <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span> <span class="o">=</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;foreground_weight&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;use_costmap&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">clustering_params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;use_costmap&quot;</span><span class="p">)</span>
@@ -242,6 +242,15 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span> <span class="o">=</span> <span class="n">model_info_xx</span>
         <span class="k">if</span> <span class="n">train</span><span class="p">:</span>
+            <span class="n">extra_clustering_param</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;min_mask_sum&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;min_unclustered_sum&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;min_object_size&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">cp</span> <span class="ow">in</span> <span class="n">extra_clustering_param</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cp</span> <span class="ow">in</span> <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]:</span>
+                    <span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">[</span><span class="s2">&quot;params&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">criterion</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_func</span> <span class="o">=</span> <span class="n">parse_config_func</span><span class="p">(</span><span class="n">model_info_xx</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
 
@@ -276,7 +285,10 @@
 
         <span class="c1"># forward</span>
         <span class="k">if</span> <span class="n">validation_stage</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;validation_sliding_windows&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_extra</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_extra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="s2">&quot;validation_sliding_windows&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_info</span><span class="o">.</span><span class="n">model_extra</span>
+            <span class="p">):</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="n">sliding_window_inference</span><span class="p">(</span>
                     <span class="n">inputs</span><span class="o">=</span><span class="n">im</span><span class="p">,</span>
                     <span class="n">predictor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">,</span>
@@ -296,7 +308,9 @@
                 <span class="n">instances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">use_costmap</span><span class="p">:</span>
-                <span class="n">sIoU</span> <span class="o">=</span> <span class="n">simplified_instance_IoU_3D</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">instances_map</span><span class="p">,</span> <span class="n">costmap</span><span class="p">)</span>
+                <span class="n">sIoU</span> <span class="o">=</span> <span class="n">simplified_instance_IoU_3D</span><span class="p">(</span>
+                    <span class="n">instances</span><span class="p">,</span> <span class="n">instances_map</span><span class="p">,</span> <span class="n">costmap</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sIoU</span> <span class="o">=</span> <span class="n">simplified_instance_IoU_3D</span><span class="p">(</span><span class="n">instances</span><span class="p">,</span> <span class="n">instances_map</span><span class="p">)</span>
 
@@ -353,17 +367,12 @@
             <span class="n">out_fn</span> <span class="o">=</span> <span class="n">save_path</span> <span class="o">+</span> <span class="s2">&quot;_pred.tiff&quot;</span>
             <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">instances_map</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">,</span> <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 
-            <span class="c1"># out_fn = save_path + &quot;_out.tiff&quot;</span>
-            <span class="c1"># OmeTiffWriter.save(</span>
-            <span class="c1">#     output.detach()</span>
-            <span class="c1">#     .cpu()</span>
-            <span class="c1">#     .numpy()[</span>
-            <span class="c1">#         0,</span>
-            <span class="c1">#     ]</span>
-            <span class="c1">#     .astype(float),</span>
-            <span class="c1">#     out_fn,</span>
-            <span class="c1">#     dim_order=dim_order,</span>
-            <span class="c1"># )</span>
+            <span class="n">out_fn</span> <span class="o">=</span> <span class="n">save_path</span> <span class="o">+</span> <span class="s2">&quot;_out.tiff&quot;</span>
+            <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">,]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
+                <span class="n">out_fn</span><span class="p">,</span>
+                <span class="n">dim_order</span><span class="o">=</span><span class="n">dim_order</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">loss</span></div>
 
 <div class="viewcode-block" id="Model.training_step"><a class="viewcode-back" href="../../../mmv_im2im.models.html#mmv_im2im.models.pl_embedseg.Model.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>

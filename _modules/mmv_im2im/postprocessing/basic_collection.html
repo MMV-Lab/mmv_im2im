@@ -249,12 +249,14 @@
                 <span class="n">th_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">th_module</span><span class="p">,</span> <span class="s2">&quot;threshold_&quot;</span> <span class="o">+</span> <span class="n">cutoff</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unsupported threhsold method&quot;</span><span class="p">)</span>
-            <span class="n">seg</span> <span class="o">=</span> <span class="n">th_func</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+            <span class="n">cutoff</span> <span class="o">=</span> <span class="n">th_func</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-            <span class="n">seg</span> <span class="o">=</span> <span class="n">prob</span> <span class="o">&gt;</span> <span class="n">cutoff</span>
+            <span class="c1"># just to confirm the type</span>
+            <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;cutoff method only str or float&quot;</span><span class="p">)</span>
 
+        <span class="n">seg</span> <span class="o">=</span> <span class="n">prob</span> <span class="o">&gt;</span> <span class="n">cutoff</span>
         <span class="n">seg</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
         <span class="n">seg</span><span class="p">[</span><span class="n">seg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">255</span>
 
