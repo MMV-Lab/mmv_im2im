@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Union, Tuple, List
+from typing import Union
 from numba import jit
 from scipy.ndimage.measurements import find_objects
 from scipy.ndimage.morphology import binary_fill_holes
@@ -143,22 +143,19 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
 
 
 def prepare_embedseg_cache(
-    data_path: Union[str, Path],
-    cache_path: Union[str, Path],
-    data_cfg,
-    patch_size: Union[Tuple, List] = None,
+    data_path: Union[str, Path], cache_path: Union[str, Path], data_cfg
 ):
-    """
-    patch_size should be in the format of [Z Y X] or [Y X]
-    """
-
     data_path = Path(data_path)
     cache_path = Path(cache_path)
     dataset_list = generate_dataset_dict(data_path)
+    patch_size = None
 
     # parse the method for centroid computation
     if data_cfg.extra is not None:
-        center_method = data_cfg.extra["center_method"]
+        if "center_method" in data_cfg.extra:
+            center_method = data_cfg.extra["center_method"]
+        if "patch_size" in data_cfg.extra:
+            patch_size = data_cfg.extra["patch_size"]
 
     # get some basic statistics from the data and do some basic validation
     min_xy = 65535
