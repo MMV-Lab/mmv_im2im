@@ -26,7 +26,7 @@ class Model(pl.LightningModule):
         # the same set of parameters as in the criterion, except "foreground_weight", so
         # pop it out
         if train:
-            self.clustering_params = model_info_xx.criterion["params"]
+            self.clustering_params = model_info_xx.criterion["params"].copy()
             self.clustering_params.pop("foreground_weight")
             if "use_costmap" in self.clustering_params:
                 self.clustering_params.pop("use_costmap")
@@ -42,6 +42,15 @@ class Model(pl.LightningModule):
 
         self.model_info = model_info_xx
         if train:
+            extra_clustering_param = [
+                "min_mask_sum",
+                "min_unclustered_sum",
+                "min_object_size",
+            ]
+            for cp in extra_clustering_param:
+                if cp in model_info_xx.criterion["params"]:
+                    model_info_xx.criterion["params"].pop(cp)
+
             self.criterion = parse_config(model_info_xx.criterion)
             self.optimizer_func = parse_config_func(model_info_xx.optimizer)
 
@@ -76,7 +85,10 @@ class Model(pl.LightningModule):
 
         # forward
         if validation_stage:
-            if "validation_sliding_windows" in self.model_info.model_extra:
+            if (
+                self.model_info.model_extra is not None
+                and "validation_sliding_windows" in self.model_info.model_extra
+            ):
                 output = sliding_window_inference(
                     inputs=im,
                     predictor=self.net,
@@ -96,7 +108,9 @@ class Model(pl.LightningModule):
                 instances = np.squeeze(instances)
 
             if use_costmap:
-                sIoU = simplified_instance_IoU_3D(instances, instances_map, costmap)
+                sIoU = simplified_instance_IoU_3D(
+                    instances, instances_map, costmap.detach().cpu().numpy() == 0
+                )
             else:
                 sIoU = simplified_instance_IoU_3D(instances, instances_map)
 
@@ -128,7 +142,13 @@ class Model(pl.LightningModule):
                     output, **self.clustering_params
                 )
                 # remove the batch dimension
-                gt = instances.detach().cpu().numpy()[0,]
+                gt = (
+                    instances.detach()
+                    .cpu()
+                    .numpy()[
+                        0,
+                    ]
+                )
             else:
                 # add back the C dimension
                 gt = np.expand_dims(instances, axis=0)
@@ -140,7 +160,11 @@ class Model(pl.LightningModule):
             # save raw image
             out_fn = save_path + "_raw.tiff"
             OmeTiffWriter.save(
-                im.detach().cpu().numpy()[0,],
+                im.detach()
+                .cpu()
+                .numpy()[
+                    0,
+                ],
                 out_fn,
                 dim_order=dim_order,
             )
@@ -153,17 +177,17 @@ class Model(pl.LightningModule):
             out_fn = save_path + "_pred.tiff"
             OmeTiffWriter.save(instances_map, out_fn, dim_order=dim_order[1:])
 
-            # out_fn = save_path + "_out.tiff"
-            # OmeTiffWriter.save(
-            #     output.detach()
-            #     .cpu()
-            #     .numpy()[
-            #         0,
-            #     ]
-            #     .astype(float),
-            #     out_fn,
-            #     dim_order=dim_order,
-            # )
+            out_fn = save_path + "_out.tiff"
+            OmeTiffWriter.save(
+                output.detach()
+                .cpu()
+                .numpy()[
+                    0,
+                ]
+                .astype(float),
+                out_fn,
+                dim_order=dim_order,
+            )
         return loss
 
     def training_step(self, batch, batch_idx):

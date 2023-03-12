@@ -3,8 +3,16 @@ import numpy as np
 
 
 def simplified_instance_IoU_3D(
-    mask: np.ndarray, pred: np.ndarray, costmap: Optional[np.ndarray]
+    mask: np.ndarray, pred: np.ndarray, exclusion_mask: Optional[np.ndarray] = None
 ):
+    if exclusion_mask is not None:
+        exclusion_mask = np.squeeze(exclusion_mask)
+        assert (
+            exclusion_mask.shape == mask.shape
+        ), "exclustion mask and gt have different sizes"
+        mask[exclusion_mask > 0] = 0
+        pred[exclusion_mask > 0] = 0
+
     # clean up ground truth by removing all objects touching boundary
     # also, boudary is defined by 5 pixels within the actual border
     boundary_template = np.zeros_like(mask)

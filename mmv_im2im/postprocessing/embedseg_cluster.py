@@ -230,9 +230,9 @@ class Cluster_3d:
         prediction,
         n_sigma=3,
         seed_thresh=0.5,
-        min_mask_sum=128,
+        min_mask_sum=64,
         min_unclustered_sum=0,
-        min_object_size=36,
+        min_object_size=3,
     ):
         depth, height, width = (
             prediction.size(1),
@@ -253,8 +253,8 @@ class Cluster_3d:
         count = 1
         mask = seed_map > 0.5
         if mask.sum() > min_mask_sum:
-            # top level decision: only start creating instances, if there are atleast
-            # 128 pixels in foreground!
+            # top level decision: only start creating instances, if there are at least
+            # min_mask_sum pixels in foreground!
 
             spatial_emb_masked = spatial_emb[mask.expand_as(spatial_emb)].view(
                 n_sigma, -1
@@ -267,7 +267,7 @@ class Cluster_3d:
 
             while (
                 unclustered.sum() > min_unclustered_sum
-            ):  # stop when the seed candidates are less than 128
+            ):  # stop when the seed candidates are less than min_clustered_sum
                 seed = (seed_map_masked * unclustered.float()).argmax().item()
                 seed_score = (seed_map_masked * unclustered.float()).max().item()
                 if seed_score < seed_thresh:

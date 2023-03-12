@@ -49,12 +49,14 @@ def extract_segmentation(
                 th_func = getattr(th_module, "threshold_" + cutoff.lower())
             except Exception:
                 raise ValueError("unsupported threhsold method")
-            seg = th_func(prob)
+            cutoff = th_func(prob)
         elif isinstance(cutoff, float):
-            seg = prob > cutoff
+            # just to confirm the type
+            pass
         else:
             raise NotImplementedError("cutoff method only str or float")
 
+        seg = prob > cutoff
         seg = seg.astype(np.uint8)
         seg[seg > 0] = 255
 
