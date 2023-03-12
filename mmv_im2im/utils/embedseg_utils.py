@@ -143,9 +143,7 @@ def generate_center_image(instance, center, ids, anisotropy_factor=1, speed_up=1
 
 
 def prepare_embedseg_cache(
-    data_path: Union[str, Path],
-    cache_path: Union[str, Path],
-    data_cfg
+    data_path: Union[str, Path], cache_path: Union[str, Path], data_cfg
 ):
     data_path = Path(data_path)
     cache_path = Path(cache_path)

@@ -142,13 +142,7 @@ class Model(pl.LightningModule):
                     output, **self.clustering_params
                 )
                 # remove the batch dimension
-                gt = (
-                    instances.detach()
-                    .cpu()
-                    .numpy()[
-                        0,
-                    ]
-                )
+                gt = instances.detach().cpu().numpy()[0,]
             else:
                 # add back the C dimension
                 gt = np.expand_dims(instances, axis=0)
@@ -160,11 +154,7 @@ class Model(pl.LightningModule):
             # save raw image
             out_fn = save_path + "_raw.tiff"
             OmeTiffWriter.save(
-                im.detach()
-                .cpu()
-                .numpy()[
-                    0,
-                ],
+                im.detach().cpu().numpy()[0,],
                 out_fn,
                 dim_order=dim_order,
             )
@@ -179,12 +169,7 @@ class Model(pl.LightningModule):
 
             out_fn = save_path + "_out.tiff"
             OmeTiffWriter.save(
-                output.detach()
-                .cpu()
-                .numpy()[
-                    0,
-                ]
-                .astype(float),
+                output.detach().cpu().numpy()[0,].astype(float),
                 out_fn,
                 dim_order=dim_order,
             )
