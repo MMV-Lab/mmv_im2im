@@ -24,3 +24,6 @@ trainer:
 
 Tensorboard is used for tracking the training progress by default. Everything is saved under `lightning_logs/version_X`. Then after installing tensorboard, you can simply run `tensorboard --logdir=./lightning_logs/version_X`. For advacned users, if you wish to change what is being logged with tensorboard, you can just modify the corresponding lightning module file, like [here](https://github.com/MMV-Lab/mmv_im2im/blob/main/mmv_im2im/models/pl_pix2pix.py#L160).
 
+# How to select different GPUs?
+
+By default, when you run `run_im2im --config myconfig.yaml`, all GPUs available on your machine are usable by the program. Then, if you select to use 1 GPU, then the first GPU will be used. If you want to run on a specific GPU(s), you can do `CUDA_VISIBLE_DEVICES=3 run_im2im --config myconfig.yaml` or `CUDA_VISIBLE_DEVICES=1,3,5 run_im2im --config myconfig.yaml` 
