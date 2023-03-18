@@ -201,6 +201,7 @@ class ProjectTester(object):
                 raise ValueError("error in prediction output shape")
 
     def run_inference(self):
+        self.setup_model()
         # set up data
         dataset_list = generate_test_dataset_dict(
             self.data_cfg.inference_input.dir, self.data_cfg.inference_input.data_type
@@ -265,14 +266,14 @@ class ProjectTester(object):
                     if ".tif" in suffix or ".tiff" in suffix or ".ome.tif" in suffix:
                         out_fn = (
                             Path(self.data_cfg.inference_output.path)
-                            / f"{fn_core}_{suffix}"
+                            / f"{fn_core}{suffix}"
                         )
                     else:
                         raise ValueError("please check output suffix, either unexpected dot or unsupported fileformat")
                 else:
                     out_fn = (
                         Path(self.data_cfg.inference_output.path)
-                        / f"{fn_core}_{suffix}.tiff"
+                        / f"{fn_core}{suffix}.tiff"
                     )
 
                 if len(out_array.shape) == 3:
@@ -302,14 +303,14 @@ class ProjectTester(object):
                     if ".png" in suffix or ".tif" in suffix or ".tiff" in suffix or ".ome.tif" in suffix:
                         out_fn = (
                             Path(self.data_cfg.inference_output.path)
-                            / f"{fn_core}_{suffix}"
+                            / f"{fn_core}{suffix}"
                         )
                     else:
                         raise ValueError("please check output suffix, either unexpected dot or unsupported fileformat")
                 else:
                     out_fn = (
                         Path(self.data_cfg.inference_output.path)
-                        / f"{fn_core}_{suffix}.tiff"
+                        / f"{fn_core}{suffix}.tiff"
                     )
 
                 print("Predicting the image")

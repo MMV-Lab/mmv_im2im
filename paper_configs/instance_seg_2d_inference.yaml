@@ -47,7 +47,3 @@ model:
       num_classes: [4, 1]
       input_channels: 1
   checkpoint: ./lightning_logs/version_17/checkpoints/best.ckpt   #ADD-YOURS
-trainer:
-  params:
-    gpus: 1
-    precision: 16

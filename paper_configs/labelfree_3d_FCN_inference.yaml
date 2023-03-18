@@ -42,7 +42,3 @@ model:
       sw_batch_size: 4
       overlap: 0.2
       mode: "gaussian"
-trainer:
-  params:
-    gpus: 1
-    precision: 16

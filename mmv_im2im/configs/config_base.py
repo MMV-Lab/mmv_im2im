@@ -228,7 +228,7 @@ class InferOutConfig:
     path: Union[Path, str, Dict] = field(default=None)
 
     # the suffix to attach in the filename
-    suffix: str = field(default="pred")
+    suffix: str = field(default="_pred")
 
 
 @dataclass
