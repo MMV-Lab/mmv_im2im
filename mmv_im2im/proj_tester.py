@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import logging
+from typing import Union
+from dask.array.core import Array as DaskArray
+from numpy import ndarray as NumpyArray
 from importlib import import_module
 from pathlib import Path
 import tempfile
@@ -43,6 +46,7 @@ class ProjectTester(object):
         self.data = None
         self.pre_process = None
         self.cpu = False
+        self.spatial_dims = -1
 
     def setup_model(self):
         model_category = self.model_cfg.framework
@@ -55,23 +59,39 @@ class ProjectTester(object):
         pre_train["state_dict"].pop("criterion.xym", None)
         pre_train["state_dict"].pop("criterion.xyzm", None)
         self.model.load_state_dict(pre_train["state_dict"])
-        if "cpu_only" in self.model_cfg.model_extra and self.model_cfg.model_extra["cpu_only"]:
+        if (
+            "cpu_only" in self.model_cfg.model_extra
+            and self.model_cfg.model_extra["cpu_only"]
+        ):
             self.cpu = True
         else:
             self.model.cuda()
 
         self.model.eval()
 
-    def process_one_image(self, img, out_fn):
-        # TODO: adjust/double_check for MONAI
-        # record the input dimension
-        # original_size = x.size()
-        # if original_size[0] == 1:
-        #    original_size = original_size[1:]
-        # original_size = tuple(original_size)
+    def setup_data_processing(self):
+        # determine spatial dimension from reader parameters
+        if "Z" in self.data_cfg.inference_input.reader_params["dimension_order_out"]:
+            self.spatial_dims = 3
+        else:
+            self.spatial_dims = 2
 
-        # Perform the prediction
-        x = img.compute()
+        # prepare data preprocessing if needed
+        if self.data_cfg.preprocess is not None:
+            # load preprocessing transformation
+            self.pre_process = parse_monai_ops_vanilla(self.data_cfg.preprocess)
+
+    def process_one_image(
+        self, img: Union[DaskArray, NumpyArray], out_fn: Union[str, Path] = None
+    ):
+        if isinstance(img, DaskArray):
+            # Perform the prediction
+            x = img.compute()
+        elif isinstance(img, NumpyArray):
+            x = img
+        else:
+            raise ValueError("invalid image")
+
         # check if need to add channel dimension
         if len(x.shape) == self.spatial_dims:
             x = np.expand_dims(x, axis=0)
@@ -140,9 +160,8 @@ class ProjectTester(object):
         else:
             pred = y_hat.cpu().numpy()
 
-        # TODO: needs to clean up after checking how to restore image size in MONAI
-        # if original_size != pred.shape[-1 * len(original_size) :]:
-        #     pred = center_crop(pred, original_size)
+        if out_fn is None:
+            return pred
 
         # determine output dimension orders
         if out_fn.suffix == ".npy":
@@ -177,14 +196,18 @@ class ProjectTester(object):
                             save_rgb(
                                 out_fn,
                                 np.moveaxis(
-                                    pred[0,],
+                                    pred[
+                                        0,
+                                    ],
                                     0,
                                     -1,
                                 ),
                             )
                         else:
                             OmeTiffWriter.save(
-                                pred[0,],
+                                pred[
+                                    0,
+                                ],
                                 out_fn,
                                 dim_order="CYX",
                             )
@@ -193,7 +216,9 @@ class ProjectTester(object):
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "error, found non-trivial batch dimension"
                 OmeTiffWriter.save(
-                    pred[0,],
+                    pred[
+                        0,
+                    ],
                     out_fn,
                     dim_order="CZYX",
                 )
@@ -202,26 +227,17 @@ class ProjectTester(object):
 
     def run_inference(self):
         self.setup_model()
-        # set up data
+        self.setup_data_processing()
+        # set up data filenames
         dataset_list = generate_test_dataset_dict(
             self.data_cfg.inference_input.dir, self.data_cfg.inference_input.data_type
         )
-
         dataset_length = len(dataset_list)
-        if "Z" in self.data_cfg.inference_input.reader_params["dimension_order_out"]:
-            self.spatial_dims = 3
-        else:
-            self.spatial_dims = 2
-
-        if self.data_cfg.preprocess is not None:
-            # load preprocessing transformation
-            self.pre_process = parse_monai_ops_vanilla(self.data_cfg.preprocess)
 
         # loop through all images and apply the model
         for i, ds in enumerate(dataset_list):
             # Read the image
             print(f"Reading the image {i}/{dataset_length}")
-            print(ds)
 
             # output file name info
             fn_core = Path(ds).stem
@@ -260,7 +276,7 @@ class ProjectTester(object):
                 # gather all individual outputs and save as timelapse
                 out_array = [np.load(tmp_one_file) for tmp_one_file in tmpfile_list]
                 out_array = np.stack(out_array, axis=0)
-                
+
                 # prepare output filename
                 if "." in suffix:
                     if ".tif" in suffix or ".tiff" in suffix or ".ome.tif" in suffix:
@@ -269,7 +285,9 @@ class ProjectTester(object):
                             / f"{fn_core}{suffix}"
                         )
                     else:
-                        raise ValueError("please check output suffix, either unexpected dot or unsupported fileformat")
+                        raise ValueError(
+                            "please check output suffix, either unexpected dot or unsupported fileformat"
+                        )
                 else:
                     out_fn = (
                         Path(self.data_cfg.inference_output.path)
@@ -300,13 +318,20 @@ class ProjectTester(object):
 
                 # prepare output filename
                 if "." in suffix:
-                    if ".png" in suffix or ".tif" in suffix or ".tiff" in suffix or ".ome.tif" in suffix:
+                    if (
+                        ".png" in suffix
+                        or ".tif" in suffix
+                        or ".tiff" in suffix
+                        or ".ome.tif" in suffix
+                    ):
                         out_fn = (
                             Path(self.data_cfg.inference_output.path)
                             / f"{fn_core}{suffix}"
                         )
                     else:
-                        raise ValueError("please check output suffix, either unexpected dot or unsupported fileformat")
+                        raise ValueError(
+                            "please check output suffix, either unexpected dot or unsupported fileformat"
+                        )
                 else:
                     out_fn = (
                         Path(self.data_cfg.inference_output.path)

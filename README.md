@@ -40,7 +40,7 @@ conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 **Stable Release:** `pip install mmv_im2im`<br>
 **Development Head:** `pip install git+https://github.com/MMV-Lab/mmv_im2im.git`
 
-### bInstall MMV_Im2Im (build from source):
+### Install MMV_Im2Im (build from source):
 
 (For users planning to extend the methods or improve the code):
 
@@ -56,6 +56,33 @@ Note: The `-e` option is the so-called "editable" mode. This will allow code cha
 ## Quick start
 
 You can try out on a simple example following [the quick start guide](tutorials/quick_start.md)
+
+Basically, you can specify your training configuration in a yaml file and run training with `run_im2im --config /path/to/train_config.yaml`. Then, you can specify the inference configuration in another yaml file and run inference with `run_im2im --config /path/to/inference_config.yaml`. You can also run the inference as a function with the provided API. This will be useful if you want to run the inference within another python script or workflow.  Here is an example:
+
+```
+from pathlib import Path
+from aicsimageio import AICSImage
+from aicsimageio.writers import OmeTiffWriter
+from mmv_im2im.configs.config_base import ProgramConfig, parse_adaptor, configuration_validation
+from mmv_im2im import ProjectTester
+
+# load the inference configuration
+cfg = parse_adaptor(config_class=ProgramConfig, config="./paper_configs/semantic_seg_2d_inference.yaml")
+cfg = configuration_validation(cfg)
+
+# define the executor for inference
+executor = ProjectTester(cfg)
+executor.setup_model()
+executor.setup_data_processing()
+
+# get the data, run inference, and save the result
+fn = Path("./data/img_00_IM.tiff")
+img = AICSImage(fn).get_image_data("YX", Z=0, C=0, T=0)
+# or using delayed loading if the data is large
+# img = AICSImage(fn).get_image_dask_data("YX", Z=0, C=0, T=0)
+seg = executor.process_one_image(img)
+OmeTiffWriter.save(seg, "output.tiff", dim_orders="YX")
+```
 
 
 ## Tutorials, examples, demonstrations and documentations
