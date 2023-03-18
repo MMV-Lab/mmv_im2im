@@ -121,7 +121,7 @@ trainer:
     devices: 1
     precision: 16
     max_epochs: 10000
-    terminate_on_nan: True
+    detect_anomaly: True
     num_sanity_val_steps: 0
   callbacks:
     - module_name: pytorch_lightning.callbacks.early_stopping
