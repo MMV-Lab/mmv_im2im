@@ -286,7 +286,7 @@ class ProjectTester(object):
                         )
                     else:
                         raise ValueError(
-                            "please check output suffix, either unexpected dot or unsupported fileformat"
+                            "please check output suffix, either unexpected dot or unsupported fileformat"  # noqa E501
                         )
                 else:
                     out_fn = (
@@ -330,7 +330,7 @@ class ProjectTester(object):
                         )
                     else:
                         raise ValueError(
-                            "please check output suffix, either unexpected dot or unsupported fileformat"
+                            "please check output suffix, either unexpected dot or unsupported fileformat"  # noqa E501
                         )
                 else:
                     out_fn = (
