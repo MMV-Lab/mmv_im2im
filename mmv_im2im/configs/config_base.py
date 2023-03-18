@@ -302,7 +302,7 @@ class ModelConfig:
     # the config for learning scheduler (see preset configs for example)
     scheduler: Dict = field(default=None, is_mutable=True)
 
-    # the checkpoint to load (for finetuning or inference)
+    # the checkpoint to load (for inference)
     checkpoint: Union[Path, str] = field(default=None)
 
     # extra for special parameters of specific method
