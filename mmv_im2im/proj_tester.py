@@ -37,12 +37,30 @@ class ProjectTester(object):
         # extract the three major chuck of the config
         self.model_cfg = cfg.model
         self.data_cfg = cfg.data
-        self.run_cfg = cfg.trainer
 
         # define variables
         self.model = None
         self.data = None
         self.pre_process = None
+        self.cpu = False
+
+    def setup_model(self):
+        model_category = self.model_cfg.framework
+        model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
+        my_model_func = getattr(model_module, "Model")
+        self.model = my_model_func(self.model_cfg, train=False)
+
+        pre_train = torch.load(self.model_cfg.checkpoint)
+        # TODO: hacky solution to remove a wrongly registered key
+        pre_train["state_dict"].pop("criterion.xym", None)
+        pre_train["state_dict"].pop("criterion.xyzm", None)
+        self.model.load_state_dict(pre_train["state_dict"])
+        if "cpu_only" in self.model_cfg.model_extra and self.model_cfg.model_extra["cpu_only"]:
+            self.cpu = True
+        else:
+            self.model.cuda()
+
+        self.model.eval()
 
     def process_one_image(self, img, out_fn):
         # TODO: adjust/double_check for MONAI
@@ -69,7 +87,10 @@ class ProjectTester(object):
         # the input here is assumed to be a tensor
         with torch.no_grad():
             # add batch dimension and move to GPU
-            x = torch.unsqueeze(x, dim=0).cuda()
+            if self.cpu:
+                x = torch.unsqueeze(x, dim=0)
+            else:
+                x = torch.unsqueeze(x, dim=0).cuda()
 
             # TODO: add convert to tensor with proper type, similar to torchio check
 
@@ -86,7 +107,8 @@ class ProjectTester(object):
                 # currently, we keep sliding window stiching step on CPU, but assume
                 # the output is on GPU (see note below). So, we manually move the data
                 # back to GPU
-                y_hat = y_hat.cuda()
+                if not self.cpu:
+                    y_hat = y_hat.cuda()
             else:
                 y_hat = self.model(x)
 
@@ -179,24 +201,6 @@ class ProjectTester(object):
                 raise ValueError("error in prediction output shape")
 
     def run_inference(self):
-        # set up model
-        model_category = self.model_cfg.framework
-        model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
-        my_model_func = getattr(model_module, "Model")
-        self.model = my_model_func(self.model_cfg, train=False)
-
-        pre_train = torch.load(self.model_cfg.checkpoint)
-        # TODO: hacky solution to remove a wrongly registered key
-        pre_train["state_dict"].pop("criterion.xym", None)
-        pre_train["state_dict"].pop("criterion.xyzm", None)
-        self.model.load_state_dict(pre_train["state_dict"])
-        self.model.cuda()
-
-        # self.model = my_model_func.load_from_checkpoint(
-        #    model_info_xx=self.model_cfg, train=False, **self.model_cfg["ckpt"]
-        # ).cuda()
-        self.model.eval()
-
         # set up data
         dataset_list = generate_test_dataset_dict(
             self.data_cfg.inference_input.dir, self.data_cfg.inference_input.data_type
@@ -255,10 +259,21 @@ class ProjectTester(object):
                 # gather all individual outputs and save as timelapse
                 out_array = [np.load(tmp_one_file) for tmp_one_file in tmpfile_list]
                 out_array = np.stack(out_array, axis=0)
-                out_fn = (
-                    Path(self.data_cfg.inference_output.path)
-                    / f"{fn_core}_{suffix}.tiff"
-                )
+                
+                # prepare output filename
+                if "." in suffix:
+                    if ".tif" in suffix or ".tiff" in suffix or ".ome.tif" in suffix:
+                        out_fn = (
+                            Path(self.data_cfg.inference_output.path)
+                            / f"{fn_core}_{suffix}"
+                        )
+                    else:
+                        raise ValueError("please check output suffix, either unexpected dot or unsupported fileformat")
+                else:
+                    out_fn = (
+                        Path(self.data_cfg.inference_output.path)
+                        / f"{fn_core}_{suffix}.tiff"
+                    )
 
                 if len(out_array.shape) == 3:
                     dim_order = "TYX"
@@ -283,10 +298,19 @@ class ProjectTester(object):
                 )
 
                 # prepare output filename
-                out_fn = (
-                    Path(self.data_cfg.inference_output.path)
-                    / f"{fn_core}_{suffix}.tiff"
-                )
+                if "." in suffix:
+                    if ".png" in suffix or ".tif" in suffix or ".tiff" in suffix or ".ome.tif" in suffix:
+                        out_fn = (
+                            Path(self.data_cfg.inference_output.path)
+                            / f"{fn_core}_{suffix}"
+                        )
+                    else:
+                        raise ValueError("please check output suffix, either unexpected dot or unsupported fileformat")
+                else:
+                    out_fn = (
+                        Path(self.data_cfg.inference_output.path)
+                        / f"{fn_core}_{suffix}.tiff"
+                    )
 
                 print("Predicting the image")
                 self.process_one_image(img, out_fn)

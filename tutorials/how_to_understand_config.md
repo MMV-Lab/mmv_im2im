@@ -204,7 +204,7 @@ All fields under `model` can be found [HERE](https://github.com/MMV-Lab/mmv_im2i
 Please refer to [the collection of sample configs](example_by_use_case.md) for examples how to set `model` in different applications.
 
 
-### part 4: trainer
+### part 4: trainer (only for training)
 
 We adopted the trainer from pytorch-lightning. You can find detailed API from [the official documentation](https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html#trainer-class-api) and [the callbacks it supports](https://pytorch-lightning.readthedocs.io/en/latest/extensions/callbacks.html#built-in-callbacks). You can find examples of how to pass in these parameters in our [example configuration files](example_by_use_case.md). A `verbose` option is available. When setting to `True`, one example data (e.g., input + output + ground truth) will be saved out in the lightning log folder at the beginning of each epoch. A typical setting for `trainer` is as follows:
 
