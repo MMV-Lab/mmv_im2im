@@ -108,7 +108,8 @@ model:
 trainer:
   verbose: True
   params:
-    gpus: 1
+    accelerator: "gpu"
+    devices: 1
     precision: 16
     max_epochs: 10000
     terminate_on_nan: True
