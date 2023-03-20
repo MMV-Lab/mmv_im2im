@@ -1,0 +1,742 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>mmv_im2im.models.nets.SA_2d &mdash; MMV Im2Im Transformation 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> MMV Im2Im Transformation
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../mmv_im2im.html">mmv_im2im package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.bin.html">mmv_im2im.bin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.configs.html">mmv_im2im.configs package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.data_modules.html">mmv_im2im.data_modules package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.models.html">mmv_im2im.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.postprocessing.html">mmv_im2im.postprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.preprocessing.html">mmv_im2im.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.utils.html">mmv_im2im.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#module-mmv_im2im.proj_tester">mmv_im2im.proj_tester module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.html#mmv_im2im.proj_tester.ProjectTester"><code class="docutils literal notranslate"><span class="pre">ProjectTester</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#module-mmv_im2im.proj_trainer">mmv_im2im.proj_trainer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.html#mmv_im2im.proj_trainer.ProjectTrainer"><code class="docutils literal notranslate"><span class="pre">ProjectTrainer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../mmv_im2im.html#module-mmv_im2im">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../mmv_im2im.html#mmv_im2im.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">MMV Im2Im Transformation</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../mmv_im2im.html">mmv_im2im</a> &raquo;</li>
+        
+      <li>mmv_im2im.models.nets.SA_2d</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mmv_im2im.models.nets.SA_2d</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+
+<div class="viewcode-block" id="Bottleneck"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.SA_2d.Bottleneck">[docs]</a><span class="k">class</span> <span class="nc">Bottleneck</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nc</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_block</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">nc</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">nc</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">nc</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">nc</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">nc</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Bottleneck.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.SA_2d.Bottleneck.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Bottleneck_transition"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.SA_2d.Bottleneck_transition">[docs]</a><span class="k">class</span> <span class="nc">Bottleneck_transition</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">nc</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_block</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">in_channels</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">nc</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">nc</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">nc</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">nc</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">in_channels</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">4</span> <span class="o">*</span> <span class="n">nc</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Bottleneck_transition.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.SA_2d.Bottleneck_transition.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SuggestiveAnnotationModel"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.SA_2d.SuggestiveAnnotationModel">[docs]</a><span class="k">class</span> <span class="nc">SuggestiveAnnotationModel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_feature</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_channels</span> <span class="o">=</span> <span class="n">in_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span> <span class="o">=</span> <span class="n">out_channels</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">num_feature</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">num_features</span><span class="o">=</span><span class="n">num_feature</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># part 2 (nc = 64)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">Bottleneck_transition</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">Bottleneck</span><span class="p">(</span><span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># part 3 (nc = 128)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">Bottleneck_transition</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="n">Bottleneck</span><span class="p">(</span><span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># part 4 (nc = 256)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">Bottleneck_transition</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span> <span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
+            <span class="n">Bottleneck</span><span class="p">(</span><span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># part 5 (nc = 256)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p5</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block5</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">Bottleneck_transition</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span> <span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
+            <span class="n">Bottleneck</span><span class="p">(</span><span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># part 6 (nc = 256)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p6</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MaxPool2d</span><span class="p">(</span><span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block6</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">Bottleneck_transition</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span> <span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
+            <span class="n">Bottleneck</span><span class="p">(</span><span class="n">nc</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># decoder for part 6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc6</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># decoder for part 5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc5</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># decoder for part 4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc4</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">32</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># decoder for part 3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc3</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># decoder for part 2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># decoder for part 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">num_feature</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># last layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">out_channels</span> <span class="o">*</span> <span class="mi">6</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_channels</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">out_channels</span><span class="o">=</span><span class="n">out_channels</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="SuggestiveAnnotationModel.forward"><a class="viewcode-back" href="../../../../mmv_im2im.models.nets.html#mmv_im2im.models.nets.SA_2d.SuggestiveAnnotationModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">fea1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">fea2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">(</span><span class="n">fea1</span><span class="p">))</span>
+        <span class="n">fea3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block3</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p3</span><span class="p">(</span><span class="n">fea2</span><span class="p">))</span>
+        <span class="n">fea4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block4</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p4</span><span class="p">(</span><span class="n">fea3</span><span class="p">))</span>
+        <span class="n">fea5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block5</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p5</span><span class="p">(</span><span class="n">fea4</span><span class="p">))</span>
+        <span class="n">fea6</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block6</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p6</span><span class="p">(</span><span class="n">fea5</span><span class="p">))</span>
+
+        <span class="n">pred6</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc6</span><span class="p">(</span><span class="n">fea6</span><span class="p">)</span>
+        <span class="n">pred5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc5</span><span class="p">(</span><span class="n">fea5</span><span class="p">)</span>
+        <span class="n">pred4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc4</span><span class="p">(</span><span class="n">fea4</span><span class="p">)</span>
+        <span class="n">pred3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc3</span><span class="p">(</span><span class="n">fea3</span><span class="p">)</span>
+        <span class="n">pred2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc2</span><span class="p">(</span><span class="n">fea2</span><span class="p">)</span>
+        <span class="n">pred1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc1</span><span class="p">(</span><span class="n">fea1</span><span class="p">)</span>
+
+        <span class="n">pred_join</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">pred1</span><span class="p">,</span> <span class="n">pred2</span><span class="p">,</span> <span class="n">pred3</span><span class="p">,</span> <span class="n">pred4</span><span class="p">,</span> <span class="n">pred5</span><span class="p">,</span> <span class="n">pred6</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">pred_final</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">pred_join</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pred_final</span></div></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">class ConvBlock(nn.Module):</span>
+<span class="sd">    def __init__(self, in_channels, out_channels, kernel_size, stride, padding=0):</span>
+<span class="sd">        super().__init__()</span>
+<span class="sd">        self.conv = nn.Conv2d(</span>
+<span class="sd">            in_channels=in_channels,</span>
+<span class="sd">            out_channels=out_channels,</span>
+<span class="sd">            kernel_size=kernel_size,</span>
+<span class="sd">            stride=stride,</span>
+<span class="sd">            padding=padding,</span>
+<span class="sd">        )</span>
+<span class="sd">        self.bn = nn.BatchNorm2d(out_channels)</span>
+
+<span class="sd">    def forward(self, x):</span>
+<span class="sd">        return F.relu(self.bn(self.conv(x)), inplace=True)</span>
+
+
+<span class="sd">class InputBlock(nn.Module):</span>
+<span class="sd">    def __init__(self, in_channels, out_channels):</span>
+<span class="sd">        super().__init__()</span>
+<span class="sd">        self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)</span>
+<span class="sd">        self.conv_1 = ConvBlock(</span>
+<span class="sd">            in_channels, out_channels // 4, kernel_size=3, stride=1, padding=1</span>
+<span class="sd">        )</span>
+<span class="sd">        self.conv_2 = ConvBlock(</span>
+<span class="sd">            out_channels // 4, out_channels, kernel_size=3, stride=1, padding=1</span>
+<span class="sd">        )</span>
+
+<span class="sd">    def forward(self, x):</span>
+<span class="sd">        x = self.pool(x)</span>
+<span class="sd">        x = self.conv_1(x)</span>
+<span class="sd">        x = self.conv_2(x)</span>
+<span class="sd">        return x</span>
+
+
+<span class="sd">class Bottleneck(nn.Module):</span>
+<span class="sd">    def __init__(self, in_channels, bottleneck_channels, out_channels):</span>
+<span class="sd">        super().__init__()</span>
+<span class="sd">        self.conv1 = nn.Conv2d(</span>
+<span class="sd">            in_channels,</span>
+<span class="sd">            bottleneck_channels,</span>
+<span class="sd">            kernel_size=1,</span>
+<span class="sd">            padding=0,</span>
+<span class="sd">            stride=1,</span>
+<span class="sd">            bias=True,</span>
+<span class="sd">        )</span>
+<span class="sd">        self.bn1 = nn.BatchNorm2d(bottleneck_channels)</span>
+<span class="sd">        self.conv2 = nn.Conv2d(</span>
+<span class="sd">            bottleneck_channels,</span>
+<span class="sd">            bottleneck_channels,</span>
+<span class="sd">            kernel_size=3,</span>
+<span class="sd">            padding=1,</span>
+<span class="sd">            stride=1,</span>
+<span class="sd">            bias=True,</span>
+<span class="sd">        )</span>
+<span class="sd">        self.bn2 = nn.BatchNorm2d(bottleneck_channels)</span>
+<span class="sd">        self.conv3 = nn.Conv2d(</span>
+<span class="sd">            bottleneck_channels,</span>
+<span class="sd">            out_channels,</span>
+<span class="sd">            kernel_size=1,</span>
+<span class="sd">            padding=0,</span>
+<span class="sd">            stride=1,</span>
+<span class="sd">            bias=True,</span>
+<span class="sd">        )</span>
+<span class="sd">        self.bn3 = nn.BatchNorm2d(out_channels)</span>
+<span class="sd">        self.conv_residual = nn.Conv2d(</span>
+<span class="sd">            in_channels, out_channels, kernel_size=1, padding=0, stride=1, bias=True</span>
+<span class="sd">        )</span>
+
+<span class="sd">    def forward(self, x):</span>
+<span class="sd">        z = F.relu(self.bn1(self.conv1(x)), inplace=True)</span>
+<span class="sd">        z = F.relu(self.bn2(self.conv2(z)), inplace=True)</span>
+<span class="sd">        z = F.relu(self.bn3(self.conv3(z)), inplace=True)</span>
+<span class="sd">        z = z + self.conv_residual(x)</span>
+<span class="sd">        return z</span>
+
+
+<span class="sd">class UpsamplingBlock(nn.Module):</span>
+<span class="sd">    def __init__(self, out_channels_for_encoder, n_times_to_upsample):</span>
+<span class="sd">        super().__init__()</span>
+<span class="sd">        up_convs = []</span>
+<span class="sd">        initial_in_channel = out_channels_for_encoder[n_times_to_upsample - 1]</span>
+<span class="sd">        out_channels_for_conv_trans = [</span>
+<span class="sd">            ch // 4 for ch in out_channels_for_encoder[:n_times_to_upsample][::-1]</span>
+<span class="sd">        ]</span>
+
+<span class="sd">        for i in range(n_times_to_upsample):</span>
+<span class="sd">            if i == 0:</span>
+<span class="sd">                up_convs.append(</span>
+<span class="sd">                    nn.ConvTranspose2d(</span>
+<span class="sd">                        initial_in_channel,</span>
+<span class="sd">                        out_channels_for_conv_trans[i],</span>
+<span class="sd">                        kernel_size=2,</span>
+<span class="sd">                        stride=2,</span>
+<span class="sd">                    )</span>
+<span class="sd">                )</span>
+<span class="sd">            else:</span>
+<span class="sd">                up_convs.append(</span>
+<span class="sd">                    nn.ConvTranspose2d(</span>
+<span class="sd">                        out_channels_for_conv_trans[i - 1],</span>
+<span class="sd">                        out_channels_for_conv_trans[i],</span>
+<span class="sd">                        kernel_size=2,</span>
+<span class="sd">                        stride=2,</span>
+<span class="sd">                    )</span>
+<span class="sd">                )</span>
+<span class="sd">        self.up_convs = nn.ModuleList(up_convs)</span>
+
+<span class="sd">    def forward(self, x):</span>
+<span class="sd">        for up_conv in self.up_convs:</span>
+<span class="sd">            x = up_conv(x)</span>
+<span class="sd">        return x</span>
+
+
+<span class="sd">class IntermediateFeatureMap(nn.Module):</span>
+<span class="sd">    def __init__(self, in_channels, bottleneck_channels, out_channels):</span>
+<span class="sd">        super().__init__()</span>
+<span class="sd">        self.pool = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)</span>
+<span class="sd">        self.bottleneck_1 = Bottleneck(in_channels, bottleneck_channels, in_channels)</span>
+<span class="sd">        self.bottleneck_2 = Bottleneck(in_channels, bottleneck_channels, out_channels)</span>
+
+<span class="sd">    def forward(self, x):</span>
+<span class="sd">        x = self.pool(x)</span>
+<span class="sd">        x = self.bottleneck_1(x)</span>
+<span class="sd">        x = self.bottleneck_2(x)</span>
+<span class="sd">        return x</span>
+
+
+<span class="sd">class SuggestiveAnnotationModel(nn.Module):</span>
+<span class="sd">    def __init__(</span>
+<span class="sd">        self, in_channels, num_classes, out_channels=[256, 256, 512, 1024, 1024, 1024]</span>
+<span class="sd">    ):</span>
+<span class="sd">        super().__init__()</span>
+<span class="sd">        encoder_blocks = []</span>
+<span class="sd">        decoder_blocks = []</span>
+<span class="sd">        for i, output_channel in enumerate(out_channels):</span>
+<span class="sd">            if i == 0:</span>
+<span class="sd">                encoder_blocks.append(</span>
+<span class="sd">                    InputBlock(in_channels=in_channels, out_channels=output_channel)</span>
+<span class="sd">                )</span>
+<span class="sd">            else:</span>
+<span class="sd">                encoder_blocks.append(</span>
+<span class="sd">                    IntermediateFeatureMap(</span>
+<span class="sd">                        in_channels=out_channels[i - 1],</span>
+<span class="sd">                        bottleneck_channels=output_channel // 4,</span>
+<span class="sd">                        out_channels=output_channel,</span>
+<span class="sd">                    )</span>
+<span class="sd">                )</span>
+<span class="sd">            decoder_blocks.append(</span>
+<span class="sd">                UpsamplingBlock(</span>
+<span class="sd">                    out_channels_for_encoder=out_channels, n_times_to_upsample=i + 1</span>
+<span class="sd">                )</span>
+<span class="sd">            )</span>
+<span class="sd">        self.encoder_blocks = nn.ModuleList(encoder_blocks)</span>
+<span class="sd">        self.decoder_blocks = nn.ModuleList(decoder_blocks)</span>
+<span class="sd">        self.out_conv_1 = ConvBlock(</span>
+<span class="sd">            in_channels=(out_channels[0] // 4) * len(out_channels),</span>
+<span class="sd">            out_channels=num_classes,</span>
+<span class="sd">            kernel_size=3,</span>
+<span class="sd">            stride=1,</span>
+<span class="sd">            padding=1,</span>
+<span class="sd">        )</span>
+<span class="sd">        self.out_conv_2 = ConvBlock(</span>
+<span class="sd">            in_channels=num_classes, out_channels=num_classes, kernel_size=1, stride=1</span>
+<span class="sd">        )</span>
+
+<span class="sd">    def forward(self, x, with_image_embedding=False):</span>
+<span class="sd">        encoder_outputs = []</span>
+<span class="sd">        for encoder_block in self.encoder_blocks:</span>
+<span class="sd">            x = encoder_block(x)</span>
+<span class="sd">            encoder_outputs.append(x)</span>
+
+<span class="sd">        decoder_outputs = []</span>
+<span class="sd">        for encoder_output, decoder_block in zip(encoder_outputs, self.decoder_blocks):</span>
+<span class="sd">            decoder_output = decoder_block(encoder_output)</span>
+<span class="sd">            decoder_outputs.append(decoder_output)</span>
+
+<span class="sd">        concat = torch.cat(decoder_outputs, 1)</span>
+<span class="sd">        out = self.out_conv_1(concat)</span>
+<span class="sd">        out = self.out_conv_2(out)</span>
+
+<span class="sd">        if with_image_embedding:</span>
+<span class="sd">            *_, last_encoder_output = encoder_outputs</span>
+<span class="sd">            last_encoder_output = last_encoder_output.view(</span>
+<span class="sd">                *last_encoder_output.shape[:2], -1</span>
+<span class="sd">            )</span>
+<span class="sd">            image_embeddings = last_encoder_output.mean(-1)</span>
+<span class="sd">            return out, image_embeddings</span>
+<span class="sd">        else:</span>
+<span class="sd">            return out</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Jianxu Chen.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

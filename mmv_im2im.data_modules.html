@@ -324,12 +324,8 @@ when using DDP.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.train_dataloader">
 <span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule.train_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.train_dataloader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement one or more PyTorch DataLoaders for training.</p>
-<dl class="simple">
-<dt>Return:</dt><dd><p>A collection of <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> specifying training samples.
-In the case of multiple dataloaders, please see this <span class="xref std std-ref">section</span>.</p>
-</dd>
-</dl>
+<dd><p>An iterable or collection of iterables specifying training samples.</p>
+<p>For more information about multiple dataloaders, see this <span class="xref std std-ref">section</span>.</p>
 <p>The dataloader you return will not be reloaded unless you set
 <a href="#id1"><span class="problematic" id="id2">:paramref:`~pytorch_lightning.trainer.Trainer.reload_dataloaders_every_n_epochs`</span></a> to
 a positive integer.</p>
@@ -351,57 +347,17 @@ a positive integer.</p>
 <li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
 </ul>
 <dl class="simple">
-<dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware.
+<dt>Note:</dt><dd><p>Lightning tries to add the correct sampler for distributed and arbitrary hardware.
 There is no need to set it yourself.</p>
 </dd>
 </dl>
-<p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># single dataloader</span>
-<span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-                                    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,))])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;/path/to/mnist/&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
-                    <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">loader</span>
-
-<span class="c1"># multiple dataloaders, return as list</span>
-<span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">mnist</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">cifar</span> <span class="o">=</span> <span class="n">CIFAR</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">mnist_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">mnist</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">cifar_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">cifar</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="c1"># each batch will be a list of tensors: [batch_mnist, batch_cifar]</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">mnist_loader</span><span class="p">,</span> <span class="n">cifar_loader</span><span class="p">]</span>
-
-<span class="c1"># multiple dataloader, return as dict</span>
-<span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">mnist</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">cifar</span> <span class="o">=</span> <span class="n">CIFAR</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-    <span class="n">mnist_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">mnist</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">cifar_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">cifar</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="c1"># each batch will be a dict of tensors: {&#39;mnist&#39;: batch_mnist, &#39;cifar&#39;: batch_cifar}</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;mnist&#39;</span><span class="p">:</span> <span class="n">mnist_loader</span><span class="p">,</span> <span class="s1">&#39;cifar&#39;</span><span class="p">:</span> <span class="n">cifar_loader</span><span class="p">}</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.val_dataloader">
 <span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mmv_im2im/data_modules/data_loader_basic.html#Im2ImDataModule.val_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.val_dataloader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement one or multiple PyTorch DataLoaders for validation.</p>
+<dd><p>An iterable or collection of iterables specifying validation samples.</p>
+<p>For more information about multiple dataloaders, see this <span class="xref std std-ref">section</span>.</p>
 <p>The dataloader you return will not be reloaded unless you set
 <a href="#id3"><span class="problematic" id="id4">:paramref:`~pytorch_lightning.trainer.Trainer.reload_dataloaders_every_n_epochs`</span></a> to
 a positive integer.</p>
@@ -413,37 +369,11 @@ a positive integer.</p>
 <li><p><a class="reference internal" href="#mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup" title="mmv_im2im.data_modules.data_loader_basic.Im2ImDataModule.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
 </ul>
 <dl class="simple">
-<dt>Note:</dt><dd><p>Lightning adds the correct sampler for distributed and arbitrary hardware
+<dt>Note:</dt><dd><p>Lightning tries to add the correct sampler for distributed and arbitrary hardware
 There is no need to set it yourself.</p>
 </dd>
-<dt>Return:</dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code> or a sequence of them specifying validation samples.</p>
-</dd>
-</dl>
-<p>Examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-                                    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,))])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;/path/to/mnist/&#39;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">loader</span>
-
-<span class="c1"># can also return multiple dataloaders</span>
-<span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">loader_a</span><span class="p">,</span> <span class="n">loader_b</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">loader_n</span><span class="p">]</span>
-</pre></div>
-</div>
-<dl class="simple">
 <dt>Note:</dt><dd><p>If you don’t need a validation dataset and a <code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code>, you don’t need to
 implement this method.</p>
-</dd>
-<dt>Note:</dt><dd><p>In the case where you return multiple validation dataloaders, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">validation_step()</span></code>
-will have an argument <code class="docutils literal notranslate"><span class="pre">dataloader_idx</span></code> which matches the order here.</p>
 </dd>
 </dl>
 </dd></dl>

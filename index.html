@@ -222,30 +222,31 @@
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
 <p>The overall package is designed with a generic image-to-image transformation framework, which could be directly used for semantic segmentation, instance segmentation, image restoration, image generation, labelfree prediction, staining transformation, etc.. The implementation takes advantage of the state-of-the-art ML engineering techniques for users to focus on researches without worrying about the engineering details. In our pre-print <a class="reference external" href="https://arxiv.org/abs/2209.02498">arxiv link</a>, we demonstrated the effectiveness of <em>MMV_Im2Im</em> in more than ten different biomedical problems/datasets.</p>
 <ul class="simple">
-<li><p>For biomedical machine learning researchers, we hope this new package could serve as the starting point for their specific problems to stimulate new biomedical image analysis or machine learning methods.</p></li>
-<li><p>For experimental biomedical researchers, we hope this work can provide a holistic view of the image-to-image transformation concept with diverse examples, so that deep learning based image-to-image transformation could be further integrated into the assay development process and permit new biomedical studies that can hardly be done only with traditional experimental methods</p></li>
+<li><p>For computational biomedical researchers (e.g., AI algorithm development or bioimage analysis workflow development), we hope this package could serve as the starting point for their specific problems, since the image-to-image “boilerplates” can be easily extended further development or adapted for users’ specific problems.</p></li>
+<li><p>For experimental biomedical researchers, we hope this work provides a comprehensive view of the image-to-image transformation concept through diversified examples and use cases, so that deep learning based image-to-image transformation could be integrated into the assay development process and permit new biomedical studies that can hardly be done only with traditional experimental methods</p></li>
 </ul>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
-<p>We recommend to <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands">create a new conda environment</a> or <a class="reference external" href="https://docs.python.org/3/library/venv.html">a virtual environment</a> with Python 3.9.</p>
+<p>Before starting, we recommend to <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands">create a new conda environment</a> or <a class="reference external" href="https://docs.python.org/3/library/venv.html">a virtual environment</a> with Python 3.9+.</p>
 <section id="install-pytorch-before-installing-our-package">
 <h3>Install PyTorch before installing our package<a class="headerlink" href="#install-pytorch-before-installing-our-package" title="Permalink to this heading">¶</a></h3>
-<p>Follow the instruction from the official website: <a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a>. E.g..</p>
+<p>Follow the instruction from the official website: <a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a>.</p>
 <p>To install the stable version (accessed on Oct 20, 2022) with conda for CUDA 11.3 (also, fine with 11.4), use the following command. Make sure check the website to find the command suitable for your system.</p>
+<p>(note: we haven’t tested the latest PyTorch 2.0, will update accordingly if necessary.)</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pytorch<span class="w"> </span>torchvision<span class="w"> </span>torchaudio<span class="w"> </span><span class="nv">cudatoolkit</span><span class="o">=</span><span class="m">11</span>.3<span class="w"> </span>-c<span class="w"> </span>pytorch
 </pre></div>
 </div>
 </section>
-<section id="basic-installation">
-<h3>basic installation<a class="headerlink" href="#basic-installation" title="Permalink to this heading">¶</a></h3>
-<p>(for users only using this package, not planning to change any code or make any extension):</p>
+<section id="install-mmv-im2im-basic">
+<h3>Install MMV_Im2Im (basic):<a class="headerlink" href="#install-mmv-im2im-basic" title="Permalink to this heading">¶</a></h3>
+<p>(For users only using this package, not planning to change any code or make any extension):</p>
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">mmv_im2im</span></code><span class="raw-html-m2r"><br></span>
 <strong>Development Head:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/MMV-Lab/mmv_im2im.git</span></code></p>
 </section>
-<section id="build-from-source">
-<h3>build from source<a class="headerlink" href="#build-from-source" title="Permalink to this heading">¶</a></h3>
-<p>(for users planning to extend the methods or improve the code):</p>
+<section id="install-mmv-im2im-build-from-source">
+<h3>Install MMV_Im2Im (build from source):<a class="headerlink" href="#install-mmv-im2im-build-from-source" title="Permalink to this heading">¶</a></h3>
+<p>(For users planning to extend the methods or improve the code):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">MMV</span><span class="o">-</span><span class="n">Lab</span><span class="o">/</span><span class="n">mmv_im2im</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">mmv_im2im</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="nb">all</span><span class="p">]</span>
@@ -254,111 +255,44 @@
 <p>Note: The <code class="docutils literal notranslate"><span class="pre">-e</span></code> option is the so-called “editable” mode. This will allow code changes taking effect immediately.</p>
 </section>
 </section>
-<section id="quick-start-try-out-on-a-simple-example">
-<h2>Quick start / Try out on a simple example<a class="headerlink" href="#quick-start-try-out-on-a-simple-example" title="Permalink to this heading">¶</a></h2>
-<p>Here, we use a <a class="reference external" href="https://www.allencell.org/label-free-determination.html#:~:text=The%20Label-Free%20Determination%20model%20can%20leverage%20the%20specificity,structures.%20How%20does%20the%20label-free%20determination%20model%20work%3F">3D labelfree prediction</a> as an example. (If you followed <a class="reference external" href="#basic-installation">basic installation</a>, you will need to install the <code class="docutils literal notranslate"><span class="pre">quilt3</span></code> package by <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">quilt3</span></code>, in order to download the data programmatically.)</p>
-<p><strong>step 1 (data preparation):</strong>, we pull 100 examples of lamin B1 images and the corresponding brightfield images from the AllenCell quilt bucket by running the following in the command line.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
-python<span class="w">  </span>scripts/pull_labelfree_sample_data.py<span class="w"> </span>--download_path<span class="w"> </span>/path/to/save/the/downloaded/images/<span class="w"> </span>--structure<span class="w"> </span>LMNB1<span class="w"> </span>--num<span class="w"> </span><span class="m">100</span>
-</pre></div>
-</div>
-<p><strong>step 2 (train):</strong> Now, we can train a labelfree model like this:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
-run_im2im<span class="w"> </span>--config<span class="w"> </span>train_labelfree_3d<span class="w">  </span>--data.data_path<span class="w"> </span>/path/to/save/the/downloaded/train
-</pre></div>
-</div>
-<p>This will apply all the default settings to train the 3D labelfree model. The training will stop after 100 epochs,</p>
-<p><strong>step 3 (test):</strong></p>
-<p>Suppose you run the training under the root of mmv_im2im. Then you will find a folder <code class="docutils literal notranslate"><span class="pre">mmv_im2im/lightning_logs/checkpoints</span></code>, where you can find several trained model. Here, we test with the model after the full training <code class="docutils literal notranslate"><span class="pre">last.ckpt</span></code> (other models are intermediate results for debugging purpose) by running:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Suppose the current working directory is the root of mmv_im2im</span>
-run_im2im<span class="w"> </span>--config<span class="w"> </span>inference_labelfree_3d<span class="w"> </span>--data.inference_input.dir<span class="w"> </span>/path/to/save/the/downloaded/holdout<span class="w"> </span>--data.inference_output.path<span class="w"> </span>/path/to/save/predictions/<span class="w"> </span>--model.checkpoint<span class="w"> </span>lightning_logs/checkpoints/last.ckpt
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this heading">¶</a></h2>
+<p>You can try out on a simple example following <a class="reference external" href="tutorials/quick_start.md">the quick start guide</a></p>
+<p>Basically, you can specify your training configuration in a yaml file and run training with <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">/path/to/train_config.yaml</span></code>. Then, you can specify the inference configuration in another yaml file and run inference with <code class="docutils literal notranslate"><span class="pre">run_im2im</span> <span class="pre">--config</span> <span class="pre">/path/to/inference_config.yaml</span></code>. You can also run the inference as a function with the provided API. This will be useful if you want to run the inference within another python script or workflow.  Here is an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">aicsimageio</span> <span class="kn">import</span> <span class="n">AICSImage</span>
+<span class="kn">from</span> <span class="nn">aicsimageio.writers</span> <span class="kn">import</span> <span class="n">OmeTiffWriter</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im.configs.config_base</span> <span class="kn">import</span> <span class="n">ProgramConfig</span><span class="p">,</span> <span class="n">parse_adaptor</span><span class="p">,</span> <span class="n">configuration_validation</span>
+<span class="kn">from</span> <span class="nn">mmv_im2im</span> <span class="kn">import</span> <span class="n">ProjectTester</span>
+
+<span class="c1"># load the inference configuration</span>
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">parse_adaptor</span><span class="p">(</span><span class="n">config_class</span><span class="o">=</span><span class="n">ProgramConfig</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="s2">&quot;./paper_configs/semantic_seg_2d_inference.yaml&quot;</span><span class="p">)</span>
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">configuration_validation</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+
+<span class="c1"># define the executor for inference</span>
+<span class="n">executor</span> <span class="o">=</span> <span class="n">ProjectTester</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="n">executor</span><span class="o">.</span><span class="n">setup_model</span><span class="p">()</span>
+<span class="n">executor</span><span class="o">.</span><span class="n">setup_data_processing</span><span class="p">()</span>
+
+<span class="c1"># get the data, run inference, and save the result</span>
+<span class="n">fn</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;./data/img_00_IM.tiff&quot;</span><span class="p">)</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">AICSImage</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="s2">&quot;YX&quot;</span><span class="p">,</span> <span class="n">Z</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># or using delayed loading if the data is large</span>
+<span class="c1"># img = AICSImage(fn).get_image_dask_data(&quot;YX&quot;, Z=0, C=0, T=0)</span>
+<span class="n">seg</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">process_one_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+<span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="s2">&quot;output.tiff&quot;</span><span class="p">,</span> <span class="n">dim_orders</span><span class="o">=</span><span class="s2">&quot;YX&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="walk-through-guide">
-<h2>Walk-through Guide<a class="headerlink" href="#walk-through-guide" title="Permalink to this heading">¶</a></h2>
-<p>We provide <a class="reference external" href="tutorials/README.md">a tutorial</a> for users to understand how to enjoy both the simplicity and the full flexibility of the package.</p>
-<p>The scripts and configurations for reproducing our experiments in the <a class="reference external" href="https://arxiv.org/abs/2209.02498">pre-print</a> can also be used as examples for walking through different applications.</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Application</p></th>
-<th class="head"><p>data preparation</p></th>
-<th class="head"><p>training config</p></th>
-<th class="head"><p>inference config</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>3D labelfree prediction</p></td>
-<td><p><a class="reference external" href="script/pull_labelfree_sample_data.py">script</a></p></td>
-<td><p><a class="reference external" href="./paper_configs/labelfree_3d_FCN_train.yaml">supervisedFCN</a>, <a href="#id5"><span class="problematic" id="id6">`supervisedPix2pix-TBA &lt;&gt;`_</span></a>, <a href="#id7"><span class="problematic" id="id8">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a class="reference external" href="./paper_configs/labelfree_3d_FCN_inference.yaml">supervisedFCN</a>, <a href="#id9"><span class="problematic" id="id10">`supervisedPix2pix-TBA &lt;&gt;`_</span></a>, <a href="#id11"><span class="problematic" id="id12">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>2D labelfree prediction</p></td>
-<td><p><a href="#id13"><span class="problematic" id="id14">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id15"><span class="problematic" id="id16">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id17"><span class="problematic" id="id18">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>2D semantic segmentation</p></td>
-<td><p><a href="#id19"><span class="problematic" id="id20">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id21"><span class="problematic" id="id22">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id23"><span class="problematic" id="id24">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>3D semantic segmentation</p></td>
-<td><p><a href="#id25"><span class="problematic" id="id26">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id27"><span class="problematic" id="id28">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id29"><span class="problematic" id="id30">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>2D instance segmentation</p></td>
-<td><p><a href="#id31"><span class="problematic" id="id32">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id33"><span class="problematic" id="id34">`supervisedEmbedSeg-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id35"><span class="problematic" id="id36">`supervisedEmbedseg-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>3D instance segmentation</p></td>
-<td><p><a href="#id37"><span class="problematic" id="id38">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a class="reference external" href="./paper_configs/train_embedseg_3d.yaml">supervisedEmbedSeg_fluo</a>, <a class="reference external" href="./paper_configs/train_embedseg_3d_BF.yaml">supervisedEmbedSeg_bf</a></p></td>
-<td><p><a class="reference external" href="./paper_configs/inference_embedseg_3d.yaml">supervisedEmbedseg_fluo</a>, <a class="reference external" href="./paper_configs/inference_embedseg_3d_bf.yaml">supervisedEmbedSeg_bf</a></p></td>
-</tr>
-<tr class="row-even"><td><p>2D unsupervised segmentation</p></td>
-<td><p><a href="#id39"><span class="problematic" id="id40">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id41"><span class="problematic" id="id42">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id43"><span class="problematic" id="id44">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>3D unsupervised segmentation</p></td>
-<td><p><a href="#id45"><span class="problematic" id="id46">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id47"><span class="problematic" id="id48">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id49"><span class="problematic" id="id50">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>2D synthetic image generation</p></td>
-<td><p><a href="#id51"><span class="problematic" id="id52">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id53"><span class="problematic" id="id54">`supervisedPix2pix-TBA &lt;&gt;`_</span></a>, <a href="#id55"><span class="problematic" id="id56">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id57"><span class="problematic" id="id58">`supervisedPix2pix-TBA &lt;&gt;`_</span></a>, <a href="#id59"><span class="problematic" id="id60">`unsupervised-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>3D synthetic image generation</p></td>
-<td><p><a href="#id61"><span class="problematic" id="id62">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id63"><span class="problematic" id="id64">`supervisedPix2pix-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id65"><span class="problematic" id="id66">`supervisedPix2pix-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>image restoration / denoising</p></td>
-<td><p><a href="#id67"><span class="problematic" id="id68">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id69"><span class="problematic" id="id70">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id71"><span class="problematic" id="id72">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>image modality transfer</p></td>
-<td><p><a href="#id73"><span class="problematic" id="id74">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id75"><span class="problematic" id="id76">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id77"><span class="problematic" id="id78">`supervisedFCN-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>staining transformation</p></td>
-<td><p><a href="#id79"><span class="problematic" id="id80">`script-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id81"><span class="problematic" id="id82">`supervisedPix2pix-TBA &lt;&gt;`_</span></a></p></td>
-<td><p><a href="#id83"><span class="problematic" id="id84">`supervisedPix2pix-TBA &lt;&gt;`_</span></a></p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="api-documentation">
-<h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">¶</a></h2>
-<p>For full package API (i.e., the technical details of each function), please visit <a class="reference external" href="https://MMV-Lab.github.io/mmv_im2im">MMV-Lab.github.io/mmv_im2im</a>.</p>
+<section id="tutorials-examples-demonstrations-and-documentations">
+<h2>Tutorials, examples, demonstrations and documentations<a class="headerlink" href="#tutorials-examples-demonstrations-and-documentations" title="Permalink to this heading">¶</a></h2>
+<p>The overall package aims to achieve both simplicty and flexibilty with the modularized image-to-image boilerplates. To help different users to best use this package, we provide documentations from four different aspects:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="tutorials/example_by_use_case.md">Examples (i.e., scripts and config files)</a> for reproducing all the experiments in our <a class="reference external" href="https://arxiv.org/abs/2209.02498">pre-print</a></p></li>
+<li><p>A bottom-up tutorials on <a class="reference external" href="tutorials/how_to_understand_boilerplates.md">how to understand the modularized image-to-image boilerplates</a> (for extending or adapting the package) and <a class="reference external" href="tutorials/how_to_understand_config.md">how to understand the configuration system in details</a> (for advance usage to make specific customization).</p></li>
+<li><p>A top-down tutorials as <a class="reference external" href="tutorials/FAQ.md">FAQ</a>, which will continuously grow as we receive more questions.</p></li>
+<li><p>Full package API (i.e., the technical details of each function) <a class="reference external" href="https://MMV-Lab.github.io/mmv_im2im">MMV-Lab.github.io/mmv_im2im</a>.</p></li>
+</ul>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this heading">¶</a></h2>

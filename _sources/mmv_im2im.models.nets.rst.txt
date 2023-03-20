@@ -20,6 +20,14 @@ mmv\_im2im.models.nets.BranchedERFNet\_3d module
    :undoc-members:
    :show-inheritance:
 
+mmv\_im2im.models.nets.SA\_2d module
+------------------------------------
+
+.. automodule:: mmv_im2im.models.nets.SA_2d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mmv\_im2im.models.nets.deeplabv3\_2d module
 -------------------------------------------
 
