@@ -39,7 +39,3 @@ model:
         nf: 64
         norm_layer: "INSTANCE"  
   checkpoint: ./lightning_logs/version_103/checkpoints/last.ckpt  #ADD-YOURS
-trainer:
-  params:
-    gpus: 1
-    precision: 16

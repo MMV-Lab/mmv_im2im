@@ -29,7 +29,6 @@ model:
   framework: pix2pix
   net:
     generator:
-      init_weight: ./lightning_logs/version_1/checkpoints/best.ckpt
       module_name: mmv_im2im.models.nets.fnet_nn_3d
       func_name: Net
       params:
@@ -53,7 +52,3 @@ model:
       sw_batch_size: 4
       overlap: 0.2
       mode: "gaussian"
-trainer:
-  params:
-    gpus: 1
-    precision: 16

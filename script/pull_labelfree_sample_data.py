@@ -79,7 +79,7 @@ class Args(object):
         p.add_argument(
             "--num",
             type=int,
-            default=20,
+            default=50,
             help="number of samples to download",
         )
 

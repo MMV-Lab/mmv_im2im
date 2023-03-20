@@ -10,7 +10,8 @@ data:
       T: 0
       Z: 0
   inference_output:
-    path: ./data/semantic2D/testA_pred   
+    path: ./data/semantic2D/testA_pred
+    suffix: .tif
 
   preprocess:
     - module_name: mmv_im2im.preprocessing.transforms
@@ -43,15 +44,11 @@ model:
       depths: [2, 2, 2, 2, 2, 2]
       norm_name: "batch"
       use_checkpoint: False
-  checkpoint: ./lightning_logs/version_2/checkpoints/best.ckpt
+  checkpoint: ./lightning_logs/version_3/checkpoints/best.ckpt
   model_extra:
+    cpu_only: True
     sliding_window_params:
       roi_size: [512, 512]
       sw_batch_size: 4
       overlap: 0.2
       mode: "gaussian"
-trainer:
-  verbose: True
-  params:
-    gpus: 1
-    precision: 16

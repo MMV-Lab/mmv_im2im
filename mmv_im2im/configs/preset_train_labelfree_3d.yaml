@@ -24,11 +24,6 @@ data:
     - module_name: mmv_im2im.preprocessing.transforms
       func_name: norm_around_center
       params:
-        keys: ["IM"]
-        min_z: 32
-    - module_name: mmv_im2im.preprocessing.transforms
-      func_name: norm_around_center
-      params:
         keys: ["IM","GT"]
         min_z: 32
     - module_name: monai.transforms
@@ -80,14 +75,14 @@ trainer:
   params:
     gpus: 1
     precision: 16
-    max_epochs: 100
+    max_epochs: 1000
     detect_anomaly: True
   callbacks:
     - module_name: pytorch_lightning.callbacks.early_stopping
       func_name: EarlyStopping
       params:
         monitor: 'val_loss'
-        patience: 100 
+        patience: 50
     - module_name: pytorch_lightning.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:

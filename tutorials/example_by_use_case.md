@@ -1,0 +1,21 @@
+# Examples by use cases
+
+This page lists the jupyter notebooks (for downloading the data from public resource) and configuration files (for training and inference) for all experiments in our [pre-print](https://arxiv.org/abs/2209.02498). These can also be used as examples for walking through different applications.
+
+| Application | data preparation | training config | inference config |
+| :---: |  :---: |  :---: |  :---: |
+| 3D labelfree prediction  | [notebook](../paper_configs/prepare_data/labelfree_3d.ipynb) | [FCN](../paper_configs/labelfree_3d_FCN_train.yaml), [pix2pix_from_scratch](../paper_configs/labelfree_3d_pix2pix_train.yaml), [pix2pix_transfer_learning](../paper_configs/labelfree_3d_pix2pix_finetune.yaml) |  [FCN](../paper_configs/labelfree_3d_FCN_inference.yaml), [ix2pix](../paper_configs/labelfree_3d_pix2pix_inference.yaml)|
+| 2D labelfree prediction  | [notebook](../paper_configs/prepare_data/labelfree_2d.ipynb) | [FCN](../paper_configs/labelfree_2d_FCN_train.yaml |  [FCN](../paper_configs/labelfree_2d_FCN_inference.yaml) |
+| 2D semantic segmentation | [notebook](../paper_configs/prepare_data/semantic_seg_2d.ipynb) | [FCN](../paper_configs/semantic_seg_2d_train.yaml) |  [FCN](../paper_configs/semantic_seg_2d_inference.yaml) |
+| 3D semantic segmentation | [notebook](../paper_configs/prepare_data/semantic_seg_3d.ipynb) | [FCN](../paper_configs/semantic_seg_3d_train.yaml) |  [FCN](../paper_configs/semantic_seg_3d_inference.yaml) |
+| 2D instance segmentation | [notebook](../paper_configs/prepare_data/instance_seg_2d.ipynb) | [EmbedSeg](../paper_configs/instance_seg_2d_train.yaml) |  [Embedseg](../paper_configs/instance_seg_2d_inference.yaml) |
+| 3D instance segmentation* | [notebook](../paper_configs/prepare_data/instance_seg_3d.ipynb) | [EmbedSeg_fluorescent_pretrain](../paper_configs/instance_seg_3d_train_fluo_pretrain.yaml), [EmbedSeg_fluoresenct_finetune](../paper_configs/instance_seg_3d_train_fluo_finetune.yaml), [EmbedSeg_brightfield_pretrain](../paper_configs/instance_seg_3d_train_bf_pretrain.yaml), [EmbedSeg_brightfield_finetune](../paper_configs/instance_seg_3d_train_bf_finetune.yaml), [EmbedSeg_FBL_pretrain](../paper_configs/instance_seg_3d_train_fbl_pretrain.yaml), [EmbedSeg_FBL_finetune](../paper_configs/instance_seg_3d_train_fbl_fintune.yaml) |  [Embedseg_fluo](../paper_configs/instance_seg_3d_inference_fluo.yaml), [EmbedSeg_brightfield](../paper_configs/instance_seg_3d_inference_bf.yaml), [EmbedSeg_FBL](../paper_configs/instance_seg_3d_inference_fbl.yaml) | 
+| 2D unsupervised segmentation | [notebook](../paper_configs/prepare_data/unsupervised_seg_2d.ipynb) | [FCN_unpair](../paper_configs/unsupervised_seg_2d_train.yaml) |  [FCN](../paper_configs/unsupervised_seg_2d_inference.yaml) | 
+| 3D unsupervised segmentation | [notebook](../paper_configs/prepare_data/unsupervised_seg_3d.ipynb) | [FCN_unpair](../paper_configs/unsupervised_seg_3d_train.yaml) |  [FCN](../paper_configs/unsupervised_seg_3d_inference.yaml) | 
+| 2D synthetic image generation | [notebook](../paper_configs/prepare_data/sythetic_gen_2d.ipynb) | [pix2pix](../paper_configs/synthetic_2d_train.yaml) | [pix2pix](../paper_configs/synthetic_2d_inference.yaml) |
+| 3D synthetic image generation | [notebook](../paper_configs/prepare_data/sythetic_gen_3d.ipynb) | [pix2pix](../paper_configs/synthetic_3d_train.yaml) | [pix2pix](../paper_configs/synthetic_3d_inference.yaml) |
+| image restoration / denoising  | [notebook](../paper_configs/prepare_data/denoising.ipynb) | [FCN](../paper_configs/denoising_3d_train.yaml) | [FCN](../paper_configs/denoising_3d_inference.yaml)  |
+| image modality transfer | [notebook](../paper_configs/prepare_data/modaity_transfer.ipynb) | [FCN](../paper_configs/modality_transfer_3d_train.yaml) | [FCN](../paper_configs/modality_transfer_3d_inference.yaml)  |
+| staining transformation | [notebook](../paper_configs/prepare_data/multiplex.ipynb) | [pix2pix](../paper_configs/multiplex_train.yaml) | [pix2pix](../paper_configs/multiplex_inference.yaml) |
+
+* See [notes on EmbedSeg training](note_embedseg.md)

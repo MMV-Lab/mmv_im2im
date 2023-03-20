@@ -134,10 +134,11 @@ model:
 trainer:
   verbose: True
   params:
-    gpus: 1
+    accelerator: "gpu"
+    devices: 1
     precision: 16
     max_epochs: 10000
-    terminate_on_nan: True
+    detect_anomaly: True
   callbacks:
     # - module_name: pytorch_lightning.callbacks.early_stopping
     #   func_name: EarlyStopping

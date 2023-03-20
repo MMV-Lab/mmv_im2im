@@ -127,8 +127,9 @@ model:
 trainer:
   verbose: True
   params:
-    gpus: 1
+    devices: 1
     precision: 16
+    accelerator: "gpu"
     max_epochs: 5000
     detect_anomaly: True
   callbacks:
