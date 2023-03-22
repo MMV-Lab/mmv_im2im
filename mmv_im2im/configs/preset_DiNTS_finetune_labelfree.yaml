@@ -1,0 +1,95 @@
+mode: train
+
+data:
+  category: "pair"
+  dataloader:
+    train:
+      dataloader_params:
+        batch_size: 1
+        pin_memory: True
+        num_workers: 4
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["IM", "GT"]
+        dimension_order_out: "ZYX"
+        T: 0
+        C: 0
+    - module_name: monai.transforms
+      func_name: AddChanneld
+      params:
+        keys: ["IM", "GT"]  
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
+      params:
+        keys: ["IM","GT"]
+        min_z: 32     
+    - module_name: monai.transforms
+      func_name: RandSpatialCropSamplesd
+      params:
+        keys: ["IM", "GT"]
+        random_size: False
+        num_samples: 4
+        roi_size: [32, 128, 128]
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT"]
+  augmentation:
+    - module_name: monai.transforms
+      func_name: RandFlipd
+      params:
+        prob: 0.5
+        keys: ["IM", "GT"]
+
+model:
+  framework: dints
+  # checkpoint:
+  net:
+    stem_param:
+      in_channels: 2,
+      num_classes: 1,
+      use_downsample: True,
+    topo_param:
+      channel_mul: 1.0
+      num_blocks: 12
+      num_depths: 4
+      use_downsample: True
+  criterion:
+    module_name: torch.nn
+    func_name: MSELoss
+    params:
+      reduction: 'mean'
+  optimizer:
+    module_name: torch.optim
+    func_name: SGD # Adam  # AdamW
+    params:
+      lr: 0.001
+      momentum: 0.9
+      weight_decay: 0.00004
+  # scheduler:
+  #   module_name: torch.optim.lr_scheduler
+  #   func_name: ExponentialLR
+  #   params:
+  #     gamma: 0.99
+trainer:
+  verbose: True
+  params:
+    accelerator: "gpu"
+    devices: 1
+    precision: 16
+    max_epochs: 1000
+    detect_anomaly: True
+  callbacks:
+    - module_name: pytorch_lightning.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 50 
+    - module_name: pytorch_lightning.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: 'best'
