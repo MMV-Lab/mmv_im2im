@@ -4,6 +4,7 @@ from typing import Dict
 from pathlib import Path
 import pytorch_lightning as pl
 import torch
+import torch.nn.functional as F
 from aicsimageio.writers import OmeTiffWriter
 import monai
 
@@ -74,6 +75,8 @@ class Model(pl.LightningModule):
         if self.stage == "search" or self.stage == "finetune":
             self.criterion = parse_config(self.model_info.criterion)
 
+        self.warm_up = self.model_info.model_extra["warm_up_epoch"]
+        self.factor_ram_cost = self.model_info.model_extra["factor_ram_cost"]
         self.model_info = model_info_xx
         self.verbose = verbose
 
@@ -97,45 +100,100 @@ class Model(pl.LightningModule):
     def forward(self, x):
         return self.net(x)
 
-    def run_finetune(self, batch, validation_stage):
+    def run_finetune(self, batch):
+        inputs = batch["IM"]
+        labels = batch["GT"]
 
-    def run_search(self, batch, validation_stage):
+        # run forward pass and get loss
+        outputs = self.model(inputs)
+        loss = self.criterion(outputs, labels)
+
+        return loss, outputs
+
+    def run_search(self, batch):
+        x = batch["IM"]
+        y = batch["GT"]
+
+        # extract the first half to train w
+        # comparable to train_dataloader_w in original implementation
+        # https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L366  # noqa E501
+        inputs = x[:x.shape[0]//2, ]
+        labels = y[:y.shape[0]//2, ]
+
+        # unfreeze the model and freeze the dints space
+        try:
+            for _ in self.model.weight_parameters():
+                _.requires_grad = True
+        except Exception:
+            for _ in self.model.module.weight_parameters():
+                _.requires_grad = True
 
         self.dints_space.log_alpha_a.requires_grad = False
         self.dints_space.log_alpha_c.requires_grad = False
 
-        x = batch["IM"]
-        y = batch["GT"]
-        if "CM" in batch.keys():
-            assert (
-                self.weighted_loss
-            ), "Costmap is detected, but no use_costmap param in criterion"
-            cm = batch["CM"]
+        # run forward pass and get loss
+        outputs = self.model(inputs)
+        loss = self.criterion(outputs, labels)
 
-        # only for badly formated data file
-        if x.size()[-1] == 1:
-            x = torch.squeeze(x, dim=-1)
-            y = torch.squeeze(y, dim=-1)
+        # check if reaching number of warm up epochs:
+        # similar to this: https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L522
+        if self.trainer.current_epoch < self.warm_up:  #  or using: self.trainer.global_step
+            return loss, outputs
+    
+        ###############################
+        # if warm-up period is done
+        ###############################
+        inputs_search = x[x.shape[0]//2:, ]
+        labels_search = y[y.shape[0]//2:, ]
 
-        y_hat = self(x)
+        # freeze the model and unfreeze the dints space
+        try:
+            for _ in self.model.weight_parameters():
+                _.requires_grad = False
+        except Exception:
+            for _ in self.model.module.weight_parameters():
+                _.requires_grad = False
 
-        if isinstance(self.criterion, torch.nn.CrossEntropyLoss):
-            # in case of CrossEntropy related error
-            # see: https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542  # noqa E501
-            y = torch.squeeze(y, dim=1)  # remove C dimension
+        self.dints_space.log_alpha_a.requires_grad = True
+        self.dints_space.log_alpha_c.requires_grad = True
 
-        if self.weighted_loss:
-            loss = self.criterion(y_hat, y, cm)
-        else:
-            loss = self.criterion(y_hat, y)
+        # https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L540
+        # linear increase topology and RAM loss
+        assert inputs_search.is_cuda, "dints search can only run on GPU"
+        current_device = inputs_search.get_device()
 
-        return loss, y_hat
+        entropy_alpha_c = torch.tensor(0.0).to(current_device)
+        entropy_alpha_a = torch.tensor(0.0).to(current_device)
+        ram_cost_full = torch.tensor(0.0).to(current_device)
+        ram_cost_usage = torch.tensor(0.0).to(current_device)
+        ram_cost_loss = torch.tensor(0.0).to(current_device)
+        topology_loss = torch.tensor(0.0).to(current_device)
+
+        probs_a, arch_code_prob_a = self.dints_space.get_prob_a(child=True)
+        entropy_alpha_a = -((probs_a) * torch.log(probs_a + 1e-5)).mean()
+        entropy_alpha_c = -(
+            F.softmax(self.dints_space.log_alpha_c, dim=-1) * F.log_softmax(self.dints_space.log_alpha_c, dim=-1)
+        ).mean()
+        topology_loss = self.dints_space.get_topology_entropy(probs_a)
+
+        ram_cost_full = self.dints_space.get_ram_cost_usage(inputs.shape, full=True)
+        ram_cost_usage = self.dints_space.get_ram_cost_usage(inputs.shape)
+        ram_cost_loss = torch.abs(self.factor_ram_cost - ram_cost_usage / ram_cost_full)
+
+        combination_weights = (self.trainer.current_epoch - self.warm_up) / (self.trainer.max_epochs - self.warm_up)  # not sure if it is self.max_epochs or self.trainer.max_epochs
+        outputs_search = self.model(inputs_search)
+
+        loss += 1.0 * (
+                    combination_weights * (entropy_alpha_a + entropy_alpha_c) + ram_cost_loss + 0.001 * topology_loss
+                )
+
+        return loss, outputs_search
 
     def training_step(self, batch, batch_idx):
-        if self.stage == "search"
-            loss, y_hat = self.run_search(batch, validation_stage=False)
+        if self.stage == "search":
+            loss, y_hat = self.run_search(batch)
         elif self.stage == "finetune":
-            loss, y_hat = self.run_finetune(batch, validation_stage=False)
+            loss, y_hat = self.run_finetune(batch)
         else:
             raise ValueError("invalid stage value")
         self.log("train_loss_step", loss, prog_bar=True)
