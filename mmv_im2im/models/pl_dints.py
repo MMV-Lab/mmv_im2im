@@ -7,12 +7,9 @@ import torch
 import torch.nn.functional as F
 from aicsimageio.writers import OmeTiffWriter
 import monai
+from monai.inferers import sliding_window_inference
 
-from mmv_im2im.utils.misc import (
-    parse_config,
-    parse_config_func,
-    parse_config_func_without_params,
-)
+from mmv_im2im.utils.misc import parse_config, parse_config_func
 from mmv_im2im.utils.model_utils import init_weights
 
 
@@ -27,6 +24,7 @@ class Model(pl.LightningModule):
     verbose: bool
         whether print out additional information for debug
     """
+
     def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super().__init__()
 
@@ -46,27 +44,29 @@ class Model(pl.LightningModule):
         if self.stage == "inference":
             # use this function: https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/decode_plot.py  # noqa E501
             pass
-        
+
         ############################
         # set up according to stage
         ############################
         # define topology search space
         if self.stage == "search":
-            self.dints_space = monai.networks.nets.TopologySearch(**model_info_xx.net.topo_param)
+            self.dints_space = monai.networks.nets.TopologySearch(
+                **model_info_xx.net.topo_param
+            )
         else:
             ckpt = torch.load(model_info_xx.checkpoint)
-            node_a = ckpt["node_a"]  # TODO: may need to update, as pytorch lightning may save addition params in ckpt
+            node_a = ckpt[
+                "node_a"
+            ]  # TODO: may need to update, as pytorch lightning may save addition params in ckpt
             arch_code_a = ckpt["arch_code_a"]
             arch_code_c = ckpt["arch_code_c"]
 
             self.dints_space = monai.networks.nets.TopologyInstance(
-                arch_code=[arch_code_a, arch_code_c],
-                **model_info_xx.net.topo_param
+                arch_code=[arch_code_a, arch_code_c], **model_info_xx.net.topo_param
             )
         # define stem
         self.model = monai.networks.nets.DiNTS(
-            dints_space=self.dints_space,
-            **model_info_xx.net.stem_param
+            dints_space=self.dints_space, **model_info_xx.net.stem_param
         )
         # TODO: need to check whether we still need SyncBatchNorm
         # ref: https://pytorch.org/docs/stable/generated/torch.nn.SyncBatchNorm.html
@@ -87,7 +87,7 @@ class Model(pl.LightningModule):
             c_optimizer_func = parse_config_func(self.model_info.optimizer["alpha_c"])
             optimizer_base = base_optimizer_func(self.parameters())
             optimizer_a = a_optimizer_func([self.dints_space.log_alpha_a])
-            optimizer_c = c_optimizer_func([self.dints_space.log_alpha_c])        
+            optimizer_c = c_optimizer_func([self.dints_space.log_alpha_c])
 
             return optimizer_base, optimizer_a, optimizer_c
 
@@ -117,8 +117,8 @@ class Model(pl.LightningModule):
         # extract the first half to train w
         # comparable to train_dataloader_w in original implementation
         # https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L366  # noqa E501
-        inputs = x[:x.shape[0]//2, ]
-        labels = y[:y.shape[0]//2, ]
+        inputs = x[: x.shape[0] // 2,]
+        labels = y[: y.shape[0] // 2,]
 
         # unfreeze the model and freeze the dints space
         try:
@@ -136,15 +136,17 @@ class Model(pl.LightningModule):
         loss = self.criterion(outputs, labels)
 
         # check if reaching number of warm up epochs:
-        # similar to this: https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L522
-        if self.trainer.current_epoch < self.warm_up:  #  or using: self.trainer.global_step
+        # similar to this: https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L522  # noqa E501
+        if (
+            self.trainer.current_epoch < self.warm_up
+        ):  #  or using: self.trainer.global_step
             return loss, outputs
-    
+
         ###############################
         # if warm-up period is done
         ###############################
-        inputs_search = x[x.shape[0]//2:, ]
-        labels_search = y[y.shape[0]//2:, ]
+        inputs_search = x[x.shape[0] // 2 :,]
+        labels_search = y[y.shape[0] // 2 :,]
 
         # freeze the model and unfreeze the dints space
         try:
@@ -157,7 +159,7 @@ class Model(pl.LightningModule):
         self.dints_space.log_alpha_a.requires_grad = True
         self.dints_space.log_alpha_c.requires_grad = True
 
-        # https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L540
+        # https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L540  # noqa E501
         # linear increase topology and RAM loss
         assert inputs_search.is_cuda, "dints search can only run on GPU"
         current_device = inputs_search.get_device()
@@ -172,7 +174,8 @@ class Model(pl.LightningModule):
         probs_a, arch_code_prob_a = self.dints_space.get_prob_a(child=True)
         entropy_alpha_a = -((probs_a) * torch.log(probs_a + 1e-5)).mean()
         entropy_alpha_c = -(
-            F.softmax(self.dints_space.log_alpha_c, dim=-1) * F.log_softmax(self.dints_space.log_alpha_c, dim=-1)
+            F.softmax(self.dints_space.log_alpha_c, dim=-1)
+            * F.log_softmax(self.dints_space.log_alpha_c, dim=-1)
         ).mean()
         topology_loss = self.dints_space.get_topology_entropy(probs_a)
 
@@ -180,14 +183,20 @@ class Model(pl.LightningModule):
         ram_cost_usage = self.dints_space.get_ram_cost_usage(inputs.shape)
         ram_cost_loss = torch.abs(self.factor_ram_cost - ram_cost_usage / ram_cost_full)
 
-        combination_weights = (self.trainer.current_epoch - self.warm_up) / (self.trainer.max_epochs - self.warm_up)  # not sure if it is self.max_epochs or self.trainer.max_epochs
+        combination_weights = (self.trainer.current_epoch - self.warm_up) / (
+            self.trainer.max_epochs - self.warm_up
+        )  # not sure if it is self.max_epochs or self.trainer.max_epochs
+
         outputs_search = self.model(inputs_search)
+        loss_a = self.criterion(outputs_search, labels_search)
 
-        loss += 1.0 * (
-                    combination_weights * (entropy_alpha_a + entropy_alpha_c) + ram_cost_loss + 0.001 * topology_loss
-                )
+        loss_a += 1.0 * (
+            combination_weights * (entropy_alpha_a + entropy_alpha_c)
+            + ram_cost_loss
+            + 0.001 * topology_loss
+        )
 
-        return loss, outputs_search
+        return loss_a, outputs_search
 
     def training_step(self, batch, batch_idx):
         if self.stage == "search":
@@ -259,7 +268,19 @@ class Model(pl.LightningModule):
         return loss
 
     def validation_step(self, batch, batch_idx):
-        loss, y_hat = self.run_step(batch, validation_stage=True)
+        val_images = batch["IM"]
+        val_labels = batch["GT"]
+
+        pred = sliding_window_inference(
+            inputs=val_images,
+            predictor=self.model,
+            device=torch.device("cpu"),
+            **self.model_info.model_extra["validation_sliding_windows"],
+        )
+
+        # do a MSE loss
+        loss = np.mean((val_labels.astype(np.float64) - pred.astype(np.float64)) ** 2)
+
         self.log("val_loss_step", loss)
 
         return loss

@@ -86,6 +86,11 @@ model:
   model_extra:
     warm_up_epoch: 10
     factor_ram_cost: 0.8  # https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.sh#L43
+    validation_sliding_windows:
+      roi_size: [32, 128, 128]
+      sw_batch_size: 1
+      overlap: 0.6
+      mode: "gaussian"
   # scheduler:
   #   base:
   #     module_name: torch.optim.lr_scheduler
