@@ -9,7 +9,11 @@ from aicsimageio.writers import OmeTiffWriter
 import monai
 from monai.inferers import sliding_window_inference
 
-from mmv_im2im.utils.misc import parse_config, parse_config_func
+from mmv_im2im.utils.misc import (
+    parse_config,
+    parse_config_func,
+    parse_config_func_without_params,
+)
 from mmv_im2im.utils.model_utils import init_weights
 
 
@@ -46,28 +50,39 @@ class Model(pl.LightningModule):
             pass
 
         ############################
-        # set up according to stage
+        # set up according to stages
         ############################
         # define topology search space
         if self.stage == "search":
             self.dints_space = monai.networks.nets.TopologySearch(
                 **model_info_xx.net.topo_param
             )
+            # define stem
+            self.model = monai.networks.nets.DiNTS(
+                dints_space=self.dints_space, **model_info_xx.net.stem_param
+            )
+
+            # TODO: need to verify the initialization methods
+            init_weights(self.model, init_type="kaiming")
+            init_weights(self.dints_space.log_alpha_a, init_type="kaiming")
+            init_weights(self.dints_space.log_alpha_c, init_type="kaiming")
         else:
             ckpt = torch.load(model_info_xx.checkpoint)
-            node_a = ckpt[
-                "node_a"
-            ]  # TODO: may need to update, as pytorch lightning may save addition params in ckpt
+            # TODO: may need to update, as pytorch lightning may save additional
+            # params in ckpt file
+            node_a = ckpt["node_a"]
             arch_code_a = ckpt["arch_code_a"]
             arch_code_c = ckpt["arch_code_c"]
 
             self.dints_space = monai.networks.nets.TopologyInstance(
-                arch_code=[arch_code_a, arch_code_c], **model_info_xx.net.topo_param
+                arch_code=[arch_code_a, arch_code_c],
+                node_a=node_a,
+                **model_info_xx.net.topo_param,
             )
-        # define stem
-        self.model = monai.networks.nets.DiNTS(
-            dints_space=self.dints_space, **model_info_xx.net.stem_param
-        )
+            # define stem
+            self.model = monai.networks.nets.DiNTS(
+                dints_space=self.dints_space, **model_info_xx.net.stem_param
+            )
         # TODO: need to check whether we still need SyncBatchNorm
         # ref: https://pytorch.org/docs/stable/generated/torch.nn.SyncBatchNorm.html
         # model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
@@ -75,12 +90,24 @@ class Model(pl.LightningModule):
         if self.stage == "search" or self.stage == "finetune":
             self.criterion = parse_config(self.model_info.criterion)
 
-        self.warm_up = self.model_info.model_extra["warm_up_epoch"]
-        self.factor_ram_cost = self.model_info.model_extra["factor_ram_cost"]
+        if "warm_up_epoch" in model_info_xx.model_extra:
+            self.warm_up = model_info_xx.model_extra["warm_up_epoch"]
+        else:
+            self.warm_up = 0
+
+        if "factor_ram_cost" in model_info_xx.model_extra:
+            self.factor_ram_cost = self.model_info.model_extra["factor_ram_cost"]
+        else:
+            self.factor_ram_cost = 0.8
+
         self.model_info = model_info_xx
         self.verbose = verbose
 
     def configure_optimizers(self):
+        # currently, the schedule is not the same as the original implementation.
+        # in order to make same learning rate scheduler, we can use customized 
+        # scheduler as described here:
+        # https://lightning.ai/docs/pytorch/stable/common/optimization.html#bring-your-own-custom-learning-rate-schedulers  # noqa E501
         if self.stage == "search":
             base_optimizer_func = parse_config_func(self.model_info.optimizer["base"])
             a_optimizer_func = parse_config_func(self.model_info.optimizer["alpha_a"])
@@ -89,13 +116,48 @@ class Model(pl.LightningModule):
             optimizer_a = a_optimizer_func([self.dints_space.log_alpha_a])
             optimizer_c = c_optimizer_func([self.dints_space.log_alpha_c])
 
-            return optimizer_base, optimizer_a, optimizer_c
+            if self.model_info.scheduler is None:
+                return [optimizer_base, optimizer_a, optimizer_c]
+            else:
+                base_scheduler_func = parse_config_func_without_params(
+                    self.model_info.scheduler["base"]
+                )
+                base_lr_scheduler = base_scheduler_func(
+                    optimizer_base, **self.model_info.scheduler["base"]["params"]
+                )
+                a_scheduler_func = parse_config_func_without_params(
+                    self.model_info.scheduler["alpha_a"]
+                )
+                a_lr_scheduler = a_scheduler_func(
+                    optimizer_a, **self.model_info.scheduler["alpha_a"]["params"]
+                )
+                c_scheduler_func = parse_config_func_without_params(
+                    self.model_info.scheduler["alpha_c"]
+                )
+                c_lr_scheduler = c_scheduler_func(
+                    optimizer_c, **self.model_info.scheduler["alpha_c"]["params"]
+                )
+
+                return [optimizer_base, optimizer_a, optimizer_c], [
+                    base_lr_scheduler,
+                    a_lr_scheduler,
+                    c_lr_scheduler,
+                ]
 
         elif self.stage == "finetune":
             optimizer_func = parse_config_func(self.model_info.optimizer)
             optimizer = optimizer_func(self.parameters())
 
-            return optimizer
+            if self.model_info.scheduler is None:
+                return optimizer
+            else:
+                scheduler_func = parse_config_func_without_params(
+                    self.model_info.scheduler
+                )
+                lr_scheduler = scheduler_func(
+                    optimizer, **self.model_info.scheduler["params"]
+                )
+                return [optimizer], [lr_scheduler]
 
     def forward(self, x):
         return self.net(x)
@@ -117,6 +179,9 @@ class Model(pl.LightningModule):
         # extract the first half to train w
         # comparable to train_dataloader_w in original implementation
         # https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L366  # noqa E501
+        # so, here we require the batch size to be an even number.
+        # this is not exactly the same as the original implementation, need to verify
+        # if this is okay
         inputs = x[: x.shape[0] // 2,]
         labels = y[: y.shape[0] // 2,]
 
@@ -132,14 +197,15 @@ class Model(pl.LightningModule):
         self.dints_space.log_alpha_c.requires_grad = False
 
         # run forward pass and get loss
+        # TODO: double check if we need manual loss.step(), I think plt does it.
         outputs = self.model(inputs)
         loss = self.criterion(outputs, labels)
 
         # check if reaching number of warm up epochs:
         # similar to this: https://github.com/Project-MONAI/tutorials/blob/main/automl/DiNTS/search_dints.py#L522  # noqa E501
-        if (
-            self.trainer.current_epoch < self.warm_up
-        ):  #  or using: self.trainer.global_step
+        # or using: self.trainer.global_step
+        # see this: https://lightning.ai/docs/pytorch/stable/common/optimization.html
+        if self.trainer.current_epoch < self.warm_up:
             return loss, outputs
 
         ###############################
@@ -279,11 +345,17 @@ class Model(pl.LightningModule):
         )
 
         # do a MSE loss
-        loss = np.mean((val_labels.astype(np.float64) - pred.astype(np.float64)) ** 2)
+        loss_mse = np.mean(
+            (val_labels.astype(np.float64) - pred.astype(np.float64)) ** 2
+        )
+        loss_cor = np.corrcoef(
+            val_labels.astype(np.float64).ravel(), pred.astype(np.float64).ravel()
+        )[0, 1]
 
-        self.log("val_loss_step", loss)
+        self.log("val_loss_mse", loss_mse)
+        self.log("val_loss_cor", loss_cor)
 
-        return loss
+        return loss_mse, loss_cor
 
     def training_epoch_end(self, training_step_outputs):
         # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968   # noqa E501
@@ -292,5 +364,9 @@ class Model(pl.LightningModule):
         self.log("train_loss", loss_ave)
 
     def validation_epoch_end(self, validation_step_outputs):
-        loss_ave = torch.stack(validation_step_outputs).mean().item()
-        self.log("val_loss", loss_ave)
+        mse_loss_outputs = [d["loss_mse"] for d in validation_step_outputs]
+        cor_loss_outputs = [d["loss_cor"] for d in validation_step_outputs]
+        mse_loss_ave = torch.stack(mse_loss_outputs).mean().item()
+        cor_loss_ave = torch.stack(cor_loss_outputs).mean().item()
+        self.log("val_loss_mse", mse_loss_ave)
+        self.log("val_loss_cor", cor_loss_ave)

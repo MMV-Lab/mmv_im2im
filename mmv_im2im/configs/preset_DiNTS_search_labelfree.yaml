@@ -91,22 +91,22 @@ model:
       sw_batch_size: 1
       overlap: 0.6
       mode: "gaussian"
-  # scheduler:
-  #   base:
-  #     module_name: torch.optim.lr_scheduler
-  #     func_name: ExponentialLR
-  #     params:
-  #       gamma: 0.99
-  #   alpha_a:
-  #     module_name: torch.optim.lr_scheduler
-  #     func_name: ExponentialLR
-  #     params:
-  #       gamma: 0.99
-  #   alpha_c:
-  #     module_name: torch.optim.lr_scheduler
-  #     func_name: ExponentialLR
-  #     params:
-  #       gamma: 0.99
+  scheduler:
+    base:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.99
+    alpha_a:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.99
+    alpha_c:
+      module_name: torch.optim.lr_scheduler
+      func_name: ExponentialLR
+      params:
+        gamma: 0.99
   
 trainer:
   verbose: True
