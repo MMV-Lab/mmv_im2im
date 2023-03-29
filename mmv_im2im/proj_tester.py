@@ -54,18 +54,21 @@ class ProjectTester(object):
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg, train=False)
 
-        pre_train = torch.load(self.model_cfg.checkpoint)
-        # TODO: hacky solution to remove a wrongly registered key
-        pre_train["state_dict"].pop("criterion.xym", None)
-        pre_train["state_dict"].pop("criterion.xyzm", None)
-        self.model.load_state_dict(pre_train["state_dict"])
-        if (
-            "cpu_only" in self.model_cfg.model_extra
-            and self.model_cfg.model_extra["cpu_only"]
-        ):
-            self.cpu = True
-        else:
-            self.model.cuda()
+        # DiNTS model is a little bit different in loading checkpoint
+        # so, the loading step is done as part of the init step
+        if not self.model_cfg.framework == "dints":
+            pre_train = torch.load(self.model_cfg.checkpoint)
+            # TODO: hacky solution to remove a wrongly registered key
+            pre_train["state_dict"].pop("criterion.xym", None)
+            pre_train["state_dict"].pop("criterion.xyzm", None)
+            self.model.load_state_dict(pre_train["state_dict"])
+            if (
+                "cpu_only" in self.model_cfg.model_extra
+                and self.model_cfg.model_extra["cpu_only"]
+            ):
+                self.cpu = True
+            else:
+                self.model.cuda()
 
         self.model.eval()
 
@@ -196,18 +199,14 @@ class ProjectTester(object):
                             save_rgb(
                                 out_fn,
                                 np.moveaxis(
-                                    pred[
-                                        0,
-                                    ],
+                                    pred[0,],
                                     0,
                                     -1,
                                 ),
                             )
                         else:
                             OmeTiffWriter.save(
-                                pred[
-                                    0,
-                                ],
+                                pred[0,],
                                 out_fn,
                                 dim_order="CYX",
                             )
@@ -216,9 +215,7 @@ class ProjectTester(object):
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "error, found non-trivial batch dimension"
                 OmeTiffWriter.save(
-                    pred[
-                        0,
-                    ],
+                    pred[0,],
                     out_fn,
                     dim_order="CZYX",
                 )

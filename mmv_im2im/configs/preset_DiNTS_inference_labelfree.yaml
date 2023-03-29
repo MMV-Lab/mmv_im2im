@@ -1,0 +1,29 @@
+mode: train
+
+data:
+  category: "pair"
+  dataloader:
+    train:
+      dataloader_params:
+        batch_size: 1
+        pin_memory: True
+        num_workers: 4
+
+  preprocess:
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: norm_around_center
+      params:
+        min_z: 32 
+
+model:
+  framework: dints
+  net:
+    stem_param:
+      in_channels: 2,
+      num_classes: 1,
+      use_downsample: True,
+    topo_param:
+      channel_mul: 1.0
+      num_blocks: 12
+      num_depths: 4
+      use_downsample: True

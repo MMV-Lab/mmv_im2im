@@ -16,6 +16,8 @@ The overall package is designed with a generic image-to-image transformation fra
 * For computational biomedical researchers (e.g., AI algorithm development or bioimage analysis workflow development), we hope this package could serve as the starting point for their specific problems, since the image-to-image "boilerplates" can be easily extended further development or adapted for users' specific problems.
 * For experimental biomedical researchers, we hope this work provides a comprehensive view of the image-to-image transformation concept through diversified examples and use cases, so that deep learning based image-to-image transformation could be integrated into the assay development process and permit new biomedical studies that can hardly be done only with traditional experimental methods
 
+(Note: the package will keep growing. The version that can match the arxiv version is [v0.4.0](https://github.com/MMV-Lab/mmv_im2im/tree/v0.4.0))
+
 
 ## Installation
 
