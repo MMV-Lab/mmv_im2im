@@ -2,7 +2,7 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/semantic2D/testA
+    dir: ./data/semantic2D/testB
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "SYX"
@@ -10,7 +10,7 @@ data:
       T: 0
       Z: 0
   inference_output:
-    path: ./data/semantic2D/testA_pred
+    path: ./data/semantic2D/testB_pred
     suffix: .tif
 
   preprocess:
@@ -22,6 +22,7 @@ data:
       params:
         channel: 1
         batch_dim: True
+        cutoff: 0.5
 
 model:
   framework: FCN
