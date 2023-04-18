@@ -26,25 +26,15 @@ data:
 model:
   framework: FCN
   net:
-    #module_name: mmv_im2im.models.nets.SA_2d
-    #func_name: SuggestiveAnnotationModel
-    #params:
-    #  in_channels: 3
-    #  out_channels: 2
-    #  num_feature: 32
     module_name: monai.networks.nets
-    func_name: SwinUNETR
+    func_name: AttentionUnet
     params:
-      spatial_dims: 2
+      spatial_dims: 2  
       in_channels: 3
       out_channels: 2
-      img_size: [512, 512]
-      feature_size: 24
-      num_heads: [3, 6, 12, 24, 24, 24]
-      depths: [2, 2, 2, 2, 2, 2]
-      norm_name: "batch"
-      use_checkpoint: False
-  checkpoint: ./lightning_logs/version_3/checkpoints/best.ckpt
+      channels: [32, 64, 128, 256, 512, 1024] #sequence of channels. Top block first. The length of channels should be no less than 2.
+      strides: [2, 2, 2, 2, 2] 
+  checkpoint: ./lightning_logs/version_165/checkpoints/best.ckpt
   model_extra:
     cpu_only: True
     sliding_window_params:

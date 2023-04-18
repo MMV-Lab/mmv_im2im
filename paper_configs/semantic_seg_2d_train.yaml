@@ -88,31 +88,45 @@ data:
 model:
   framework: FCN
   net:
-    #module_name: mmv_im2im.models.nets.SA_2d
-    #func_name: SuggestiveAnnotationModel
-    #params:
-    #  in_channels: 3
-    #  out_channels: 2
-    #  num_feature: 32
     module_name: monai.networks.nets
-    func_name: SwinUNETR
+    func_name: AttentionUnet
     params:
-      spatial_dims: 2
+      spatial_dims: 2  
       in_channels: 3
       out_channels: 2
-      img_size: [512, 512]
-      feature_size: 24
-      num_heads: [3, 6, 12, 24, 24, 24]
-      depths: [2, 2, 2, 2, 2, 2]
-      norm_name: "batch"
-      use_checkpoint: False
+      channels: [32, 64, 128, 256, 512, 1024] #sequence of channels. Top block first. The length of channels should be no less than 2.
+      strides: [2, 2, 2, 2, 2] 
+    # module_name: mmv_im2im.models.nets.SA_2d
+    # func_name: SuggestiveAnnotationModel
+    # params:
+    #   in_channels: 3
+    #   out_channels: 2
+    #   num_feature: 32
+    # module_name: monai.networks.nets
+    # func_name: SwinUNETR
+    # params:
+    #   spatial_dims: 2
+    #   in_channels: 3
+    #   out_channels: 2
+    #   img_size: [512, 512]
+    #   feature_size: 24
+    #   num_heads: [3, 6, 12, 24, 24, 24]
+    #   depths: [2, 2, 2, 2, 2, 2]
+    #   norm_name: "batch"
+    #   use_checkpoint: False
   criterion:
+    # module_name: monai.losses
+    # func_name: DiceCELoss
+    # params:
+    #   softmax: True
+    #   to_onehot_y: True
+    #   reduction: 'mean'
     module_name: monai.losses
-    func_name: DiceCELoss
+    func_name: GeneralizedDiceFocalLoss
     params:
       softmax: True
       to_onehot_y: True
-      reduction: 'mean'
+      focal_weight: [1.0, 1.0]
   optimizer:
     module_name: torch.optim
     func_name: AdamW
@@ -137,7 +151,7 @@ trainer:
       func_name: EarlyStopping
       params:
         monitor: 'val_loss'
-        patience: 50 
+        patience: 500
     - module_name: pytorch_lightning.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
