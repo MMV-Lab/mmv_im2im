@@ -38,12 +38,15 @@ dev_requirements = [
 ]
 
 data_requirements = [
-    "quilt3"
+    "quilt3",
+    "pooch",
+    "matplotlib",
+    "notebook"
 ]
 
 requirements = [
     "pytorch-lightning>=2.0.0",
-    "torch>=2.0.1"
+    "torch>=2.0.1",
     "monai>=1.1.0",
     "aicsimageio",
     "pandas",
@@ -53,11 +56,11 @@ requirements = [
     "scikit-learn"
 ]
 
-requirements_embedseg = [
+embedseg_requirements = [
     "numba"
 ]
 
-requirements_extra = [
+advance_requirements = [
     "tensorboard"
 ]
 
@@ -65,12 +68,17 @@ extra_requirements = {
     "setup": setup_requirements,
     "test": test_requirements,
     "dev": dev_requirements,
-    "quick": data_requirements,
+    "data": data_requirements,
+    "embedseg": [
+        *requirements,
+        *embedseg_requirements,
+    ],
     "all": [
         *requirements,
         *dev_requirements,
-        *requirements_embedseg,
-        *requirements_extra,
+        *data_requirements,
+        *embedseg_requirements,
+        *advance_requirements,
     ]
 }
 

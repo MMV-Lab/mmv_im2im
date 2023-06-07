@@ -337,7 +337,7 @@ def prepare_embedseg_cache(
             )
             if costmap_flag:
                 OmeTiffWriter.save(
-                    costmap_crop.astype(np.float),
+                    costmap_crop.astype(float),
                     cache_path / f"{fn_base}_{j:04d}_CM.tiff",
                     dim_order=dim_order,
                 )

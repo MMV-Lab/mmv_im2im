@@ -109,9 +109,9 @@ class Model(pl.LightningModule):
             else:
                 yhat_act = y_hat
 
-            src_out = np.squeeze(src[0,].detach().cpu().numpy()).astype(np.float)
-            tar_out = np.squeeze(tar[0,].detach().cpu().numpy()).astype(np.float)
-            prd_out = np.squeeze(yhat_act[0,].detach().cpu().numpy()).astype(np.float)
+            src_out = np.squeeze(src[0,].detach().cpu().numpy()).astype(float)
+            tar_out = np.squeeze(tar[0,].detach().cpu().numpy()).astype(float)
+            prd_out = np.squeeze(yhat_act[0,].detach().cpu().numpy()).astype(float)
 
             if len(src_out.shape) == 2:
                 src_order = "YX"
