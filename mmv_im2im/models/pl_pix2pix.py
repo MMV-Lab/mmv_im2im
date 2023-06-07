@@ -154,13 +154,13 @@ class Model(pl.LightningModule):
 
         return loss
 
-    def training_epoch_end(self, outputs):
+    def on_training_epoch_end(self, outputs):
         G_mean_loss = torch.stack([x["loss"] for x in outputs[0]]).mean().item()
         D_mean_loss = torch.stack([x["loss"] for x in outputs[1]]).mean().item()
         self.log("generator_loss", G_mean_loss)
         self.log("discriminator_loss", D_mean_loss)
 
-    def validation_step(self, batch, batch_idx):
+    def on_validation_step(self, batch, batch_idx):
         image_A = batch["IM"]
         image_B = batch["GT"]
 

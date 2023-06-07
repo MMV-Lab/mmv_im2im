@@ -308,7 +308,7 @@ class Model(pl.LightningModule):
             )  # on_step=True, on_epoch=True, prog_bar=True, logger=True)
             return output
 
-    def training_epoch_end(self, outputs):
+    def on_training_epoch_end(self, outputs):
         avg_loss = sum(
             [
                 torch.stack([x["loss"] for x in outputs[i]]).mean().item() / 2
@@ -326,7 +326,7 @@ class Model(pl.LightningModule):
         loss_dictionary = self.run_step(batch, batch_idx)
         return loss_dictionary
 
-    def validation_epoch_end(self, validation_step_outputs):
+    def on_validation_epoch_end(self, validation_step_outputs):
         validation_generator_loss = (
             torch.stack([x["generator_loss"] for x in validation_step_outputs], dim=0)
             .mean()

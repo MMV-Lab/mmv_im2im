@@ -205,13 +205,13 @@ class Model(pl.LightningModule):
 
         return loss
 
-    def training_epoch_end(self, training_step_outputs):
+    def on_training_epoch_end(self, training_step_outputs):
         # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968   # noqa E501
         training_step_outputs = [d["loss"] for d in training_step_outputs]
         loss_ave = torch.stack(training_step_outputs).mean().item()
         self.log("train_loss", loss_ave)
 
-    def validation_epoch_end(self, validation_step_outputs):
+    def on_validation_epoch_end(self, validation_step_outputs):
         validation_step_outputs = [d["sIoU"] for d in validation_step_outputs]
         loss_ave = np.stack(validation_step_outputs).mean()
         self.log("val_loss", loss_ave, sync_dist=True)

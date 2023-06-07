@@ -42,16 +42,23 @@ data_requirements = [
 ]
 
 requirements = [
-    "pytorch-lightning",
+    "pytorch-lightning>=2.0.0",
+    "torch>=2.0.1"
     "monai>=1.1.0",
     "aicsimageio",
     "pandas",
     "scikit-image",
-    "einops",
-    "numba",  # required by embedseg
     "protobuf<4.21.0",
     "pyrallis",
     "scikit-learn"
+]
+
+requirements_embedseg = [
+    "numba"
+]
+
+requirements_extra = [
+    "tensorboard"
 ]
 
 extra_requirements = {
@@ -62,6 +69,8 @@ extra_requirements = {
     "all": [
         *requirements,
         *dev_requirements,
+        *requirements_embedseg,
+        *requirements_extra,
     ]
 }
 
@@ -75,6 +84,7 @@ setup(
         "Natural Language :: English",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     description="A python package for deep learing based image to image transformation",  # noqa E501
     entry_points={

@@ -2,6 +2,7 @@ import os
 import numpy as np
 from typing import Dict
 from pathlib import Path
+from random import randint
 import pytorch_lightning as pl
 import torch
 from aicsimageio.writers import OmeTiffWriter
@@ -139,17 +140,12 @@ class Model(pl.LightningModule):
             else:
                 raise ValueError(f"unexpected pred dims {prd_out.shape}")
 
-            out_fn = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_src.tiff"
-            )
+            rand_tag = randint(1, 1000)
+            out_fn = Path(self.trainer.log_dir) / f"{self.current_epoch}_{rand_tag}_src.tiff"
             OmeTiffWriter.save(src_out, out_fn, dim_order=src_order)
-            out_fn = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_tar.tiff"
-            )
+            out_fn = Path(self.trainer.log_dir) / f"{self.current_epoch}_{rand_tag}_tar.tiff"
             OmeTiffWriter.save(tar_out, out_fn, dim_order=tar_order)
-            out_fn = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_prd.tiff"
-            )
+            out_fn = Path(self.trainer.log_dir) / f"{self.current_epoch}_{rand_tag}_prd.tiff"
             OmeTiffWriter.save(prd_out, out_fn, dim_order=prd_order)
 
         return loss
@@ -160,12 +156,12 @@ class Model(pl.LightningModule):
 
         return loss
 
-    def training_epoch_end(self, training_step_outputs):
+    def on_training_epoch_end(self, training_step_outputs):
         # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968   # noqa E501
         training_step_outputs = [d["loss"] for d in training_step_outputs]
         loss_ave = torch.stack(training_step_outputs).mean().item()
         self.log("train_loss", loss_ave)
 
-    def validation_epoch_end(self, validation_step_outputs):
+    def on_validation_epoch_end(self, validation_step_outputs):
         loss_ave = torch.stack(validation_step_outputs).mean().item()
         self.log("val_loss", loss_ave)
