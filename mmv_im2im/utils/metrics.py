@@ -2,7 +2,7 @@ from typing import Optional
 import numpy as np
 
 
-def simplified_instance_IoU_3D(
+def simplified_instance_IoU(
     mask: np.ndarray, pred: np.ndarray, exclusion_mask: Optional[np.ndarray] = None
 ):
     if exclusion_mask is not None:
@@ -16,10 +16,18 @@ def simplified_instance_IoU_3D(
     # clean up ground truth by removing all objects touching boundary
     # also, boudary is defined by 5 pixels within the actual border
     boundary_template = np.zeros_like(mask)
-    boundary_template[:, :5, :] = 1
-    boundary_template[:, -5:, :] = 1
-    boundary_template[:, :, :5] = 1
-    boundary_template[:, :, -5:] = 1
+    if len(mask.shape) == 3:
+        boundary_template[:, :5, :] = 1
+        boundary_template[:, -5:, :] = 1
+        boundary_template[:, :, :5] = 1
+        boundary_template[:, :, -5:] = 1
+    elif len(mask.shape) == 2:
+        boundary_template[:5, :] = 1
+        boundary_template[-5:, :] = 1
+        boundary_template[:, :5] = 1
+        boundary_template[:, -5:] = 1
+    else:
+        raise ValueError("bad image size in IoU")
 
     bd_idx = list(np.unique(mask[boundary_template > 0]))
     adjusted_mask = mask.copy()

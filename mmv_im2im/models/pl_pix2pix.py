@@ -4,7 +4,7 @@ from importlib import import_module
 import numpy as np
 from tifffile import imsave
 from skimage.io import imsave as save_rgb
-import pytorch_lightning as pl
+import lightning as pl
 import torch
 from mmv_im2im.utils.misc import parse_config_func
 from mmv_im2im.utils.model_utils import init_weights, state_dict_simplification
@@ -14,6 +14,9 @@ from mmv_im2im.models.nets.gans import define_generator, define_discriminator
 class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super(Model, self).__init__()
+
+        # Important: This property activates manual optimization.
+        self.automatic_optimization = False
 
         self.verbose = verbose
         gen_init = None
@@ -118,7 +121,7 @@ class Model(pl.LightningModule):
             out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_A.tiff"
             imsave(out_fn, image_A)
 
-    def training_step(self, batch, batch_idx, optimizer_idx):
+    def training_step(self, batch):
         # imageB : real image
         # imageA : condition image
         # conditional GAN refers generating a realistic image (image B as ground truth),
@@ -126,54 +129,87 @@ class Model(pl.LightningModule):
         image_A = batch["IM"]
         image_B = batch["GT"]
 
-        self.generator.train()
+        # get optimizer:
+        d_opt, g_opt = self.optimizers()
 
+        #######################
         # calculate loss
-        loss = None
-        if optimizer_idx == 0:
-            fake_B = self.generator(image_A).detach()
-            loss = self.loss.discriminator_step(
-                self.discriminator, image_A, image_B, fake_B
-            )
-            self.log("D Loss", loss)
-        elif optimizer_idx == 1:
-            fake_B = self.generator(image_A)
-            loss = self.loss.generator_step(
-                self.discriminator, image_A, image_B, fake_B
-            )
-            self.log("G Loss", loss)
+        #######################
+        # for generator
+        self.toggle_optimizer(g_opt)
+        fake_B = self.generator(image_A)
+        g_loss = self.loss.generator_step(self.discriminator, image_A, image_B, fake_B)
 
-        if self.verbose and batch_idx == 0 and optimizer_idx == 0:
-            fake_images = fake_B.detach()
-            fake_image = fake_images[0].cpu().numpy()
+        self.log(
+            "train_g_loss",
+            g_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
+        g_opt.zero_grad()
+        self.manual_backward(g_loss)
+        g_opt.step()
+        self.untoggle_optimizer(g_opt)
 
-            image_A0 = image_A[0].detach().cpu().numpy()
-            image_B0 = image_B[0].detach().cpu().numpy()
+        # for discriminator
+        self.toggle_optimizer(d_opt)
+        fake_B = self.generator(image_A).detach()
+        d_loss = self.loss.discriminator_step(
+            self.discriminator, image_A, image_B, fake_B
+        )
 
-            self.save_pix2pix_output(image_A0, image_B0, fake_image, "train")
+        self.log(
+            "train_d_loss",
+            d_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
+        d_opt.zero_grad()
+        self.manual_backward(d_loss)
+        d_opt.step()
+        self.untoggle_optimizer(d_opt)
 
-        return loss
+        sch_d, sch_g = self.lr_schedulers()
+        if self.trainer.is_last_batch:
+            sch_g.step()
+            sch_d.step()
 
-    def on_training_epoch_end(self, outputs):
-        G_mean_loss = torch.stack([x["loss"] for x in outputs[0]]).mean().item()
-        D_mean_loss = torch.stack([x["loss"] for x in outputs[1]]).mean().item()
-        self.log("generator_loss", G_mean_loss)
-        self.log("discriminator_loss", D_mean_loss)
-
-    def on_validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx):
         image_A = batch["IM"]
         image_B = batch["GT"]
 
         fake_B = self.generator(image_A).detach()
-        D_loss = self.loss.discriminator_step(
+        d_loss = self.loss.discriminator_step(
             self.discriminator, image_A, image_B, fake_B
         )
-        G_loss = self.loss.generator_step(self.discriminator, image_A, image_B, fake_B)
+        self.log(
+            "val_d_loss",
+            d_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
+
+        g_loss = self.loss.generator_step(self.discriminator, image_A, image_B, fake_B)
+        self.log(
+            "val_g_loss",
+            g_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
 
         if self.verbose and batch_idx == 0:
-            # check if the log path exists, if not create one
-            Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
-
             fake_images = fake_B.detach()
             fake_image = fake_images[0].cpu().numpy()
 
@@ -181,15 +217,3 @@ class Model(pl.LightningModule):
             image_B0 = image_B[0].detach().cpu().numpy()
 
             self.save_pix2pix_output(image_A0, image_B0, fake_image, "val")
-
-        return {"G_loss": G_loss, "D_loss": D_loss}
-
-    def validation_epoch_end(self, val_step_outputs):
-        val_gen_loss = (
-            torch.stack([x["G_loss"] for x in val_step_outputs], dim=0).mean().item()
-        )
-        val_disc_loss = (
-            torch.stack([x["D_loss"] for x in val_step_outputs], dim=0).mean().item()
-        )
-        self.log("val_loss_generator", val_gen_loss)
-        self.log("val_loss_discriminator", val_disc_loss)

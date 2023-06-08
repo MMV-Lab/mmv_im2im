@@ -13,7 +13,7 @@
 import random
 from torch.utils.data import random_split
 from monai.data import DataLoader
-import pytorch_lightning as pl
+import lightning as pl
 from mmv_im2im.utils.for_transform import parse_monai_ops  # , custom_preproc_to_tio
 from mmv_im2im.utils.misc import (
     generate_dataset_dict_monai,

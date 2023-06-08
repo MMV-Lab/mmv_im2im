@@ -196,18 +196,14 @@ class ProjectTester(object):
                             save_rgb(
                                 out_fn,
                                 np.moveaxis(
-                                    pred[
-                                        0,
-                                    ],
+                                    pred[0,],
                                     0,
                                     -1,
                                 ),
                             )
                         else:
                             OmeTiffWriter.save(
-                                pred[
-                                    0,
-                                ],
+                                pred[0,],
                                 out_fn,
                                 dim_order="CYX",
                             )
@@ -216,9 +212,7 @@ class ProjectTester(object):
             elif len(pred.shape) == 5:
                 assert pred.shape[0] == 1, "error, found non-trivial batch dimension"
                 OmeTiffWriter.save(
-                    pred[
-                        0,
-                    ],
+                    pred[0,],
                     out_fn,
                     dim_order="CZYX",
                 )

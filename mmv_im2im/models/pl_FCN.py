@@ -1,9 +1,8 @@
-import os
 import numpy as np
 from typing import Dict
 from pathlib import Path
 from random import randint
-import pytorch_lightning as pl
+import lightning as pl
 import torch
 from aicsimageio.writers import OmeTiffWriter
 
@@ -46,7 +45,6 @@ class Model(pl.LightningModule):
                 self.seg_flag = True
 
     def configure_optimizers(self):
-        # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
         optimizer = self.optimizer_func(self.parameters())
         if self.model_info.scheduler is None:
             return optimizer
@@ -93,14 +91,23 @@ class Model(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss, y_hat = self.run_step(batch, validation_stage=False)
-        self.log("train_loss_step", loss, prog_bar=True)
+        self.log(
+            "train_loss",
+            loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
 
         if self.verbose and batch_idx == 0:
             src = batch["IM"]
             tar = batch["GT"]
 
             # check if the log path exists, if not create one
-            Path(self.trainer.log_dir).mkdir(parents=True, exist_ok=True)
+            save_path = Path(self.trainer.log_dir)
+            save_path.mkdir(parents=True, exist_ok=True)
 
             # check if need to use softmax
             if self.seg_flag:
@@ -141,27 +148,25 @@ class Model(pl.LightningModule):
                 raise ValueError(f"unexpected pred dims {prd_out.shape}")
 
             rand_tag = randint(1, 1000)
-            out_fn = Path(self.trainer.log_dir) / f"{self.current_epoch}_{rand_tag}_src.tiff"
+            out_fn = save_path / f"epoch_{self.current_epoch}_src_{rand_tag}.tiff"
             OmeTiffWriter.save(src_out, out_fn, dim_order=src_order)
-            out_fn = Path(self.trainer.log_dir) / f"{self.current_epoch}_{rand_tag}_tar.tiff"
+            out_fn = save_path / f"epoch_{self.current_epoch}_tar_{rand_tag}.tiff"
             OmeTiffWriter.save(tar_out, out_fn, dim_order=tar_order)
-            out_fn = Path(self.trainer.log_dir) / f"{self.current_epoch}_{rand_tag}_prd.tiff"
+            out_fn = save_path / f"epoch_{self.current_epoch}_prd_{rand_tag}_.tiff"
             OmeTiffWriter.save(prd_out, out_fn, dim_order=prd_order)
 
         return loss
 
     def validation_step(self, batch, batch_idx):
         loss, y_hat = self.run_step(batch, validation_stage=True)
-        self.log("val_loss_step", loss)
+        self.log(
+            "val_loss",
+            loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
 
         return loss
-
-    def on_training_epoch_end(self, training_step_outputs):
-        # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968   # noqa E501
-        training_step_outputs = [d["loss"] for d in training_step_outputs]
-        loss_ave = torch.stack(training_step_outputs).mean().item()
-        self.log("train_loss", loss_ave)
-
-    def on_validation_epoch_end(self, validation_step_outputs):
-        loss_ave = torch.stack(validation_step_outputs).mean().item()
-        self.log("val_loss", loss_ave)

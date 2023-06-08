@@ -2,7 +2,7 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/labelfree2D/test
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/labelfree2D/test
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "YX"
@@ -10,7 +10,7 @@ data:
       T: 0
       Z: 0
   inference_output:
-    path: ./data/labelfree2D/pred   
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/labelfree2D/pred   
 
   preprocess:
     - module_name: monai.transforms

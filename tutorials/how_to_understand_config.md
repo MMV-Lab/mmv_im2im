@@ -217,13 +217,13 @@ trainer:
     max_epochs: 1000
     detect_anomaly: True
   callbacks:  # any callback for pytorch-lightning trainer
-    - module_name: pytorch_lightning.callbacks.early_stopping
+    - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
         monitor: 'val_loss'
         patience: 50 
         verbose: True
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         monitor: 'val_loss'

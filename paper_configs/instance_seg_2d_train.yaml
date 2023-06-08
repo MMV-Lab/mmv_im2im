@@ -2,8 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: "./data/instance2D/train"
-  cache_path: "./data/instance2D/cache"
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance2D/train
+  cache_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance2D/cache
   extra:
     center_method: "medoid"
   dataloader:
@@ -122,19 +122,18 @@ trainer:
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
-    num_sanity_val_steps: 0
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
+    - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         patience: 50
         verbose: True
         mode: "max"
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         filename: '{epoch}-{train_loss:.5f}'
         save_top_k: 2
         save_last: True

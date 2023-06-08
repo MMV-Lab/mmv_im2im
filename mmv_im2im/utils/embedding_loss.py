@@ -107,9 +107,7 @@ class SpatialEmbLoss_3d(nn.Module):
                 if self.use_costmap:
                     # adjust the cost here, because some of the background pixels might
                     # have zero weight
-                    seed_loss += torch.sum(
-                        costmap * torch.pow(seed_map[bg_mask] - 0, 2)
-                    )
+                    seed_loss += torch.sum(costmap * torch.pow(seed_map[bg_mask] - 0, 2))
                 else:
                     seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 

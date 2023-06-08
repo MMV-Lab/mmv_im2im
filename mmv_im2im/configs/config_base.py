@@ -323,7 +323,7 @@ class TrainerConfig:
     callbacks: List[Dict] = field(
         default=[
             {
-                "module_name": "pytorch_lightning.callbacks",
+                "module_name": "lightning.pytorch.callbacks",
                 "func_name": "ModelCheckpoint",
                 "params": {"save_last": True},
             }

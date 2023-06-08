@@ -21,16 +21,14 @@ The overall package is designed with a generic image-to-image transformation fra
 
 Before starting, we recommend to [create a new conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands) or [a virtual environment](https://docs.python.org/3/library/venv.html) with Python 3.9+.
 
-### Install PyTorch before installing our package
+### Install the development head of MONAI
 
-Follow the instruction from the official website: https://pytorch.org/get-started/locally/. 
-
-To install the stable version (accessed on Oct 20, 2022) with conda for CUDA 11.3 (also, fine with 11.4), use the following command. Make sure check the website to find the command suitable for your system.
-
-(note: we haven't tested the latest PyTorch 2.0, will update accordingly if necessary.)
-
-```bash
-conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
+Due to this bug in MONAI: https://github.com/Project-MONAI/MONAI/pull/6523, which has been fixed in the dev branch but not in the stable release yet, we need to install the current dev head to avoid this bug. To do this:
+```
+git clone https://github.com/Project-MONAI/MONAI.git
+cd ./MONAI
+# note: the dev branch is the default branch after cloning MONAI
+pip install .
 ```
 
 ### Install MMV_Im2Im (basic):

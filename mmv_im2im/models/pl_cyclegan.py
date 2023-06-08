@@ -2,7 +2,7 @@
 This module provides lighting module for cycleGAN
 """
 import torch
-import pytorch_lightning as pl
+import lightning as pl
 from pathlib import Path
 import numpy as np
 from mmv_im2im.utils.misc import parse_config, parse_config_func
@@ -19,6 +19,10 @@ from skimage.io import imsave as save_rgb
 class Model(pl.LightningModule):
     def __init__(self, model_info_xx: Dict, train: bool = True, verbose: bool = False):
         super(Model, self).__init__()
+
+        # Important: This property activates manual optimization.
+        self.automatic_optimization = False
+
         self.verbose = verbose
         self.generator_model_image_AtoB = define_generator(
             model_info_xx.net["generator"]
@@ -136,7 +140,7 @@ class Model(pl.LightningModule):
             out_fn = log_dir / f"{current_stage}_epoch_{current_epoch}_real_A.tiff"
             imsave(out_fn, image_A)
 
-    # only for test or validation
+    # only for validation
     def run_step(self, batch, batch_idx):
         # get the data
         image_A = batch["IM"]
@@ -207,7 +211,10 @@ class Model(pl.LightningModule):
             )
         return output
 
-    def training_step(self, batch, batch_idx, optimizer_idx):
+    def training_step(self, batch):
+        # get optimizer:
+        g_opt, d_opt = self.optimizers()
+
         # get the batch
         image_A = batch["IM"]
         image_B = batch["GT"]
@@ -216,128 +223,150 @@ class Model(pl.LightningModule):
         fake_A_from_B = self.generator_model_image_BtoA(image_B)
         fake_B_from_A = self.generator_model_image_AtoB(image_A)
 
-        if optimizer_idx == 0:
-            ############################
-            # train generators
-            ############################
-            # GAN loss
-            predFakeA = self.discriminator_model_image_A(fake_A_from_B)
-            predFakeB = self.discriminator_model_image_B(fake_B_from_A)
+        ############################
+        # train generators
+        ############################
+        self.toggle_optimizer(g_opt)
+        # GAN loss
+        predFakeA = self.discriminator_model_image_A(fake_A_from_B)
+        predFakeB = self.discriminator_model_image_B(fake_B_from_A)
 
-            pred_real = torch.ones_like(predFakeA, requires_grad=False)
+        pred_real = torch.ones_like(predFakeA, requires_grad=False)
 
-            gan_loss_B = self.gan_loss(predFakeB, pred_real)
-            gan_loss_A = self.gan_loss(predFakeA, pred_real)
-            gan_loss = (gan_loss_A + gan_loss_B) / 2
+        gan_loss_B = self.gan_loss(predFakeB, pred_real)
+        gan_loss_A = self.gan_loss(predFakeA, pred_real)
+        gan_loss = (gan_loss_A + gan_loss_B) / 2
 
-            # cycle loss
-            cycle_loss_A = self.cycle_loss(
-                self.generator_model_image_BtoA(fake_B_from_A), image_A
-            )
-            cycle_loss_B = self.cycle_loss(
-                self.generator_model_image_AtoB(fake_A_from_B), image_B
-            )
-            cycle_loss = (cycle_loss_A + cycle_loss_B) / 2
-
-            # identity loss
-            fake_A_from_A = self.generator_model_image_BtoA(image_A)
-            fake_B_from_B = self.generator_model_image_BtoA(image_B)
-            identity_loss_A = self.identity_loss(fake_A_from_A, image_A)
-            identity_loss_B = self.identity_loss(fake_B_from_B, image_B)
-            identity_loss = (identity_loss_A + identity_loss_B) / 2
-
-            # weighted sum into generator loss
-            G_loss = (
-                gan_loss * self.gan_w
-                + cycle_loss * self.cycle_w
-                + identity_loss * self.identity_w
-            )
-            tqdm_dict = {
-                "g_loss": G_loss,
-                "validity": gan_loss,
-                "reconstr": cycle_loss,
-                "identity": identity_loss,
-            }
-            output = OrderedDict(
-                {"loss": G_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
-            )
-            self.log("Generator Loss", tqdm_dict["g_loss"])
-
-            if self.verbose and batch_idx == 0:
-                self.save_cyclegan_output(
-                    image_A[0].detach().cpu().numpy(),
-                    image_B[0].detach().cpu().numpy(),
-                    fake_A_from_B[0].detach().cpu().numpy(),
-                    fake_B_from_A[0].detach().cpu().numpy(),
-                    "train",
-                )
-            return output
-
-        elif optimizer_idx == 1:
-            ############################
-            # train discriminators
-            ############################
-            fakeA_sample = self.fake_pool_A.push_and_pop(fake_A_from_B)
-            fakeB_sample = self.fake_pool_B.push_and_pop(fake_B_from_A)
-            predFakeA = self.discriminator_model_image_A(fakeA_sample)
-            predFakeB = self.discriminator_model_image_B(fakeB_sample)
-
-            pred_real = torch.ones_like(predFakeA, requires_grad=False)
-            pred_fake = torch.zeros_like(predFakeA, requires_grad=False)
-
-            # discriminator on domain A
-            predRealA = self.discriminator_model_image_A(image_A)
-            dis_loss_A_real = self.gan_loss(predRealA, pred_real)
-            dis_loss_A_fake = self.gan_loss(predFakeA, pred_fake)
-
-            # discriminator on domain B
-            predRealB = self.discriminator_model_image_B(image_B)
-            dis_loss_B_real = self.gan_loss(predRealB, pred_real)
-            dis_loss_B_fake = self.gan_loss(predFakeB, pred_fake)
-
-            # average over all dis loss
-            D_loss = 0.5 * (
-                dis_loss_A_fake + dis_loss_A_real + dis_loss_B_fake + dis_loss_B_real
-            )
-            tqdm_dict = {"d_loss": D_loss}
-            output = OrderedDict(
-                {"loss": D_loss, "progress_bar": tqdm_dict, "log": tqdm_dict}
-            )
-            self.log(
-                "Discriminator Loss", tqdm_dict["d_loss"]
-            )  # on_step=True, on_epoch=True, prog_bar=True, logger=True)
-            return output
-
-    def on_training_epoch_end(self, outputs):
-        avg_loss = sum(
-            [
-                torch.stack([x["loss"] for x in outputs[i]]).mean().item() / 2
-                for i in range(2)
-            ]
+        # cycle loss
+        cycle_loss_A = self.cycle_loss(
+            self.generator_model_image_BtoA(fake_B_from_A), image_A
         )
-        G_mean_loss = torch.stack([x["loss"] for x in outputs[0]]).mean().item()
-        D_mean_loss = torch.stack([x["loss"] for x in outputs[1]]).mean().item()
-        self.log("Average Loss", avg_loss)
-        self.log("Generator Loss", G_mean_loss)
-        self.log("Discriminator Loss", D_mean_loss)
-        return None
+        cycle_loss_B = self.cycle_loss(
+            self.generator_model_image_AtoB(fake_A_from_B), image_B
+        )
+        cycle_loss = (cycle_loss_A + cycle_loss_B) / 2
+
+        # identity loss
+        fake_A_from_A = self.generator_model_image_BtoA(image_A)
+        fake_B_from_B = self.generator_model_image_BtoA(image_B)
+        identity_loss_A = self.identity_loss(fake_A_from_A, image_A)
+        identity_loss_B = self.identity_loss(fake_B_from_B, image_B)
+        identity_loss = (identity_loss_A + identity_loss_B) / 2
+
+        # weighted sum into generator loss
+        g_loss = (
+            gan_loss * self.gan_w
+            + cycle_loss * self.cycle_w
+            + identity_loss * self.identity_w
+        )
+
+        self.log(
+            "train_g_loss",
+            g_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
+        # each individual loss only record in logger, not on progress bar
+        self.log(
+            "train_validity",
+            gan_loss,
+            on_step=True,
+            on_epoch=True,
+            logger=True,
+            sync_dist=True,
+        )
+        self.log(
+            "train_reconstruction",
+            cycle_loss,
+            on_step=True,
+            on_epoch=True,
+            logger=True,
+            sync_dist=True,
+        )
+        self.log(
+            "train_identity",
+            identity_loss,
+            on_step=True,
+            on_epoch=True,
+            logger=True,
+            sync_dist=True,
+        )
+
+        g_opt.zero_grad()
+        self.manual_backward(g_loss)
+        g_opt.step()
+
+        self.untoggle_optimizer(g_opt)
+
+        ############################
+        # train discriminators
+        ############################
+        self.toggle_optimizer(d_opt)
+
+        fakeA_sample = self.fake_pool_A.push_and_pop(fake_A_from_B)
+        fakeB_sample = self.fake_pool_B.push_and_pop(fake_B_from_A)
+        predFakeA = self.discriminator_model_image_A(fakeA_sample)
+        predFakeB = self.discriminator_model_image_B(fakeB_sample)
+
+        pred_real = torch.ones_like(predFakeA, requires_grad=False)
+        pred_fake = torch.zeros_like(predFakeA, requires_grad=False)
+
+        # discriminator on domain A
+        predRealA = self.discriminator_model_image_A(image_A)
+        dis_loss_A_real = self.gan_loss(predRealA, pred_real)
+        dis_loss_A_fake = self.gan_loss(predFakeA, pred_fake)
+
+        # discriminator on domain B
+        predRealB = self.discriminator_model_image_B(image_B)
+        dis_loss_B_real = self.gan_loss(predRealB, pred_real)
+        dis_loss_B_fake = self.gan_loss(predFakeB, pred_fake)
+
+        # average over all dis loss
+        d_loss = 0.5 * (
+            dis_loss_A_fake + dis_loss_A_real + dis_loss_B_fake + dis_loss_B_real
+        )
+
+        self.log(
+            "train_d_loss",
+            d_loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
+        d_opt.zero_grad()
+        self.manual_backward(d_loss)
+        d_opt.step()
+
+        self.untoggle_optimizer(d_opt)
+
+        sch_g, sch_d = self.lr_schedulers()
+        if self.trainer.is_last_batch:
+            sch_g.step()
+            sch_d.step()
 
     def validation_step(self, batch, batch_idx):
-        loss_dictionary = self.run_step(batch, batch_idx)
-        return loss_dictionary
+        val_loss = self.run_step(batch, batch_idx)
 
-    def on_validation_epoch_end(self, validation_step_outputs):
-        validation_generator_loss = (
-            torch.stack([x["generator_loss"] for x in validation_step_outputs], dim=0)
-            .mean()
-            .item()
+        self.log(
+            "val_g_loss",
+            val_loss["generator_loss"],
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
         )
-        validation_discriminator_loss = (
-            torch.stack(
-                [x["discriminator_loss"] for x in validation_step_outputs], dim=0
-            )
-            .mean()
-            .item()
+        self.log(
+            "val_d_loss",
+            val_loss["discriminator_loss"],
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
         )
-        self.log("val_loss_generator", validation_generator_loss)
-        self.log("val_loss_discriminator", validation_discriminator_loss)

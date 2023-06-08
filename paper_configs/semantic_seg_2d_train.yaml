@@ -147,12 +147,12 @@ trainer:
     max_epochs: 5000
     detect_anomaly: True
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
+    - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
         monitor: 'val_loss'
         patience: 500
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         monitor: 'val_loss'
@@ -160,7 +160,7 @@ trainer:
         save_top_k: 5
         save_last: True
         save_weights_only: True 
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         monitor: 'val_loss'

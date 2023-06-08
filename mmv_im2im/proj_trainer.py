@@ -3,7 +3,7 @@
 import logging
 from pathlib import Path
 from importlib import import_module
-import pytorch_lightning as pl
+import lightning as pl
 import torch
 from mmv_im2im.data_modules import get_data_module
 from mmv_im2im.utils.misc import parse_ops_list
@@ -68,9 +68,7 @@ class ProjectTrainer(object):
             callback_list = []
         else:
             callback_list = parse_ops_list(self.train_cfg.callbacks)
-        trainer = pl.Trainer(
-            callbacks=callback_list, **self.train_cfg.params, deterministic=True
-        )
+        trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg.params)
 
         # save the configuration in the log directory
         save_path = Path(trainer.log_dir)

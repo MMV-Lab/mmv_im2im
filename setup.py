@@ -45,7 +45,7 @@ data_requirements = [
 ]
 
 requirements = [
-    "pytorch-lightning>=2.0.0",
+    "lightning>=2.0.0",
     "torch>=2.0.1",
     "monai>=1.1.0",
     "aicsimageio",
@@ -53,7 +53,8 @@ requirements = [
     "scikit-image",
     "protobuf<4.21.0",
     "pyrallis",
-    "scikit-learn"
+    "scikit-learn",
+    "tensorboard",
 ]
 
 embedseg_requirements = [
@@ -61,7 +62,7 @@ embedseg_requirements = [
 ]
 
 advance_requirements = [
-    "tensorboard"
+    
 ]
 
 extra_requirements = {

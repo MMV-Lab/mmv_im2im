@@ -2,11 +2,11 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/labelfree2D/train
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/labelfree2D/train
   dataloader:
     train:
       dataloader_params:
-        batch_size: 4
+        batch_size: 8
         pin_memory: True
         num_workers: 4
 
@@ -86,13 +86,14 @@ trainer:
     max_epochs: 10000
     detect_anomaly: True
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
+    - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         patience: 50 
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         filename: 'best'
+        save_last: True

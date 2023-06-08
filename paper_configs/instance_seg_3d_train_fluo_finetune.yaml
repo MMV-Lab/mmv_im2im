@@ -105,14 +105,14 @@ trainer:
     detect_anomaly: True
     gradient_clip_val: 0.8
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
+    - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
         monitor: 'val_loss'
         patience: 5
         verbose: True
         mode: 'max'
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         monitor: 'val_loss'
