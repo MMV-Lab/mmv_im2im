@@ -44,7 +44,11 @@ data_requirements = [
     "notebook"
 ]
 
-requirements = [
+embedseg_requirements = [
+    "numba"
+]
+
+basic_requirements = [
     "lightning>=2.0.0",
     "torch>=2.0.1",
     "monai>=1.1.0",
@@ -57,12 +61,9 @@ requirements = [
     "tensorboard",
 ]
 
-embedseg_requirements = [
-    "numba"
-]
-
-advance_requirements = [
-    
+requirements = [
+    *embedseg_requirements,
+    *basic_requirements,
 ]
 
 extra_requirements = {
@@ -70,16 +71,12 @@ extra_requirements = {
     "test": test_requirements,
     "dev": dev_requirements,
     "data": data_requirements,
-    "embedseg": [
-        *requirements,
-        *embedseg_requirements,
-    ],
+    "basic": basic_requirements,
     "all": [
-        *requirements,
+        *basic_requirements,
         *dev_requirements,
         *data_requirements,
         *embedseg_requirements,
-        *advance_requirements,
     ]
 }
 
