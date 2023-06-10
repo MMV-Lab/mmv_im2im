@@ -167,15 +167,8 @@ class Model(pl.LightningModule):
             OmeTiffWriter.save(gt, out_fn, dim_order=dim_order)
 
             # # save instance segmentation
-            # out_fn = save_path + "_pred.tiff"
-            # OmeTiffWriter.save(instances_map, out_fn, dim_order=dim_order[1:])
-
             out_fn = save_path / f"{self.current_epoch}_{current_stage}_seg.tiff"
-            OmeTiffWriter.save(
-                output.detach().cpu().numpy()[0,].astype(float),
-                out_fn,
-                dim_order=dim_order,
-            )
+            OmeTiffWriter.save(instances_map, out_fn, dim_order=dim_order[1:])
         return loss
 
     def training_step(self, batch, batch_idx):
