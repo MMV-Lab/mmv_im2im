@@ -67,12 +67,17 @@ class SpatialEmbLoss_3d(nn.Module):
         )
 
         # weighted loss
+        instances_adjusted = instances
         if self.use_costmap:
+            # make sure costmaps only work as exclusion masks, i.e.,
+            # only containing values of 0 and 1, 0 = pixels to exclude
+            costmaps[costmaps > 1] = 1
+            costmaps[costmaps > 0] = 1
+            assert not torch.any(costmaps < 0), "cannot have negative value in costmap"
+
             # only need to adjust instances in this step, because for pixels
             # with zero weight, this step will ignore the corresponding instances
-            instances_adjusted = instances * costmaps
-        else:
-            instances_adjusted = instances
+            instances_adjusted[costmaps == 0] = 0
 
         xyzm_s = self.xyzm[:, 0:depth, 0:height, 0:width].contiguous()  # 3 x d x h x w
 
@@ -92,32 +97,29 @@ class SpatialEmbLoss_3d(nn.Module):
 
             if self.use_costmap:
                 costmap = costmaps[b]
-            instance = instances[b]  # without costmap adjustment
+            instance = instances_adjusted[b]  # after costmap adjustment
             label = labels[b]
             center_image = center_images[b]
 
             # use adjusted instance to find all ids
+            # i.e., if one instance is completed inside the 
+            # exclusion mask, then this instance will be skipped
             instance_ids = instances_adjusted[b].unique()
             instance_ids = instance_ids[instance_ids != 0]
 
             # regress bg to zero
             bg_mask = label == 0
 
-            if bg_mask.sum() > 0:
-                if self.use_costmap:
-                    # adjust the cost here, because some of the background pixels might
-                    # have zero weight
-                    seed_loss += torch.sum(
-                        costmap * torch.pow(seed_map[bg_mask] - 0, 2)
-                    )
-                else:
-                    seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
+            # adjust the cost here, because some of the background pixels might
+            # have zero weight. All we need to do is to make sure the pixels
+            # being exluded not contributing to the contribution, i.e., with
+            # value False in bg_mask
+            if self.use_costmap:
+                bg_mask[costmap == 0] = 0
+            if bg_mask.sum() > 0: 
+                seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 
             for id in instance_ids:
-                # use the original instance without costmap adjustment to fetch
-                # instance mask, since the costmap may partial cut some instances
-                # and alter the ground truth only use the costmap to adjust the
-                # loss values at the end
                 in_mask = instance.eq(id)  # 1 x d x h x w
 
                 center_mask = in_mask & center_image
@@ -132,43 +134,26 @@ class SpatialEmbLoss_3d(nn.Module):
                     self.n_sigma, -1
                 )  # 3 x N
 
-                s = sigma_in.mean(1).view(self.n_sigma, 1, 1, 1)  # n_sigma x 1 x 1 x 1
+                smean = sigma_in.mean(1).view(self.n_sigma, 1, 1, 1)  # n_sigma x 1 x 1 x 1
 
                 # calculate var loss before exp
-                if self.use_costmap:
-                    var_loss = var_loss + torch.mean(
-                        costmap * torch.pow(sigma_in - s[..., 0, 0].detach(), 2)
-                    )
-                else:
-                    var_loss = var_loss + torch.mean(
-                        torch.pow(sigma_in - s[..., 0, 0].detach(), 2)
-                    )
+                var_loss = var_loss + torch.mean(
+                    torch.pow(sigma_in - smean[..., 0, 0].detach(), 2)
+                )
 
-                s = torch.exp(s * 10)
+                s = torch.exp(smean * 10)
                 dist = torch.exp(
                     -1
                     * torch.sum(torch.pow(spatial_emb - center, 2) * s, 0, keepdim=True)
                 )
 
                 # apply lovasz-hinge loss
-                # TODO: currently, if we assume the costmap is just to make some
-                # instances on/off. this loss is still good. Otherwise, there might be
-                # a little off.
                 instance_loss = instance_loss + lovasz_hinge(dist * 2 - 1, in_mask)
 
                 # seed loss
-                if self.use_costmap:
-                    seed_loss += self.foreground_weight * torch.sum(
-                        costmap
-                        * torch.pow(seed_map[in_mask] - dist[in_mask].detach(), 2)
-                    )
-                else:
-                    seed_loss += self.foreground_weight * torch.sum(
-                        torch.pow(seed_map[in_mask] - dist[in_mask].detach(), 2)
-                    )
-
-                # calculate instance iou
-                # iou_instance = calculate_iou(dist > 0.5, in_mask)
+                seed_loss += self.foreground_weight * torch.sum(
+                    torch.pow(seed_map[in_mask] - dist[in_mask].detach(), 2)
+                )
 
                 obj_count += 1
 
@@ -176,6 +161,7 @@ class SpatialEmbLoss_3d(nn.Module):
                 instance_loss /= obj_count
                 var_loss /= obj_count
 
+            seed_loss = seed_loss / (depth * height * width)
             if self.use_costmap:
                 seed_loss = seed_loss / costmap.sum()
             else:
@@ -239,6 +225,12 @@ class SpatialEmbLoss_2d(nn.Module):
         # weighted loss
         instances_adjusted = instances
         if self.use_costmap:
+            # make sure costmaps only work as exclusion masks, i.e.,
+            # only containing values of 0 and 1, 0 = pixels to exclude
+            costmaps[costmaps > 1] = 1
+            costmaps[costmaps > 0] = 1
+            assert not torch.any(costmaps < 0), "cannot have negative value in costmap"
+
             # only need to adjust instances in this step, because for pixels with
             # zero weight, this step will ignore the corresponding instances
             instances_adjusted[costmaps == 0] = 0
@@ -260,7 +252,7 @@ class SpatialEmbLoss_2d(nn.Module):
 
             if self.use_costmap:
                 costmap = costmaps[b]
-            instance = instances[b]
+            instance = instances_adjusted[b]  # after costmap
             label = labels[b]
             center_image = center_images[b] > 0
 
@@ -270,21 +262,18 @@ class SpatialEmbLoss_2d(nn.Module):
 
             # regress bg to zero
             bg_mask = label == 0
+
+            # adjust the cost here, because some of the background pixels might
+            # have zero weight. All we need to do is to make sure the pixels
+            # being exluded not contributing to the contribution, i.e., with
+            # value False in bg_mask
+            if self.use_costmap:
+                bg_mask[costmap == 0] = 0
+
             if bg_mask.sum() > 0:
-                if self.use_costmap:
-                    # adjust the cost here, because some of the background pixels might
-                    # have zero weight
-                    seed_loss += torch.sum(
-                        costmap * torch.pow(seed_map[bg_mask] - 0, 2)
-                    )
-                else:
-                    seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
+                seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 
             for id in instance_ids:
-                # use the original instance without costmap adjustment to fetch
-                # instance mask, since the costmap may partial cut some instances
-                # and alter the ground truth only use the costmap to adjust the loss
-                # values at the end
                 in_mask = instance.eq(id)  # 1 x h x w
 
                 center_mask = in_mask & center_image
@@ -302,14 +291,9 @@ class SpatialEmbLoss_2d(nn.Module):
                 s = sigma_in.mean(1).view(self.n_sigma, 1, 1)  # n_sigma x 1 x 1
 
                 # calculate var loss before exp
-                if self.use_costmap:
-                    var_loss = var_loss + torch.mean(
-                        costmap * torch.pow(sigma_in - s[..., 0].detach(), 2)
-                    )
-                else:
-                    var_loss = var_loss + torch.mean(
-                        torch.pow(sigma_in - s[..., 0].detach(), 2)
-                    )
+                var_loss = var_loss + torch.mean(
+                    torch.pow(sigma_in - s[..., 0].detach(), 2)
+                )
 
                 s = torch.exp(s * 10)  # TODO
                 dist = torch.exp(
@@ -318,24 +302,12 @@ class SpatialEmbLoss_2d(nn.Module):
                 )
 
                 # apply lovasz-hinge loss
-                # TODO: currently, if we assume the costmap is just to make some
-                # instances on/off. this loss is still good. Otherwise, there might be
-                # a little off.
                 instance_loss = instance_loss + lovasz_hinge(dist * 2 - 1, in_mask)
 
                 # seed loss
-                if self.use_costmap:
-                    seed_loss += self.foreground_weight * torch.sum(
-                        costmap
-                        * torch.pow(seed_map[in_mask] - dist[in_mask].detach(), 2)
-                    )
-                else:
-                    seed_loss += self.foreground_weight * torch.sum(
-                        torch.pow(seed_map[in_mask] - dist[in_mask].detach(), 2)
-                    )
-
-                # calculate instance iou
-                # iou_instance = calculate_iou(dist > 0.5, in_mask)
+                seed_loss += self.foreground_weight * torch.sum(
+                    torch.pow(seed_map[in_mask] - dist[in_mask].detach(), 2)
+                )
 
                 obj_count += 1
 
@@ -343,6 +315,7 @@ class SpatialEmbLoss_2d(nn.Module):
                 instance_loss /= obj_count
                 var_loss /= obj_count
 
+            seed_loss = seed_loss / (height * width)
             if self.use_costmap:
                 seed_loss = seed_loss / costmap.sum()
             else:
