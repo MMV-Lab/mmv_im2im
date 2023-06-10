@@ -102,7 +102,7 @@ class SpatialEmbLoss_3d(nn.Module):
             center_image = center_images[b]
 
             # use adjusted instance to find all ids
-            # i.e., if one instance is completed inside the 
+            # i.e., if one instance is completed inside the
             # exclusion mask, then this instance will be skipped
             instance_ids = instances_adjusted[b].unique()
             instance_ids = instance_ids[instance_ids != 0]
@@ -116,7 +116,7 @@ class SpatialEmbLoss_3d(nn.Module):
             # value False in bg_mask
             if self.use_costmap:
                 bg_mask[costmap == 0] = 0
-            if bg_mask.sum() > 0: 
+            if bg_mask.sum() > 0:
                 seed_loss += torch.sum(torch.pow(seed_map[bg_mask] - 0, 2))
 
             for id in instance_ids:
@@ -134,7 +134,9 @@ class SpatialEmbLoss_3d(nn.Module):
                     self.n_sigma, -1
                 )  # 3 x N
 
-                smean = sigma_in.mean(1).view(self.n_sigma, 1, 1, 1)  # n_sigma x 1 x 1 x 1
+                smean = sigma_in.mean(1).view(
+                    self.n_sigma, 1, 1, 1
+                )  # n_sigma x 1 x 1 x 1
 
                 # calculate var loss before exp
                 var_loss = var_loss + torch.mean(

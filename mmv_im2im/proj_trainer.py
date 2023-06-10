@@ -74,9 +74,15 @@ class ProjectTrainer(object):
         save_path = Path(trainer.log_dir)
         if trainer.local_rank == 0:
             save_path.mkdir(parents=True, exist_ok=True)
-            pyrallis.dump(self.model_cfg, open(save_path / Path("model_config.yaml"), "w"))
-            pyrallis.dump(self.train_cfg, open(save_path / Path("train_config.yaml"), "w"))
-            pyrallis.dump(self.data_cfg, open(save_path / Path("data_config.yaml"), "w"))
+            pyrallis.dump(
+                self.model_cfg, open(save_path / Path("model_config.yaml"), "w")
+            )
+            pyrallis.dump(
+                self.train_cfg, open(save_path / Path("train_config.yaml"), "w")
+            )
+            pyrallis.dump(
+                self.data_cfg, open(save_path / Path("data_config.yaml"), "w")
+            )
 
         # start training
         print("start training ... ")
