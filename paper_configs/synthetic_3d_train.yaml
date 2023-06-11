@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/synthetic3D/HIST1H2BJ/train
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic3D/HIST1H2BJ/train
   dataloader:
     train:
       dataloader_params:
@@ -148,7 +148,7 @@ trainer:
     accelerator: "gpu"
     devices: 1
     precision: 16
-    max_epochs: 2000
+    max_epochs: 3000
     detect_anomaly: True
   # callbacks:
   #   - module_name: lightning.pytorch.callbacks.early_stopping

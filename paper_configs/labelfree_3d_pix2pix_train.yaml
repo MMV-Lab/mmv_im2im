@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/labelfree3D/FBL/train
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/labelfree3D/FBL/train
   dataloader:
     train:
       dataloader_params:
@@ -121,7 +121,7 @@ model:
       module_name: torch.optim
       func_name: Adam  # AdamW
       params:
-        lr: 0.00002 # larger, e.g. 0.002, if train from scratch
+        lr: 0.002 # larger, e.g. 0.002, if train from scratch, smaller e.g. 0.00002 for finetuning
         betas: [0.5, 0.999]
         weight_decay: 0.0005
     discriminator:
@@ -136,7 +136,7 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.999
+        gamma: 0.98
     discriminator:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
@@ -146,8 +146,7 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 4
-    strategy: "ddp_find_unused_parameters_true"
+    devices: 1
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
@@ -163,4 +162,5 @@ trainer:
       func_name: ModelCheckpoint
       params:
         monitor: 'val_g_loss_epoch'
-        filename: 'best'
+        save_last: True
+        save_weights_only: True 

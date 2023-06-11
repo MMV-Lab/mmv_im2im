@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/labelfree3D/FBL/holdout   #ADD-YOURS
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/labelfree3D/FBL/holdout   #ADD-YOURS
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: ./data/labelfree3D/FBL/pred   #ADD-YOURS
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/labelfree3D/FBL/pred_v2   #ADD-YOURS
   preprocess:      
     - module_name: mmv_im2im.preprocessing.transforms
       func_name: norm_around_center
@@ -45,7 +45,7 @@ model:
         n_layers: 3
         nf: 64
         norm_layer: "INSTANCE"
-  checkpoint: ./lightning_logs/version_15/checkpoints/best.ckpt   #ADD-YOURS
+  checkpoint: ./lightning_logs/version_11/checkpoints/last.ckpt   #ADD-YOURS
   model_extra:
     sliding_window_params:
       roi_size: [32, 128, 128]

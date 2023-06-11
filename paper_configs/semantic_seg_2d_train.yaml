@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/semantic2D/train
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic2D/train
   dataloader:
     train:
       dataloader_params:
@@ -150,18 +150,14 @@ trainer:
     - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         patience: 500
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         filename: '{epoch}-{val_loss:.5f}'
         save_top_k: 5
         save_last: True
         save_weights_only: True 
-    - module_name: lightning.pytorch.callbacks.model_checkpoint
-      func_name: ModelCheckpoint
-      params:
-        monitor: 'val_loss'
-        filename: 'best'
+        verbose: True

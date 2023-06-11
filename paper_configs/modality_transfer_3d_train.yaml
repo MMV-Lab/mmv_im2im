@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/modalityTransfer/train/Microtubule
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/modalityTransfer/train/Nuclear_Pore_complex
   dataloader:
     train:
       dataloader_params:
@@ -130,7 +130,7 @@ model:
     module_name: torch.optim.lr_scheduler
     func_name: ExponentialLR
     params:
-      gamma: 0.99
+      gamma: 0.98
 trainer:
   verbose: True
   params:
@@ -149,8 +149,5 @@ trainer:
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
-        filename: '{epoch}-{val_loss:.5f}'
-        save_top_k: 2
         save_last: True
         save_weights_only: True 

@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/denoising/train/Planaria  #ADD-YOURS
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/denoising/train/Tribolium  #Planaria
   dataloader:
     train:
       dataloader_params:
@@ -43,7 +43,7 @@ model:
       spatial_dims: 3
       in_channels: 1
       out_channels: 1
-      channels: [32, 64, 128, 256]
+      channels: [64, 128, 256, 512]
       strides: [2, 2, 2]
       num_res_units: 3
       norm: "BATCH"
@@ -67,7 +67,7 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 2
+    devices: 1
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
@@ -75,12 +75,13 @@ trainer:
     - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
-        monitor: 'val_loss'
-        patience: 50 
+        monitor: 'val_loss_epoch'
+        patience: 100
+        verbose: True
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         filename: '{epoch}-{val_loss:.5f}'
         save_top_k: 2
         save_last: True

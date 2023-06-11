@@ -8,10 +8,24 @@ data:
     center_method: "medoid"
   dataloader:
     train:
+      # dataloader_type:
+      #   module_name: monai.data
+      #   func_name: Dataset
+      # dataset_params: []
       dataloader_params:
         batch_size: 16
         pin_memory: True
         num_workers: 8
+    val:
+      # dataloader_type:
+      #   module_name: monai.data
+      #   func_name: Dataset
+      # dataset_params: []
+      dataloader_params:
+        batch_size: 16
+        pin_memory: True
+        num_workers: 8
+
 
   preprocess:
     - module_name: monai.transforms
@@ -118,16 +132,17 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 1
+    devices: 2
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
+    num_sanity_val_steps: 0
   callbacks:
     - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
         monitor: 'val_loss_epoch'
-        patience: 50
+        patience: 100
         verbose: True
         mode: "max"
     - module_name: lightning.pytorch.callbacks.model_checkpoint
@@ -135,7 +150,6 @@ trainer:
       params:
         monitor: 'val_loss_epoch'
         filename: '{epoch}-{train_loss:.5f}'
-        save_top_k: 2
         save_last: True
         save_weights_only: True 
         mode: "max"

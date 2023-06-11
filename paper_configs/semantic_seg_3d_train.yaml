@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/semantic3D/train_fbl/ 
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic3D/train_fbl/ 
   dataloader:
     train:
       dataloader_params:
@@ -69,7 +69,7 @@ model:
       strides: [[1, 1, 1], [1, 2, 2], [1, 1, 1], [2, 2, 2]]
       kernel_size: [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]
       upsample_kernel_size:  [[1, 2, 2], [1, 1, 1], [2, 2, 2]]
-      filters: [64, 128, 192, 256]
+      filters: [64, 128, 128, 256]
       dropout: 0.2
       res_block: True
     # module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
@@ -117,14 +117,11 @@ trainer:
     - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         patience: 50 
         verbose: True
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
-        filename: '{epoch}-{val_loss:.5f}'
-        save_top_k: 2
         save_last: True
         save_weights_only: True 

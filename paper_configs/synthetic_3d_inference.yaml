@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/synthetic3D/HIST1H2BJ/holdout   #ADD-YOURS
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/data/synthetic3D/HIST1H2BJ/holdout   #ADD-YOURS
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: ./data/synthetic3D/HIST1H2BJ/pred   #ADD-YOURS
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/data/synthetic3D/HIST1H2BJ/pred   #ADD-YOURS
   preprocess:            
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles

@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/denoising/test/Planaria/test_data/condition_3   #ADD-YOURS
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/denoising/test/Planaria/test_data/condition_3   #ADD-YOURS
     data_type: tif
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: ./data/denoising/test/Planaria/test_data/pred_3   #ADD-YOURS
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/denoising/test/Planaria/test_data/pred_3_v2   #ADD-YOURS
   preprocess:       
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -28,11 +28,11 @@ model:
       spatial_dims: 3
       in_channels: 1
       out_channels: 1
-      channels: [32, 64, 128, 256]
+      channels: [64, 128, 256, 512]
       strides: [2, 2, 2]
       num_res_units: 3
       norm: "BATCH"
-  checkpoint: ./lightning_logs/version_63/checkpoints/last.ckpt  #ADD-YOURS
+  checkpoint: ./lightning_logs/version_1/checkpoints/last.ckpt  #ADD-YOURS
   model_extra:
     sliding_window_params:
       roi_size: [32, 512, 512]

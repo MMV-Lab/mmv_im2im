@@ -91,9 +91,10 @@ trainer:
       params:
         monitor: 'val_loss_epoch'
         patience: 50 
+        verbose: True
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         monitor: 'val_loss_epoch'
-        filename: 'best'
         save_last: True
+        save_weights_only: True 

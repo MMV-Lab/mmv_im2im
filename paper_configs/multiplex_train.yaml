@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path:  ./data/multiplex/train/trans1
+  data_path:  /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/multiplex/train/trans3
   dataloader:
     train:
       dataloader_params:
@@ -135,8 +135,5 @@ trainer:
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss_discriminator'
-        filename: '{epoch}-{val_loss_discriminator:.5f}'
-        save_top_k: 2
         save_last: True
         save_weights_only: True

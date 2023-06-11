@@ -65,10 +65,10 @@ class ProjectTrainer(object):
 
         # set up training
         if self.train_cfg.callbacks is None:
-            callback_list = []
+            trainer = pl.Trainer(**self.train_cfg.params)
         else:
             callback_list = parse_ops_list(self.train_cfg.callbacks)
-        trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg.params)
+            trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg.params)
 
         # save the configuration in the log directory
         save_path = Path(trainer.log_dir)
