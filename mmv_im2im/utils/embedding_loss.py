@@ -45,7 +45,10 @@ class SpatialEmbLoss_3d(nn.Module):
         xyzm = torch.cat((xm, ym, zm), 0)
 
         self.register_buffer("xyzm", xyzm)
-        self.use_costmap = use_costmap
+
+        # TODO: currently, the costmap for embedding loss needs
+        # further investigation, so set to False until fixed
+        self.use_costmap = False  # use_costmap
 
     def forward(
         self,
@@ -67,7 +70,7 @@ class SpatialEmbLoss_3d(nn.Module):
         )
 
         # weighted loss
-        instances_adjusted = instances
+        instances_adjusted = instances.clone().detach()
         if self.use_costmap:
             # make sure costmaps only work as exclusion masks, i.e.,
             # only containing values of 0 and 1, 0 = pixels to exclude
@@ -97,7 +100,7 @@ class SpatialEmbLoss_3d(nn.Module):
 
             if self.use_costmap:
                 costmap = costmaps[b]
-            instance = instances_adjusted[b]  # after costmap adjustment
+            instance = instances[b]  # without costmap adjustment
             label = labels[b]
             center_image = center_images[b]
 

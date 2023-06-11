@@ -180,7 +180,6 @@ class Model(pl.LightningModule):
             loss = self.run_step(batch, validation_stage=False, save_path=log_dir)
         else:
             loss = self.run_step(batch, validation_stage=False)
-
         self.log(
             "train_loss",
             loss,
@@ -198,9 +197,9 @@ class Model(pl.LightningModule):
             # check if the log path exists, if not create one
             log_dir = Path(self.trainer.log_dir)
             log_dir.mkdir(parents=True, exist_ok=True)
-            loss = self.run_step(batch, validation_stage=True, save_path=log_dir)
+            loss = self.run_step(batch, validation_stage=False, save_path=log_dir)
         else:
-            loss = self.run_step(batch, validation_stage=True)
+            loss = self.run_step(batch, validation_stage=False)
         self.log(
             "val_loss",
             loss,
