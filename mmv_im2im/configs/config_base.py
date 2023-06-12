@@ -320,7 +320,7 @@ class TrainerConfig:
     params: Dict = field(default=None)
 
     # the config for callbacks
-    callbacks: List[Dict] = field(default=None,  is_mutable=True)
+    callbacks: List[Dict] = field(default=None, is_mutable=True)
 
     # global variable that can be used to overwrite gpus in trainer
     gpus: Union[int, List[int]] = field(default=None, is_mutable=True)
