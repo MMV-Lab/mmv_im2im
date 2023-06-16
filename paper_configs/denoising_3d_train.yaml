@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/denoising/train/Tribolium  #Planaria
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/denoising/train/Planaria  #Tribolium  #Planaria
   dataloader:
     train:
       dataloader_params:
@@ -54,7 +54,7 @@ model:
       reduction: 'mean'
   optimizer:
     module_name: torch.optim
-    func_name: AdamW  # Adam
+    func_name: Adam  # Adam
     params:
       lr: 0.001
       weight_decay: 0.0005
@@ -71,6 +71,7 @@ trainer:
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
+    gradient_clip_val: 0.8
   callbacks:
     - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping

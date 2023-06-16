@@ -2,15 +2,15 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: ./data/instance3D/train_fbl
-  cache_path: ./data/instance3D/cache_fbl
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/train_fbl
+  cache_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/cache_fbl
   extra:
     center_method: "centroid" # "medoid"
     patch_size: [32, 256, 256]
   dataloader:
     train_val_ratio: 0.05
     train:
-      partial_loader: 0.5
+      # partial_loader: 0.5
       dataloader_params:
         batch_size: 1
         pin_memory: True
@@ -131,7 +131,7 @@ trainer:
     max_epochs: 500
     detect_anomaly: True
     gradient_clip_val: 0.8
-    reload_dataloaders_every_n_epochs: 10
+    #reload_dataloaders_every_n_epochs: 10
   callbacks:
     # - module_name: lightning.pytorch.callbacks.early_stopping
     #   func_name: EarlyStopping

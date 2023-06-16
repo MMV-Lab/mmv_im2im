@@ -349,6 +349,15 @@ class Model(pl.LightningModule):
             sch_g.step()
             sch_d.step()
 
+            if self.verbose:
+                self.save_cyclegan_output(
+                    image_A[0].detach().cpu().numpy(),
+                    image_B[0].detach().cpu().numpy(),
+                    fake_A_from_B[0].detach().cpu().numpy(),
+                    fake_B_from_A[0].detach().cpu().numpy(),
+                    "train",
+                )
+
     def validation_step(self, batch, batch_idx):
         val_loss = self.run_step(batch, batch_idx)
 

@@ -60,7 +60,8 @@ class ProjectTester(object):
         pre_train["state_dict"].pop("criterion.xyzm", None)
         self.model.load_state_dict(pre_train["state_dict"])
         if (
-            "cpu_only" in self.model_cfg.model_extra
+            self.model_cfg.model_extra is not None
+            and "cpu_only" in self.model_cfg.model_extra
             and self.model_cfg.model_extra["cpu_only"]
         ):
             self.cpu = True

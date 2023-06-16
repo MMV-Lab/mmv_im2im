@@ -98,6 +98,8 @@ model:
       n_sigma: 3
       foreground_weight: 4.5
       use_costmap: True
+      min_mask_sum: 128
+      min_object_size: 36
   optimizer:
       module_name: torch.optim
       func_name: Adam  # AdamW

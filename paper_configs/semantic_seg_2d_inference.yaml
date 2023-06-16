@@ -2,7 +2,7 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/semantic2D/testB
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic2D/testA
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "SYX"
@@ -10,7 +10,7 @@ data:
       T: 0
       Z: 0
   inference_output:
-    path: ./data/semantic2D/testB_pred
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic2D/testA_pred_v2
     suffix: .tif
 
   preprocess:
@@ -35,7 +35,7 @@ model:
       out_channels: 2
       channels: [32, 64, 128, 256, 512, 1024] #sequence of channels. Top block first. The length of channels should be no less than 2.
       strides: [2, 2, 2, 2, 2] 
-  checkpoint: ./lightning_logs/version_165/checkpoints/best.ckpt
+  checkpoint: ./lightning_logs/version_19/checkpoints/epoch=477-val_loss=0.14901.ckpt
   model_extra:
     cpu_only: True
     sliding_window_params:

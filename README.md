@@ -21,6 +21,8 @@ The overall package is designed with a generic image-to-image transformation fra
 
 Before starting, we recommend to [create a new conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands) or [a virtual environment](https://docs.python.org/3/library/venv.html) with Python 3.9+.
 
+Please note that the proper setup of hardware is beyond the scope of this pacakge. This package was tested with GPU/CPU on Linux/Windows and CPU on MacOS.
+
 ### Install the development head of MONAI
 
 Due to this bug in MONAI: https://github.com/Project-MONAI/MONAI/pull/6523, which has been fixed in the dev branch but not in the stable release yet, we need to install the current dev head to avoid this bug. To do this:

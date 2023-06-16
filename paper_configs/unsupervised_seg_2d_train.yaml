@@ -1,7 +1,8 @@
 mode: train
 
 data:
-  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/unsupervise2D/train   #ADD-YOURS
+  data_path: /mnt/eternus/project_data/im2im_paper/unsupervised_segmentation/train_2d/TJP1
+  #/mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/unsupervise2D/train   #ADD-YOURS
   category: "unpair"
   dataloader:
     train:
@@ -122,12 +123,12 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.98
+        gamma: 0.95
     discriminator:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.98
+        gamma: 0.95
 trainer:
   verbose: True
   params:
@@ -135,21 +136,18 @@ trainer:
     devices: 2
     strategy: "ddp_find_unused_parameters_true"
     precision: 16
-    max_epochs: 2000
+    max_epochs: 500
     detect_anomaly: True
   callbacks:
-    - module_name: lightning.pytorch.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_g_loss'
-        patience: 50
-        verbose: True
-        min_delta: 0.00001
+    # - module_name: lightning.pytorch.callbacks.early_stopping
+    #   func_name: EarlyStopping
+    #   params:
+    #     monitor: 'val_g_loss'
+    #     patience: 50
+    #     verbose: True
+    #     min_delta: 0.00001
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_g_loss'
-        filename: '{epoch}-{val_loss:.5f}'
-        save_top_k: 2
         save_last: True
         save_weights_only: True 

@@ -2,7 +2,8 @@ mode: train
 
 data:
   category: "pair"
-  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/labelfree3D/FBL/train
+  data_path: /mnt/eternus/project_data/im2im_paper/labelfree_3D/LMNB1/train
+  #/mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/labelfree3D/FBL/train
   dataloader:
     train:
       dataloader_params:
@@ -121,7 +122,7 @@ model:
       module_name: torch.optim
       func_name: Adam  # AdamW
       params:
-        lr: 0.002 # larger, e.g. 0.002, if train from scratch, smaller e.g. 0.00002 for finetuning
+        lr: 0.0002 # larger, e.g. 0.002, if train from scratch, smaller e.g. 0.00002 for finetuning
         betas: [0.5, 0.999]
         weight_decay: 0.0005
     discriminator:
@@ -136,12 +137,12 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.98
+        gamma: 0.99
     discriminator:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.999
+        gamma: 0.99
 trainer:
   verbose: True
   params:
@@ -151,16 +152,15 @@ trainer:
     max_epochs: 10000
     detect_anomaly: True
   callbacks:
-    - module_name: lightning.pytorch.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_g_loss_epoch'
-        patience: 50 
-        verbose: True
-        mode: "min"
+    # - module_name: lightning.pytorch.callbacks.early_stopping
+    #   func_name: EarlyStopping
+    #   params:
+    #     monitor: 'val_d_loss_epoch'
+    #     patience: 50 
+    #     verbose: True
+    #     mode: "min"
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_g_loss_epoch'
         save_last: True
         save_weights_only: True 

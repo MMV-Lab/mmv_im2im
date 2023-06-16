@@ -10,17 +10,15 @@ data:
     train:
       # dataloader_type:
       #   module_name: monai.data
-      #   func_name: Dataset
-      # dataset_params: []
+      #   func_name: SmartCacheDataset
+      # dataset_params:
+      #   cache_rate: 0.2
+      #   replace_rate: 0.1
       dataloader_params:
         batch_size: 16
         pin_memory: True
         num_workers: 8
     val:
-      # dataloader_type:
-      #   module_name: monai.data
-      #   func_name: Dataset
-      # dataset_params: []
       dataloader_params:
         batch_size: 16
         pin_memory: True
@@ -118,6 +116,8 @@ model:
       n_sigma: 2
       foreground_weight: 10
       use_costmap: False
+      min_mask_sum: 128
+      min_object_size: 36
   optimizer:
       module_name: torch.optim
       func_name: Adam  # AdamW
@@ -132,7 +132,8 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 2
+    # strategy: "ddp_find_unused_parameters_true"
+    devices: 1
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
@@ -144,13 +145,13 @@ trainer:
         monitor: 'val_loss_epoch'
         patience: 100
         verbose: True
-        mode: "max"
+        #mode: "max"
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         monitor: 'val_loss_epoch'
-        filename: '{epoch}-{train_loss:.5f}'
+        filename: '{epoch}-{val_loss:.5f}'
         save_last: True
         save_weights_only: True 
-        mode: "max"
+        #mode: "max"
 
