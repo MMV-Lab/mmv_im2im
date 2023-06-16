@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "embedseg"
-  # data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/instance3D/train_fluo
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/instance3D/train_fluo
   cache_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/cache_fluo
   extra:
     center_method: "centroid"
@@ -122,19 +122,8 @@ trainer:
     check_val_every_n_epoch: 5
     num_sanity_val_steps: 0
   callbacks:
-  #   - module_name: lightning.pytorch.callbacks.early_stopping
-  #     func_name: EarlyStopping
-  #     params:
-  #       monitor: 'val_loss_epoch'
-  #       patience: 5
-  #       verbose: True
-  #       mode: 'max'
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        #monitor: 'val_loss_epoch'
-        #filename: '{epoch}-{val_loss:.5f}'
-        #save_top_k: 2
         save_last: True
         save_weights_only: True 
-        #mode: 'max'

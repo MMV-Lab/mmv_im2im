@@ -2,14 +2,14 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: ./data/instance3D/train_fbl
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/train_fbl
   dataloader:
     train:
       dataloader_params:
         batch_size: 1
         pin_memory: True
         num_workers: 4 #4
-        persistent_workers: True
+        # persistent_workers: True
 
   preprocess:
     - module_name: monai.transforms
@@ -63,12 +63,7 @@ model:
   framework: embedseg
   model_extra:
     center_method: "centroid"
-    pre-train: ./lightning_logs/version_152/checkpoints/last.ckpt  #26 # 50
-    validation_sliding_windows:
-      roi_size: [32, 512, 512]
-      sw_batch_size: 1
-      overlap: 0.6
-      mode: "gaussian"
+    pre-train: ./lightning_logs/version_44/checkpoints/last.ckpt  #26 # 50
   net:
     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
     func_name: UNet3D
@@ -106,19 +101,12 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 2
+    devices: 3
     precision: 16
-    max_epochs: 500
+    max_epochs: 200
     detect_anomaly: True
     gradient_clip_val: 0.8
   callbacks:
-    # - module_name: lightning.pytorch.callbacks.early_stopping
-    #   func_name: EarlyStopping
-    #   params:
-    #     monitor: 'val_loss'
-    #     patience: 50
-    #     verbose: True
-    #     mode: 'max'
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
@@ -127,4 +115,3 @@ trainer:
         save_top_k: 2
         save_last: True
         save_weights_only: True 
-        mode: 'max'

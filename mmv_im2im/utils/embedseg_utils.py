@@ -381,7 +381,7 @@ def prepare_embedseg_tensor(
         class_image = np.expand_dims(class_image, axis=0)
         class_labels_list.append(class_image.astype(np.ubyte))
         center_image = np.expand_dims(center_image, axis=0)
-        center_images_list.append(center_image.astype(np.bool))
+        center_images_list.append(center_image.astype(bool))
 
     # stack into batch and covert to MetaTensor
     center_images = from_numpy(np.stack(center_images_list, axis=0))

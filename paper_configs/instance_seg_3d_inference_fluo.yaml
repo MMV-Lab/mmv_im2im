@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir:  "./data/instance3D/holdout_fluo"   #ADD-YOURS
+    dir:  /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/holdout_fluo   #ADD-YOURS
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path:  "./data/instance3D/pred_fluo"   #ADD-YOURS
+    path:  /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/pred_fluo_v2   #ADD-YOURS
   preprocess:
     - module_name: monai.transforms
       func_name: NormalizeIntensity
@@ -30,13 +30,13 @@ data:
         pixel_z: 1
         n_sigma: 3
         seed_thresh: 0.5
-        min_mask_sum: 2
+        min_mask_sum: 128
         min_unclustered_sum: 20
-        min_object_size: 20
+        min_object_size: 36
 
 model:
   framework: embedseg
-  checkpoint: ./lightning_logs/version_27/checkpoints/last.ckpt
+  checkpoint: ./lightning_logs/version_45/checkpoints/last.ckpt
   net:
     module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single
     func_name: UNet3D

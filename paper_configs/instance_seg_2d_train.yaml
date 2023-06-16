@@ -132,7 +132,7 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    # strategy: "ddp_find_unused_parameters_true"
+    # strategy: "ddp_find_unused_parameters_true"  # uncomment this when using multiple GPUs
     devices: 1
     precision: 16
     max_epochs: 10000
@@ -143,9 +143,8 @@ trainer:
       func_name: EarlyStopping
       params:
         monitor: 'val_loss_epoch'
-        patience: 100
+        patience: 50
         verbose: True
-        #mode: "max"
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
@@ -153,5 +152,4 @@ trainer:
         filename: '{epoch}-{val_loss:.5f}'
         save_last: True
         save_weights_only: True 
-        #mode: "max"
 

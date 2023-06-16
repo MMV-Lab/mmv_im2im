@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/data/synthetic3D/HIST1H2BJ/holdout   #ADD-YOURS
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic3D/HIST1H2BJ/holdout   #ADD-YOURS
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/data/synthetic3D/HIST1H2BJ/pred   #ADD-YOURS
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic3D/HIST1H2BJ/pred_v2   #ADD-YOURS
   preprocess:            
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -40,7 +40,7 @@ model:
         n_layers: 3
         nf: 64
         norm_layer: "INSTANCE"
-  checkpoint: ./lightning_logs/version_54/checkpoints/last.ckpt   #ADD-YOURS
+  checkpoint: ./lightning_logs/version_23/checkpoints/epoch=2180-step=619404.ckpt   #ADD-YOURS
   model_extra:
     sliding_window_params:
       roi_size: [32, 256, 256]

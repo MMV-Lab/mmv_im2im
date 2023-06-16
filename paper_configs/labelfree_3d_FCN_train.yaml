@@ -95,10 +95,10 @@ trainer:
     - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         patience: 50 
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         filename: 'best'

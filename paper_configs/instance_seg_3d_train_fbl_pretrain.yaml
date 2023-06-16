@@ -128,18 +128,11 @@ trainer:
     accelerator: "gpu"
     devices: 2
     precision: 16
-    max_epochs: 500
+    max_epochs: 300
     detect_anomaly: True
     gradient_clip_val: 0.8
     #reload_dataloaders_every_n_epochs: 10
   callbacks:
-    # - module_name: lightning.pytorch.callbacks.early_stopping
-    #   func_name: EarlyStopping
-    #   params:
-    #     monitor: 'val_loss'
-    #     patience: 50
-    #     verbose: True
-    #     mode: 'max'
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
@@ -148,4 +141,3 @@ trainer:
         save_top_k: 2
         save_last: True
         save_weights_only: True 
-        mode: 'max'

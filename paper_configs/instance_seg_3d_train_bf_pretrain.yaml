@@ -2,8 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: ./data/instance3D/train_bf
-  cache_path: ./data/instance3D/cache_bf
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/train_bf
+  cache_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/cache_bf
   extra:
     center_method: "centroid"
   dataloader:
@@ -95,6 +95,8 @@ model:
       n_sigma: 3
       foreground_weight: 4.5
       use_costmap: True
+      min_mask_sum: 128
+      min_object_size: 36
   optimizer:
       module_name: torch.optim
       func_name: Adam  # AdamW
@@ -109,25 +111,16 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 6
+    devices: 4
     precision: 16
-    max_epochs: 200
+    max_epochs: 10
     detect_anomaly: True
     gradient_clip_val: 0.8
+    check_val_every_n_epoch: 5
+    num_sanity_val_steps: 0
   callbacks:
-    - module_name: lightning.pytorch.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_loss'
-        patience: 5
-        verbose: True
-        mode: 'max'
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
-        filename: '{epoch}-{val_loss:.5f}'
-        save_top_k: 2
         save_last: True
         save_weights_only: True 
-        mode: 'max'
