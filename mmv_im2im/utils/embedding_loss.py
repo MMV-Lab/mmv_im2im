@@ -231,7 +231,7 @@ class SpatialEmbLoss_2d(nn.Module):
         xym_s = self.xym[:, 0:height, 0:width].contiguous()  # 2 x h x w
 
         # weighted loss
-        # instances_adjusted = instances
+        instances_adjusted = instances.copy()
         if self.use_costmap:
             # make sure costmaps only work as exclusion masks, i.e.,
             # only containing values of 0 and 1, 0 = pixels to exclude
