@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/modalityTransfer/test/Microtubule
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/modalityTransfer/test/Nuclear_Pore_complex #Microtubule
     data_type: tif
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: ./data/modalityTransfer/test/Microtubule/pred    
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/modalityTransfer/test/Nuclear_Pore_complex/pred  #Microtubule/pred
   preprocess:      
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -36,7 +36,7 @@ model:
       in_channel: 1
       n_classes: 1 # out_channels
       down_ratio: 2
-  checkpoint: ./lightning_logs/version_68/checkpoints/last.ckpt
+  checkpoint: ./lightning_logs/version_17/checkpoints/last.ckpt
   model_extra:
     sliding_window_params:
       roi_size: [6, 512, 512]   # Has to be the same as in RandSpatialCropd in modality_transfer_3d_train.yaml 

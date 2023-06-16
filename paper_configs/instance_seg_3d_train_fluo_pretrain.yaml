@@ -2,8 +2,8 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: ./data/instance3D/train_fluo
-  cache_path: ./data/instance3D/cache_fluo
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/instance3D/train_fluo
+  cache_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance3D/cache_fluo
   extra:
     center_method: "centroid"
   dataloader:
@@ -11,8 +11,12 @@ data:
       dataloader_params:
         batch_size: 1
         pin_memory: True
-        num_workers: 4 #4
-        persistent_workers: True
+        num_workers: 32
+    val:
+      dataloader_params:
+        batch_size: 1
+        pin_memory: True
+        num_workers: 32
 
   preprocess:
     - module_name: monai.transforms
@@ -94,6 +98,8 @@ model:
       n_sigma: 3
       foreground_weight: 4.5
       use_costmap: True
+      min_mask_sum: 128
+      min_object_size: 36
   optimizer:
       module_name: torch.optim
       func_name: Adam  # AdamW
@@ -108,25 +114,16 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 3
+    devices: 8
     precision: 16
-    max_epochs: 50
+    max_epochs: 10
     detect_anomaly: True
     gradient_clip_val: 0.8
+    check_val_every_n_epoch: 5
+    num_sanity_val_steps: 0
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_loss'
-        patience: 50
-        verbose: True
-        mode: 'max'
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
-        filename: '{epoch}-{val_loss:.5f}'
-        save_top_k: 2
         save_last: True
         save_weights_only: True 
-        mode: 'max'

@@ -3,7 +3,7 @@
 import logging
 from pathlib import Path
 from importlib import import_module
-import pytorch_lightning as pl
+import lightning as pl
 import torch
 from mmv_im2im.data_modules import get_data_module
 from mmv_im2im.utils.misc import parse_ops_list
@@ -65,17 +65,24 @@ class ProjectTrainer(object):
 
         # set up training
         if self.train_cfg.callbacks is None:
-            callback_list = []
+            trainer = pl.Trainer(**self.train_cfg.params)
         else:
             callback_list = parse_ops_list(self.train_cfg.callbacks)
-        trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg.params)
+            trainer = pl.Trainer(callbacks=callback_list, **self.train_cfg.params)
 
         # save the configuration in the log directory
         save_path = Path(trainer.log_dir)
-        save_path.mkdir(parents=True, exist_ok=True)
-        pyrallis.dump(self.model_cfg, open(save_path / Path("model_config.yaml"), "w"))
-        pyrallis.dump(self.train_cfg, open(save_path / Path("train_config.yaml"), "w"))
-        pyrallis.dump(self.data_cfg, open(save_path / Path("data_config.yaml"), "w"))
+        if trainer.local_rank == 0:
+            save_path.mkdir(parents=True, exist_ok=True)
+            pyrallis.dump(
+                self.model_cfg, open(save_path / Path("model_config.yaml"), "w")
+            )
+            pyrallis.dump(
+                self.train_cfg, open(save_path / Path("train_config.yaml"), "w")
+            )
+            pyrallis.dump(
+                self.data_cfg, open(save_path / Path("data_config.yaml"), "w")
+            )
 
         # start training
         print("start training ... ")

@@ -2,14 +2,14 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/semantic3D/holdout_fbl
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic3D/holdout_fbl
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "ZYX"
       C: 0
       T: 0
   inference_output:
-    path: ./data/semantic3D/pred_fbl
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic3D/pred_fbl_v2
 
   preprocess:
     - module_name: monai.transforms
@@ -36,10 +36,10 @@ model:
       strides: [[1, 1, 1], [1, 2, 2], [1, 1, 1], [2, 2, 2]]
       kernel_size: [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]
       upsample_kernel_size:  [[1, 2, 2], [1, 1, 1], [2, 2, 2]]
-      filters: [64, 128, 192, 256]
+      filters: [64, 128, 128, 256]
       dropout: 0.2
       res_block: True
-  checkpoint: ./lightning_logs/version_153/checkpoints/last.ckpt
+  checkpoint: ./lightning_logs/version_21/checkpoints/last.ckpt
   model_extra:
     sliding_window_params:
       roi_size: [32, 512, 512]

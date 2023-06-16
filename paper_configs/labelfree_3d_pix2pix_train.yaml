@@ -2,7 +2,8 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/labelfree3D/FBL/train
+  data_path: /mnt/eternus/project_data/im2im_paper/labelfree_3D/HIST1H2BJ/train  #LMNB1/train
+  #/mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/labelfree3D/FBL/train
   dataloader:
     train:
       dataloader_params:
@@ -45,7 +46,7 @@ data:
         keys: ["IM", "GT"]
         random_size: False
         num_samples: 4
-        roi_size: [32, 128, 128]
+        roi_size: [32, 256, 256]
     - module_name: monai.transforms
       func_name: EnsureTyped
       params:
@@ -121,7 +122,7 @@ model:
       module_name: torch.optim
       func_name: Adam  # AdamW
       params:
-        lr: 0.00002 # larger, e.g. 0.002, if train from scratch
+        lr: 0.0002 # larger, e.g. 0.002, if train from scratch, smaller e.g. 0.00002 for finetuning
         betas: [0.5, 0.999]
         weight_decay: 0.0005
     discriminator:
@@ -136,28 +137,24 @@ model:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.999
+        gamma: 0.99
     discriminator:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
       params:
-        gamma: 0.999
+        gamma: 0.99
 trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 1
+    devices: 4 # 1
+    strategy: "ddp_find_unused_parameters_true"
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_loss_discriminator'
-        patience: 50 
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss_discriminator'
-        filename: 'best'
+        save_last: True
+        save_weights_only: True 

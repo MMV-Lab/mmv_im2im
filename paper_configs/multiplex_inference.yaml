@@ -2,7 +2,7 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/multiplex/test/trans2  #ADD-YOURS
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/multiplex/test/trans3  #ADD-YOURS
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "SYX"
@@ -10,7 +10,7 @@ data:
       T: 0
       Z: 0
   inference_output:
-    path: ./data/multiplex/test/pred2   #ADD-YOURS
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/multiplex/test/pred3_v2   #ADD-YOURS
 
   preprocess:
     - module_name: monai.transforms
@@ -38,4 +38,4 @@ model:
         n_layers: 4
         nf: 64
         norm_layer: "INSTANCE"  
-  checkpoint: ./lightning_logs/version_103/checkpoints/last.ckpt  #ADD-YOURS
+  checkpoint: ./lightning_logs/version_14/checkpoints/last.ckpt  #ADD-YOURS

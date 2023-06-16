@@ -38,30 +38,45 @@ dev_requirements = [
 ]
 
 data_requirements = [
-    "quilt3"
+    "quilt3",
+    "pooch",
+    "matplotlib",
+    "notebook"
 ]
 
-requirements = [
-    "pytorch-lightning",
+embedseg_requirements = [
+    "numba"
+]
+
+basic_requirements = [
+    "lightning>=2.0.0",
+    "torch>=2.0.1",
     "monai>=1.1.0",
     "aicsimageio",
     "pandas",
     "scikit-image",
-    "einops",
-    "numba",  # required by embedseg
     "protobuf<4.21.0",
     "pyrallis",
-    "scikit-learn"
+    "scikit-learn",
+    "tensorboard",
+]
+
+requirements = [
+    *embedseg_requirements,
+    *basic_requirements,
 ]
 
 extra_requirements = {
     "setup": setup_requirements,
     "test": test_requirements,
     "dev": dev_requirements,
-    "quick": data_requirements,
+    "data": data_requirements,
+    "basic": basic_requirements,
     "all": [
-        *requirements,
+        *basic_requirements,
         *dev_requirements,
+        *data_requirements,
+        *embedseg_requirements,
     ]
 }
 
@@ -75,6 +90,7 @@ setup(
         "Natural Language :: English",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     description="A python package for deep learing based image to image transformation",  # noqa E501
     entry_points={

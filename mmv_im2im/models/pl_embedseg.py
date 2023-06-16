@@ -1,8 +1,8 @@
-import os
 import numpy as np
 from typing import Dict
+from pathlib import Path
 from aicsimageio.writers import OmeTiffWriter
-import pytorch_lightning as pl
+import lightning as pl
 from mmv_im2im.postprocessing.embedseg_cluster import generate_instance_clusters
 from mmv_im2im.utils.embedseg_utils import prepare_embedseg_tensor
 from mmv_im2im.utils.model_utils import init_weights
@@ -14,7 +14,7 @@ from mmv_im2im.utils.misc import (
     parse_config_func,
     parse_config_func_without_params,
 )
-from mmv_im2im.utils.metrics import simplified_instance_IoU_3D
+from mmv_im2im.utils.metrics import simplified_instance_IoU
 
 
 class Model(pl.LightningModule):
@@ -55,7 +55,6 @@ class Model(pl.LightningModule):
             self.optimizer_func = parse_config_func(model_info_xx.optimizer)
 
     def configure_optimizers(self):
-        # https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.lightning.html#pytorch_lightning.core.lightning.LightningModule.configure_optimizers  # noqa E501
         optimizer = self.optimizer_func(self.parameters())
         if self.model_info.scheduler is None:
             return optimizer
@@ -85,6 +84,7 @@ class Model(pl.LightningModule):
 
         # forward
         if validation_stage:
+            # generate predictions
             if (
                 self.model_info.model_extra is not None
                 and "validation_sliding_windows" in self.model_info.model_extra
@@ -95,26 +95,27 @@ class Model(pl.LightningModule):
                     device=torch.device("cpu"),
                     **self.model_info.model_extra["validation_sliding_windows"],
                 )
+                # move back to CUDA
+                output = output.cuda()
             else:
                 output = self.net(im)
-            # move back to CUDA
-            output = output.cuda()
 
             # generate instance segmentation
             instances_map = generate_instance_clusters(output, **self.clustering_params)
 
+            # calculate simplified IoU loss for validation
             instances = instances.detach().cpu().numpy()
             if len(instances.shape) > spatial_dim:
                 instances = np.squeeze(instances)
 
             if use_costmap:
-                sIoU = simplified_instance_IoU_3D(
+                sIoU = simplified_instance_IoU(
                     instances, instances_map, costmap.detach().cpu().numpy() == 0
                 )
             else:
-                sIoU = simplified_instance_IoU_3D(instances, instances_map)
+                sIoU = simplified_instance_IoU(instances, instances_map)
 
-            loss = {"sIoU": sIoU}
+            loss = sIoU
         else:
             output = self(im)
 
@@ -136,8 +137,10 @@ class Model(pl.LightningModule):
             loss = loss.mean()
 
         if save_path is not None:
+            current_stage = "val"
             # get instance segmentation if not yet
             if not validation_stage:
+                current_stage = "train"
                 instances_map = generate_instance_clusters(
                     output, **self.clustering_params
                 )
@@ -152,7 +155,7 @@ class Model(pl.LightningModule):
                 dim_order = "CZYX"
 
             # save raw image
-            out_fn = save_path + "_raw.tiff"
+            out_fn = save_path / f"{self.current_epoch}_{current_stage}_raw.tiff"
             OmeTiffWriter.save(
                 im.detach().cpu().numpy()[0,],
                 out_fn,
@@ -160,58 +163,51 @@ class Model(pl.LightningModule):
             )
 
             # save ground truth
-            out_fn = save_path + "_gt.tiff"
+            out_fn = save_path / f"{self.current_epoch}_{current_stage}_gt.tiff"
             OmeTiffWriter.save(gt, out_fn, dim_order=dim_order)
 
-            # save instance segmentation
-            out_fn = save_path + "_pred.tiff"
+            # # save instance segmentation
+            out_fn = save_path / f"{self.current_epoch}_{current_stage}_seg.tiff"
             OmeTiffWriter.save(instances_map, out_fn, dim_order=dim_order[1:])
-
-            out_fn = save_path + "_out.tiff"
-            OmeTiffWriter.save(
-                output.detach().cpu().numpy()[0,].astype(float),
-                out_fn,
-                dim_order=dim_order,
-            )
         return loss
 
     def training_step(self, batch, batch_idx):
         if self.verbose and batch_idx == 0:
-            if not os.path.exists(self.trainer.log_dir):
-                os.mkdir(self.trainer.log_dir)
-            save_path_base = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_train_"
-            )
-            loss = self.run_step(
-                batch, validation_stage=False, save_path=save_path_base
-            )
+            # check if the log path exists, if not create one
+            log_dir = Path(self.trainer.log_dir)
+            log_dir.mkdir(parents=True, exist_ok=True)
+
+            loss = self.run_step(batch, validation_stage=False, save_path=log_dir)
         else:
             loss = self.run_step(batch, validation_stage=False)
+        self.log(
+            "train_loss",
+            loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
 
-        self.log("train_loss_iter", loss, on_step=True, on_epoch=True, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         if self.verbose and batch_idx == 0:
-            if not os.path.exists(self.trainer.log_dir):
-                os.mkdir(self.trainer.log_dir)
-            save_path_base = (
-                self.trainer.log_dir + os.sep + str(self.current_epoch) + "_val_"
-            )
-            loss = self.run_step(batch, validation_stage=True, save_path=save_path_base)
+            # check if the log path exists, if not create one
+            log_dir = Path(self.trainer.log_dir)
+            log_dir.mkdir(parents=True, exist_ok=True)
+            loss = self.run_step(batch, validation_stage=False, save_path=log_dir)
         else:
-            loss = self.run_step(batch, validation_stage=True)
-        self.log("val_loss_iter", loss, on_step=True, on_epoch=True, sync_dist=True)
+            loss = self.run_step(batch, validation_stage=False)
+        self.log(
+            "val_loss",
+            loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+            sync_dist=True,
+        )
 
         return loss
-
-    def training_epoch_end(self, training_step_outputs):
-        # be aware of future deprecation: https://github.com/Lightning-AI/lightning/issues/9968   # noqa E501
-        training_step_outputs = [d["loss"] for d in training_step_outputs]
-        loss_ave = torch.stack(training_step_outputs).mean().item()
-        self.log("train_loss", loss_ave)
-
-    def validation_epoch_end(self, validation_step_outputs):
-        validation_step_outputs = [d["sIoU"] for d in validation_step_outputs]
-        loss_ave = np.stack(validation_step_outputs).mean()
-        self.log("val_loss", loss_ave, sync_dist=True)

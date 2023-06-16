@@ -2,16 +2,28 @@ mode: train
 
 data:
   category: "embedseg"
-  data_path: "./data/instance2D/train"
-  cache_path: "./data/instance2D/cache"
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance2D/train
+  cache_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/instance2D/cache
   extra:
     center_method: "medoid"
   dataloader:
     train:
+      # dataloader_type:
+      #   module_name: monai.data
+      #   func_name: SmartCacheDataset
+      # dataset_params:
+      #   cache_rate: 0.2
+      #   replace_rate: 0.1
       dataloader_params:
         batch_size: 16
         pin_memory: True
         num_workers: 8
+    val:
+      dataloader_params:
+        batch_size: 16
+        pin_memory: True
+        num_workers: 8
+
 
   preprocess:
     - module_name: monai.transforms
@@ -104,6 +116,8 @@ model:
       n_sigma: 2
       foreground_weight: 10
       use_costmap: False
+      min_mask_sum: 128
+      min_object_size: 36
   optimizer:
       module_name: torch.optim
       func_name: Adam  # AdamW
@@ -118,26 +132,24 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
+    # strategy: "ddp_find_unused_parameters_true"  # uncomment this when using multiple GPUs
     devices: 1
     precision: 16
     max_epochs: 10000
     detect_anomaly: True
     num_sanity_val_steps: 0
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
+    - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
       params:
-        monitor: 'val_loss'
+        monitor: 'val_loss_epoch'
         patience: 50
         verbose: True
-        mode: "max"
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss'
-        filename: '{epoch}-{train_loss:.5f}'
-        save_top_k: 2
+        monitor: 'val_loss_epoch'
+        filename: '{epoch}-{val_loss:.5f}'
         save_last: True
         save_weights_only: True 
-        mode: "max"
 

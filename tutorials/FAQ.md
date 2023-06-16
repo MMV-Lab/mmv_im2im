@@ -27,3 +27,18 @@ Tensorboard is used for tracking the training progress by default. Everything is
 # How to select different GPUs?
 
 By default, when you run `run_im2im --config myconfig.yaml`, all GPUs available on your machine are usable by the program. Then, if you select to use 1 GPU, then the first GPU will be used. If you want to run on a specific GPU(s), you can do `CUDA_VISIBLE_DEVICES=3 run_im2im --config myconfig.yaml` or `CUDA_VISIBLE_DEVICES=1,3,5 run_im2im --config myconfig.yaml` 
+
+
+# How to automatically select which GPU to use?
+
+set `device = "auto"` in `trainer`. For example:
+```
+trainer:
+  verbose: True
+  params:
+    accelerator: "gpu"
+    devices: "auto"
+    precision: 16
+    max_epochs: 2000
+    detect_anomaly: True
+```

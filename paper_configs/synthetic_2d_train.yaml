@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/synthetic2D/NPM1/train
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic2D/NPM1/train
   dataloader:
     train:
       dataloader_params:
@@ -152,14 +152,9 @@ trainer:
     precision: 16
     max_epochs: 2000
     detect_anomaly: True
-  # callbacks:
-  #   - module_name: pytorch_lightning.callbacks.early_stopping
-  #     func_name: EarlyStopping
-  #     params:
-  #       monitor: 'val_loss_discriminator'
-  #       patience: 50 
-  #   - module_name: pytorch_lightning.callbacks.model_checkpoint
-  #     func_name: ModelCheckpoint
-  #     params:
-  #       monitor: 'val_loss_discriminator'
-  #       filename: 'best'
+  callbacks:
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        save_last: True
+        save_weights_only: True 

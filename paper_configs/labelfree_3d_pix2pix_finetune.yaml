@@ -149,16 +149,11 @@ trainer:
     accelerator: "gpu"
     devices: 1
     precision: 16
-    max_epochs: 10000
+    max_epochs: 1000
     detect_anomaly: True
   callbacks:
-    - module_name: pytorch_lightning.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_loss_discriminator'
-        patience: 50 
-    - module_name: pytorch_lightning.callbacks.model_checkpoint
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss_discriminator'
-        filename: 'best'
+        save_last: True
+        save_weights_only: True

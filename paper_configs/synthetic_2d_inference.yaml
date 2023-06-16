@@ -2,7 +2,7 @@ mode: inference
 
 data:
   inference_input:
-    dir: ./data/synthetic2D/NPM1/holdout   #ADD-YOURS
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic2D/NPM1/holdout   #ADD-YOURS
     data_type: _IM.tiff  # this will search only files with name *_IM.tiff
     reader_params:
       dimension_order_out: "YX"
@@ -10,7 +10,7 @@ data:
       T: 0
       Z: 0
   inference_output:
-    path: ./data/synthetic2D/NPM1/pred   #ADD-YOURS
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic2D/NPM1/pred_v2   #ADD-YOURS
   preprocess:            
     - module_name: monai.transforms
       func_name: ScaleIntensityRangePercentiles
@@ -42,7 +42,7 @@ model:
         n_layers: 4
         nf: 64
         norm_layer: "INSTANCE"
-  checkpoint: ./lightning_logs/version_72/checkpoints/last.ckpt   #ADD-YOURS
+  checkpoint: ./lightning_logs/version_22/checkpoints/epoch=2015-step=274176.ckpt   #ADD-YOURS
   model_extra:
     sliding_window_params:
       roi_size: [512, 512]
