@@ -23,3 +23,4 @@ RUN git clone https://github.com/Project-MONAI/MONAI.git \
     && pip install -e .[all] \
     && cd .. \
     && pip install --upgrade pyopenssl
+WORKDIR /workspace/mmv_im2im

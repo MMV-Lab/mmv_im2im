@@ -28,3 +28,4 @@ RUN git clone https://github.com/Project-MONAI/MONAI.git \
     && cd ./mmv_im2im \
     && pip install -e .[all] \
     && cd ..
+WORKDIR /workspace/mmv_im2im
