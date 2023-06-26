@@ -52,6 +52,8 @@ pip install -e .[all]
 
 Note: The `-e` option is the so-called "editable" mode. This will allow code changes taking effect immediately.
 
+### (Optional) Install using docker
+It is also possible to use our package through [docker](https://www.docker.com/). The installation tutorial is [here](docker/tutorial.md).
 
 ## Quick start
 
