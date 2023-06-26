@@ -42,13 +42,12 @@ We illustrate the usability of our package through a simple labelfree 2d task.
     ```bash
     run_im2im --config 'paper_configs/labelfree_2d_FCN_train.yaml'\
       --data.data_path 'data/labelfree2D/train'\
-      --trainer.params "{'max_epochs':10}"\
-      --trainer.callbacks "[]"\
+      --trainer.params "{'max_epochs':10,'accelerator':'auto'}"\
       --data.dataloader.train.dataloader_params "{'batch_size':1,'num_workers':1}"
     ```
     - for testing:
     ```bash
-    run_im2im --config '/content/mmv_im2im/paper_configs/labelfree_2d_FCN_inference.yaml'\
+    run_im2im --config 'paper_configs/labelfree_2d_FCN_inference.yaml'\
       --data.inference_input.dir 'data/labelfree2D/test'\
       --data.inference_output.path 'data/labelfree2D/pred'\
       --model.checkpoint 'lightning_logs/version_0/checkpoints/best.ckpt'

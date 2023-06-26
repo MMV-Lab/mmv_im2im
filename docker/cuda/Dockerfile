@@ -20,6 +20,6 @@ RUN git clone https://github.com/Project-MONAI/MONAI.git \
     && cd .. \
     && git clone https://github.com/MMV-Lab/mmv_im2im.git \
     && cd ./mmv_im2im \
-    && git checkout plt2.0 \
     && pip install -e .[all] \
-    && cd ..
+    && cd .. \
+    && pip install --upgrade pyopenssl
