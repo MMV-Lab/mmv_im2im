@@ -4,5 +4,5 @@ docker run -it \
 --name mmv_im2im \
 --shm-size=8gb \
 -v $(pwd)/data:/workspace/mmv_im2im/data \
-mmv_im2im \
+mmv_im2im:$1 \
 /bin/bash

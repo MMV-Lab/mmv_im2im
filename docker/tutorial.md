@@ -10,7 +10,7 @@ docker pull mmvlab/mmv_im2im:v0.4.0_arm64
 Then create and run a container:
 ```bash
 # make sure you are in the root dir of mmv_im2im package
-bash docker/arm64/run_container.sh
+bash docker/arm64/run_container.sh v0.4.0_arm64
 ```
 ### 2. Amd64(Intel/AMD CPU)
 Firstly, pull our image from the dockerfile:
@@ -20,7 +20,7 @@ docker pull mmvlab/mmv_im2im:v0.4.0_amd64
 Then create and run a container:
 ```bash
 # make sure you are in the root dir of mmv_im2im package
-bash docker/amd64/run_container.sh
+bash docker/amd64/run_container.sh v0.4.0_amd64
 ```
 ### 3. CUDA(Nvidia GPU)
 Firstly, pull our image from the dockerfile:
@@ -30,7 +30,7 @@ docker pull mmvlab/mmv_im2im:v0.4.0_amd64_cuda113
 Then create and run a container:
 ```bash
 # make sure you are in the root dir of mmv_im2im package
-bash docker/cuda/run_container.sh
+bash docker/cuda/run_container.sh v0.4.0_amd64_cuda113
 ```
 
 ## Simple tutorial: labelfree 2d task
