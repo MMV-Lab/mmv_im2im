@@ -178,65 +178,79 @@ class ConvNeXt(nn.Module):
         x = self.forward_features(x)
         return x
 
-class Decoder(nn.Module):
+# below is the decoder part.
+
+class DoubleConv(nn.Module):
+    """(conv => BN => ReLU) * 2"""
+
+    def __init__(self, in_ch, out_ch):
+        super(DoubleConv, self).__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        x = self.conv(x)
+        return x
+
+class Up(nn.Module):
     """Decoder in the U-net structure segmentation model.
 
     Args:
         nn (_type_): _description_
     """
-    def __init__(self):
-        pass
+    def __init__(self, in_ch, out_ch, bilinear=False):
+        super(Up, self).__init__()
+        if bilinear:
+            self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+        else:
+            self.up = nn.ConvTranspose2d(in_ch, out_ch, 2, stride=2)
+        self.conv = DoubleConv(in_ch, out_ch)
+
+    def forward(self, x1, x2):
+        x1 = self.up(x1)
+        x = torch.cat([x2, x1], dim=1)
+        x = self.conv(x)
+        return x
+
+class Decoder(nn.Module):
+    def __init__(self, dims):
+        super(Decoder, self).__init__()
+        self.dims = dims[::-1]
+        self.up = [Up(self.dims[i],self.dims[i+1]) for i in range(3)]
+    
+    def forward(self, x):
+        x = x[::-1]
+        x_low = x[0]
+        out = self.up[0](x_low, x[1])
+        out = self.up[1](out, x[2])
+        out = self.up[2](out, x[3])
+        return out
+
+
+class OutConv(nn.Module):
+    def __init__(self, in_ch, out_ch):
+        super(OutConv, self).__init__()
+        self.conv = nn.ConvTranspose2d(in_ch, out_ch, 4, 4)
 
     def forward(self, x):
-        pass
-
-class UNeXt(nn.Module):
-    def __init__(self):
-        self.backbone = convnext_tiny()
-        self.decoder = Decoder()
+        x = self.conv(x)
+        return x
+    
+class Net(nn.Module):
+    def __init__(self, n_class, depths, dims):
+        super(Net, self).__init__()
+        self.backbone = ConvNeXt(depths= depths, dims= dims)
+        self.decoder = Decoder(dims)
+        self.outc = OutConv(dims[0], n_class)
     
     def forward(self, x):
         x = self.backbone(x)
-        out = self.decoder(x)
+        y = self.decoder(x)
+        out = self.outc(y)
         return out
-
-def convnext_tiny(num_classes: int):
-    # https://dl.fbaipublicfiles.com/convnext/convnext_tiny_1k_224_ema.pth
-    model = ConvNeXt(depths=[3, 3, 9, 3],
-                     dims=[96, 192, 384, 768],
-                     num_classes=num_classes)
-    return model
-
-
-def convnext_small(num_classes: int):
-    # https://dl.fbaipublicfiles.com/convnext/convnext_small_1k_224_ema.pth
-    model = ConvNeXt(depths=[3, 3, 27, 3],
-                     dims=[96, 192, 384, 768],
-                     num_classes=num_classes)
-    return model
-
-
-def convnext_base(num_classes: int):
-    # https://dl.fbaipublicfiles.com/convnext/convnext_base_1k_224_ema.pth
-    # https://dl.fbaipublicfiles.com/convnext/convnext_base_22k_224.pth
-    model = ConvNeXt(depths=[3, 3, 27, 3],
-                     dims=[128, 256, 512, 1024],
-                     num_classes=num_classes)
-    return model
-
-
-def convnext_large(num_classes: int):
-    # https://dl.fbaipublicfiles.com/convnext/convnext_large_1k_224_ema.pth
-    # https://dl.fbaipublicfiles.com/convnext/convnext_large_22k_224.pth
-    model = ConvNeXt(depths=[3, 3, 27, 3],
-                     dims=[192, 384, 768, 1536],
-                     num_classes=num_classes)
-    return model
-
-
-def convnext_xlarge(num_classes: int):
-    # https://dl.fbaipublicfiles.com/convnext/convnext_xlarge_22k_224.pth
-    model = ConvNeXt(depths=[3, 3, 27, 3],
-                     dims=[256, 512, 1024, 2048],
-                     num_classes=num_classes)
-    return model
