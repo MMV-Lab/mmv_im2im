@@ -130,7 +130,7 @@ class ConvNeXt(nn.Module):
                              LayerNorm(dims[0], eps=1e-6, data_format="channels_first"))
         self.downsample_layers.append(stem)
 
-        # 对应stage2-stage4前的3个downsample
+        # corresponds to the 3 downsample blocks before stage2-stage4.
         for i in range(3):
             downsample_layer = nn.Sequential(LayerNorm(dims[i], eps=1e-6, data_format="channels_first"),
                                              nn.Conv2d(dims[i], dims[i+1], kernel_size=2, stride=2))
@@ -139,7 +139,7 @@ class ConvNeXt(nn.Module):
         self.stages = nn.ModuleList()  # 4 feature resolution stages, each consisting of multiple blocks
         dp_rates = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]
         cur = 0
-        # 构建每个stage中堆叠的block
+        # construct the tilted block in every stage
         for i in range(4):
             stage = nn.Sequential(
                 *[Block(dim=dims[i], drop_rate=dp_rates[cur + j], layer_scale_init_value=layer_scale_init_value)
@@ -155,13 +155,6 @@ class ConvNeXt(nn.Module):
             layer_name = f'norm{i_layer}'
             self.add_module(layer_name, layer)
         
-        self.apply(self._init_weights)
-
-
-    def _init_weights(self, m):
-        if isinstance(m, (nn.Conv2d, nn.Linear)):
-            nn.init.trunc_normal_(m.weight, std=0.2)
-            nn.init.constant_(m.bias, 0)
 
     def forward_features(self, x: torch.Tensor) -> torch.Tensor:
         outs = []
@@ -181,17 +174,17 @@ class ConvNeXt(nn.Module):
 # below is the decoder part.
 
 class DoubleConv(nn.Module):
-    """(conv => BN => ReLU) * 2"""
+    """(conv => BN => GELU) * 2"""
 
     def __init__(self, in_ch, out_ch):
         super(DoubleConv, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, out_ch, 3, padding=1),
             nn.BatchNorm2d(out_ch),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(),
             nn.Conv2d(out_ch, out_ch, 3, padding=1),
             nn.BatchNorm2d(out_ch),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(),
         )
 
     def forward(self, x):
@@ -199,7 +192,7 @@ class DoubleConv(nn.Module):
         return x
 
 class Up(nn.Module):
-    """Decoder in the U-net structure segmentation model.
+    """Upsampler in the U skip-connection model.
 
     Args:
         nn (_type_): _description_
@@ -219,10 +212,11 @@ class Up(nn.Module):
         return x
 
 class Decoder(nn.Module):
-    def __init__(self, dims):
+    def __init__(self, dims, n_class):
         super(Decoder, self).__init__()
         self.dims = dims[::-1]
-        self.up = [Up(self.dims[i],self.dims[i+1]) for i in range(3)]
+        self.up = nn.ModuleList([Up(self.dims[i],self.dims[i+1]) for i in range(3)])
+        self.outconv = nn.ConvTranspose2d(self.dims[-1], n_class, 4, 4)
     
     def forward(self, x):
         x = x[::-1]
@@ -230,27 +224,16 @@ class Decoder(nn.Module):
         out = self.up[0](x_low, x[1])
         out = self.up[1](out, x[2])
         out = self.up[2](out, x[3])
+        out = self.outconv(out)
         return out
-
-
-class OutConv(nn.Module):
-    def __init__(self, in_ch, out_ch):
-        super(OutConv, self).__init__()
-        self.conv = nn.ConvTranspose2d(in_ch, out_ch, 4, 4)
-
-    def forward(self, x):
-        x = self.conv(x)
-        return x
     
 class Net(nn.Module):
     def __init__(self, n_class, depths, dims):
         super(Net, self).__init__()
         self.backbone = ConvNeXt(depths= depths, dims= dims)
-        self.decoder = Decoder(dims)
-        self.outc = OutConv(dims[0], n_class)
+        self.decoder = Decoder(dims, n_class)
     
     def forward(self, x):
         x = self.backbone(x)
-        y = self.decoder(x)
-        out = self.outc(y)
+        out = self.decoder(x)
         return out
