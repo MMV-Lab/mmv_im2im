@@ -1,0 +1,42 @@
+mode: inference
+
+data:
+  inference_input:
+    # dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/labelfree2D/test
+    dir: /mnt/eternus/users/Yu/sandbox/mmv_im2im/data/labelfree_2d/test
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
+    reader_params:
+      dimension_order_out: "YX"
+      C: 0
+      T: 0
+      Z: 0
+  inference_output:
+    path: /mnt/eternus/users/Yu/sandbox/mmv_im2im/data/labelfree_2d/pred_v2
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: NormalizeIntensity
+    # - module_name: monai.transforms
+    #   func_name: ScaleIntensityRangePercentiles
+    #   params:
+    #     lower: 0.5
+    #     upper: 99.5
+    #     b_min: -1
+    #     b_max: 1
+
+model:
+  framework: FCN
+  net:
+    module_name: mmv_im2im.models.nets.convnext_2d
+    func_name: Net
+    params:
+      n_class: 1
+      depths: [3, 3, 9, 3]
+      dims: [96, 192, 384, 768]
+  checkpoint: ./lightning_logs/version_11/checkpoints/last.ckpt
+  model_extra:
+    sliding_window_params:
+      roi_size: [224, 224]
+      sw_batch_size: 4
+      overlap: 0.2
+      mode: "gaussian"
