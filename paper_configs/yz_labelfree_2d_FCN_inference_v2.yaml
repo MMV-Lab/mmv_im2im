@@ -11,7 +11,7 @@ data:
       T: 0
       Z: 0
   inference_output:
-    path: /mnt/eternus/users/Yu/sandbox/summer_hackathon/data/labelfree_2d/pred_fnet
+    path: /mnt/eternus/users/Yu/sandbox/summer_hackathon/data/labelfree_2d/pred
 
   preprocess:
     - module_name: monai.transforms
@@ -26,23 +26,24 @@ data:
 
 model:
   framework: FCN
-  # net:
-  #   module_name: mmv_im2im.models.nets.convnext_2d
-  #   func_name: Net
-  #   params:
-  #     n_class: 1
-  #     depths: [3, 3, 9, 3]
-  #     dims: [96, 192, 384, 768]
   net:
-    module_name: mmv_im2im.models.nets.fnet_nn_2d
+    module_name: mmv_im2im.models.nets.convnext_2d_v2
     func_name: Net
     params:
-      depth: 4
-      mult_chan: 32
-  checkpoint: ./lightning_logs/labelfree_2d_fnet/checkpoints/last.ckpt
+      in_channels: 1
+      n_channels: 64
+      n_classes: 1
+      exp_r: 4
+      kernel_size: 3
+      deep_supervision: False
+      do_res: False
+      do_res_up_down: True
+      block_counts: [2,2,6,2,2,2,6,2,2]
+      norm_type: "group"
+  checkpoint: ./lightning_logs/labelfree_2d/checkpoints/last.ckpt
   model_extra:
     sliding_window_params:
-      roi_size: [256, 256]
+      roi_size: [224, 224]
       sw_batch_size: 4
       overlap: 0.2
       mode: "gaussian"

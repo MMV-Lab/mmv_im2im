@@ -6,7 +6,7 @@ data:
   dataloader:
     train:
       dataloader_params:
-        batch_size: 4
+        batch_size: 2
         pin_memory: True
         num_workers: 4
 
@@ -27,14 +27,6 @@ data:
       func_name: NormalizeIntensityd
       params:
         keys: ["IM", "GT"]            
-    # - module_name: monai.transforms
-    #   func_name: ScaleIntensityRangePercentilesd
-    #   params:
-    #     keys: ["IM", "GT"]
-    #     lower: 0.5
-    #     upper: 99.5
-    #     b_min: -1
-    #     b_max: 1
     - module_name: monai.transforms
       func_name: RandSpatialCropSamplesd
       params:
@@ -55,19 +47,20 @@ data:
 
 model:
   framework: FCN
-  # net:
-  #  module_name: mmv_im2im.models.nets.convnext_2d
-  #  func_name: Net
-  #  params:
-  #    n_class: 1
-  #    depths: [3, 3, 9, 3]
-  #    dims: [96, 192, 384, 768]
   net:
-    module_name: mmv_im2im.models.nets.fnet_nn_2d
+    module_name: mmv_im2im.models.nets.convnext_2d_v2
     func_name: Net
     params:
-      depth: 4
-      mult_chan: 32
+      in_channels: 1
+      n_channels: 64
+      n_classes: 1
+      exp_r: 4
+      kernel_size: 3
+      deep_supervision: False
+      do_res: False
+      do_res_up_down: True
+      block_counts: [2,2,6,2,2,2,6,2,2]
+      norm_type: "group"
   criterion:
     module_name: torch.nn
     func_name: MSELoss
@@ -88,8 +81,8 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 2
-    precision: 16
+    devices: 1
+    precision: 32
     max_epochs: 30
     detect_anomaly: True
   callbacks:

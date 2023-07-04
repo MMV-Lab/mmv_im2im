@@ -2,23 +2,30 @@ mode: train
 
 data:
   category: "pair"
-  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v2/data/labelfree2D/train
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic3D/train_fbl/ 
   dataloader:
     train:
       dataloader_params:
-        batch_size: 4
-        pin_memory: True
+        batch_size: 1
+        pin_memory: False
         num_workers: 4
 
   preprocess:
     - module_name: monai.transforms
       func_name: LoadImaged
       params:
-        keys: ["IM", "GT"]
-        dimension_order_out: "YX"
+        keys: ["IM"]
+        dimension_order_out: "ZYX"
         C: 0
         T: 0
-        Z: 0
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["GT"]
+        dtype: int
+        dimension_order_out: "ZYX"
+        C: 0
+        T: 0
     - module_name: monai.transforms
       func_name: AddChanneld
       params:
@@ -26,22 +33,14 @@ data:
     - module_name: monai.transforms
       func_name: NormalizeIntensityd
       params:
-        keys: ["IM", "GT"]            
-    # - module_name: monai.transforms
-    #   func_name: ScaleIntensityRangePercentilesd
-    #   params:
-    #     keys: ["IM", "GT"]
-    #     lower: 0.5
-    #     upper: 99.5
-    #     b_min: -1
-    #     b_max: 1
+        keys: ["IM"]
     - module_name: monai.transforms
       func_name: RandSpatialCropSamplesd
       params:
         keys: ["IM", "GT"]
         random_size: False
-        num_samples: 4
-        roi_size: [256, 256]
+        num_samples: 1
+        roi_size: [32, 256, 256]
     - module_name: monai.transforms
       func_name: EnsureTyped
       params:
@@ -52,27 +51,33 @@ data:
       params:
         prob: 0.5
         keys: ["IM", "GT"]
+    - module_name: monai.transforms
+      func_name: RandHistogramShiftd
+      params:
+        prob: 0.2
+        keys: ["IM"]
 
 model:
   framework: FCN
-  # net:
-  #  module_name: mmv_im2im.models.nets.convnext_2d
-  #  func_name: Net
-  #  params:
-  #    n_class: 1
-  #    depths: [3, 3, 9, 3]
-  #    dims: [96, 192, 384, 768]
   net:
-    module_name: mmv_im2im.models.nets.fnet_nn_2d
+    module_name: mmv_im2im.models.nets.convnext_3d
     func_name: Net
     params:
-      depth: 4
-      mult_chan: 32
+      in_channels: 1
+      n_channels: 32
+      n_classes: 2
+      exp_r: 1
+      kernel_size: 3
+      deep_supervision: False
+      do_res: True
+      do_res_up_down: True
+      block_counts: [2,2,2,2,2,2,2,2,2]
   criterion:
-    module_name: torch.nn
-    func_name: MSELoss
+    module_name: monai.losses
+    func_name: GeneralizedDiceFocalLoss
     params:
-      reduction: 'mean'
+      softmax: True
+      to_onehot_y: True
   optimizer:
     module_name: torch.optim
     func_name: Adam  # AdamW
@@ -88,10 +93,12 @@ trainer:
   verbose: True
   params:
     accelerator: "gpu"
-    devices: 2
-    precision: 16
-    max_epochs: 30
+    devices: 1
+    precision: 32
+    max_epochs: 100
     detect_anomaly: True
+    # gradient_clip_val: 0.5
+    # gradient_clip_algorithm: "value"
   callbacks:
     - module_name: lightning.pytorch.callbacks.early_stopping
       func_name: EarlyStopping
@@ -102,6 +109,5 @@ trainer:
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss_epoch'
         save_last: True
         save_weights_only: True 
