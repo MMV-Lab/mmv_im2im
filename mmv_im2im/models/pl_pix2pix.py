@@ -37,10 +37,10 @@ class Model(pl.LightningModule):
                     try:
                         self.generator.load_state_dict(pre_train["state_dict"])
                     except Exception:
-                        cleaned_state_dict = state_dict_simplification(
-                            pre_train["state_dict"]
-                        )
-                        self.generator.load_state_dict(cleaned_state_dict)
+                            cleaned_state_dict = state_dict_simplification(
+                                  pre_train["state_dict"], cut = "generator."
+                            )
+                            self.generator.load_state_dict(cleaned_state_dict, strict=False)
                 else:
                     init_weights(self.generator, init_type=gen_init)
             else:
