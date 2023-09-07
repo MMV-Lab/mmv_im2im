@@ -48,7 +48,7 @@ class SpatialEmbLoss_3d(nn.Module):
 
         # TODO: currently, the costmap for embedding loss needs
         # further investigation, so set to False until fixed
-        self.use_costmap = use_costmap
+        self.use_costmap = False #use_costmap
 
     def forward(
         self,
