@@ -1,7 +1,9 @@
 # mmv_im2im Docker Deployment
 ## Installation
 ### Prerequisite:
-You need to download the docker for your operating system, see the tutorial [here](https://docs.docker.com/get-docker/). You also need to install [nvidia-docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#setting-up-nvidia-container-toolkit) if you want to use gpu.
+- You need to download the docker for your operating system, see the tutorial [here](https://docs.docker.com/get-docker/). 
+- To utilize GPU, it is also required to install [nvidia-docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#setting-up-nvidia-container-toolkit). 
+- on MacOS, we recommend to allocate at least 8GB memory and 4GB swap for docker to run our example.
 ### 1. Arm64(Apple M1/2)
 Firstly, pull our image from the dockerhub:
 ```bash
