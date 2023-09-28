@@ -97,7 +97,21 @@ The overall package aims to achieve both simplicty and flexibilty with the modul
 * Full package API (i.e., the technical details of each function) [MMV-Lab.github.io/mmv_im2im](https://MMV-Lab.github.io/mmv_im2im).
 * A google colab jupyter notebook [![Open All in Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/MMV-Lab/mmv_im2im/)(branch: resubmission,notebook: tutorials/labelfree_2d.ipynb) about how to do labelfree 2d using our package.
 
+### Contribute models to [BioImage Model Zoo](https://bioimage.io/#/)
 
+We highly appreciate the BioImage Model Zoo's initiative to provide a comprehensive collection of pre-trained models for a wide range of applications. To make MMV_Im2Im trained models available as well, the first step involves extracting the state_dict from the PyTorch Lightning checkpoint.
+This can be done via:
+
+```python
+import torch
+
+ckpt_path = "./lightning_logs/version_0/checkpoints/last.ckpt"
+checkpoint = torch.load(ckpt_path, map_location=torch.device('cpu'))
+state_dict = checkpoint['state_dict']
+torch.save(state_dict, "./state_dict.pt")
+```
+
+All further steps to provide models can be found in the [official documentation](https://bioimage.io/docs/#/contribute_models/README).
 
 ## Development
 
