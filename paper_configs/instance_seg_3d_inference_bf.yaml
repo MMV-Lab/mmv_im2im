@@ -32,9 +32,15 @@ data:
         pixel_z: 1
         n_sigma: 3
         seed_thresh: 0.5
-        min_mask_sum: 2
+        min_mask_sum: 128
         min_unclustered_sum: 20
-        min_object_size: 20
+        min_object_size: 100
+    - module_name: mmv_im2im.postprocessing.basic_collection
+      func_name: prune_labels_by_size
+      params:
+        min_size: 1500
+    - module_name: mmv_im2im.postprocessing.basic_collection
+      func_name: remove_isolated_pixels  
 
 model:
   framework: embedseg
