@@ -62,7 +62,7 @@ model:
     module_name: torch.optim.lr_scheduler
     func_name: ExponentialLR
     params:
-      gamma: 0.98
+      gamma: 0.99
 trainer:
   verbose: True
   params:
@@ -73,17 +73,10 @@ trainer:
     detect_anomaly: True
     gradient_clip_val: 0.8
   callbacks:
-    - module_name: lightning.pytorch.callbacks.early_stopping
-      func_name: EarlyStopping
-      params:
-        monitor: 'val_loss_epoch'
-        patience: 100
-        verbose: True
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
-        monitor: 'val_loss_epoch'
-        filename: '{epoch}-{val_loss:.5f}'
-        save_top_k: 2
-        save_last: True
-        save_weights_only: True 
+        save_weights_only: True
+        every_n_epochs: 500 
+        save_top_k: -1  
+        save_last: True      

@@ -104,7 +104,7 @@ model:
       module_name: torch.optim
       func_name: Adam  # AdamW
       params:
-        lr: 0.00001
+        lr: 0.0001
   scheduler:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
@@ -116,7 +116,7 @@ trainer:
     accelerator: "gpu"
     devices: 8
     precision: 16
-    max_epochs: 10
+    max_epochs: 100
     detect_anomaly: True
     gradient_clip_val: 0.8
     check_val_every_n_epoch: 5

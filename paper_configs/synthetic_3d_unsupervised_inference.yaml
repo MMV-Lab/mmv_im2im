@@ -1,0 +1,47 @@
+mode: inference
+
+data:
+  inference_input:
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic3D/HIST1H2BJ/holdout   #ADD-YOURS
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
+    reader_params:
+      dimension_order_out: "ZYX"
+      C: 0
+      T: 0
+  inference_output:
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic3D/HIST1H2BJ/pred_v2   #ADD-YOURS
+  preprocess:            
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentiles
+      params:
+        lower: 0
+        upper: 100
+        b_min: -1
+        b_max: 1
+
+model:
+  framework: cyclegan
+  net:
+    generator:
+      module_name: aicsmlsegment.NetworkArchitecture.unet_xy_zoom_0pad_single  
+      func_name: UNet3D
+      params:
+        in_channel: 1
+        n_classes: 1
+        down_ratio: 3
+    discriminator:
+      type: predefined_basic
+      params:
+        spatial_dims: 3
+        in_channels: 1
+        n_layers: 4
+        nf: 64
+        norm_layer: "INSTANCE"
+  checkpoint: ./lightning_logs/version_/checkpoints/last.ckpt   #ADD-YOURS
+  model_extra:
+    inference_direction: "AtoB"  
+    sliding_window_params:
+      roi_size: [32, 192, 192]
+      sw_batch_size: 4
+      overlap: 0.2
+      mode: "gaussian"

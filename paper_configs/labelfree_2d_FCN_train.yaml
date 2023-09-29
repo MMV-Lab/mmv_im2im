@@ -98,3 +98,8 @@ trainer:
         monitor: 'val_loss_epoch'
         save_last: True
         save_weights_only: True 
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: 'best'

@@ -101,7 +101,7 @@ model:
       module_name: torch.optim
       func_name: Adam  # AdamW
       params:
-        lr: 0.00001
+        lr: 0.0001
   scheduler:
       module_name: torch.optim.lr_scheduler
       func_name: ExponentialLR
@@ -113,14 +113,41 @@ trainer:
     accelerator: "gpu"
     devices: 4
     precision: 16
-    max_epochs: 10
+    max_epochs: 250
     detect_anomaly: True
     gradient_clip_val: 0.8
     check_val_every_n_epoch: 5
     num_sanity_val_steps: 0
   callbacks:
+    # - module_name: lightning.pytorch.callbacks.model_checkpoint
+    #   func_name: ModelCheckpoint
+    #   params:
+    #     save_last: True
+    #     save_weights_only: True 
+    - module_name: lightning.pytorch.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 10        
+    # - module_name: lightning.pytorch.callbacks.model_checkpoint
+    #   func_name: ModelCheckpoint
+    #   params:
+    #     monitor: 'val_loss'
+    #     filename: '{epoch}-{val_loss:.5f}'
+    #     save_top_k: 5
+    #     save_last: True
+    #     save_weights_only: True 
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
+        monitor: 'val_loss'
+        filename: 'best'
+        save_top_k: 1
         save_last: True
-        save_weights_only: True 
+        save_weights_only: True     
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        save_weights_only: True
+        every_n_epochs: 5 
+        save_top_k: -1                        

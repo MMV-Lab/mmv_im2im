@@ -102,7 +102,7 @@ trainer:
     devices: 3
     #strategy: "ddp_find_unused_parameters_true"  # uncomment this when using multiple GPUs
     precision: 16
-    max_epochs: 200
+    max_epochs: 300
     detect_anomaly: True
     gradient_clip_val: 0.8
   callbacks:
