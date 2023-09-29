@@ -44,7 +44,7 @@ def main():
 
     try:
         # check gpu option
-        assert torch.cuda.is_available(), "GPU is not available."
+        # assert torch.cuda.is_available(), "GPU is not available."
         # torch.cuda.set_device(torch.device("cuda:0"))
 
         if cfg.mode.lower() == TRAIN_MODE:
