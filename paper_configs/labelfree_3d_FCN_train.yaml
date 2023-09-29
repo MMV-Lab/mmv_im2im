@@ -69,7 +69,6 @@ model:
       out_channels: 1
     # module_name: monai.networks.nets
     # func_name: UNETR
-    # init_weight: lightning_logs/version_0/checkpoints/epoch=3575-val_loss=0.18559.ckpt
     # params:
     #   in_channels: 1
     #   out_channels: 1
