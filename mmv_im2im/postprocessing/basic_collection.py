@@ -3,7 +3,7 @@ from importlib import import_module
 import numpy as np
 from skimage.measure import regionprops
 from skimage.segmentation import relabel_sequential
-from skimage.morphology import binary_opening, ball
+from skimage.morphology import binary_opening
 import torch
 
 
@@ -86,12 +86,10 @@ def generate_classmap(im: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
 
 
 def prune_labels_by_size(labeled_image, min_size=10):
-
     # Iterate through labeled objects and calculate their areas
     for region in regionprops(labeled_image):
         if region.num_pixels < min_size:
             labeled_image[labeled_image == region.label] = 0
-    #import pdb; pdb.set_trace()
     filtered_labeled_image, _, _ = relabel_sequential(labeled_image)
     return filtered_labeled_image
 
