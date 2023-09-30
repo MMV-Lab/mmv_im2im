@@ -44,10 +44,6 @@ data_requirements = [
     "notebook"
 ]
 
-embedseg_requirements = [
-    "numba"
-]
-
 logger_requirements = [
     "tensorboard",
 ]
@@ -63,6 +59,7 @@ requirements = [
     "pyrallis",
     "scikit-learn",
     "tensorboard",
+    "numba",
 ]
 
 
@@ -73,21 +70,14 @@ extra_requirements = {
     "paper": [
         *requirements,
         *data_requirements,
-        *embedseg_requirements
-    ],
-    "embedseg": [
-        *requirements,
-        *embedseg_requirements
     ],
     "advanced": [
         *requirements,
         *logger_requirements,
-        *embedseg_requirements
     ],
     "all": [
         *requirements,
         *logger_requirements,
-        *embedseg_requirements,
         *data_requirements,
         *dev_requirements,
     ]
