@@ -75,10 +75,6 @@ extra_requirements = {
         *data_requirements,
         *embedseg_requirements
     ],
-    "embedseg": [
-        *requirements,
-        *embedseg_requirements
-    ],
     "advanced": [
         *requirements,
         *logger_requirements,
