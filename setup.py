@@ -109,7 +109,7 @@ setup(
     keywords="deep learning, microscopy image analysis, biomedical image analysis",
     name="mmv_im2im",
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*"]),
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     setup_requires=setup_requirements,
     test_suite="mmv_im2im/tests",
     tests_require=test_requirements,
