@@ -1,7 +1,6 @@
 # MMV Im2Im Transformation
 
 [![Build Status](https://github.com/MMV-Lab/mmv_im2im/workflows/Build%20Main/badge.svg)](https://github.com/MMV-Lab/mmv_im2im/actions)
-[![Documentation](https://github.com/MMV-Lab/mmv_im2im/workflows/Documentation/badge.svg)](https://MMV-Lab.github.io/mmv_im2im/)
 
 A generic python package for deep learning based image-to-image transformation in biomedical applications
 
@@ -21,7 +20,7 @@ The overall package is designed with a generic image-to-image transformation fra
 
 Before starting, we recommend to [create a new conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands) or [a virtual environment](https://docs.python.org/3/library/venv.html) with Python 3.9+.
 
-Please note that the proper setup of hardware is beyond the scope of this pacakge. This package was tested with GPU/CPU on Linux/Windows and CPU on MacOS.
+Please note that the proper setup of hardware is beyond the scope of this pacakge. This package was tested with GPU/CPU on Linux/Windows and CPU on MacOS. [Special note for MacOS users: Directly pip install in MacOS may need [additional setup of xcode](https://developer.apple.com/forums/thread/673827).]
 
 ### Install the development head of MONAI
 
@@ -41,6 +40,8 @@ pip install .
 **Option 2: advanced functionality (core + logger)** `pip install mmv_im2im[advance]`<br>
 **Option 3: to reproduce paper:** `pip install mmv_im2im[paper]`<br>
 **Option 4: install everything:** `pip install mmv_im2im[all]`<br>
+
+For MacOS users, additional ' ' marks are need when using installation tags in zsh. For example, `pip install mmv_im2im[paper]` should be `pip install mmv_im2im'[paper]'` in MacOS.
 
 ### Install MMV_Im2Im for customization or extension:
 
