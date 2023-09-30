@@ -33,16 +33,18 @@ cd ./MONAI
 pip install .
 ```
 
-### Install MMV_Im2Im (basic):
+### Install MMV_Im2Im for basic usage:
 
 (For users only using this package, not planning to change any code or make any extension):
 
-**Stable Release:** `pip install mmv_im2im`<br>
-**Development Head:** `pip install git+https://github.com/MMV-Lab/mmv_im2im.git`
+**Option 1: core functionality only** `pip install mmv_im2im`<br>
+**Option 2: core functionality + EmbedSeg** `pip install mmv_im2im[embedseg]`<br>
+**Option 3: advanced functionality (core + EmbedSeg + logger)** `pip install mmv_im2im[advance]`<br>
+**Option 4: to reproduce paper:** `pip install mmv_im2im[paper]`<br>
+**Option 5: install everything:** `pip install mmv_im2im[all]`<br>
 
-### Install MMV_Im2Im (build from source):
+### Install MMV_Im2Im for customization or extension:
 
-(For users planning to extend the methods or improve the code):
 
 ```
 git clone https://github.com/MMV-Lab/mmv_im2im.git
@@ -50,10 +52,15 @@ cd mmv_im2im
 pip install -e .[all]
 ```
 
-Note: The `-e` option is the so-called "editable" mode. This will allow code changes taking effect immediately.
+Note: The `-e` option is the so-called "editable" mode. This will allow code changes taking effect immediately. The installation tags, `embedseg`, `advance`, `paper`, `all`, are be selected based on your needs.
 
-### (Optional) Install using docker
+### (Optional) Install using Docker
+
 It is also possible to use our package through [docker](https://www.docker.com/). The installation tutorial is [here](docker/tutorial.md).
+
+### (Optional) Use MMV_Im2Im with Google Colab
+
+We provide a web-based demo, if cloud computing is preferred. you can [![Open a 2D labelfree DEMO in Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/MMV-Lab/mmv_im2im/blob/main/tutorials/colab/labelfree_2d.ipynb). The same demo can de adapted for different applications.
 
 ## Quick start
 
@@ -119,4 +126,3 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the
 
 
 **MIT license**
-

@@ -48,7 +48,11 @@ embedseg_requirements = [
     "numba"
 ]
 
-basic_requirements = [
+logger_requirements = [
+    "tensorboard",
+]
+
+requirements = [
     "lightning>=2.0.0",
     "torch>=2.0.1",
     "monai>=1.1.0",
@@ -61,22 +65,31 @@ basic_requirements = [
     "tensorboard",
 ]
 
-requirements = [
-    *embedseg_requirements,
-    *basic_requirements,
-]
 
 extra_requirements = {
     "setup": setup_requirements,
     "test": test_requirements,
     "dev": dev_requirements,
-    "data": data_requirements,
-    "basic": basic_requirements,
-    "all": [
-        *basic_requirements,
-        *dev_requirements,
+    "paper": [
+        *requirements,
         *data_requirements,
+        *embedseg_requirements
+    ],
+    "embedseg": [
+        *requirements,
+        *embedseg_requirements
+    ],
+    "advanced": [
+        *requirements,
+        *logger_requirements,
+        *embedseg_requirements
+    ],
+    "all": [
+        *requirements,
+        *logger_requirements,
         *embedseg_requirements,
+        *data_requirements,
+        *dev_requirements,
     ]
 }
 
