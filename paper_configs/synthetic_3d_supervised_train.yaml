@@ -148,7 +148,7 @@ trainer:
     accelerator: "gpu"
     devices: 1
     precision: 16
-    max_epochs: 2000
+    max_epochs: 10000
     detect_anomaly: True
   callbacks:
     - module_name: lightning.pytorch.callbacks.model_checkpoint

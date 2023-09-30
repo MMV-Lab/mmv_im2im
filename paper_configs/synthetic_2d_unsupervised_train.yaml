@@ -2,11 +2,11 @@ mode: train
 
 data:
   category: "pair"
-  data_path: ./data/labelfree3D/FBL/train
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/synthetic2D/NPM1/train
   dataloader:
     train:
       dataloader_params:
-        batch_size: 2
+        batch_size: 4
         pin_memory: True
         num_workers: 4
 
@@ -15,37 +15,37 @@ data:
       func_name: LoadImaged
       params:
         keys: ["IM", "GT"]
-        dimension_order_out: "ZYX"
+        dimension_order_out: "YX"
         T: 0
         C: 0
+        Z: 0
     - module_name: monai.transforms
       func_name: AddChanneld
       params:
-        keys: ["IM", "GT"]  
-    - module_name: mmv_im2im.preprocessing.transforms
-      func_name: norm_around_center
+        keys: ["IM", "GT"]          
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
       params:
-        keys: ["IM","GT"]
-        min_z: 32  
-    # - module_name: monai.transforms
-    #   func_name: NormalizeIntensityd
-    #   params:
-    #     keys: ["IM", "GT"]          
-    # - module_name: monai.transforms
-    #   func_name: ScaleIntensityRangePercentilesd
-    #   params:
-    #     keys: ["IM", "GT"]
-    #     lower: 0.05
-    #     upper: 99.95
-    #     b_min: -1
-    #     b_max: 1    
+        keys: ["GT"]
+        lower: 0.01
+        upper: 99.99
+        b_min: -1
+        b_max: 1    
+    - module_name: monai.transforms
+      func_name: ScaleIntensityRangePercentilesd
+      params:
+        keys: ["IM"]
+        lower: 0
+        upper: 100
+        b_min: -1
+        b_max: 1    
     - module_name: monai.transforms
       func_name: RandSpatialCropSamplesd
       params:
         keys: ["IM", "GT"]
         random_size: False
         num_samples: 4
-        roi_size: [32, 128, 128]
+        roi_size: [256, 256]
     - module_name: monai.transforms
       func_name: EnsureTyped
       params:
@@ -58,71 +58,53 @@ data:
         keys: ["IM", "GT"]
 
 model:
-  framework: pix2pix
+  framework: cyclegan
   net:
     generator:
-      # type: the "type" parameter is only need for pre-defined models, like pre-defined resnet
-      #type: predefined_resnet
-      #params:
-      #  spatial_dims: 2
-      #  in_channels: 3
-      #  out_channels: 3
-      #  n_down_blocks: 4
-      #  n_res_blocks: 9
-      #  nf: 64
-      #  norm_layer: "BATCH"
-      init_weight: ./lightning_logs/version_1/checkpoints/best.ckpt
-      module_name: mmv_im2im.models.nets.fnet_nn_3d
-      func_name: Net
+      type: predefined_resnet
       params:
-        depth: 4
-        mult_chan: 32
+        spatial_dims: 2
         in_channels: 1
         out_channels: 1
-    #discriminator:
-    #  type: predefined_basic
-    #  params:
-    #    spatial_dims: 2
-    #    in_channels: 6
-    #    n_layers: 4
-    #    nf: 64
-    #    norm_layer: "INSTANCE"
+        n_down_blocks: 4
+        n_res_blocks: 9
+        nf: 64
+        norm_layer: "BATCH"  
     discriminator:
-      type: predefined_multiscale
+      type: predefined_basic
       params:
-        num_discriminator: 2
-        spatial_dims: 3
-        in_channels: 2
-        n_layers: 3
+        spatial_dims: 2
+        in_channels: 1
+        n_layers: 4
         nf: 64
         norm_layer: "INSTANCE"
   criterion:
-    loss_type: pix2pix_HD  # pix2pix_HD_original | pix2pix_HD  |  pix2pix_basic
     gan_loss:
-      module_name: torch.nn
-      func_name: BCEWithLogitsLoss  # MSELoss
-      params:
-        reduction: 'mean'
-    reconstruction_loss:
       module_name: torch.nn
       func_name: MSELoss
       params:
         reduction: 'mean'
-    fm_loss:  # feature matching loss
+    cycle_loss:
+      module_name: torch.nn
+      func_name: L1Loss
+      params:
+        reduction: 'mean'
+    identity_loss:
       module_name: torch.nn
       func_name: L1Loss
       params:
         reduction: 'mean'
     weights:
       gan_loss: 1
-      fm_loss: 10
-      reconstruction_loss: 20
+      cycle_loss: 10
+      identity_loss: 2
+    fake_pool_size: 50
   optimizer:
     generator:
       module_name: torch.optim
       func_name: Adam  # AdamW
       params:
-        lr: 0.00002 # larger, e.g. 0.002, if train from scratch
+        lr: 0.0002
         betas: [0.5, 0.999]
         weight_decay: 0.0005
     discriminator:
@@ -149,11 +131,11 @@ trainer:
     accelerator: "gpu"
     devices: 1
     precision: 16
-    max_epochs: 5000
+    max_epochs: 2000
     detect_anomaly: True
   callbacks:
     - module_name: lightning.pytorch.callbacks.model_checkpoint
       func_name: ModelCheckpoint
       params:
         save_last: True
-        save_weights_only: True
+        save_weights_only: True 

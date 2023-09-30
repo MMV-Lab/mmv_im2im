@@ -47,6 +47,14 @@ model:
         n_layers: 3
         nf: 64
         norm_layer: "INSTANCE"
+    # discriminator:
+    #  type: predefined_basic
+    #  params:
+    #    spatial_dims: 3
+    #    in_channels: 2
+    #    n_layers: 4
+    #    nf: 64
+    #    norm_layer: "INSTANCE"         
   checkpoint: ./lightning_logs/version_40/checkpoints/last.ckpt   #ADD-YOURS
   model_extra:
     sliding_window_params:

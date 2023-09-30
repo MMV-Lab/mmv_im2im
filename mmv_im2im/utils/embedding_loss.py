@@ -48,7 +48,7 @@ class SpatialEmbLoss_3d(nn.Module):
 
         # TODO: currently, the costmap for embedding loss needs
         # further investigation, so set to False until fixed
-        self.use_costmap = use_costmap
+        self.use_costmap = False  # use_costmap
 
     def forward(
         self,
@@ -231,7 +231,7 @@ class SpatialEmbLoss_2d(nn.Module):
         xym_s = self.xym[:, 0:height, 0:width].contiguous()  # 2 x h x w
 
         # weighted loss
-        instances_adjusted = instances.copy()
+        instances_adjusted = instances.clone().detach()
         if self.use_costmap:
             # make sure costmaps only work as exclusion masks, i.e.,
             # only containing values of 0 and 1, 0 = pixels to exclude

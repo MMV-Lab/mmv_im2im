@@ -11,7 +11,7 @@ import traceback
 import tempfile
 from pathlib import Path
 
-import torch
+# import torch
 
 from mmv_im2im import ProjectTester, ProjectTrainer
 from mmv_im2im.configs.config_base import (
@@ -44,7 +44,7 @@ def main():
 
     try:
         # check gpu option
-        assert torch.cuda.is_available(), "GPU is not available."
+        # assert torch.cuda.is_available(), "GPU is not available."
         # torch.cuda.set_device(torch.device("cuda:0"))
 
         if cfg.mode.lower() == TRAIN_MODE:
