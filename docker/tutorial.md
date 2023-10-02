@@ -37,7 +37,7 @@ bash docker/cuda/run_container.sh v0.4.0_amd64_cu113
 
 ## Simple tutorial: labelfree 2d task
 We illustrate the usability of our package through a simple labelfree 2d task. 
-- To download the example data, please refer to this [notebook](paper_configs/prepare_data/labelfree_2d.ipynb). Please make sure the data is in the right path.
+- To download the example data, please refer to this [notebook](../paper_configs/prepare_data/labelfree_2d.ipynb). Please make sure the data is in the right path.
 - We recommend you to run the docker using [vscode](https://code.visualstudio.com/) with [docker plugin](https://code.visualstudio.com/docs/containers/overview).
 - To run the code:
     - for training:
