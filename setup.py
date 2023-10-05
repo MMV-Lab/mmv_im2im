@@ -49,10 +49,10 @@ logger_requirements = [
 ]
 
 requirements = [
-    "lightning>=2.0.0",
-    "torch>=2.0.1",
+    "lightning==2.0.0",
+    "torch==2.0.1",
     "monai>=1.1.0",
-    "aicsimageio",
+    "aicsimageio==4.10.0",
     "pandas",
     "scikit-image",
     "protobuf<4.21.0",
