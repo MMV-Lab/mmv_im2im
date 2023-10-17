@@ -347,7 +347,7 @@ def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
             )
     else:
         print("unsupported data type")
-
+    
     assert len(dataset_list) > 0, "empty dataset"
 
     return dataset_list
