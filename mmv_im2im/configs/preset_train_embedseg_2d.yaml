@@ -78,4 +78,4 @@ trainer:
     devices: 1
     precision: 16
     max_epochs: 10000
-    terminate_on_nan: True
+    detect_anomaly: True
