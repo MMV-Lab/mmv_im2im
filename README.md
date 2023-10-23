@@ -52,7 +52,7 @@ cd mmv_im2im
 pip install -e .[all]
 ```
 
-Note: The `-e` option is the so-called "editable" mode. This will allow code changes taking effect immediately. The installation tags, `embedseg`, `advance`, `paper`, `all`, are be selected based on your needs.
+Note: The `-e` option is the so-called "editable" mode. This will allow code changes taking effect immediately. The installation tags, `advance`, `paper`, `all`, are be selected based on your needs.
 
 ### (Optional) Install using Docker
 
