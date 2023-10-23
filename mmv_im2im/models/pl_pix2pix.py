@@ -33,7 +33,10 @@ class Model(pl.LightningModule):
             if gen_init is not None:
                 if Path(gen_init).is_file:
                     print(f"loading pre-train from {gen_init}")
-                    pre_train = torch.load(Path(gen_init))
+                    try:
+                        pre_train = torch.load(Path(gen_init))
+                    except RuntimeError:
+                        pre_train = torch.load(Path(gen_init), map_location=torch.device('cpu'))    
                     try:
                         self.generator.load_state_dict(pre_train["state_dict"])
                     except Exception:
