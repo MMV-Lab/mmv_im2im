@@ -60,7 +60,6 @@ requirements = [
     "scikit-learn",
     "tensorboard",
     "numba",
-    "monai @ git+https://github.com/Project-MONAI/MONAI.git@37b58fcec48f3ec1f84d7cabe9c7ad08a93882c0", # I will adjust each deprecated AddChannel transform to update requirements to monai>=1.1.0
 ]
 
 

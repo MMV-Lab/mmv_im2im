@@ -4,6 +4,7 @@
 
 A generic python package for deep learning based image-to-image transformation in biomedical applications
 
+The main branch will be further developed in order to be able to use the latest state of the art techniques and methods in the future. To reproduce the results of our manuscript, we refer to the branch [paper_version](https://github.com/MMV-Lab/mmv_im2im/tree/paper_version).
 (We are actively working on the documentation and tutorials. Submit a feature request if there is anything you need.)
 
 ---
@@ -22,15 +23,17 @@ Before starting, we recommend to [create a new conda environment](https://docs.c
 
 Please note that the proper setup of hardware is beyond the scope of this pacakge. This package was tested with GPU/CPU on Linux/Windows and CPU on MacOS. [Special note for MacOS users: Directly pip install in MacOS may need [additional setup of xcode](https://developer.apple.com/forums/thread/673827).]
 
-### Install the development head of MONAI
+### Install MONAI
 
-Due to this bug in MONAI: https://github.com/Project-MONAI/MONAI/pull/6523, which has been fixed in the dev branch but not in the stable release yet, we need to install the current dev head to avoid this bug. To do this:
+To reproduce our results, we need to install MONAI's code version of a specific commit. To do this:
 ```
 git clone https://github.com/Project-MONAI/MONAI.git
 cd ./MONAI
-# note: the dev branch is the default branch after cloning MONAI
+git checkout 37b58fcec48f3ec1f84d7cabe9c7ad08a93882c0
 pip install .
 ```
+
+We will remove this step for the main branch in the future to ensure a simplified installation of our tool.
 
 ### Install MMV_Im2Im for basic usage:
 
