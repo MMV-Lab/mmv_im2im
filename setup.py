@@ -51,7 +51,7 @@ logger_requirements = [
 requirements = [
     "lightning==2.0.0",
     "torch==2.0.1",
-#    "monai>=1.1.0",
+    "monai>=1.2.0",
     "aicsimageio==4.10.0",
     "pandas",
     "scikit-image",
@@ -60,7 +60,6 @@ requirements = [
     "scikit-learn",
     "tensorboard",
     "numba",
-    "monai @ git+https://github.com/Project-MONAI/MONAI.git@37b58fcec48f3ec1f84d7cabe9c7ad08a93882c0", # I will adjust each deprecated AddChannel transform to update requirements to monai>=1.1.0
 ]
 
 
