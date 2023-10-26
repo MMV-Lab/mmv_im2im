@@ -104,6 +104,7 @@ The overall package aims to achieve both simplicty and flexibilty with the modul
 * [Examples (i.e., scripts and config files)](tutorials/example_by_use_case.md) for reproducing all the experiments in our [pre-print](https://arxiv.org/abs/2209.02498)
 * A bottom-up tutorials on [how to understand the modularized image-to-image boilerplates](tutorials/how_to_understand_boilerplates.md) (for extending or adapting the package) and [how to understand the configuration system in details](tutorials/how_to_understand_config.md) (for advance usage to make specific customization).
 * A top-down tutorials as [FAQ](tutorials/FAQ.md), which will continuously grow as we receive more questions.
+* All the models used in the manuscript and sample data can be found here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10034416.svg)](https://doi.org/10.5281/zenodo.10034416)
 
 
 ### Contribute models to [BioImage Model Zoo](https://bioimage.io/#/)
