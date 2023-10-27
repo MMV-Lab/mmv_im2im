@@ -59,7 +59,7 @@ Note: The `-e` option is the so-called "editable" mode. This will allow code cha
 
 ### (Optional) Install using Docker
 
-It is also possible to use our package through [docker](https://www.docker.com/). The installation tutorial is [here](docker/tutorial.md).
+It is also possible to use our package through [docker](https://www.docker.com/). The installation tutorial is [here](docker/tutorial.md). Specifically, for MacOS users, please refer to [this tutorial](tutorials/docker/mmv_im2im_docker_tutorial.md).
 
 ### (Optional) Use MMV_Im2Im with Google Colab
 
