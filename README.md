@@ -4,6 +4,7 @@
 
 A generic python package for deep learning based image-to-image transformation in biomedical applications
 
+The main branch will be further developed in order to be able to use the latest state of the art techniques and methods in the future. To reproduce the results of our manuscript, we refer to the branch [paper_version](https://github.com/MMV-Lab/mmv_im2im/tree/paper_version).
 (We are actively working on the documentation and tutorials. Submit a feature request if there is anything you need.)
 
 ---
@@ -22,15 +23,17 @@ Before starting, we recommend to [create a new conda environment](https://docs.c
 
 Please note that the proper setup of hardware is beyond the scope of this pacakge. This package was tested with GPU/CPU on Linux/Windows and CPU on MacOS. [Special note for MacOS users: Directly pip install in MacOS may need [additional setup of xcode](https://developer.apple.com/forums/thread/673827).]
 
-### Install the development head of MONAI
+### Install MONAI
 
-Due to this bug in MONAI: https://github.com/Project-MONAI/MONAI/pull/6523, which has been fixed in the dev branch but not in the stable release yet, we need to install the current dev head to avoid this bug. To do this:
+To reproduce our results, we need to install MONAI's code version of a specific commit. To do this:
 ```
 git clone https://github.com/Project-MONAI/MONAI.git
 cd ./MONAI
-# note: the dev branch is the default branch after cloning MONAI
+git checkout 37b58fcec48f3ec1f84d7cabe9c7ad08a93882c0
 pip install .
 ```
+
+We will remove this step for the main branch in the future to ensure a simplified installation of our tool.
 
 ### Install MMV_Im2Im for basic usage:
 
@@ -52,7 +55,7 @@ cd mmv_im2im
 pip install -e .[all]
 ```
 
-Note: The `-e` option is the so-called "editable" mode. This will allow code changes taking effect immediately. The installation tags, `embedseg`, `advance`, `paper`, `all`, are be selected based on your needs.
+Note: The `-e` option is the so-called "editable" mode. This will allow code changes taking effect immediately. The installation tags, `advance`, `paper`, `all`, are be selected based on your needs.
 
 ### (Optional) Install using Docker
 
@@ -101,6 +104,7 @@ The overall package aims to achieve both simplicty and flexibilty with the modul
 * [Examples (i.e., scripts and config files)](tutorials/example_by_use_case.md) for reproducing all the experiments in our [pre-print](https://arxiv.org/abs/2209.02498)
 * A bottom-up tutorials on [how to understand the modularized image-to-image boilerplates](tutorials/how_to_understand_boilerplates.md) (for extending or adapting the package) and [how to understand the configuration system in details](tutorials/how_to_understand_config.md) (for advance usage to make specific customization).
 * A top-down tutorials as [FAQ](tutorials/FAQ.md), which will continuously grow as we receive more questions.
+* All the models used in the manuscript and sample data can be found here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10034416.svg)](https://doi.org/10.5281/zenodo.10034416)
 
 
 ### Contribute models to [BioImage Model Zoo](https://bioimage.io/#/)

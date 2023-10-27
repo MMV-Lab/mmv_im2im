@@ -30,5 +30,6 @@ model:
       mode: "gaussian"
 trainer:
   params:
-    gpus: 1
+    accelerator: "gpu"
+    devices: 1
     precision: 16

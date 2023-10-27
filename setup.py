@@ -51,7 +51,7 @@ logger_requirements = [
 requirements = [
     "lightning==2.0.0",
     "torch==2.0.1",
-    "monai>=1.1.0",
+    "monai>=1.2.0",
     "aicsimageio==4.10.0",
     "pandas",
     "scikit-image",
