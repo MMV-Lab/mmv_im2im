@@ -4,8 +4,8 @@
 
 A generic python package for deep learning based image-to-image transformation in biomedical applications
 
-The main branch will be further developed in order to be able to use the latest state of the art techniques and methods in the future. To reproduce the results of our manuscript, we refer to the branch [paper_version](https://github.com/MMV-Lab/mmv_im2im/tree/paper_version).
-(We are actively working on the documentation and tutorials. Submit a feature request if there is anything you need.)
+This "paper_version" branch will only serve as the record for reproducibility of the experiments shown in our paper.
+We will keep updating the config files in the main branch to accommodate further updates of third-party dependencies to ensure that users are always able to keep up with state-of-the-art, while it is still possible to reproduce the paper version from this "paper_version" branch.
 
 ---
 
