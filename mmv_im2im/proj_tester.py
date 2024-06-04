@@ -54,18 +54,25 @@ class ProjectTester(object):
         my_model_func = getattr(model_module, "Model")
         self.model = my_model_func(self.model_cfg, train=False)
 
-        pre_train = torch.load(self.model_cfg.checkpoint)
-        # TODO: hacky solution to remove a wrongly registered key
-        pre_train["state_dict"].pop("criterion.xym", None)
-        pre_train["state_dict"].pop("criterion.xyzm", None)
-        self.model.load_state_dict(pre_train["state_dict"])
         if (
             self.model_cfg.model_extra is not None
             and "cpu_only" in self.model_cfg.model_extra
             and self.model_cfg.model_extra["cpu_only"]
         ):
             self.cpu = True
+            pre_train = torch.load(
+                self.model_cfg.checkpoint,
+                map_location=torch.device('cpu')
+            )
         else:
+            pre_train = torch.load(self.model_cfg.checkpoint)
+
+        # TODO: hacky solution to remove a wrongly registered key
+        pre_train["state_dict"].pop("criterion.xym", None)
+        pre_train["state_dict"].pop("criterion.xyzm", None)
+        self.model.load_state_dict(pre_train["state_dict"])
+
+        if not self.cpu:
             self.model.cuda()
 
         self.model.eval()
