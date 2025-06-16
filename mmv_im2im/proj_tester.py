@@ -92,11 +92,13 @@ class ProjectTester(object):
     def process_one_image(
         self, img: Union[DaskArray, NumpyArray], out_fn: Union[str, Path] = None
     ):
+
         if isinstance(img, DaskArray):
             # Perform the prediction
             x = img.compute()
         elif isinstance(img, NumpyArray):
             x = img
+
         else:
             raise ValueError("invalid image")
 
@@ -108,6 +110,7 @@ class ProjectTester(object):
         x = torch.tensor(x.astype(np.float32))
 
         # run pre-processing on tensor if needed
+
         if self.pre_process is not None:
             x = self.pre_process(x)
 
@@ -115,6 +118,7 @@ class ProjectTester(object):
         # the input here is assumed to be a tensor
         with torch.no_grad():
             # add batch dimension and move to GPU
+
             if self.cpu:
                 x = torch.unsqueeze(x, dim=0)
             else:
@@ -132,6 +136,7 @@ class ProjectTester(object):
                     device=torch.device("cpu"),
                     **self.model_cfg.model_extra["sliding_window_params"],
                 )
+
                 # currently, we keep sliding window stiching step on CPU, but assume
                 # the output is on GPU (see note below). So, we manually move the data
                 # back to GPU
@@ -238,6 +243,7 @@ class ProjectTester(object):
 
         # loop through all images and apply the model
         for i, ds in enumerate(dataset_list):
+
             # Read the image
             print(f"Reading the image {i}/{dataset_length}")
 
@@ -260,6 +266,7 @@ class ProjectTester(object):
 
                 # get the number of time points
                 reader = AICSImage(ds)
+
                 timelapse_data = reader.dims.T
 
                 tmpfile_list = []
@@ -314,9 +321,12 @@ class ProjectTester(object):
                 # clean up temporary dir
                 shutil.rmtree(tmppath)
             else:
-                img = AICSImage(ds).reader.get_image_dask_data(
+                img = AICSImage(ds).reader.get_image_data(
                     **self.data_cfg.inference_input.reader_params
                 )
+                # img = AICSImage(ds).reader.get_image_dask_data(
+                #     **self.data_cfg.inference_input.reader_params
+                # )
 
                 # prepare output filename
                 if "." in suffix:
@@ -342,3 +352,4 @@ class ProjectTester(object):
 
                 print("Predicting the image")
                 self.process_one_image(img, out_fn)
+                
