@@ -1,0 +1,43 @@
+mode: inference
+
+data:
+  inference_input:
+    dir: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1_prob/data/semantic2D/testA_prob
+    data_type: _IM.tiff  # this will search only files with name *_IM.tiff
+    reader_params:
+      dimension_order_out: "SYX"
+      C: 0
+      T: 0
+      Z: 0
+  inference_output:
+    path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1_prob/data/semantic2D/testA_pred_v2_prob
+    suffix: .tif
+
+  preprocess:
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: normalize_staining
+  postprocess:
+    - module_name: mmv_im2im.postprocessing.basic_collection
+      func_name: extract_segmentation
+      params:
+        channel: 1
+        batch_dim: True
+        cutoff: 0.5
+
+model:
+  framework: ProbUnet
+  net:
+    module_name: mmv_im2im.models.nets.ProbUnet
+    func_name: ProbabilisticUNet
+    params:
+      in_channels: 2
+      n_classes: 3
+      latent_dim: 6
+  checkpoint:  ./lightning_logs/version_0/checkpoints/last.ckpt
+  model_extra:
+    cpu_only: False
+trainer:
+  verbose: True
+  params:
+    gpus: 1
+    precision: 32

@@ -1,0 +1,142 @@
+mode: train
+
+data:
+  category: "pair"
+  data_path: /mnt/eternus/users/Jianxu/projects/im2im_experiments_v1/data/semantic2D/train
+  dataloader:
+    train:
+      dataloader_params:
+        batch_size: 8
+        pin_memory: True
+        num_workers: 16
+
+  preprocess:
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["IM"]
+        dimension_order_out: "SYX"
+        C: 0
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["GT"]
+        dimension_order_out: "YX"
+        T: 0
+        Z: 0
+        C: 0
+    - module_name: mmv_im2im.preprocessing.transforms
+      func_name: normalize_staining
+      params:
+        keys: ["IM"]
+    - module_name: monai.transforms
+      func_name: AddChanneld
+      params:
+        keys: ["GT"]
+    - module_name: monai.transforms
+      func_name: CastToTyped
+      params:
+        keys: ["GT"]
+        dtype: int
+    - module_name: monai.transforms
+      func_name: CastToTyped
+      params:
+        keys: ["IM"]
+        dtype: float32
+    - module_name: monai.transforms
+      func_name: SpatialPadd
+      params:
+        keys: ["IM", "GT"]
+        spatial_size: [512, 512]
+        mode: "reflect" 
+    - module_name: monai.transforms
+      func_name: RandSpatialCropd
+      params:
+        keys: ["IM", "GT"]
+        random_size: False
+        roi_size: [512, 512]
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT"]
+  augmentation:
+    - module_name: monai.transforms
+      func_name: RandFlipd
+      params:
+        prob: 0.5
+        keys: ["IM", "GT"]
+    - module_name: monai.transforms
+      func_name: RandHistogramShiftd
+      params:
+        prob: 0.1
+        keys: ["IM"]
+    - module_name: monai.transforms
+      func_name: Rand2DElasticd
+      params:
+        prob: 0.5
+        spacing: [32, 32]
+        magnitude_range: [1, 5]
+        rotate_range: [0, 0.5]
+        scale_range: [0.1, 0.25]
+        translate_range: [10, 50]
+        padding_mode: "reflection"
+        mode: "nearest"
+        keys: ["IM", "GT"]
+
+model:
+  framework: ProbUnet
+  net:
+    module_name: mmv_im2im.models.nets.ProbUnet
+    func_name: ProbabilisticUNet
+    params:
+      in_channels: 2
+      n_classes: 3 
+      latent_dim: 6
+
+  criterion:
+    module_name: mmv_im2im.utils.elbo_loss 
+    func_name: ELBOLoss 
+    params:
+      beta: 0.5 
+      n_classes: 3
+
+  optimizer:
+    module_name: torch.optim
+    func_name: AdamW
+    params:
+      lr: 0.001 
+      weight_decay: 0.0001
+
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    func_name: ReduceLROnPlateau
+    params:
+      mode: 'min'
+      factor: 0.5
+      patience: 10
+    monitor: 'val_loss'
+
+trainer:
+  verbose: True
+  params:
+    precision: 32
+    max_epochs: 3000
+    detect_anomaly: True
+
+  callbacks:
+    - module_name: lightning.pytorch.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 80
+        verbose: True
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: '{epoch}-{val_loss:.5f}'
+        mode: min
+        save_top_k: 5
+        save_last: true

@@ -17,5 +17,6 @@ This page lists the jupyter notebooks (for downloading the data from public reso
 | image restoration / denoising  | [notebook](../paper_configs/prepare_data/denoising.ipynb) | [FCN](../paper_configs/denoising_3d_train.yaml) | [FCN](../paper_configs/denoising_3d_inference.yaml)  |
 | image modality transfer | [notebook](../paper_configs/prepare_data/modaity_transfer.ipynb) | [FCN](../paper_configs/modality_transfer_3d_train.yaml) | [FCN](../paper_configs/modality_transfer_3d_inference.yaml)  |
 | staining transformation | [notebook](../paper_configs/prepare_data/multiplex.ipynb) | [pix2pix](../paper_configs/multiplex_train.yaml) | [pix2pix](../paper_configs/multiplex_inference.yaml) |
+| 2D probabilistic semantic segmentation | [notebook](../paper_configs/prepare_data/semantic_seg_2d.ipynb) | [PUnet](../paper_configs/probabilistic_semantic_seg_2d_train.yaml) |  [PUnet](../paper_configs/probabilistic_semantic_seg_2d_inference.yaml) |
 
 * See [notes on EmbedSeg training](note_embedseg.md)
