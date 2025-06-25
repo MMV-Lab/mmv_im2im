@@ -1,0 +1,147 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mmv_im2im"
+version = "0.5.2"
+authors = [
+    { name="Jianxu Chen", email="jianxuchen.ai@gmail.com" },
+]
+description = "A python package for deep learning based image to image transformation"
+readme = "README.md"
+license = { text="MIT license" }
+requires-python = ">=3.9"
+keywords = ["deep learning", "microscopy image analysis", "biomedical image analysis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "lightning>=2.0.1",  
+    "torch==2.0.1",
+    "monai>=1.2.0",
+    "bioio==1.6.1", 
+    "pandas",
+    "scikit-image",
+    "protobuf<4.21.0",
+    "pyrallis",
+    "scikit-learn",
+    "tensorboard",
+    "numba",
+    "numpy<2",
+    "pydantic==2.11.7",
+    "fastapi>=0.100.0", 
+    "uvicorn[standard]",
+    "botocore==1.38.38",
+    "bioio-ome-tiff==1.1.0", 
+    "bioio-ome-zarr==1.2.0",
+    "pydantic-zarr",
+    "bioio-tifffile==1.1.0",
+    "bioio-lif==1.1.0",
+    "ngff-zarr",     
+    "tifffile",      
+    "ome-types",     
+    "imageio", 
+    "zarr", 
+]
+
+[project.optional-dependencies]
+advanced = [
+    "tensorboard",
+]
+paper = [
+    "quilt3",
+    "pooch",
+    "matplotlib",
+    "notebook",
+]
+
+
+image-io = []
+
+dev = [
+    "pytest-runner>=5.2",
+    "black>=19.10b0",
+    "codecov>=2.1.4",
+    "flake8>=3.8.3",
+    "flake8-debugger>=3.2.1",
+    "pytest>=5.4.3",
+    "pytest-cov>=2.9.0",
+    "pytest-raises>=0.11",
+    "numpy<2",
+    "bump2version>=1.0.1",
+    "coverage>=5.1",
+    "ipython>=7.15.0",
+    "m2r2>=0.2.7",
+    "Sphinx>=3.4.3",
+    "sphinx_rtd_theme>=0.5.1",
+    "tox>=3.15.2",
+    "twine>=3.1.1",
+    "wheel>=0.34.2",
+]
+
+test = [
+    "black>=19.10b0",
+    "codecov>=2.1.4",
+    "flake8>=3.8.3",
+    "flake8-debugger>=3.2.1",
+    "pytest>=5.4.3",
+    "pytest-cov>=2.9.0",
+    "pytest-raises>=0.11",
+    "numpy<2",
+]
+
+all = [
+    "mmv_im2im[advanced]",
+    "mmv_im2im[paper]",
+    "mmv_im2im[image-io]",
+    "mmv_im2im[dev]",
+    "mmv_im2im[test]",
+]
+
+dynamic = ["optional-dependencies"]
+
+[project.urls]
+"Homepage" = "https://github.com/MMV-Lab/mmv_im2im"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[project.scripts]
+run_im2im = "mmv_im2im.bin.run_im2im:main"
+
+[tool.pytest.ini_options]
+addopts = "--cov=mmv_im2im --no-cov-on-fail --cov-report=term-missing --cov-report=xml --cov-branch --durations=10"
+testpaths = [
+    "mmv_im2im/tests",
+]
+python_files = "test_*.py"
+
+[tool.flake8]
+exclude = [
+    "docs/",
+    ".git/",
+    "__pycache__/",
+    "build/",
+    "dist/",
+    ".venv/",
+    ".tox/",
+    "*.egg-info/",
+]
+ignore = [
+	"E203",
+	"E402",
+	"W291",
+	"W503",
+	"W293",
+	"W292",
+	"E501",
+] 
+max-line-length = 88

@@ -405,9 +405,9 @@ def configuration_validation(cfg):
                 cfg.data.dataloader.train.dataset_params["cache_dir"]
                 != cfg.data.dataloader.val.dataset_params["cache_dir"]
             ):
-                cfg.data.dataloader.val.dataset_params[
-                    "cache_dir"
-                ] = cfg.data.dataloader.train.dataset_params["cache_dir"]
+                cfg.data.dataloader.val.dataset_params["cache_dir"] = (
+                    cfg.data.dataloader.train.dataset_params["cache_dir"]
+                )
                 warnings.warn(
                     UserWarning(
                         "The cache dir of PersistentDataset for validation was"

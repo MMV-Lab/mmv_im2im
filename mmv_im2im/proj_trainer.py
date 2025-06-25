@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 class ProjectTrainer(object):
     """
-    entry for training models
+    Entry point for training models.
 
     Parameters
     ----------
@@ -30,10 +30,10 @@ class ProjectTrainer(object):
     """
 
     def __init__(self, cfg):
-        # seed everything before start
+        # seed everything before starting
         pl.seed_everything(123, workers=True)
 
-        # extract the three major chuck of the config
+        # extract the three major config sections
         self.model_cfg = cfg.model
         self.train_cfg = cfg.trainer
         self.data_cfg = cfg.data
@@ -59,9 +59,44 @@ class ProjectTrainer(object):
                 )
             elif "pre-train" in self.model_cfg.model_extra:
                 pre_train = torch.load(self.model_cfg.model_extra["pre-train"])
-                # TODO: hacky solution to remove a wrongly registered key
-                pre_train["state_dict"].pop("criterion.xym", None)
-                self.model.load_state_dict(pre_train["state_dict"])
+
+                if "extend" in self.model_cfg.model_extra:
+
+                    if (
+                        self.model_cfg.model_extra["extend"] is not None
+                        and self.model_cfg.model_extra["extend"] is True
+                    ):
+                        """Load the model in extension mode, for exmaple loading the wheights trained for a
+                        2 class segmentation but ignoring the output layer and adding new one
+                        for tranferlearning for more classes"""
+
+                        # remove wrongly registered key if present
+                        pre_train["state_dict"].pop("criterion.xym", None)
+
+                        # load only compatible layers (skip mismatched shapes, like final layer)
+                        model_state = self.model.state_dict()
+                        pretrained_dict = pre_train["state_dict"]
+                        filtered_dict = {}
+
+                        for k, v in pretrained_dict.items():
+                            if k in model_state and v.shape == model_state[k].shape:
+                                filtered_dict[k] = v
+                            else:
+                                print(
+                                    f"Skipped loading layer: {k} due to shape mismatch."
+                                )
+
+                        # update model weights with loaded compatible parameters
+                        model_state.update(filtered_dict)
+                        self.model.load_state_dict(model_state)
+
+                else:
+
+                    # load the model as always
+
+                    # TODO: hacky solution to remove a wrongly registered key
+                    pre_train["state_dict"].pop("criterion.xym", None)
+                    self.model.load_state_dict(pre_train["state_dict"])
 
         # set up training
         if self.train_cfg.callbacks is None:

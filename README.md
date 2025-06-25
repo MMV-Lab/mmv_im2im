@@ -21,6 +21,11 @@ The overall package is designed with a generic image-to-image transformation fra
 
 Before starting, we recommend to [create a new conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands) or [a virtual environment](https://docs.python.org/3/library/venv.html) with Python 3.9+.
 
+```
+conda create -y -n im2im -c conda-forge python=3.11
+conda activate im2im
+```
+
 Please note that the proper setup of hardware is beyond the scope of this pacakge. This package was tested with GPU/CPU on Linux/Windows and CPU on MacOS. [Special note for MacOS users: Directly pip install in MacOS may need [additional setup of xcode](https://developer.apple.com/forums/thread/673827).]
 
 ### Install MONAI
@@ -73,8 +78,8 @@ Basically, you can specify your training configuration in a yaml file and run tr
 
 ```
 from pathlib import Path
-from aicsimageio import AICSImage
-from aicsimageio.writers import OmeTiffWriter
+from bioio import BioImage
+from bioio.writers import OmeTiffWriter
 from mmv_im2im.configs.config_base import ProgramConfig, parse_adaptor, configuration_validation
 from mmv_im2im import ProjectTester
 
@@ -89,9 +94,9 @@ executor.setup_data_processing()
 
 # get the data, run inference, and save the result
 fn = Path("./data/img_00_IM.tiff")
-img = AICSImage(fn).get_image_data("YX", Z=0, C=0, T=0)
+img = BioImage(fn).get_image_data("YX", Z=0, C=0, T=0)
 # or using delayed loading if the data is large
-# img = AICSImage(fn).get_image_dask_data("YX", Z=0, C=0, T=0)
+# img = BioImage(fn).get_image_dask_data("YX", Z=0, C=0, T=0)
 seg = executor.process_one_image(img)
 OmeTiffWriter.save(seg, "output.tiff", dim_orders="YX")
 ```
