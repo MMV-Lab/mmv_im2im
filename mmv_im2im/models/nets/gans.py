@@ -129,7 +129,7 @@ class generator_encoder_decoder(nn.Module):
                 down_block(
                     in_channels=prev_channel,
                     out_channels=this_channel,
-                    **model_info["down_block"]["params"]
+                    **model_info["down_block"]["params"],
                 )
             )
 
@@ -142,7 +142,7 @@ class generator_encoder_decoder(nn.Module):
                 res_block(
                     in_channels=prev_channel,
                     out_channels=this_channel,
-                    **model_info["res_block"]["params"]
+                    **model_info["res_block"]["params"],
                 )
             )
 
@@ -155,7 +155,7 @@ class generator_encoder_decoder(nn.Module):
                 up_block(
                     in_channels=prev_channel,
                     out_channels=this_channel,
-                    **model_info["up_block"]["params"]
+                    **model_info["up_block"]["params"],
                 )
             )
 

@@ -4,8 +4,8 @@ import pandas as pd
 import quilt3
 from pathlib import Path
 import random
-from aicsimageio import AICSImage
-from aicsimageio.writers import OmeTiffWriter
+from bioio import BioImage
+from bioio.writers import OmeTiffWriter
 import os
 import sys
 import logging
@@ -158,7 +158,7 @@ class Executor(object):
             pkg[subdir_name][file_name].fetch(local_fn)
 
             # extract the bf and structures channel
-            reader = AICSImage(local_fn)
+            reader = BioImage(local_fn)
             bf_img = reader.get_image_data(
                 "ZYX", C=row.ChannelNumberBrightfield, S=0, T=0
             )

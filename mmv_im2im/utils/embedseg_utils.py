@@ -3,8 +3,8 @@ from typing import Union
 from numba import jit
 from scipy.ndimage.measurements import find_objects
 from scipy.ndimage.morphology import binary_fill_holes
-from aicsimageio.writers import OmeTiffWriter
-from aicsimageio import AICSImage
+from bioio.writers import OmeTiffWriter
+from bioio import BioImage
 from tqdm import tqdm
 from pathlib import Path
 import warnings
@@ -163,7 +163,7 @@ def prepare_embedseg_cache(
     spatial_dim = 2
     for ds in dataset_list:
         fn = ds["source_fn"]
-        reader = AICSImage(fn)
+        reader = BioImage(fn)
         this_minXY = min(reader.dims.X, reader.dims.Y)
         min_xy = min((this_minXY, min_xy))
         if reader.dims.Z > 1 and spatial_dim == 2:
@@ -204,11 +204,11 @@ def prepare_embedseg_cache(
     # loop through the dataset
     for ds in tqdm(dataset_list):
         # get instance segmentation labels
-        instance_reader = AICSImage(ds["target_fn"])
+        instance_reader = BioImage(ds["target_fn"])
         instance = instance_reader.get_image_data(**reader_params)
 
         # get raw image
-        image_reader = AICSImage(ds["source_fn"])
+        image_reader = BioImage(ds["source_fn"])
         image = image_reader.get_image_data(**raw_reader_params)
 
         # check if costmap exists
@@ -217,7 +217,7 @@ def prepare_embedseg_cache(
         costmap_flag = False
         if cm_fn.is_file():
             costmap_flag = True
-            cm_reader = AICSImage(cm_fn)
+            cm_reader = BioImage(cm_fn)
             costmap = cm_reader.get_image_data(**reader_params)
 
         # parse filename

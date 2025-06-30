@@ -115,9 +115,9 @@ class Cluster_2d:
                     ):
                         instance_map_masked[proposal.squeeze()] = count
                         instance_mask = torch.zeros(height, width).short()
-                        instance_mask[
-                            mask.squeeze().cpu()
-                        ] = proposal.short().cpu()  # TODO
+                        instance_mask[mask.squeeze().cpu()] = (
+                            proposal.short().cpu()
+                        )  # TODO
                         center_image = torch.zeros(height, width).short()
 
                         center[0] = int(
