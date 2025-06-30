@@ -322,8 +322,7 @@ class ProjectTester(object):
                 img = BioImage(ds).get_image_data(
                     **self.data_cfg.inference_input.reader_params
                 )
-
-
+                
                 # prepare output filename
                 if "." in suffix:
                     if (
