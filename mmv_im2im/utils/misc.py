@@ -4,7 +4,7 @@ from functools import partial
 import importlib
 import numpy as np
 import inspect
-from aicsimageio import AICSImage
+from bioio import BioImage
 from typing import Sequence, Tuple
 from monai.data import ImageReader
 from monai.utils import ensure_tuple, require_pkg
@@ -12,7 +12,7 @@ from monai.config import PathLike
 from monai.data.image_reader import _stack_images
 
 
-@require_pkg(pkg_name="aicsimageio")
+@require_pkg(pkg_name="bioio")
 class monai_bio_reader(ImageReader):
     def __init__(self, **kwargs):
         super().__init__()
@@ -22,7 +22,7 @@ class monai_bio_reader(ImageReader):
         filenames: Sequence[PathLike] = ensure_tuple(data)
         img_ = []
         for name in filenames:
-            img_.append(AICSImage(f"{name}"))
+            img_.append(BioImage(f"{name}"))
 
         return img_ if len(filenames) > 1 else img_[0]
 

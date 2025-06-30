@@ -1,6 +1,7 @@
 """
 This module provides lighting module for cycleGAN
 """
+
 import torch
 import lightning as pl
 from pathlib import Path
