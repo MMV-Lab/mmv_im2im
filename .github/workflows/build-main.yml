@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.9, '3.10', 3.11]
+        python-version: ['3.10', '3.11']
         os: [
           ubuntu-latest,
           windows-latest,
@@ -36,17 +36,17 @@ jobs:
       run: |
         pytest --cov-report xml --cov=mmv_im2im mmv_im2im/tests/
     - name: Upload codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
 
   lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9.15
+        python-version: 3.11
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
@@ -68,7 +68,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: 3.11
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
