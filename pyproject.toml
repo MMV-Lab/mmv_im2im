@@ -96,12 +96,25 @@ test = [
     "numpy<2",
 ]
 
+data_requirements = [
+    "quilt3",
+    "pooch",
+    "matplotlib",
+    "notebook"
+]
+
+logger_requirements = [
+    "tensorboard",
+]
+
 all = [
     "mmv_im2im[advanced]",
     "mmv_im2im[paper]",
     "mmv_im2im[image-io]",
     "mmv_im2im[dev]",
     "mmv_im2im[test]",
+    "mmv_im2im[data_requirements]",
+    "mmv_im2im[logger_requirements]",
 ]
 
 dynamic = ["optional-dependencies"]
