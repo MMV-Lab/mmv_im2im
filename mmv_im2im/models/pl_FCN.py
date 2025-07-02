@@ -4,7 +4,7 @@ from pathlib import Path
 from random import randint
 import lightning as pl
 import torch
-from aicsimageio.writers import OmeTiffWriter
+from bioio.writers import OmeTiffWriter
 
 from mmv_im2im.utils.misc import (
     parse_config,
@@ -53,7 +53,16 @@ class Model(pl.LightningModule):
             lr_scheduler = scheduler_func(
                 optimizer, **self.model_info.scheduler["params"]
             )
-            return {"optimizer": optimizer, "lr_scheduler": lr_scheduler}
+            return {
+                "optimizer": optimizer,
+                "lr_scheduler": {
+                    "scheduler": lr_scheduler,
+                    "monitor": "val_loss",
+                    "interval": "epoch",
+                    "frequency": 1,
+                    "strict": True,
+                },
+            }
 
     def prepare_batch(self, batch):
         return
@@ -120,40 +129,17 @@ class Model(pl.LightningModule):
             tar_out = np.squeeze(tar[0,].detach().cpu().numpy()).astype(float)
             prd_out = np.squeeze(yhat_act[0,].detach().cpu().numpy()).astype(float)
 
-            if len(src_out.shape) == 2:
-                src_order = "YX"
-            elif len(src_out.shape) == 3:
-                src_order = "ZYX"
-            elif len(src_out.shape) == 4:
-                src_order = "CZYX"
-            else:
-                raise ValueError("unexpected source dims")
-
-            if len(tar_out.shape) == 2:
-                tar_order = "YX"
-            elif len(tar_out.shape) == 3:
-                tar_order = "ZYX"
-            elif len(tar_out.shape) == 4:
-                tar_order = "CZYX"
-            else:
-                raise ValueError("unexpected target dims")
-
-            if len(prd_out.shape) == 2:
-                prd_order = "YX"
-            elif len(prd_out.shape) == 3:
-                prd_order = "ZYX"
-            elif len(prd_out.shape) == 4:
-                prd_order = "CZYX"
-            else:
-                raise ValueError(f"unexpected pred dims {prd_out.shape}")
+            def get_dim_order(arr):
+                dims = len(arr.shape)
+                return {2: "YX", 3: "ZYX", 4: "CZYX"}.get(dims, "YX")
 
             rand_tag = randint(1, 1000)
             out_fn = save_path / f"epoch_{self.current_epoch}_src_{rand_tag}.tiff"
-            OmeTiffWriter.save(src_out, out_fn, dim_order=src_order)
+            OmeTiffWriter.save(src_out, out_fn, dim_order=get_dim_order(src_out))
             out_fn = save_path / f"epoch_{self.current_epoch}_tar_{rand_tag}.tiff"
-            OmeTiffWriter.save(tar_out, out_fn, dim_order=tar_order)
+            OmeTiffWriter.save(tar_out, out_fn, dim_order=get_dim_order(tar_out))
             out_fn = save_path / f"epoch_{self.current_epoch}_prd_{rand_tag}_.tiff"
-            OmeTiffWriter.save(prd_out, out_fn, dim_order=prd_order)
+            OmeTiffWriter.save(prd_out, out_fn, dim_order=get_dim_order(prd_out))
 
         return loss
 
@@ -170,3 +156,4 @@ class Model(pl.LightningModule):
         )
 
         return loss
+        

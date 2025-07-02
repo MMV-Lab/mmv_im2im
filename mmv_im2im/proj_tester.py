@@ -9,8 +9,8 @@ from pathlib import Path
 import tempfile
 import shutil
 import numpy as np
-from aicsimageio import AICSImage
-from aicsimageio.writers import OmeTiffWriter
+from bioio import BioImage
+from bioio.writers import OmeTiffWriter
 import torch
 from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla
@@ -61,8 +61,7 @@ class ProjectTester(object):
         ):
             self.cpu = True
             pre_train = torch.load(
-                self.model_cfg.checkpoint,
-                map_location=torch.device('cpu')
+                self.model_cfg.checkpoint, map_location=torch.device("cpu")
             )
         else:
             pre_train = torch.load(self.model_cfg.checkpoint)
@@ -92,11 +91,13 @@ class ProjectTester(object):
     def process_one_image(
         self, img: Union[DaskArray, NumpyArray], out_fn: Union[str, Path] = None
     ):
+
         if isinstance(img, DaskArray):
             # Perform the prediction
             x = img.compute()
         elif isinstance(img, NumpyArray):
             x = img
+
         else:
             raise ValueError("invalid image")
 
@@ -108,6 +109,7 @@ class ProjectTester(object):
         x = torch.tensor(x.astype(np.float32))
 
         # run pre-processing on tensor if needed
+
         if self.pre_process is not None:
             x = self.pre_process(x)
 
@@ -115,6 +117,7 @@ class ProjectTester(object):
         # the input here is assumed to be a tensor
         with torch.no_grad():
             # add batch dimension and move to GPU
+
             if self.cpu:
                 x = torch.unsqueeze(x, dim=0)
             else:
@@ -132,6 +135,7 @@ class ProjectTester(object):
                     device=torch.device("cpu"),
                     **self.model_cfg.model_extra["sliding_window_params"],
                 )
+
                 # currently, we keep sliding window stiching step on CPU, but assume
                 # the output is on GPU (see note below). So, we manually move the data
                 # back to GPU
@@ -238,6 +242,7 @@ class ProjectTester(object):
 
         # loop through all images and apply the model
         for i, ds in enumerate(dataset_list):
+
             # Read the image
             print(f"Reading the image {i}/{dataset_length}")
 
@@ -259,12 +264,12 @@ class ProjectTester(object):
                 print(f"making a temp folder at {tmppath}")
 
                 # get the number of time points
-                reader = AICSImage(ds)
+                reader = BioImage(ds)
                 timelapse_data = reader.dims.T
 
                 tmpfile_list = []
                 for t_idx in range(timelapse_data):
-                    img = AICSImage(ds).reader.get_image_dask_data(
+                    img = BioImage(ds).get_image_data(
                         T=[t_idx], **self.data_cfg.inference_input.reader_params
                     )
                     print(f"Predicting the image timepoint {t_idx}")
@@ -314,10 +319,10 @@ class ProjectTester(object):
                 # clean up temporary dir
                 shutil.rmtree(tmppath)
             else:
-                img = AICSImage(ds).reader.get_image_dask_data(
+                img = BioImage(ds).get_image_data(
                     **self.data_cfg.inference_input.reader_params
                 )
-
+                
                 # prepare output filename
                 if "." in suffix:
                     if (

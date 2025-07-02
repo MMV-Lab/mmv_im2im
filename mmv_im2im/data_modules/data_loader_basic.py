@@ -106,7 +106,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             train_dataset = train_dataset_func(
                 data=train_data,
                 transform=self.transform,
-                **train_loader_info.dataset_params
+                **train_loader_info.dataset_params,
             )
         else:
             train_dataset = train_dataset_func(
@@ -117,7 +117,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             train_dataset,
             shuffle=True,
             collate_fn=list_data_collate,
-            **train_loader_info.dataloader_params
+            **train_loader_info.dataloader_params,
         )
         return train_dataloader
 
@@ -130,7 +130,7 @@ class Im2ImDataModule(pl.LightningDataModule):
             val_dataset = val_dataset_func(
                 data=self.val_data,
                 transform=self.preproc,
-                **val_loader_info.dataset_params
+                **val_loader_info.dataset_params,
             )
         else:
             val_dataset = val_dataset_func(data=self.val_data, transform=self.preproc)
@@ -138,6 +138,6 @@ class Im2ImDataModule(pl.LightningDataModule):
             val_dataset,
             shuffle=False,
             collate_fn=list_data_collate,
-            **val_loader_info.dataloader_params
+            **val_loader_info.dataloader_params,
         )
         return val_dataloader

@@ -78,7 +78,7 @@ def iou(preds, labels, C, EMPTY=1.0, ignore=None, per_image=False):
 def lovasz_hinge(logits, labels, per_image=True, ignore=None):
     """
     Binary Lovasz hinge loss
-      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)  # noqa W605
+      logits: [B, H, W] Variable, logits at each pixel (between -infty and +infty)  # noqa W605
       labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
       per_image: compute the loss per image instead of per batch
       ignore: void class id
@@ -98,7 +98,7 @@ def lovasz_hinge(logits, labels, per_image=True, ignore=None):
 def lovasz_hinge_flat(logits, labels):
     """
     Binary Lovasz hinge loss
-      logits: [P] Variable, logits at each prediction (between -\infty and +\infty)  # noqa W605
+      logits: [P] Variable, logits at each prediction (between -infty and +infty)  # noqa W605
       labels: [P] Tensor, binary ground truth labels (0 or 1)
       ignore: label to ignore
     """
@@ -143,7 +143,7 @@ class StableBCELoss(torch.nn.modules.Module):
 def binary_xloss(logits, labels, ignore=None):
     """
     Binary Cross entropy loss
-      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)  # noqa W605
+      logits: [B, H, W] Variable, logits at each pixel (between -infty and +infty)  # noqa W605
       labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
       ignore: void class id
     """
@@ -169,7 +169,7 @@ def lovasz_softmax(probas, labels, only_present=False, per_image=False, ignore=N
         loss = mean(
             lovasz_softmax_flat(
                 *flatten_probas(prob.unsqueeze(0), lab.unsqueeze(0), ignore),
-                only_present=only_present
+                only_present=only_present,
             )
             for prob, lab in zip(probas, labels)
         )

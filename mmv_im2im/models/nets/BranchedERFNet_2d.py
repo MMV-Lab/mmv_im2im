@@ -1,9 +1,10 @@
 """
 Author: Davy Neven
-Licensed under the CC BY-NC 4.0 license 
+Licensed under the CC BY-NC 4.0 license
 (https://creativecommons.org/licenses/by-nc/4.0/)
 https://github.com/davyneven/SpatialEmbeddings
 """
+
 import torch
 import torch.nn as nn
 import mmv_im2im.models.nets.erfnet as erfnet

@@ -58,7 +58,7 @@ class Model(pl.LightningModule):
                     except RuntimeError:
                         pre_train = torch.load(
                             Path(dis_init), map_location=torch.device("cpu")
-                        )    
+                        )
                     self.discriminator.load_state_dict(pre_train["state_dict"])
                 else:
                     init_weights(self.discriminator, init_type=dis_init)
