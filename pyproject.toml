@@ -10,13 +10,12 @@ authors = [
 ]
 description = "A python package for deep learning based image to image transformation"
 readme = "README.md"
-license = { text="MIT license" }
+license = "MIT"
 requires-python = ">=3.10"
 keywords = ["deep learning", "microscopy image analysis", "biomedical image analysis"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
