@@ -74,8 +74,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel
     - name: Build Package
-      run: |
-        python setup.py sdist bdist_wheel
+      run: python -m build
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
