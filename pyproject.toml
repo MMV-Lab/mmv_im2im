@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mmv_im2im"
-version = "0.5.3"
+version = "0.5.4"
 authors = [
     { name="Jianxu Chen", email="jianxuchen.ai@gmail.com" },
 ]
