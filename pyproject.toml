@@ -126,7 +126,10 @@ include-package-data = true
 zip-safe = false
 
 [tool.setuptools.packages.find]
-include = ["mmv_im2im"]
+include = ["mmv_im2im", "mmv_im2im.*"]
+
+[tool.setuptools.package-dir]
+mmv_im2im = "mmv_im2im"
 
 [project.scripts]
 run_im2im = "mmv_im2im.bin.run_im2im:main"
