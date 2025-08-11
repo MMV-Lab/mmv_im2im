@@ -92,7 +92,7 @@ class Args(object):
         log.debug("Command Line:")
         log.debug("\t{}".format(" ".join(sys.argv)))
         log.debug("Args:")
-        for (k, v) in self.__dict__.items():
+        for k, v in self.__dict__.items():
             log.debug("\t{}: {}".format(k, v))
 
 
@@ -139,7 +139,7 @@ class Executor(object):
         holdout_path = holdout_path_base / Path(cline)
         holdout_path.mkdir(exist_ok=True)
 
-        # download all FOVs or a certain 
+        # download all FOVs or a certain
         if num_samples_per_cell_line > 0:
             num = num_samples_per_cell_line
         else:
@@ -162,9 +162,7 @@ class Executor(object):
             bf_img = reader.get_image_data(
                 "ZYX", C=row.ChannelNumberBrightfield, S=0, T=0
             )
-            str_img = reader.get_image_data(
-                "ZYX", C=row.ChannelNumberStruct, S=0, T=0
-            )
+            str_img = reader.get_image_data("ZYX", C=row.ChannelNumberStruct, S=0, T=0)
 
             if random.random() < 0.2:
                 data_path = holdout_path

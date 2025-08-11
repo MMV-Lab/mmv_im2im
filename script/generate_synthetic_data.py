@@ -143,7 +143,7 @@ def generate_data(args):
                 px = randint(15, im.shape[-0] - 15)
                 im[py, px] = 1
             im = dilation(im > 0, disk(5)).astype(np.float32)
-            imsave(out_raw_fn, im) 
+            imsave(out_raw_fn, im)
             raw = gaussian_filter(im, 5)
             raw = random_noise(raw).astype(np.float32)
             # raw = random_noise(raw, mode="salt").astype(np.float32)
