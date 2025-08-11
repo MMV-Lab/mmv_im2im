@@ -16,6 +16,7 @@ from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla
 from skimage.io import imsave as save_rgb
 
+
 # from mmv_im2im.utils.piecewise_inference import predict_piecewise
 from monai.inferers import sliding_window_inference
 
@@ -48,6 +49,9 @@ class ProjectTester(object):
         self.cpu = False
         self.spatial_dims = -1
 
+        
+
+
     def setup_model(self):
         model_category = self.model_cfg.framework
         model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
@@ -60,21 +64,32 @@ class ProjectTester(object):
             and self.model_cfg.model_extra["cpu_only"]
         ):
             self.cpu = True
-            pre_train = torch.load(
-                self.model_cfg.checkpoint, map_location=torch.device("cpu")
+            checkpoint = torch.load(
+                self.model_cfg.checkpoint, map_location=torch.device("cpu"), weights_only=False
             )
         else:
-            pre_train = torch.load(self.model_cfg.checkpoint)
+            checkpoint = torch.load(self.model_cfg.checkpoint, weights_only=False)
 
-        # TODO: hacky solution to remove a wrongly registered key
-        pre_train["state_dict"].pop("criterion.xym", None)
-        pre_train["state_dict"].pop("criterion.xyzm", None)
-        self.model.load_state_dict(pre_train["state_dict"])
+
+        if isinstance(checkpoint, dict) and 'state_dict' in checkpoint:
+
+            pre_train = checkpoint
+            pre_train["state_dict"].pop("criterion.xym", None)
+            pre_train["state_dict"].pop("criterion.xyzm", None)
+            self.model.load_state_dict(pre_train["state_dict"], strict=False)
+        else:
+            
+            state_dict = checkpoint
+            state_dict.pop("criterion.xym", None)
+            state_dict.pop("criterion.xyzm", None)
+            self.model.load_state_dict(state_dict, strict=False)
 
         if not self.cpu:
             self.model.cuda()
 
         self.model.eval()
+
+
 
     def setup_data_processing(self):
         # determine spatial dimension from reader parameters

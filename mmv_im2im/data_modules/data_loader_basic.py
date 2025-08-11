@@ -22,7 +22,6 @@ from mmv_im2im.utils.misc import (
 import monai
 from monai.data import list_data_collate
 
-
 class Im2ImDataModule(pl.LightningDataModule):
     def __init__(self, data_cfg):
         super().__init__()
