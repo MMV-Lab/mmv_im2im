@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmv_im2im.utils.fractal_layers import Slice_windows, FractalDimension
+from mmv_im2im.utils.fractal_layers import FractalDimension
 from mmv_im2im.utils.topological_loss import TI_Loss
 from mmv_im2im.utils.connectivity_loss import ConnectivityCoherenceLoss
 from monai.losses import GeneralizedDiceFocalLoss

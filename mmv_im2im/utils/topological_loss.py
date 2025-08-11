@@ -88,8 +88,8 @@ class TI_Loss(torch.nn.Module):
                 )
             elif self.connectivity == 26:
                 np_kernel = np.ones((k, k, k))
-
-        self.kernel = torch_kernel = torch.from_numpy(
+                
+        self.kernel = torch.from_numpy(
             np.expand_dims(np.expand_dims(np_kernel, axis=0), axis=0)
         )
 
