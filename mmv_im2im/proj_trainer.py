@@ -49,8 +49,11 @@ class ProjectTrainer(object):
                 self.model = self.model.load_from_checkpoint(
                     self.model_cfg.model_extra["resume"]
                 )
+
             elif "pre-train" in self.model_cfg.model_extra:
-                pre_train = torch.load(self.model_cfg.model_extra["pre-train"])
+                pre_train = torch.load(
+                    self.model_cfg.model_extra["pre-train"], weights_only=False
+                )
 
                 if "extend" in self.model_cfg.model_extra:
                     if (
@@ -71,10 +74,10 @@ class ProjectTrainer(object):
                                 )
 
                         model_state.update(filtered_dict)
-                        self.model.load_state_dict(model_state)
+                        self.model.load_state_dict(model_state, strict=False)
                 else:
                     pre_train["state_dict"].pop("criterion.xym", None)
-                    self.model.load_state_dict(pre_train["state_dict"])
+                    self.model.load_state_dict(pre_train["state_dict"], strict=False)
 
         if self.train_cfg.callbacks is None:
             trainer = pl.Trainer(**self.train_cfg.params)
@@ -97,4 +100,3 @@ class ProjectTrainer(object):
 
         print("start training ... ")
         trainer.fit(model=self.model, datamodule=self.data)
-        

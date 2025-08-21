@@ -156,4 +156,3 @@ class Model(pl.LightningModule):
         )
 
         return loss
-        

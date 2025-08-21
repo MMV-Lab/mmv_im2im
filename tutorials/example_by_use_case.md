@@ -5,7 +5,7 @@ This page lists the jupyter notebooks (for downloading the data from public reso
 | Application | data preparation | training config | inference config |
 | :---: |  :---: |  :---: |  :---: |
 | 3D labelfree prediction  | [notebook](../paper_configs/prepare_data/labelfree_3d.ipynb) | [FCN](../paper_configs/labelfree_3d_FCN_train.yaml), [pix2pix_from_scratch](../paper_configs/labelfree_3d_pix2pix_train.yaml), [pix2pix_transfer_learning](../paper_configs/labelfree_3d_pix2pix_finetune.yaml) |  [FCN](../paper_configs/labelfree_3d_FCN_inference.yaml), [ix2pix](../paper_configs/labelfree_3d_pix2pix_inference.yaml)|
-| 2D labelfree prediction  | [notebook](../paper_configs/prepare_data/labelfree_2d.ipynb) | [FCN](../paper_configs/labelfree_2d_FCN_train.yaml |  [FCN](../paper_configs/labelfree_2d_FCN_inference.yaml) |
+| 2D labelfree prediction  | [notebook](../paper_configs/prepare_data/labelfree_2d.ipynb) | [FCN](../paper_configs/labelfree_2d_FCN_train.yaml) |  [FCN](../paper_configs/labelfree_2d_FCN_inference.yaml) |
 | 2D semantic segmentation | [notebook](../paper_configs/prepare_data/semantic_seg_2d.ipynb) | [FCN](../paper_configs/semantic_seg_2d_train.yaml) |  [FCN](../paper_configs/semantic_seg_2d_inference.yaml) |
 | 3D semantic segmentation | [notebook](../paper_configs/prepare_data/semantic_seg_3d.ipynb) | [FCN](../paper_configs/semantic_seg_3d_train.yaml) |  [FCN](../paper_configs/semantic_seg_3d_inference.yaml) |
 | 2D instance segmentation | [notebook](../paper_configs/prepare_data/instance_seg_2d.ipynb) | [EmbedSeg](../paper_configs/instance_seg_2d_train.yaml) |  [Embedseg](../paper_configs/instance_seg_2d_inference.yaml) |
