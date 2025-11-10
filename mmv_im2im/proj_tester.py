@@ -15,10 +15,10 @@ import torch
 from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla
 from skimage.io import imsave as save_rgb
-
-
-# from mmv_im2im.utils.piecewise_inference import predict_piecewise
+import bioio_tifffile
+from tqdm import tqdm
 from monai.inferers import sliding_window_inference
+
 
 # https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction_guide.html#predicting
 ###############################################################################
@@ -106,9 +106,9 @@ class ProjectTester(object):
         if isinstance(img, DaskArray):
             # Perform the prediction
             x = img.compute()
+
         elif isinstance(img, NumpyArray):
             x = img
-
         else:
             raise ValueError("invalid image")
 
@@ -243,19 +243,16 @@ class ProjectTester(object):
                 raise ValueError("error in prediction output shape")
 
     def run_inference(self):
+
         self.setup_model()
         self.setup_data_processing()
         # set up data filenames
         dataset_list = generate_test_dataset_dict(
             self.data_cfg.inference_input.dir, self.data_cfg.inference_input.data_type
         )
-        dataset_length = len(dataset_list)
 
         # loop through all images and apply the model
-        for i, ds in enumerate(dataset_list):
-
-            # Read the image
-            print(f"Reading the image {i}/{dataset_length}")
+        for ds in tqdm(dataset_list, desc="Predicting images"):
 
             # output file name info
             fn_core = Path(ds).stem
@@ -275,15 +272,35 @@ class ProjectTester(object):
                 print(f"making a temp folder at {tmppath}")
 
                 # get the number of time points
-                reader = BioImage(ds)
+                try:
+                    reader = BioImage(ds, reader=bioio_tifffile.Reader)
+                except Exception:
+                    try:
+                        reader = BioImage(ds)
+                    except Exception as e:
+                        print(f"Error: {e}")
+                        print(f"Image {ds} failed at read process check the format.")
+
                 timelapse_data = reader.dims.T
 
                 tmpfile_list = []
-                for t_idx in range(timelapse_data):
-                    img = BioImage(ds).get_image_data(
-                        T=[t_idx], **self.data_cfg.inference_input.reader_params
-                    )
-                    print(f"Predicting the image timepoint {t_idx}")
+                for t_idx in tqdm(
+                    range(timelapse_data), desc="Predicting image timepoint"
+                ):
+                    try:
+                        img = BioImage(ds, reader=bioio_tifffile.Reader).get_image_data(
+                            T=[t_idx], **self.data_cfg.inference_input.reader_params
+                        )
+                    except Exception:
+                        try:
+                            img = BioImage(ds).get_image_data(
+                                T=[t_idx], **self.data_cfg.inference_input.reader_params
+                            )
+                        except Exception as e:
+                            print(f"Error: {e}")
+                            print(
+                                f"Image {ds} failed at read process check the format."
+                            )
 
                     # prepare output filename
                     out_fn = Path(tmppath) / f"{fn_core}_{t_idx}.npy"
@@ -330,9 +347,18 @@ class ProjectTester(object):
                 # clean up temporary dir
                 shutil.rmtree(tmppath)
             else:
-                img = BioImage(ds).get_image_data(
-                    **self.data_cfg.inference_input.reader_params
-                )
+                try:
+                    img = BioImage(ds, reader=bioio_tifffile.Reader).get_image_data(
+                        **self.data_cfg.inference_input.reader_params
+                    )
+                except Exception:
+                    try:
+                        img = BioImage(ds).get_image_data(
+                            **self.data_cfg.inference_input.reader_params
+                        )
+                    except Exception as e:
+                        print(f"Error: {e}")
+                        print(f"Image {ds} failed at read process check the format.")
 
                 # prepare output filename
                 if "." in suffix:
@@ -356,5 +382,4 @@ class ProjectTester(object):
                         / f"{fn_core}{suffix}.tiff"
                     )
 
-                print("Predicting the image")
                 self.process_one_image(img, out_fn)

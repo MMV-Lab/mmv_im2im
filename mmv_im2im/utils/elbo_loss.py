@@ -5,6 +5,7 @@ from mmv_im2im.utils.fractal_layers import FractalDimension
 from mmv_im2im.utils.topological_loss import TI_Loss
 from mmv_im2im.utils.connectivity_loss import ConnectivityCoherenceLoss
 from monai.losses import GeneralizedDiceFocalLoss
+from monai.metrics import HausdorffDistanceMetric
 
 
 class KLDivergence(nn.Module):
@@ -73,6 +74,10 @@ class ELBOLoss(nn.Module):
         use_gdl_focal_regularization (bool): If True, Includes Generalized Dice Focal (GDF) regularization.
         gdl_focal_weight (float): Weighting factor for GDF.
         gdl_class_weights (list):  Weights for each class.
+        use_hausdorff_regularization (bool): Enable or disable  Hausdorff regularization
+        hausdorff_weight (float): Weighting factor for the Hausdorff loss term.
+        hausdorff_ignore_background (bool): If True, ignore background for Hausdorff loss.
+        task (str): The task type, either "segment" for segmentation or "regression" for regression.
     """
 
     def __init__(
@@ -100,11 +105,16 @@ class ELBOLoss(nn.Module):
         gdl_focal_weight: float = 1.0,
         elbo_class_weights: list = None,
         gdl_class_weights: list = None,
+        use_hausdorff_regularization: bool = False,
+        hausdorff_weight: float = 0.1,
+        hausdorff_ignore_background: bool = True,
+        task: str = "segment",
     ):
         super().__init__()
         self.beta = beta
         self.n_classes = n_classes
         self.kl_clamp = kl_clamp
+        self.task = task
         self.kl_divergence_calculator = KLDivergence()
 
         self.use_fractal_regularization = use_fractal_regularization
@@ -135,7 +145,6 @@ class ELBOLoss(nn.Module):
         else:
             self.topological_weight = 0.0
 
-        # New Connectivity Regularization
         self.use_connectivity_regularization = use_connectivity_regularization
         if self.use_connectivity_regularization:
             self.connectivity_weight = connectivity_weight
@@ -161,7 +170,16 @@ class ELBOLoss(nn.Module):
         else:
             self.gdl_focal_weight = 0.0
 
-        # Convert class_weights list to a torch.Tensor
+        self.use_hausdorff_regularization = use_hausdorff_regularization
+        if self.use_hausdorff_regularization:
+            self.hausdorff_weight = hausdorff_weight
+            self.hausdorff_distance_calculator = HausdorffDistanceMetric(
+                include_background=not hausdorff_ignore_background,
+                reduction="mean",
+            )
+        else:
+            self.hausdorff_weight = 0.0
+
         if elbo_class_weights is not None:
             self.elbo_class_weights = torch.tensor(
                 elbo_class_weights, dtype=torch.float32
@@ -187,27 +205,47 @@ class ELBOLoss(nn.Module):
         Returns:
             torch.Tensor: The calculated ELBO loss.
         """
-        # Ensure y_true has correct dimensions (e.g., [B, H, W]) for cross_entropy
-        if y_true.ndim == 4 and y_true.shape[1] == 1:
-            y_true_squeezed = y_true.squeeze(1)  # Squeeze channel dim to [B, H, W]
-        else:
-            y_true_squeezed = y_true
 
-        # Negative Cross-Entropy (Log-Likelihood)
-        if (
-            self.elbo_class_weights is not None
-            and self.elbo_class_weights.device != logits.device
-        ):
-            elbo_class_weights_on_device = self.elbo_class_weights.to(logits.device)
-        else:
-            elbo_class_weights_on_device = self.elbo_class_weights
+        if self.task == "segment":
 
-        log_likelihood = -F.cross_entropy(
-            logits,
-            y_true_squeezed.long(),
-            reduction="mean",
-            weight=elbo_class_weights_on_device,
-        )
+            if y_true.shape[1] == 1:
+                y_true_squeezed = y_true.squeeze(1)
+            else:
+                y_true_squeezed = y_true
+
+            if (
+                self.elbo_class_weights is not None
+                and self.elbo_class_weights.device != logits.device
+            ):
+                elbo_class_weights_on_device = self.elbo_class_weights.to(logits.device)
+            else:
+                elbo_class_weights_on_device = self.elbo_class_weights
+
+            log_likelihood = -F.cross_entropy(
+                logits,
+                y_true_squeezed.long(),
+                reduction="mean",
+                weight=elbo_class_weights_on_device,
+            )
+
+        elif self.task == "regression":
+            # log_likelihood = -F.mse_loss(
+            #     logits,
+            #     y_true,
+            #     reduction="mean",
+            # )
+            # log_likelihood = -F.mae_loss(
+            #     logits,
+            #     y_true,
+            #     reduction="mean",
+            # )
+            log_likelihood = -F.huber_loss(
+                logits,
+                y_true,
+                reduction="mean",
+            )
+        else:
+            raise ValueError(f"Unknown task type: {self.task}")
 
         # KL-Divergence
         kl_div = self.kl_divergence_calculator(
@@ -218,61 +256,93 @@ class ELBOLoss(nn.Module):
 
         total_loss = elbo_loss
 
-        if self.use_fractal_regularization:
-            y_pred_mask = F.softmax(logits, dim=1).argmax(dim=1, keepdim=True).float()
+        if self.task == "segment":
+            if self.use_fractal_regularization:
+                y_pred_mask = (
+                    F.softmax(logits, dim=1).argmax(dim=1, keepdim=True).float()
+                )
 
-            if y_true_squeezed.ndim == 3:
-                y_true_for_fractal = y_true_squeezed.unsqueeze(1).float()
-            else:
-                y_true_for_fractal = y_true.float()
+                if y_true.ndim == 4 and y_true.shape[1] == 1:
+                    y_true_for_fractal = y_true.float()
+                else:
+                    y_true_for_fractal = y_true.unsqueeze(1).float()
 
-            fd_true = self.fractal_dimension_calculator(y_true_for_fractal)
-            fd_pred = self.fractal_dimension_calculator(y_pred_mask)
+                fd_true = self.fractal_dimension_calculator(y_true_for_fractal)
+                fd_pred = self.fractal_dimension_calculator(y_pred_mask)
 
-            fractal_loss = torch.mean(torch.abs(fd_true - fd_pred))
-            total_loss += self.fractal_weight * fractal_loss
+                fractal_loss = torch.mean(torch.abs(fd_true - fd_pred))
+                total_loss += self.fractal_weight * fractal_loss
 
-        if self.use_topological_regularization:
-            # y_true needs to be B, C, H, W or B, C, H, W, D for TI_Loss, where C=1
-            # If y_true is B, H, W, unsqueeze to B, 1, H, W
-            if y_true_squeezed.ndim == 3:
-                y_true_for_topological = y_true_squeezed.unsqueeze(1).float()
-            else:
-                y_true_for_topological = (
-                    y_true.float()
-                )  # This should already be B, 1, H, W
+            if self.use_topological_regularization:
+                # y_true needs to be B, C, H, W or B, C, H, W, D for TI_Loss, where C=1
+                # If y_true is B, H, W, unsqueeze to B, 1, H, W
+                if y_true.ndim == 3:
+                    y_true_for_topological = y_true.unsqueeze(1).float()
+                else:
+                    y_true_for_topological = y_true.float()
 
-            # logits are B, C, H, W (or B, C, H, W, D), which is what TI_Loss expects for x
-            topological_loss = self.topological_loss_calculator(
-                logits, y_true_for_topological
-            )
-            total_loss += self.topological_weight * topological_loss
+                # logits are B, C, H, W (or B, C, H, W, D), which is what TI_Loss expects for x
+                topological_loss = self.topological_loss_calculator(
+                    logits, y_true_for_topological
+                )
+                total_loss += self.topological_weight * topological_loss
 
-        if self.use_connectivity_regularization:
-            # y_pred_softmax: (B, C, H, W)
-            y_pred_softmax = F.softmax(logits, dim=1)
+            if self.use_connectivity_regularization:
+                # y_pred_softmax: (B, C, H, W)
+                y_pred_softmax = F.softmax(logits, dim=1)
 
-            # y_true_one_hot: Need to convert y_true_squeezed (B, H, W) to one-hot (B, C, H, W)
-            # Ensure the number of classes matches n_classes used in ELBOLoss
-            y_true_one_hot = (
-                F.one_hot(y_true_squeezed.long(), num_classes=self.n_classes)
-                .permute(0, 3, 1, 2)
-                .float()
-            )
+                # y_true_one_hot: Need to convert y_true_squeezed (B, H, W) to one-hot (B, C, H, W)
+                y_true_one_hot = (
+                    F.one_hot(y_true_squeezed.long(), num_classes=self.n_classes)
+                    .permute(0, 3, 1, 2)
+                    .float()
+                )
 
-            connectivity_loss = self.connectivity_coherence_calculator(
-                y_pred_softmax, y_true_one_hot
-            )
-            total_loss += self.connectivity_weight * connectivity_loss
+                connectivity_loss = self.connectivity_coherence_calculator(
+                    y_pred_softmax, y_true_one_hot
+                )
+                total_loss += self.connectivity_weight * connectivity_loss
 
-        if self.use_gdl_focal_regularization:
-            # logits: (B, C, H, W)
-            # y_true: (B, H, W) o (B, 1, H, W)
-            # GeneralizedDiceFocalLoss de MONAI puede manejar esto directamente
-            y_true_for_gdl_focal = y_true_squeezed.unsqueeze(1).long()
-            gdl_focal_loss = self.gdl_focal_loss_calculator(
-                logits, y_true_for_gdl_focal
-            )
-            total_loss += self.gdl_focal_weight * gdl_focal_loss
+            if self.use_gdl_focal_regularization:
+                # logits: (B, C, H, W)
+                # y_true: (B, H, W) o (B, 1, H, W)
+                y_true_for_gdl_focal = y_true_squeezed.unsqueeze(1).long()
+                gdl_focal_loss = self.gdl_focal_loss_calculator(
+                    logits, y_true_for_gdl_focal
+                )
+                total_loss += self.gdl_focal_weight * gdl_focal_loss
+
+            if self.use_hausdorff_regularization:
+                # Get the one-hot encoded ground truth
+                # Squeeze y_true to (B, H, W) if it's (B, 1, H, W)
+                if y_true.ndim == 4 and y_true.shape[1] == 1:
+                    y_true_squeezed = y_true.squeeze(1)
+                else:
+                    y_true_squeezed = y_true
+
+                # Calculate the Hausdorff distance
+                # The metric returns a tensor of shape (B, C), so we take the mean
+                try:
+                    # Convert ground truth to one-hot format (B, C, H, W)
+                    y_true_one_hot = F.one_hot(
+                        y_true_squeezed.long(), num_classes=self.n_classes
+                    ).permute(0, 3, 1, 2)
+
+                    # Get the one-hot encoded prediction from logits
+                    y_pred_one_hot = F.one_hot(
+                        logits.argmax(dim=1), num_classes=self.n_classes
+                    ).permute(0, 3, 1, 2)
+
+                    # Calculate the Hausdorff distance
+                    # The metric returns a tensor of shape (B, C), so we take the mean
+                    hausdorff_loss = self.hausdorff_distance_calculator(
+                        y_pred=y_pred_one_hot, y_true=y_true_one_hot
+                    ).mean()
+
+                    # Add the Hausdorff loss to the total loss
+                    total_loss += self.hausdorff_weight * hausdorff_loss
+                except Exception:
+                    # Avoid troubles with some tensor that become None douring the hausdorff computation
+                    pass
 
         return total_loss

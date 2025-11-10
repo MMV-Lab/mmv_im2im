@@ -1,4 +1,3 @@
-# Save this as ProbUnet.py (or mmv_im2im/models/ProbUnet.py if that's its actual path)
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -13,17 +12,17 @@ def get_valid_num_groups(channels):
 
 
 class ConvBlock(nn.Module):
-    """Standard 2D Convolutional Block."""
+    """Standard 2D/3D Convolutional Block."""
 
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels, out_channels, Conv, GroupNorm):
         super().__init__()
         gn_groups1 = get_valid_num_groups(out_channels)
         gn_groups2 = get_valid_num_groups(out_channels)
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1)
-        self.gn1 = nn.GroupNorm(gn_groups1, out_channels)
+        self.conv1 = Conv(in_channels, out_channels, kernel_size=3, padding=1)
+        self.gn1 = GroupNorm(gn_groups1, out_channels)
         self.relu1 = nn.ReLU(inplace=True)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1)
-        self.gn2 = nn.GroupNorm(gn_groups2, out_channels)
+        self.conv2 = Conv(out_channels, out_channels, kernel_size=3, padding=1)
+        self.gn2 = GroupNorm(gn_groups2, out_channels)
         self.relu2 = nn.ReLU(inplace=True)
 
     def forward(self, x):
@@ -35,10 +34,10 @@ class ConvBlock(nn.Module):
 class Down(nn.Module):
     """Downsampling block (MaxPool + ConvBlock)."""
 
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels, out_channels, MaxPool, ConvBlock, Conv, GroupNorm):
         super().__init__()
-        self.pool = nn.MaxPool2d(2)
-        self.conv_block = ConvBlock(in_channels, out_channels)
+        self.pool = MaxPool(2)
+        self.conv_block = ConvBlock(in_channels, out_channels, Conv, GroupNorm)
 
     def forward(self, x):
         x = self.pool(x)
@@ -51,7 +50,7 @@ class Up(nn.Module):
 
     Args:
         in_channels_x1_before_upsample (int): Number of channels of the feature map (x1)
-                                                before being upsampled by ConvTranspose2d.
+                                                before being upsampled by ConvTranspose.
         in_channels_x2_skip_connection (int): Number of channels of the skip connection (x2).
         out_channels (int): Number of output channels for the final ConvBlock in this Up stage.
     """
@@ -61,10 +60,15 @@ class Up(nn.Module):
         in_channels_x1_before_upsample,
         in_channels_x2_skip_connection,
         out_channels,
+        ConvTranspose,
+        ConvBlock,
+        Conv,
+        GroupNorm,
+        interpolation_mode,
     ):
         super().__init__()
-
-        self.up = nn.ConvTranspose2d(
+        self.interpolation_mode = interpolation_mode
+        self.up = ConvTranspose(
             in_channels_x1_before_upsample,
             in_channels_x1_before_upsample // 2,
             kernel_size=2,
@@ -74,14 +78,24 @@ class Up(nn.Module):
         channels_for_conv_block = (
             in_channels_x1_before_upsample // 2
         ) + in_channels_x2_skip_connection
-        self.conv_block = ConvBlock(channels_for_conv_block, out_channels)
+        self.conv_block = ConvBlock(
+            channels_for_conv_block, out_channels, Conv, GroupNorm
+        )
 
     def forward(self, x1, x2):
         x1 = self.up(x1)
-        # Adjust dimensions if there's a mismatch due to padding or odd sizes
-        diffY = x2.size()[2] - x1.size()[2]
-        diffX = x2.size()[3] - x1.size()[3]
-        x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2, diffY // 2, diffY - diffY // 2])
+
+        # Get the spatial size of the skip connection tensor
+        spatial_size_x2 = x2.size()[2:]
+
+        if x1.size()[2:] != spatial_size_x2:
+            x1 = F.interpolate(
+                x1,
+                size=spatial_size_x2,
+                mode=self.interpolation_mode,
+                align_corners=False,
+            )
+
         x = torch.cat([x2, x1], dim=1)
         return self.conv_block(x)
 
@@ -89,96 +103,140 @@ class Up(nn.Module):
 class PriorNet(nn.Module):
     """Network to predict prior distribution (mu, logvar)."""
 
-    def __init__(self, in_channels, latent_dim):
+    def __init__(self, in_channels, latent_dim, Conv):
         super().__init__()
-        self.conv = nn.Conv2d(in_channels, 2 * latent_dim, kernel_size=1)
+        self.conv = Conv(in_channels, 2 * latent_dim, kernel_size=1)
 
     def forward(self, x):
         mu_logvar = self.conv(x)
-        mu = mu_logvar[:, : self.conv.out_channels // 2, :, :]
-        logvar = mu_logvar[:, self.conv.out_channels // 2 :, :, :]
+        mu = mu_logvar[:, : self.conv.out_channels // 2, ...]
+        logvar = mu_logvar[:, self.conv.out_channels // 2 :, ...]
         return mu, logvar
 
 
 class PosteriorNet(nn.Module):
     """Network to predict posterior distribution (mu, logvar)."""
 
-    def __init__(self, in_channels, latent_dim):
+    def __init__(self, in_channels, latent_dim, Conv):
         super().__init__()
-        self.conv = nn.Conv2d(in_channels, 2 * latent_dim, kernel_size=1)
+        self.conv = Conv(in_channels, 2 * latent_dim, kernel_size=1)
 
     def forward(self, x):
         mu_logvar = self.conv(x)
-        mu = mu_logvar[:, : self.conv.out_channels // 2, :, :]
-        logvar = mu_logvar[:, self.conv.out_channels // 2 :, :, :]
+        mu = mu_logvar[:, : self.conv.out_channels // 2, ...]
+        logvar = mu_logvar[:, self.conv.out_channels // 2 :, ...]
         return mu, logvar
 
 
 class ProbabilisticUNet(nn.Module):
-    """Probabilistic UNet model."""
+    """Probabilistic UNet model.
+
+    This model can operate in 2D or 3D based on the 'model_type' parameter.
+    """
 
     def __init__(
-        self, in_channels, n_classes, latent_dim=6, **kwargs
-    ):  # Added **kwargs to capture extra params
+        self,
+        in_channels,
+        n_classes,
+        latent_dim=6,
+        task="segment",
+        model_type="2D",
+        **kwargs,
+    ):
         super().__init__()
         self.in_channels = in_channels
         self.n_classes = n_classes
         self.latent_dim = latent_dim
-        # self.beta is no longer needed here as it's handled by the loss function
+        self.task = task
+        self.model_type = model_type
+
+        # Select the appropriate layers based on model_type
+        if model_type == "2D":
+            self.Conv = nn.Conv2d
+            self.MaxPool = nn.MaxPool2d
+            self.ConvTranspose = nn.ConvTranspose2d
+            self.GroupNorm = nn.GroupNorm
+            self.interpolation_mode = "bilinear"
+        elif model_type == "3D":
+            self.Conv = nn.Conv3d
+            self.MaxPool = nn.MaxPool3d
+            self.ConvTranspose = nn.ConvTranspose3d
+            self.GroupNorm = nn.GroupNorm
+            self.interpolation_mode = "trilinear"
+        else:
+            raise ValueError(f"Unknown model_type: {model_type}")
 
         # Encoder path (U-Net)
-        self.inc = ConvBlock(in_channels, 32)
-        self.down1 = Down(32, 64)
-        self.down2 = Down(64, 128)
-        self.down3 = Down(128, 256)
-        self.down4 = Down(256, 512)  # Bottleneck features
+        self.inc = ConvBlock(in_channels, 32, self.Conv, self.GroupNorm)
+        self.down1 = Down(32, 64, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
+        self.down2 = Down(64, 128, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
+        self.down3 = Down(128, 256, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
+        self.down4 = Down(256, 512, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
 
         # Prior and Posterior Networks
-        self.prior_net = PriorNet(512, latent_dim)
-        # PosteriorNet input channels: 512 (features) + n_classes (one-hot y)
-        self.posterior_net = PosteriorNet(512 + n_classes, latent_dim)
+        self.prior_net = PriorNet(512, latent_dim, self.Conv)
+        # PosteriorNet input channels: 512 (features) + n_classes (one-hot y or float y)
+        self.posterior_net = PosteriorNet(512 + n_classes, latent_dim, self.Conv)
 
         # Decoder Path (U-Net upsampling path)
-        # Input channels for Up blocks adjusted to include latent_dim
         self.up1 = Up(
             in_channels_x1_before_upsample=512 + latent_dim,
             in_channels_x2_skip_connection=256,
             out_channels=256,
+            ConvTranspose=self.ConvTranspose,
+            ConvBlock=ConvBlock,
+            Conv=self.Conv,
+            GroupNorm=self.GroupNorm,
+            interpolation_mode=self.interpolation_mode,
         )
 
         self.up2 = Up(
             in_channels_x1_before_upsample=256,
             in_channels_x2_skip_connection=128,
             out_channels=128,
+            ConvTranspose=self.ConvTranspose,
+            ConvBlock=ConvBlock,
+            Conv=self.Conv,
+            GroupNorm=self.GroupNorm,
+            interpolation_mode=self.interpolation_mode,
         )
 
         self.up3 = Up(
             in_channels_x1_before_upsample=128,
             in_channels_x2_skip_connection=64,
             out_channels=64,
+            ConvTranspose=self.ConvTranspose,
+            ConvBlock=ConvBlock,
+            Conv=self.Conv,
+            GroupNorm=self.GroupNorm,
+            interpolation_mode=self.interpolation_mode,
         )
 
         self.up4 = Up(
             in_channels_x1_before_upsample=64,
             in_channels_x2_skip_connection=32,
             out_channels=32,
+            ConvTranspose=self.ConvTranspose,
+            ConvBlock=ConvBlock,
+            Conv=self.Conv,
+            GroupNorm=self.GroupNorm,
+            interpolation_mode=self.interpolation_mode,
         )
 
-        self.outc = nn.Conv2d(32, n_classes, kernel_size=1)
+        self.outc = self.Conv(32, n_classes, kernel_size=1)
 
     def forward(self, x, y=None):
         """
         Forward pass of the Probabilistic UNet.
 
         Args:
-            x (torch.Tensor): Input image tensor (B, C, H, W).
-            y (torch.Tensor, optional): Ground truth segmentation mask (B, 1, H, W or B, H, W)
-                                         used for training to calculate posterior.
-                                         Defaults to None (for inference).
+            x (torch.Tensor): Input image tensor (B, C, H, W) for 2D or (B, C, D, H, W) for 3D.
+            y (torch.Tensor, optional): Ground truth segmentation mask used for training to
+                                         calculate posterior. Defaults to None (for inference).
 
         Returns:
             tuple: A tuple containing:
-                - logits (torch.Tensor): Output logits of the UNet (B, n_classes, H, W).
+                - logits (torch.Tensor): Output logits of the UNet.
                 - prior_mu (torch.Tensor): Mean of the prior distribution.
                 - prior_logvar (torch.Tensor): Log-variance of the prior distribution.
                 - post_mu (torch.Tensor or None): Mean of the posterior distribution (None if y is None).
@@ -197,21 +255,28 @@ class ProbabilisticUNet(nn.Module):
         # Posterior calculation and latent variable sampling
         post_mu, post_logvar = None, None
         if y is not None:
-            # Ensure y is one-hot encoded and downsampled to match features spatial dimensions.
-            # y typically comes as [B, 1, H, W] with integer class labels.
-            # Convert to [B, n_classes, H, W] for one-hot, then permute for channel dim.
-            y_one_hot = (
-                F.one_hot(y.long().squeeze(1), num_classes=self.n_classes)
-                .permute(0, 3, 1, 2)
-                .float()
-            )
+            if self.task == "segment":
+                # Ensure y is one-hot encoded and downsampled
+                y_one_hot = F.one_hot(y.long().squeeze(1), num_classes=self.n_classes)
+                y_one_hot = y_one_hot.permute(
+                    0, -1, *range(1, y_one_hot.dim() - 1)
+                ).float()
 
-            # Downsample y_one_hot to match features' spatial dimensions
-            y_downsampled = F.interpolate(
-                y_one_hot, size=features.shape[2:], mode="nearest"
-            )
+                y_downsampled = F.interpolate(
+                    y_one_hot, size=features.shape[2:], mode="nearest"
+                )
+            elif self.task == "regression":
+                # For regression, y is already a float tensor, just downsample
+                y_downsampled = F.interpolate(
+                    y,
+                    size=features.shape[2:],
+                    mode=self.interpolation_mode,
+                    align_corners=False,
+                )
+            else:
+                raise ValueError(f"Unknown task type: {self.task}")
 
-            # Concatenate features and downsampled one-hot y for posterior network
+            # Concatenate features and downsampled y for posterior network
             post_mu, post_logvar = self.posterior_net(
                 torch.cat([features, y_downsampled], dim=1)
             )
@@ -227,17 +292,16 @@ class ProbabilisticUNet(nn.Module):
             z = prior_mu + eps * std_prior
 
         # Expand 'z' to spatial dimensions for concatenation
+        spatial_dims = features.size()[2:]
         if z.dim() == 2:  # [B, latent_dim]
-            z_expanded = (
-                z.unsqueeze(-1)
-                .unsqueeze(-1)
-                .repeat(1, 1, features.size(2), features.size(3))
-            )
-        elif z.dim() == 4:  # [B, latent_dim, H, W]
-            if z.size(2) != features.size(2) or z.size(3) != features.size(3):
-                z_expanded = F.interpolate(
-                    z, size=(features.size(2), features.size(3)), mode="nearest"
-                )
+            # Expands latent vector to spatial dimensions
+            z_expanded = z.unsqueeze(-1)
+            for _ in range(len(spatial_dims) - 1):
+                z_expanded = z_expanded.unsqueeze(-1)
+            z_expanded = z_expanded.repeat(1, 1, *spatial_dims)
+        elif z.dim() == 2 + len(spatial_dims):
+            if z.size()[2:] != spatial_dims:
+                z_expanded = F.interpolate(z, size=spatial_dims, mode="nearest")
             else:
                 z_expanded = z
         else:
