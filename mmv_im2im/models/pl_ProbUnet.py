@@ -136,22 +136,32 @@ class Model(pl.LightningModule):
     def log_images(self, batch, y_hat, stage):
         src = batch["IM"]
         tar = batch["GT"]
+        task = self.model_info.net["params"].get("task", "segment")
 
         save_path = Path(self.trainer.log_dir)
         save_path.mkdir(parents=True, exist_ok=True)
 
-        act = torch.nn.Softmax(dim=1)
-        yhat_act = act(y_hat)
+        if task == "segment":
+            act = torch.nn.Softmax(dim=1)
+            yhat_act = act(y_hat)
+            prd_out = np.squeeze(
+                yhat_act[0].detach().cpu().numpy().argmax(axis=0)
+            ).astype(float)
+            tar_out = np.squeeze(tar[0].detach().cpu().numpy()).astype(float)
 
-        src_out = np.squeeze(src[0].detach().cpu().numpy()).astype(float)
-        tar_out = np.squeeze(tar[0].detach().cpu().numpy()).astype(float)
-        prd_out = np.squeeze(yhat_act[0].detach().cpu().numpy()).astype(float)
+        elif task == "regression":
+            prd_out = np.squeeze(y_hat[0].detach().cpu().numpy()).astype(float)
+            tar_out = np.squeeze(tar[0].detach().cpu().numpy()).astype(float)
+        else:
+            raise ValueError(f"Unknown task type for logging: {task}")
 
         def get_dim_order(arr):
             dims = len(arr.shape)
-            return {2: "YX", 3: "ZYX", 4: "CZYX"}.get(dims, "YX")
+            return {2: "YX", 3: "CYX"}.get(dims, "YX")
 
         rand_tag = randint(1, 1000)
+
+        src_out = np.squeeze(src[0].detach().cpu().numpy()).astype(float)
 
         out_fn = save_path / f"epoch_{self.current_epoch}_{stage}_src_{rand_tag}.tiff"
         OmeTiffWriter.save(src_out, out_fn, dim_order=get_dim_order(src_out))

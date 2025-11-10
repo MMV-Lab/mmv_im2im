@@ -13,7 +13,9 @@ from pathlib import Path
 
 # import torch
 
+
 from mmv_im2im import ProjectTester, ProjectTrainer
+from mmv_im2im.map_extractor import MapExtractor
 from mmv_im2im.configs.config_base import (
     ProgramConfig,
     parse_adaptor,
@@ -32,6 +34,7 @@ logging.basicConfig(
 ###############################################################################
 TRAIN_MODE = "train"
 INFER_MODE = "inference"
+MAP_MODE = "uncertainty_map"
 
 ###############################################################################
 
@@ -69,6 +72,9 @@ def main():
                 exe.run_training()
         elif cfg.mode.lower() == INFER_MODE:
             exe = ProjectTester(cfg)
+            exe.run_inference()
+        elif cfg.mode.lower() == MAP_MODE:
+            exe = MapExtractor(cfg)
             exe.run_inference()
         else:
             log.error(f"Mode {cfg.mode} is not supported yet")

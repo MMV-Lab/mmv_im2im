@@ -10,6 +10,7 @@ from monai.data import ImageReader
 from monai.utils import ensure_tuple, require_pkg
 from monai.config import PathLike
 from monai.data.image_reader import _stack_images
+import bioio_tifffile
 
 
 @require_pkg(pkg_name="bioio")
@@ -22,7 +23,15 @@ class monai_bio_reader(ImageReader):
         filenames: Sequence[PathLike] = ensure_tuple(data)
         img_ = []
         for name in filenames:
-            img_.append(BioImage(f"{name}"))
+            try:
+                img_.append(BioImage(f"{name}", reader=bioio_tifffile.Reader))
+
+            except Exception:
+                try:
+                    img_.append(BioImage(f"{name}"))
+                except Exception as e:
+                    print(f"Error: {e}")
+                    print(f"Image {name} failed at read process check the format.")
 
         return img_ if len(filenames) > 1 else img_[0]
 
