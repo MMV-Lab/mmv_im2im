@@ -6,7 +6,7 @@ __author__ = "Jianxu Chen"
 __email__ = "jianxuchen.ai@gmail.com"
 # Do not edit this string manually, always use bumpversion
 # Details in CONTRIBUTING.md
-__version__ = "0.6.1"
+__version__ = "0.5.7"
 
 
 def get_module_version():
