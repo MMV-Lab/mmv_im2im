@@ -186,9 +186,10 @@ class DataloaderModuleConfig:
     # the parameters to be passed in when making the dataset (e.g. PersistentDataset)
     # find full API in the corresponding Dataset function
     # e.g. https://docs.monai.io/en/stable/data.html#persistentdataset
-    dataset_params: Dict = field(
-        default={"cache_dir": "./tmp", "pickle_protocol": 5}, is_mutable=True
-    )
+    # dataset_params: Dict = field(
+    #     default={"cache_dir": "./tmp", "pickle_protocol": 5}, is_mutable=True
+    # )
+    dataset_params: Dict = field(default_factory=dict, is_mutable=True)
 
     # the parameters to be passed in when making the DataLoader
     # find full API here:
@@ -313,6 +314,9 @@ class ModelConfig:
 class TrainerConfig:
     """Config for how to run the training"""
 
+    # strategy used  example ddp, ddp_find_unused_parameters_true
+    strategy: str = field(default=None)
+
     # whether to save sample outputs at the beginning of each epoch
     verbose: bool = field(default=False)
 
@@ -382,25 +386,32 @@ def configuration_validation(cfg):
 
     # check 5, if a global GPU number is set, update the value in trainer
     if cfg.trainer.gpus is not None:
-        cfg.trainer.params["gpus"] = cfg.trainer.gpu
+        cfg.trainer.params["devices"] = cfg.trainer.gpus
+        cfg.trainer.params["accelerator"] = "gpu"
 
     # check 5, if PersistentDataset is used, make sure add a tmpdir in subdirectory
     # (otherwise may cause hash errors)
     if cfg.mode == "train":
-        if (
+        is_train_persistent = (
             cfg.data.dataloader.train.dataloader_type["func_name"]
             == "PersistentDataset"
-        ):
-            assert (
-                cfg.data.dataloader.val.dataloader_type["func_name"]
-                == "PersistentDataset"
-            ), "currently, train and val can only use persisten loader together"
+        )
+        is_val_persistent = (
+            cfg.data.dataloader.val.dataloader_type["func_name"] == "PersistentDataset"
+        )
 
-        if cfg.data.dataloader.val.dataloader_type["func_name"] == "PersistentDataset":
+        if is_train_persistent or is_val_persistent:
+
             assert (
-                cfg.data.dataloader.train.dataloader_type["func_name"]
-                == "PersistentDataset"
-            ), "currently, train and val can only use persisten loader together"
+                is_train_persistent and is_val_persistent
+            ), "currently, train and val can only use persisten loader together."
+
+            for loader_cfg in [cfg.data.dataloader.train, cfg.data.dataloader.val]:
+                if "cache_dir" not in loader_cfg.dataset_params:
+                    loader_cfg.dataset_params["cache_dir"] = "./tmp_cache"
+                if "pickle_protocol" not in loader_cfg.dataset_params:
+                    loader_cfg.dataset_params["pickle_protocol"] = 5
+
             if (
                 cfg.data.dataloader.train.dataset_params["cache_dir"]
                 != cfg.data.dataloader.val.dataset_params["cache_dir"]

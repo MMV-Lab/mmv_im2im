@@ -46,10 +46,12 @@ dependencies = [
     "tifffile",      
     "ome-types",     
     "imageio", 
-    "zarr", 
+    "zarr",
+    "torch_topological", 
 ]
 
 [project.optional-dependencies]
+
 advanced = [
     "tensorboard",
 ]

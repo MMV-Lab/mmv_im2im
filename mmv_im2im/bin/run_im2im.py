@@ -5,6 +5,7 @@
 This sample script will get deployed in the bin directory of the
 users' virtualenv when the parent module is installed using pip.
 """
+
 import logging
 import sys
 import traceback
@@ -21,7 +22,6 @@ from mmv_im2im.configs.config_base import (
     parse_adaptor,
     configuration_validation,
 )
-
 
 ###############################################################################
 
