@@ -19,11 +19,11 @@ import bioio_tifffile
 from tqdm import tqdm
 from monai.inferers import sliding_window_inference
 
-
 # https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction_guide.html#predicting
 ###############################################################################
 
 log = logging.getLogger(__name__)
+logging.getLogger("bioio").setLevel(logging.ERROR)
 
 ###############################################################################
 

@@ -1,321 +1,260 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-
-def get_valid_num_groups(channels):
-    """Returns a valid number of groups for GroupNorm."""
-    for g in [8, 4, 2, 1]:
-        if channels % g == 0:
-            return g
-    return 1
+from monai.networks.blocks.convolutions import Convolution
+from monai.networks.layers.factories import Norm
 
 
 class ConvBlock(nn.Module):
-    """Standard 2D/3D Convolutional Block."""
-
-    def __init__(self, in_channels, out_channels, Conv, GroupNorm):
-        super().__init__()
-        gn_groups1 = get_valid_num_groups(out_channels)
-        gn_groups2 = get_valid_num_groups(out_channels)
-        self.conv1 = Conv(in_channels, out_channels, kernel_size=3, padding=1)
-        self.gn1 = GroupNorm(gn_groups1, out_channels)
-        self.relu1 = nn.ReLU(inplace=True)
-        self.conv2 = Conv(out_channels, out_channels, kernel_size=3, padding=1)
-        self.gn2 = GroupNorm(gn_groups2, out_channels)
-        self.relu2 = nn.ReLU(inplace=True)
-
-    def forward(self, x):
-        x = self.relu1(self.gn1(self.conv1(x)))
-        x = self.relu2(self.gn2(self.conv2(x)))
-        return x
-
-
-class Down(nn.Module):
-    """Downsampling block (MaxPool + ConvBlock)."""
-
-    def __init__(self, in_channels, out_channels, MaxPool, ConvBlock, Conv, GroupNorm):
-        super().__init__()
-        self.pool = MaxPool(2)
-        self.conv_block = ConvBlock(in_channels, out_channels, Conv, GroupNorm)
-
-    def forward(self, x):
-        x = self.pool(x)
-        x = self.conv_block(x)
-        return x
-
-
-class Up(nn.Module):
-    """Upsampling block (ConvTranspose + Concat + ConvBlock).
-
-    Args:
-        in_channels_x1_before_upsample (int): Number of channels of the feature map (x1)
-                                                before being upsampled by ConvTranspose.
-        in_channels_x2_skip_connection (int): Number of channels of the skip connection (x2).
-        out_channels (int): Number of output channels for the final ConvBlock in this Up stage.
-    """
-
     def __init__(
         self,
-        in_channels_x1_before_upsample,
-        in_channels_x2_skip_connection,
-        out_channels,
-        ConvTranspose,
-        ConvBlock,
-        Conv,
-        GroupNorm,
-        interpolation_mode,
+        spatial_dims: int,
+        in_channels: int,
+        out_channels: int,
+        kernel_size=3,
+        strides=1,
+        dropout=0.0,
     ):
         super().__init__()
-        self.interpolation_mode = interpolation_mode
-        self.up = ConvTranspose(
-            in_channels_x1_before_upsample,
-            in_channels_x1_before_upsample // 2,
-            kernel_size=2,
-            stride=2,
+        # padding=None in MONAI Convolution defaults to "same" padding
+        layers = [
+            Convolution(
+                spatial_dims,
+                in_channels,
+                out_channels,
+                kernel_size=kernel_size,
+                strides=strides,
+                padding=None,
+                adn_ordering="NDA",
+                act="relu",
+                norm=Norm.BATCH,
+                dropout=dropout,
+            ),
+            Convolution(
+                spatial_dims,
+                out_channels,
+                out_channels,
+                kernel_size=kernel_size,
+                strides=1,
+                padding=None,
+                adn_ordering="NDA",
+                act="relu",
+                norm=Norm.BATCH,
+                dropout=dropout,
+            ),
+        ]
+        self.conv = nn.Sequential(*layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.conv(x)
+
+
+class UpConv(nn.Module):
+    def __init__(
+        self,
+        spatial_dims: int,
+        in_channels: int,
+        out_channels: int,
+        kernel_size=3,
+        strides=2,
+        dropout=0.0,
+    ):
+        super().__init__()
+        self.up = Convolution(
+            spatial_dims,
+            in_channels,
+            out_channels,
+            strides=strides,
+            kernel_size=kernel_size,
+            act="relu",
+            adn_ordering="NDA",
+            norm=Norm.BATCH,
+            dropout=dropout,
+            is_transposed=True,
         )
 
-        channels_for_conv_block = (
-            in_channels_x1_before_upsample // 2
-        ) + in_channels_x2_skip_connection
-        self.conv_block = ConvBlock(
-            channels_for_conv_block, out_channels, Conv, GroupNorm
-        )
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.up(x)
 
-    def forward(self, x1, x2):
-        x1 = self.up(x1)
 
-        # Get the spatial size of the skip connection tensor
-        spatial_size_x2 = x2.size()[2:]
-
-        if x1.size()[2:] != spatial_size_x2:
-            x1 = F.interpolate(
-                x1,
-                size=spatial_size_x2,
-                mode=self.interpolation_mode,
-                align_corners=False,
+class Encoder(nn.Module):
+    def __init__(
+        self,
+        spatial_dims,
+        in_channels,
+        channels,
+        strides,
+        kernel_size=3,
+        dropout=0.0,
+        latent_dim=6,
+    ):
+        super().__init__()
+        self.blocks = nn.ModuleList()
+        curr_c = in_channels
+        for c, s in zip(channels, strides):
+            self.blocks.append(
+                ConvBlock(spatial_dims, curr_c, c, kernel_size, s, dropout)
             )
-
-        x = torch.cat([x2, x1], dim=1)
-        return self.conv_block(x)
-
-
-class PriorNet(nn.Module):
-    """Network to predict prior distribution (mu, logvar)."""
-
-    def __init__(self, in_channels, latent_dim, Conv):
-        super().__init__()
-        self.conv = Conv(in_channels, 2 * latent_dim, kernel_size=1)
-
-    def forward(self, x):
-        mu_logvar = self.conv(x)
-        mu = mu_logvar[:, : self.conv.out_channels // 2, ...]
-        logvar = mu_logvar[:, self.conv.out_channels // 2 :, ...]
-        return mu, logvar
-
-
-class PosteriorNet(nn.Module):
-    """Network to predict posterior distribution (mu, logvar)."""
-
-    def __init__(self, in_channels, latent_dim, Conv):
-        super().__init__()
-        self.conv = Conv(in_channels, 2 * latent_dim, kernel_size=1)
+            curr_c = c
+        self.gap = (
+            nn.AdaptiveAvgPool2d(1) if spatial_dims == 2 else nn.AdaptiveAvgPool3d(1)
+        )
+        self.mu_layer = Convolution(
+            spatial_dims, curr_c, latent_dim, 1, 1, 0, conv_only=True
+        )
+        self.logvar_layer = Convolution(
+            spatial_dims, curr_c, latent_dim, 1, 1, 0, conv_only=True
+        )
 
     def forward(self, x):
-        mu_logvar = self.conv(x)
-        mu = mu_logvar[:, : self.conv.out_channels // 2, ...]
-        logvar = mu_logvar[:, self.conv.out_channels // 2 :, ...]
-        return mu, logvar
+        for block in self.blocks:
+            x = block(x)
+        x = self.gap(x)
+        return self.mu_layer(x).flatten(1), self.logvar_layer(x).flatten(1)
 
 
 class ProbabilisticUNet(nn.Module):
-    """Probabilistic UNet model.
-
-    This model can operate in 2D or 3D based on the 'model_type' parameter.
-    """
-
     def __init__(
         self,
+        spatial_dims,
         in_channels,
-        n_classes,
+        out_channels,
+        channels,
+        strides,
+        kernel_size=3,
+        up_kernel_size=3,
         latent_dim=6,
-        task="segment",
-        model_type="2D",
-        **kwargs,
+        dropout=0.0,
     ):
         super().__init__()
-        self.in_channels = in_channels
-        self.n_classes = n_classes
+        self.spatial_dims = spatial_dims
+        self.out_channels = out_channels
         self.latent_dim = latent_dim
-        self.task = task
-        self.model_type = model_type
 
-        # Select the appropriate layers based on model_type
-        if model_type == "2D":
-            self.Conv = nn.Conv2d
-            self.MaxPool = nn.MaxPool2d
-            self.ConvTranspose = nn.ConvTranspose2d
-            self.GroupNorm = nn.GroupNorm
-            self.interpolation_mode = "bilinear"
-        elif model_type == "3D":
-            self.Conv = nn.Conv3d
-            self.MaxPool = nn.MaxPool3d
-            self.ConvTranspose = nn.ConvTranspose3d
-            self.GroupNorm = nn.GroupNorm
-            self.interpolation_mode = "trilinear"
-        else:
-            raise ValueError(f"Unknown model_type: {model_type}")
+        # Backbone Encoder
+        self.unet_encoder = nn.ModuleList()
+        curr_c = in_channels
+        for c, s in zip(channels, strides):
+            self.unet_encoder.append(
+                ConvBlock(spatial_dims, curr_c, c, kernel_size, s, dropout)
+            )
+            curr_c = c
 
-        # Encoder path (U-Net)
-        self.inc = ConvBlock(in_channels, 32, self.Conv, self.GroupNorm)
-        self.down1 = Down(32, 64, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
-        self.down2 = Down(64, 128, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
-        self.down3 = Down(128, 256, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
-        self.down4 = Down(256, 512, self.MaxPool, ConvBlock, self.Conv, self.GroupNorm)
-
-        # Prior and Posterior Networks
-        self.prior_net = PriorNet(512, latent_dim, self.Conv)
-        # PosteriorNet input channels: 512 (features) + n_classes (one-hot y or float y)
-        self.posterior_net = PosteriorNet(512 + n_classes, latent_dim, self.Conv)
-
-        # Decoder Path (U-Net upsampling path)
-        self.up1 = Up(
-            in_channels_x1_before_upsample=512 + latent_dim,
-            in_channels_x2_skip_connection=256,
-            out_channels=256,
-            ConvTranspose=self.ConvTranspose,
-            ConvBlock=ConvBlock,
-            Conv=self.Conv,
-            GroupNorm=self.GroupNorm,
-            interpolation_mode=self.interpolation_mode,
-        )
-
-        self.up2 = Up(
-            in_channels_x1_before_upsample=256,
-            in_channels_x2_skip_connection=128,
-            out_channels=128,
-            ConvTranspose=self.ConvTranspose,
-            ConvBlock=ConvBlock,
-            Conv=self.Conv,
-            GroupNorm=self.GroupNorm,
-            interpolation_mode=self.interpolation_mode,
-        )
-
-        self.up3 = Up(
-            in_channels_x1_before_upsample=128,
-            in_channels_x2_skip_connection=64,
-            out_channels=64,
-            ConvTranspose=self.ConvTranspose,
-            ConvBlock=ConvBlock,
-            Conv=self.Conv,
-            GroupNorm=self.GroupNorm,
-            interpolation_mode=self.interpolation_mode,
-        )
-
-        self.up4 = Up(
-            in_channels_x1_before_upsample=64,
-            in_channels_x2_skip_connection=32,
-            out_channels=32,
-            ConvTranspose=self.ConvTranspose,
-            ConvBlock=ConvBlock,
-            Conv=self.Conv,
-            GroupNorm=self.GroupNorm,
-            interpolation_mode=self.interpolation_mode,
-        )
-
-        self.outc = self.Conv(32, n_classes, kernel_size=1)
-
-    def forward(self, x, y=None):
-        """
-        Forward pass of the Probabilistic UNet.
-
-        Args:
-            x (torch.Tensor): Input image tensor (B, C, H, W) for 2D or (B, C, D, H, W) for 3D.
-            y (torch.Tensor, optional): Ground truth segmentation mask used for training to
-                                         calculate posterior. Defaults to None (for inference).
-
-        Returns:
-            tuple: A tuple containing:
-                - logits (torch.Tensor): Output logits of the UNet.
-                - prior_mu (torch.Tensor): Mean of the prior distribution.
-                - prior_logvar (torch.Tensor): Log-variance of the prior distribution.
-                - post_mu (torch.Tensor or None): Mean of the posterior distribution (None if y is None).
-                - post_logvar (torch.Tensor or None): Log-variance of the posterior distribution (None if y is None).
-        """
-        # Encoder (U-Net)
-        x1 = self.inc(x)
-        x2 = self.down1(x1)
-        x3 = self.down2(x2)
-        x4 = self.down3(x3)
-        features = self.down4(x4)  # Bottleneck
-
-        # Prior distribution
-        prior_mu, prior_logvar = self.prior_net(features)
-
-        # Posterior calculation and latent variable sampling
-        post_mu, post_logvar = None, None
-        if y is not None:
-            if self.task == "segment":
-                # Ensure y is one-hot encoded and downsampled
-                y_one_hot = F.one_hot(y.long().squeeze(1), num_classes=self.n_classes)
-                y_one_hot = y_one_hot.permute(
-                    0, -1, *range(1, y_one_hot.dim() - 1)
-                ).float()
-
-                y_downsampled = F.interpolate(
-                    y_one_hot, size=features.shape[2:], mode="nearest"
+        # Backbone Decoder
+        self.unet_decoder = nn.ModuleList()
+        rev_c = channels[::-1]
+        rev_s = strides[::-1]
+        # We decode len(channels) - 1 times to match the skip connections
+        for i in range(len(channels) - 1):
+            self.unet_decoder.append(
+                UpConv(
+                    spatial_dims,
+                    rev_c[i],
+                    rev_c[i + 1],
+                    up_kernel_size,
+                    rev_s[i],
+                    dropout,
                 )
-            elif self.task == "regression":
-                # For regression, y is already a float tensor, just downsample
-                y_downsampled = F.interpolate(
-                    y,
-                    size=features.shape[2:],
-                    mode=self.interpolation_mode,
-                    align_corners=False,
-                )
-            else:
-                raise ValueError(f"Unknown task type: {self.task}")
-
-            # Concatenate features and downsampled y for posterior network
-            post_mu, post_logvar = self.posterior_net(
-                torch.cat([features, y_downsampled], dim=1)
+            )
+            self.unet_decoder.append(
+                ConvBlock(spatial_dims, rev_c[i], rev_c[i + 1], kernel_size, 1, dropout)
             )
 
-            # Sample 'z' from the posterior distribution
-            std_post = torch.exp(0.5 * post_logvar)
-            eps = torch.randn_like(std_post)
-            z = post_mu + eps * std_post
-        else:
-            # If 'y' is not provided (inference), sample 'z' from the prior.
-            std_prior = torch.exp(0.5 * prior_logvar)
-            eps = torch.randn_like(std_prior)
-            z = prior_mu + eps * std_prior
+        self.prior_net = Encoder(
+            spatial_dims,
+            in_channels,
+            channels,
+            strides,
+            kernel_size,
+            dropout,
+            latent_dim,
+        )
+        self.posterior_net = Encoder(
+            spatial_dims,
+            in_channels + out_channels,
+            channels,
+            strides,
+            kernel_size,
+            dropout,
+            latent_dim,
+        )
 
-        # Expand 'z' to spatial dimensions for concatenation
-        spatial_dims = features.size()[2:]
-        if z.dim() == 2:  # [B, latent_dim]
-            # Expands latent vector to spatial dimensions
-            z_expanded = z.unsqueeze(-1)
-            for _ in range(len(spatial_dims) - 1):
-                z_expanded = z_expanded.unsqueeze(-1)
-            z_expanded = z_expanded.repeat(1, 1, *spatial_dims)
-        elif z.dim() == 2 + len(spatial_dims):
-            if z.size()[2:] != spatial_dims:
-                z_expanded = F.interpolate(z, size=spatial_dims, mode="nearest")
+        self.f_comb = nn.Sequential(
+            Convolution(
+                spatial_dims,
+                channels[0] + latent_dim,
+                channels[0],
+                1,
+                1,
+                0,
+                conv_only=True,
+                act="relu",
+            ),
+            Convolution(
+                spatial_dims,
+                channels[0],
+                channels[0],
+                1,
+                1,
+                0,
+                conv_only=True,
+                act="relu",
+            ),
+            Convolution(
+                spatial_dims, channels[0], out_channels, 1, 1, 0, conv_only=True
+            ),
+        )
+
+    def reparameterize(self, mu, logvar):
+        return mu + torch.randn_like(mu) * torch.exp(0.5 * logvar)
+
+    def forward(self, x, seg=None, train_posterior=True):
+        skips = []
+        unet_x = x
+        for block in self.unet_encoder:
+            unet_x = block(unet_x)
+            skips.append(unet_x)
+
+        unet_x = skips.pop()  # Bottleneck
+
+        for i in range(0, len(self.unet_decoder), 2):
+            up_x = self.unet_decoder[i](unet_x)
+            skip_x = skips.pop()
+            unet_x = torch.cat([up_x, skip_x], dim=1)
+            unet_x = self.unet_decoder[i + 1](unet_x)
+
+        mu_prior, logvar_prior = self.prior_net(x)
+        mu_post, logvar_post = None, None
+
+        if train_posterior and seg is not None:
+            if seg.shape[1] != self.out_channels:
+                seg_temp = seg
+                if seg_temp.shape[1] == 1:
+                    seg_temp = seg_temp.squeeze(1)
+                seg_one_hot = (
+                    F.one_hot(seg_temp.long(), num_classes=self.out_channels)
+                    .permute(0, 3, 1, 2)
+                    .float()
+                )
             else:
-                z_expanded = z
+                seg_one_hot = seg.float()
+
+            cat_input = torch.cat([x, seg_one_hot], dim=1)
+            mu_post, logvar_post = self.posterior_net(cat_input)
+            z_sample = self.reparameterize(mu_post, logvar_post)
         else:
-            raise ValueError(f"Unexpected latent vector z dimension: {z.dim()}")
+            z_sample = self.reparameterize(mu_prior, logvar_prior)
 
-        # Concatenate bottleneck features with latent vector
-        concat_bottleneck = torch.cat([features, z_expanded], dim=1)
+        # Broadcast z and combine
+        z_b = z_sample.view(
+            z_sample.shape[0], self.latent_dim, *([1] * self.spatial_dims)
+        ).expand(-1, -1, *unet_x.shape[2:])
+        reconstruction = self.f_comb(torch.cat([unet_x, z_b], dim=1))
 
-        # Decoder (U-Net upsampling path)
-        x_up = self.up1(concat_bottleneck, x4)
-        x_up = self.up2(x_up, x3)
-        x_up = self.up3(x_up, x2)
-        x_up = self.up4(x_up, x1)
-        output = self.outc(x_up)
-
-        # Return all necessary components for ELBO calculation
-        return output, prior_mu, prior_logvar, post_mu, post_logvar
+        return {
+            "pred": reconstruction,
+            "mu_post": mu_post,
+            "logvar_post": logvar_post,
+            "prior_mu": mu_prior,
+            "prior_logvar": logvar_prior,
+        }

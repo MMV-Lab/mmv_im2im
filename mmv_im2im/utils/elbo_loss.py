@@ -1,36 +1,18 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmv_im2im.utils.fractal_layers import FractalDimension
-from mmv_im2im.utils.topological_loss import TI_Loss
-from mmv_im2im.utils.connectivity_loss import ConnectivityCoherenceLoss
-from monai.losses import GeneralizedDiceFocalLoss
-from monai.metrics import HausdorffDistanceMetric
 
 
 class KLDivergence(nn.Module):
-    """Calculates KL Divergence between two diagonal Gaussians."""
+    """
+    Calculates the KL Divergence between two diagonal Gaussian distributions.
+    Used for the Probabilistic U-Net latent space regularization.
+    """
 
     def __init__(self):
         super().__init__()
 
     def forward(self, mu_q, logvar_q, mu_p, logvar_p, kl_clamp=None):
-        """
-        Calculates the KL Divergence between two diagonal Gaussian distributions.
-
-        Args:
-            mu_q (torch.Tensor): Mean of the approximate posterior distribution.
-            logvar_q (torch.Tensor): Log-variance of the approximate posterior
-                                     distribution.
-            mu_p (torch.Tensor): Mean of the prior distribution.
-            logvar_p (torch.Tensor): Log-variance of the prior distribution.
-            clamp (float): Value to clamp logvar_q, logvar_p in case of gradient explotion.
-
-        Returns:
-            torch.Tensor: The mean KL divergence over the batch.
-        """
-        # Clamp log-variances to prevent numerical instability
-        # This limits exp(logvar) to a stable range, e.g., [2.06e-9, 4.85e8]
         if kl_clamp is not None:
             logvar_q = torch.clamp(logvar_q, min=-kl_clamp, max=kl_clamp)
             logvar_p = torch.clamp(logvar_p, min=-kl_clamp, max=kl_clamp)
@@ -40,146 +22,99 @@ class KLDivergence(nn.Module):
             - logvar_q
             + (torch.exp(logvar_q) + (mu_q - mu_p) ** 2) / torch.exp(logvar_p)
             - 1,
-            dim=[1, 2, 3],  # Sum over latent channels, H, W
+            dim=1,
         )
         return torch.mean(kl_batch_sum)
 
 
 class ELBOLoss(nn.Module):
-    """
-    Calculates the Evidence Lower Bound (ELBO) loss for Probabilistic UNet,
-    with optional fractal dimension, topological, and connectivity regularization.
-
-    Args:
-        beta (float): Weighting factor for the KL divergence term.
-        n_classes (int): Number of classes in the segmentation task.
-        kl_clamp (float): Value to clamp logvar_q, logvar_p in case of gradient explotion for kl.
-        use_fractal_regularization (bool): If True, includes the fractal dimension regularization term.
-        fractal_weight (float): Weighting factor for the fractal dimension loss term (only if use_fractal_regularization is True).
-        fractal_num_kernels (int): Number of kernels for FractalDimension (only if use_fractal_regularization is True).
-        fractal_mode (str): Mode for FractalDimension ("classic" or "entropy") (only if use_fractal_regularization is True).
-        fractal_to_binary (bool): Whether to binarize input for FractalDimension (only if use_fractal_regularization is True).
-        use_topological_regularization (bool): If True, includes the topological regularization term.
-        topological_weight (float): Weighting factor for the topological loss term (only if use_topological_regularization is True).
-        topological_dim (int): Dimension for TI_Loss (2 for 2D, 3 for 3D) (only if use_topological_regularization is True).
-        topological_connectivity (int): Connectivity for TI_Loss (4 or 8 for 2D; 6 or 26 for 3D) (only if use_topological_regularization is True).
-        topological_inclusion (list): List of [A,B] class pairs for inclusion in TI_Loss (only if use_topological_regularization is True).
-        topological_exclusion (list): List of [A,C] class pairs for exclusion in TI_Loss (only if use_topological_regularization is True).
-        topological_min_thick (int): Minimum thickness for TI_Loss (only if use_topological_regularization is True and connectivity is 8 or 26).
-        use_connectivity_regularization (bool): If True, includes the new connectivity coherence regularization term.
-        connectivity_weight (float): Weighting factor for the connectivity coherence loss term.
-        connectivity_kernel_size (int): Kernel size for connectivity coherence loss (e.g., 3).
-        connectivity_ignore_background (bool): If True, ignore background for connectivity loss.
-        elbo_class_weights (list or torch.Tensor, optional): Weights for each class in the cross-entropy loss.
-        use_gdl_focal_regularization (bool): If True, Includes Generalized Dice Focal (GDF) regularization.
-        gdl_focal_weight (float): Weighting factor for GDF.
-        gdl_class_weights (list):  Weights for each class.
-        use_hausdorff_regularization (bool): Enable or disable  Hausdorff regularization
-        hausdorff_weight (float): Weighting factor for the Hausdorff loss term.
-        hausdorff_ignore_background (bool): If True, ignore background for Hausdorff loss.
-        task (str): The task type, either "segment" for segmentation or "regression" for regression.
-    """
-
     def __init__(
         self,
         beta: float = 1.0,
         n_classes: int = 2,
+        spatial_dims: int = 2,
         kl_clamp: float = None,
+        elbo_class_weights: list = None,
+        task: str = "segment",
+        # --- Fractal Regularization ---
         use_fractal_regularization: bool = False,
         fractal_weight: float = 0.1,
+        fractal_warmup_epochs: int = 10,
         fractal_num_kernels: int = 5,
         fractal_mode: str = "classic",
         fractal_to_binary: bool = True,
+        # --- Topological Regularization (TI Loss) ---
         use_topological_regularization: bool = False,
         topological_weight: float = 0.1,
-        topological_dim: int = 2,
-        topological_connectivity: int = 4,
+        topological_warmup_epochs: int = 10,
+        topological_connectivity: int = 4,  # Use 6 or 26 for 3D
         topological_inclusion: list = None,
         topological_exclusion: list = None,
         topological_min_thick: int = 1,
+        # --- Connectivity Regularization ---
         use_connectivity_regularization: bool = False,
         connectivity_weight: float = 0.1,
+        connectivity_warmup_epochs: int = 10,
         connectivity_kernel_size: int = 3,
+        connectivity_mode: str = "single",
+        kernel_shape: str = "square",
         connectivity_ignore_background: bool = True,
+        lambda_density: float = 1.0,
+        lambda_gradient: float = 0.2,
+        connectivity_metric_density: str = "huber",
+        connectivity_metric_gradient: str = "cosine",
+        # --- GDL Focal Regularization (MONAI) ---
         use_gdl_focal_regularization: bool = False,
         gdl_focal_weight: float = 1.0,
-        elbo_class_weights: list = None,
+        gdl_warmup_epochs: int = 10,
         gdl_class_weights: list = None,
+        # --- Hausdorff Regularization (MONAI) ---
         use_hausdorff_regularization: bool = False,
         hausdorff_weight: float = 0.1,
-        hausdorff_ignore_background: bool = True,
-        task: str = "segment",
+        hausdorff_downsample_scale: float = 0.5,
+        hausdorff_dt_iterations: int = 30,
+        hausdorff_warmup_epochs: int = 10,
+        hausdorff_include_background: bool = False,
+        # --- Homology Regularization (Persistence Image) ---
+        use_homology_regularization: bool = False,
+        homology_weight: float = 0.1,
+        homology_warmup_epochs: int = 10,
+        homology_interval: int = 1,
+        homology_downsample_scale: float = 0.5,
+        homology_class_context: str = "general",
+        homology_metric: str = "smooth_l1",
+        homology_features: str = "all",
+        homology_sigma: float = 0.05,
+        homology_resolution: tuple = (30, 30),
+        homology_filtering: bool = True,
+        homology_threshold: float = 0.01,
+        homology_k_top: int = 500,
+        chunks: int = 2000,
+        weighting_power: float = 2.0,
+        composite_flag: bool = True,
+        # --- Topological Complexity Regularization ---
+        use_topological_complexity: bool = False,
+        topological_complexity_weight: float = 0.1,
+        complexity_warmup_epochs: int = 10,
+        complexity_interval: int = 1,
+        complexity_downsample_scale: float = 0.5,
+        complexity_features: str = "all",
+        complexity_class_context: str = "general",
+        complexity_metric: str = "mse",
+        complexity_threshold: float = 0.001,
+        complexity_k_top: int = 2000,
+        complexity_temperature: float = 0.01,
+        complexity_auto_balance: bool = True,
     ):
         super().__init__()
         self.beta = beta
         self.n_classes = n_classes
+        self.spatial_dims = spatial_dims
         self.kl_clamp = kl_clamp
         self.task = task
         self.kl_divergence_calculator = KLDivergence()
 
-        self.use_fractal_regularization = use_fractal_regularization
-        if self.use_fractal_regularization:
-            self.fractal_weight = fractal_weight
-            self.fractal_dimension_calculator = FractalDimension(
-                num_kernels=fractal_num_kernels,
-                mode=fractal_mode,
-                to_binary=fractal_to_binary,
-            )
-        else:
-            self.fractal_weight = 0.0
-
-        self.use_topological_regularization = use_topological_regularization
-        if self.use_topological_regularization:
-            self.topological_weight = topological_weight
-            if topological_inclusion is None:
-                topological_inclusion = []
-            if topological_exclusion is None:
-                topological_exclusion = []
-            self.topological_loss_calculator = TI_Loss(
-                dim=topological_dim,
-                connectivity=topological_connectivity,
-                inclusion=topological_inclusion,
-                exclusion=topological_exclusion,
-                min_thick=topological_min_thick,
-            )
-        else:
-            self.topological_weight = 0.0
-
-        self.use_connectivity_regularization = use_connectivity_regularization
-        if self.use_connectivity_regularization:
-            self.connectivity_weight = connectivity_weight
-            self.connectivity_coherence_calculator = ConnectivityCoherenceLoss(
-                kernel_size=connectivity_kernel_size,
-                ignore_background=connectivity_ignore_background,
-                num_classes=n_classes,
-            )
-        else:
-            self.connectivity_weight = 0.0
-
-        self.use_gdl_focal_regularization = use_gdl_focal_regularization
-        if self.use_gdl_focal_regularization:
-            self.gdl_focal_weight = gdl_focal_weight
-            monai_focal_weights = None
-            if gdl_class_weights is not None:
-                monai_focal_weights = torch.tensor(
-                    gdl_class_weights, dtype=torch.float32
-                )
-            self.gdl_focal_loss_calculator = GeneralizedDiceFocalLoss(
-                softmax=True, to_onehot_y=True, weight=monai_focal_weights
-            )
-        else:
-            self.gdl_focal_weight = 0.0
-
-        self.use_hausdorff_regularization = use_hausdorff_regularization
-        if self.use_hausdorff_regularization:
-            self.hausdorff_weight = hausdorff_weight
-            self.hausdorff_distance_calculator = HausdorffDistanceMetric(
-                include_background=not hausdorff_ignore_background,
-                reduction="mean",
-            )
-        else:
-            self.hausdorff_weight = 0.0
-
+        # Class weights for the main reconstruction loss (Cross Entropy)
         if elbo_class_weights is not None:
             self.elbo_class_weights = torch.tensor(
                 elbo_class_weights, dtype=torch.float32
@@ -187,162 +122,372 @@ class ELBOLoss(nn.Module):
         else:
             self.elbo_class_weights = None
 
-    def forward(self, logits, y_true, prior_mu, prior_logvar, post_mu, post_logvar):
-        """
-        Computes the ELBO loss, with optional fractal dimension and topological regularization terms.
+        # --- Initialize Regularizers ---
+        reg_used = []
 
-        Args:
-            logits (torch.Tensor): Output logits from the Probabilistic UNet
-                                   (B, C, H, W).
-            y_true (torch.Tensor): Ground truth segmentation mask (B, 1, H, W
-                                   or B, H, W).
-            prior_mu (torch.Tensor): Mean of the prior distribution.
-            prior_logvar (torch.Tensor): Log-variance of the prior distribution.
-            post_mu (torch.Tensor): Mean of the approximate posterior distribution.
-            post_logvar (torch.Tensor): Log-variance of the approximate posterior
-                                        distribution.
+        # 1. Fractal
+        self.use_fractal_regularization = use_fractal_regularization
+        if self.use_fractal_regularization:
+            self.fractal_weight = fractal_weight
+            self.fractal_warmup_epochs = fractal_warmup_epochs
+            reg_used.append(f"Fractal-Dimension {fractal_mode}")
+            from mmv_im2im.utils.fractal_layers import FractalDimension
 
-        Returns:
-            torch.Tensor: The calculated ELBO loss.
-        """
-
-        if self.task == "segment":
-
-            if y_true.shape[1] == 1:
-                y_true_squeezed = y_true.squeeze(1)
-            else:
-                y_true_squeezed = y_true
-
-            if (
-                self.elbo_class_weights is not None
-                and self.elbo_class_weights.device != logits.device
-            ):
-                elbo_class_weights_on_device = self.elbo_class_weights.to(logits.device)
-            else:
-                elbo_class_weights_on_device = self.elbo_class_weights
-
-            log_likelihood = -F.cross_entropy(
-                logits,
-                y_true_squeezed.long(),
-                reduction="mean",
-                weight=elbo_class_weights_on_device,
+            self.fractal_dimension_calculator = FractalDimension(
+                num_kernels=fractal_num_kernels,
+                mode=fractal_mode,
+                to_binary=fractal_to_binary,
+                spatial_dims=self.spatial_dims,
             )
 
-        elif self.task == "regression":
-            # log_likelihood = -F.mse_loss(
-            #     logits,
-            #     y_true,
-            #     reduction="mean",
-            # )
-            # log_likelihood = -F.mae_loss(
-            #     logits,
-            #     y_true,
-            #     reduction="mean",
-            # )
-            log_likelihood = -F.huber_loss(
+        # 2. Topological (TI Loss)
+        self.use_topological_regularization = use_topological_regularization
+        if self.use_topological_regularization:
+            self.topological_weight = topological_weight
+            self.topological_warmup_epochs = topological_warmup_epochs
+            reg_used.append("Topological-Restrictions (TI Loss)")
+            from mmv_im2im.utils.topological_loss import TI_Loss
+
+            self.topological_loss_calculator = TI_Loss(
+                dim=self.spatial_dims,
+                connectivity=topological_connectivity,
+                inclusion=topological_inclusion if topological_inclusion else [],
+                exclusion=topological_exclusion if topological_exclusion else [],
+                min_thick=topological_min_thick,
+            )
+
+        # 3. Connectivity
+        self.use_connectivity_regularization = use_connectivity_regularization
+        if self.use_connectivity_regularization:
+            self.connectivity_weight = connectivity_weight
+            self.connectivity_warmup_epochs = connectivity_warmup_epochs
+            reg_used.append(f"Connectivity Coherence {connectivity_mode}")
+            from mmv_im2im.utils.connectivity_loss import ConnectivityCoherenceLoss
+
+            self.connectivity_coherence_calculator = ConnectivityCoherenceLoss(
+                spatial_dims=self.spatial_dims,
+                connectivity_mode=connectivity_mode,
+                kernel_shape=kernel_shape,
+                connectivity_kernel_size=connectivity_kernel_size,
+                ignore_background=connectivity_ignore_background,
+                num_classes=n_classes,
+                lambda_density=lambda_density,
+                lambda_gradient=lambda_gradient,
+                metric_density=connectivity_metric_density,
+                metric_gradient=connectivity_metric_gradient,
+            )
+
+        # 4. GDL Focal (MONAI)
+        self.use_gdl_focal_regularization = use_gdl_focal_regularization
+        if self.use_gdl_focal_regularization:
+            self.gdl_focal_weight = gdl_focal_weight
+            self.gdl_warmup_epochs = gdl_warmup_epochs
+            reg_used.append("Generalized Dice Focal")
+            from monai.losses import GeneralizedDiceFocalLoss
+
+            monai_focal_weights = (
+                torch.tensor(gdl_class_weights, dtype=torch.float32)
+                if gdl_class_weights
+                else None
+            )
+            # MONAI losses are generally dimension-agnostic given correct input shape
+            self.gdl_focal_loss_calculator = GeneralizedDiceFocalLoss(
+                softmax=True, to_onehot_y=True, weight=monai_focal_weights
+            )
+
+        # 5. Hausdorff
+        self.use_hausdorff_regularization = use_hausdorff_regularization
+        if self.use_hausdorff_regularization:
+            self.hausdorff_weight = hausdorff_weight
+            self.hausdorff_warmup_epochs = hausdorff_warmup_epochs
+            self.hausdorff_downsample_scale = hausdorff_downsample_scale
+            self.hausdorff_dt_iterations = hausdorff_dt_iterations
+            self.hausdorff_include_background = hausdorff_include_background
+            reg_used.append("Hausdorff")
+            from mmv_im2im.utils.hausdorff_loss import HausdorffLoss
+
+            self.hausdorff_loss_calculator = HausdorffLoss(
+                spatial_dims=self.spatial_dims,
+                dt_iterations=self.hausdorff_dt_iterations,
+                include_background=self.hausdorff_include_background,
+            )
+
+        # 6. Homology (Persistence Image)
+        self.use_homology_regularization = use_homology_regularization
+        if self.use_homology_regularization:
+            self.homology_interval = max(1, homology_interval)
+            self.homology_weight = homology_weight
+            self.homology_warmup_epochs = homology_warmup_epochs
+            self.homology_downsample_scale = homology_downsample_scale
+            reg_used.append("Persistence Image (Homology)")
+            from mmv_im2im.utils.homology_loss import HomologyLoss
+
+            self.homology_calculator = HomologyLoss(
+                spatial_dims=self.spatial_dims,
+                resolution=homology_resolution,
+                sigma=homology_sigma,
+                features=homology_features,
+                class_context=homology_class_context,
+                metric=homology_metric,
+                chunks=chunks,
+                filtering=homology_filtering,
+                treshold=homology_threshold,
+                k_top=homology_k_top,
+                weighting_power=weighting_power,
+                composite_flag=composite_flag,
+            )
+
+        # 7. Topological Complexity
+        self.use_topological_complexity = use_topological_complexity
+        if self.use_topological_complexity:
+            self.complexity_interval = max(1, complexity_interval)
+            self.topological_complexity_weight = topological_complexity_weight
+            self.complexity_warmup_epochs = complexity_warmup_epochs
+            self.complexity_downsample_scale = complexity_downsample_scale
+            if complexity_metric == "wasserstein":
+                reg_used.append("Persistence Complexity (Diagrams)")
+            else:
+                reg_used.append("Persistence Complexity (Entropy-Betti)")
+            from mmv_im2im.utils.topological_complexity_loss import (
+                TopologicalComplexityLoss,
+            )
+
+            self.topological_complexity_calculator = TopologicalComplexityLoss(
+                spatial_dims=self.spatial_dims,
+                features=complexity_features,
+                class_context=complexity_class_context,
+                metric=complexity_metric,
+                threshold=complexity_threshold,
+                k_top=complexity_k_top,
+                temperature=complexity_temperature,
+                auto_balance=complexity_auto_balance,
+            )
+
+        if len(reg_used) > 0:
+            print(f"Active Regularizers: {reg_used}")
+
+    def _get_warmup_factor(self, current_epoch, warmup_epochs):
+        if torch.is_tensor(current_epoch):
+            current_epoch = current_epoch.detach().cpu().item()
+        if torch.is_tensor(warmup_epochs):
+            warmup_epochs = warmup_epochs.detach().cpu().item()
+
+        current_epoch = float(current_epoch)
+        warmup_epochs = float(max(1, warmup_epochs))
+
+        if current_epoch >= warmup_epochs:
+            return 1.0
+        return current_epoch / warmup_epochs
+
+    def _downsample_inputs(self, logits, y_true, scale_factor):
+        """Downsamples inputs for computationally expensive topological losses."""
+        if scale_factor >= 1.0:
+            return logits, y_true
+
+        # Determine mode based on dimensionality
+        if self.spatial_dims == 3:
+            mode = "trilinear"
+        else:
+            mode = "bilinear"
+
+        # Downsample Logits
+        logits_small = F.interpolate(
+            logits, scale_factor=scale_factor, mode=mode, align_corners=False
+        )
+
+        # Downsample GT
+        # y_true can be (B, H, W), (B, D, H, W) or with channel dim
+        if y_true.ndim == logits.ndim - 1:
+            y_true_float = y_true.unsqueeze(1).float()
+        else:
+            y_true_float = y_true.float()
+
+        y_true_small = F.interpolate(
+            y_true_float, scale_factor=scale_factor, mode="nearest"
+        )
+
+        # Squeeze back if needed
+        if y_true.ndim == logits.ndim - 1:
+            y_true_small = y_true_small.squeeze(1)
+
+        return logits_small, y_true_small.long()
+
+    def forward(
+        self, logits, y_true, prior_mu, prior_logvar, post_mu, post_logvar, epoch
+    ):
+        """
+        Computes the ELBO loss + Regularizers.
+        Args:
+            logits: (B, C, H, W) or (B, C, D, H, W)
+            y_true: Integer ground truth labels
+        """
+
+        # --- 1. Input Standardization ---
+        # Ensure y_true has the right shape
+        if y_true.ndim == logits.ndim:  # Has channel dim (B, 1, ...)
+            y_true_ch = y_true
+            y_true_flat = y_true.squeeze(1)
+        elif y_true.ndim == logits.ndim - 1:  # No channel dim (B, ...)
+            y_true_ch = y_true.unsqueeze(1)
+            y_true_flat = y_true
+        else:
+            raise ValueError(
+                f"y_true shape {y_true.shape} incompatible with logits {logits.shape}"
+            )
+
+        if (
+            self.elbo_class_weights is not None
+            and self.elbo_class_weights.device != logits.device
+        ):
+            self.elbo_class_weights = self.elbo_class_weights.to(logits.device)
+
+        # --- 2. Base Reconstruction Loss (Cross Entropy) ---
+        if self.task == "segment":
+            reconstruction_loss = F.cross_entropy(
                 logits,
-                y_true,
+                y_true_flat.long(),
                 reduction="mean",
+                weight=self.elbo_class_weights,
             )
         else:
-            raise ValueError(f"Unknown task type: {self.task}")
+            reconstruction_loss = F.huber_loss(logits, y_true, reduction="mean")
 
-        # KL-Divergence
+        # --- 3. KL Divergence ---
         kl_div = self.kl_divergence_calculator(
             post_mu, post_logvar, prior_mu, prior_logvar, self.kl_clamp
         )
 
-        elbo_loss = -(log_likelihood - self.beta * kl_div)
+        total_loss = reconstruction_loss + (self.beta * kl_div)
 
-        total_loss = elbo_loss
-
+        # --- 4. Regularizers ---
         if self.task == "segment":
+
+            # Helper: Softmax Probs
+            if (
+                self.use_fractal_regularization
+                or self.use_connectivity_regularization
+                or self.use_homology_regularization
+                or self.use_topological_complexity
+            ):
+                probs = F.softmax(logits, dim=1)
+
+            # A. Fractal Dimension
             if self.use_fractal_regularization:
-                y_pred_mask = (
-                    F.softmax(logits, dim=1).argmax(dim=1, keepdim=True).float()
+                fractal_factor = self._get_warmup_factor(
+                    epoch, self.fractal_warmup_epochs
                 )
+                if fractal_factor > 0:
+                    # Slice foreground depending on dimensions
+                    if self.n_classes > 1:
+                        if self.spatial_dims == 3:
+                            fg_probs = 1.0 - probs[:, 0:1, :, :, :]
+                        else:
+                            fg_probs = 1.0 - probs[:, 0:1, :, :]
+                    else:
+                        fg_probs = probs
 
-                if y_true.ndim == 4 and y_true.shape[1] == 1:
-                    y_true_for_fractal = y_true.float()
-                else:
-                    y_true_for_fractal = y_true.unsqueeze(1).float()
+                    y_fractal = (y_true_ch > 0).float()
+                    with torch.no_grad():
+                        fd_true = self.fractal_dimension_calculator(y_fractal)
+                    fd_pred = self.fractal_dimension_calculator(fg_probs)
+                    # fd_pred = torch.clamp(fd_pred, min=0.0, max=3.0) -> jut if nan still appear
+                    fractal_loss = F.mse_loss(fd_pred, fd_true)
+                    total_loss += (self.fractal_weight * fractal_factor) * fractal_loss
 
-                fd_true = self.fractal_dimension_calculator(y_true_for_fractal)
-                fd_pred = self.fractal_dimension_calculator(y_pred_mask)
-
-                fractal_loss = torch.mean(torch.abs(fd_true - fd_pred))
-                total_loss += self.fractal_weight * fractal_loss
-
+            # B. TI Loss
             if self.use_topological_regularization:
-                # y_true needs to be B, C, H, W or B, C, H, W, D for TI_Loss, where C=1
-                # If y_true is B, H, W, unsqueeze to B, 1, H, W
-                if y_true.ndim == 3:
-                    y_true_for_topological = y_true.unsqueeze(1).float()
-                else:
-                    y_true_for_topological = y_true.float()
-
-                # logits are B, C, H, W (or B, C, H, W, D), which is what TI_Loss expects for x
-                topological_loss = self.topological_loss_calculator(
-                    logits, y_true_for_topological
+                topological_factor = self._get_warmup_factor(
+                    epoch, self.topological_warmup_epochs
                 )
-                total_loss += self.topological_weight * topological_loss
+                if topological_factor > 0:
+                    topo_loss = self.topological_loss_calculator(logits, y_true_ch)
+                    total_loss += (
+                        self.topological_weight * topological_factor
+                    ) * topo_loss
 
+            # C. Connectivity Coherence
             if self.use_connectivity_regularization:
-                # y_pred_softmax: (B, C, H, W)
-                y_pred_softmax = F.softmax(logits, dim=1)
-
-                # y_true_one_hot: Need to convert y_true_squeezed (B, H, W) to one-hot (B, C, H, W)
-                y_true_one_hot = (
-                    F.one_hot(y_true_squeezed.long(), num_classes=self.n_classes)
-                    .permute(0, 3, 1, 2)
-                    .float()
+                connectivity_factor = self._get_warmup_factor(
+                    epoch, self.connectivity_warmup_epochs
                 )
+                if connectivity_factor > 0:
+                    # Create One-Hot GT (B, C, ...)
+                    y_true_onehot = F.one_hot(
+                        y_true_flat.long(), num_classes=self.n_classes
+                    )
+                    # Permute: Last dim (C) moves to dim 1
+                    permute_dims = (0, logits.ndim - 1) + tuple(
+                        range(1, logits.ndim - 1)
+                    )
+                    y_true_onehot = y_true_onehot.permute(*permute_dims).float()
 
-                connectivity_loss = self.connectivity_coherence_calculator(
-                    y_pred_softmax, y_true_one_hot
-                )
-                total_loss += self.connectivity_weight * connectivity_loss
+                    conn_loss = self.connectivity_coherence_calculator(
+                        probs, y_true_onehot
+                    )
+                    total_loss += (
+                        self.connectivity_weight * connectivity_factor
+                    ) * conn_loss
 
+            # D. GDL Focal
             if self.use_gdl_focal_regularization:
-                # logits: (B, C, H, W)
-                # y_true: (B, H, W) o (B, 1, H, W)
-                y_true_for_gdl_focal = y_true_squeezed.unsqueeze(1).long()
-                gdl_focal_loss = self.gdl_focal_loss_calculator(
-                    logits, y_true_for_gdl_focal
-                )
-                total_loss += self.gdl_focal_weight * gdl_focal_loss
+                gdl_factor = self._get_warmup_factor(epoch, self.gdl_warmup_epochs)
+                if gdl_factor > 0:
+                    gdl_loss = self.gdl_focal_loss_calculator(logits, y_true_ch.long())
+                    total_loss += (self.gdl_focal_weight * gdl_factor) * gdl_loss
 
+            # E. Hausdorff
             if self.use_hausdorff_regularization:
-                # Get the one-hot encoded ground truth
-                # Squeeze y_true to (B, H, W) if it's (B, 1, H, W)
-                if y_true.ndim == 4 and y_true.shape[1] == 1:
-                    y_true_squeezed = y_true.squeeze(1)
-                else:
-                    y_true_squeezed = y_true
+                hausdorff_factor = self._get_warmup_factor(
+                    epoch, self.hausdorff_warmup_epochs
+                )
+                if hausdorff_factor > 0:
+                    logits_hs, y_true_hs = self._downsample_inputs(
+                        logits, y_true_ch, self.hausdorff_downsample_scale
+                    )
+                    if torch.sum(y_true_hs > 0) > 0:
+                        try:
+                            h_loss = self.hausdorff_loss_calculator(
+                                logits_hs, y_true_hs
+                            )
+                            if not torch.isfinite(h_loss):
+                                h_loss = torch.tensor(0.0, device=logits.device)
+                        except Exception:
+                            h_loss = torch.tensor(0.0, device=logits.device)
+                    else:
+                        h_loss = torch.tensor(0.0, device=logits.device)
+                    total_loss += (self.hausdorff_weight * hausdorff_factor) * h_loss
 
-                # Calculate the Hausdorff distance
-                # The metric returns a tensor of shape (B, C), so we take the mean
-                try:
-                    # Convert ground truth to one-hot format (B, C, H, W)
-                    y_true_one_hot = F.one_hot(
-                        y_true_squeezed.long(), num_classes=self.n_classes
-                    ).permute(0, 3, 1, 2)
+            # F. Homology
+            if self.use_homology_regularization:
+                homology_factor = self._get_warmup_factor(
+                    epoch, self.homology_warmup_epochs
+                )
+                if epoch % self.homology_interval == 0:
+                    if homology_factor > 0:
+                        logits_h, y_true_h = self._downsample_inputs(
+                            logits, y_true_flat, self.homology_downsample_scale
+                        )
+                        probs_h = F.softmax(logits_h, dim=1)
+                        h_loss = self.homology_calculator(probs_h, y_true_h)
+                        total_loss += (self.homology_weight * homology_factor) * h_loss
 
-                    # Get the one-hot encoded prediction from logits
-                    y_pred_one_hot = F.one_hot(
-                        logits.argmax(dim=1), num_classes=self.n_classes
-                    ).permute(0, 3, 1, 2)
+            # G. Topological Complexity
+            if self.use_topological_complexity:
+                complexity_factor = self._get_warmup_factor(
+                    epoch, self.complexity_warmup_epochs
+                )
+                if epoch % self.complexity_interval == 0:
+                    if complexity_factor > 0:
+                        logits_c, y_true_c = self._downsample_inputs(
+                            logits, y_true_flat, self.complexity_downsample_scale
+                        )
+                        probs_c = F.softmax(logits_c, dim=1)
 
-                    # Calculate the Hausdorff distance
-                    # The metric returns a tensor of shape (B, C), so we take the mean
-                    hausdorff_loss = self.hausdorff_distance_calculator(
-                        y_pred=y_pred_one_hot, y_true=y_true_one_hot
-                    ).mean()
-
-                    # Add the Hausdorff loss to the total loss
-                    total_loss += self.hausdorff_weight * hausdorff_loss
-                except Exception:
-                    # Avoid troubles with some tensor that become None douring the hausdorff computation
-                    pass
+                        c_loss = self.topological_complexity_calculator(
+                            probs_c, y_true_c
+                        )
+                        total_loss += (
+                            self.topological_complexity_weight * complexity_factor
+                        ) * c_loss
 
         return total_loss

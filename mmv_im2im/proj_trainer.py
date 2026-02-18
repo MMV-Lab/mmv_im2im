@@ -11,12 +11,12 @@ import pyrallis
 
 import warnings
 
-
 warnings.simplefilter(action="ignore", category=FutureWarning)
-
+torch.set_float32_matmul_precision("medium")
 ###############################################################################
 
 log = logging.getLogger(__name__)
+logging.getLogger("bioio").setLevel(logging.ERROR)
 
 ###############################################################################
 

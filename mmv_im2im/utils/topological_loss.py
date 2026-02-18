@@ -17,10 +17,7 @@ and provided by the github repo:  https://github.com/TopoXLab/TopoInteraction
 
 import numpy as np
 import torch
-
-"""
-The proposed topological interaction (TI) module encodes topological interactions by computing the critical voxels map. The critical voxels map contains the locations which induce errors in the topological interactions. The TI loss is introduced based on the topological interaction module.
-"""
+import torch.nn.functional as F
 
 
 class TI_Loss(torch.nn.Module):
@@ -28,9 +25,6 @@ class TI_Loss(torch.nn.Module):
         """
         :param dim: 2 if 2D; 3 if 3D
         :param connectivity: 4 or 8 for 2D; 6 or 26 for 3D
-        :param inclusion: list of [A,B] classes where A is completely surrounded by B.
-        :param exclusion: list of [A,C] classes where A and C exclude each other.
-        :param min_thick: Minimum thickness/separation between the two classes. Only used if connectivity is 8 for 2D or 26 for 3D
         """
         super(TI_Loss, self).__init__()
 
@@ -38,17 +32,19 @@ class TI_Loss(torch.nn.Module):
         self.connectivity = connectivity
         self.min_thick = min_thick
         self.interaction_list = []
-        self.sum_dim_list = None
-        self.conv_op = None
-        self.apply_nonlin = lambda x: torch.nn.functional.softmax(x, 1)
-        self.ce_loss_func = torch.nn.CrossEntropyLoss(reduction="none")
 
+        # Define operations based on dimension
         if self.dim == 2:
-            self.sum_dim_list = [1, 2, 3]
-            self.conv_op = torch.nn.functional.conv2d
+            self.sum_dim_list = [1, 2, 3]  # (B, C, H, W) -> sum over C, H, W
+            self.conv_op = F.conv2d
         elif self.dim == 3:
-            self.sum_dim_list = [1, 2, 3, 4]
-            self.conv_op = torch.nn.functional.conv3d
+            self.sum_dim_list = [1, 2, 3, 4]  # (B, C, D, H, W) -> sum over C, D, H, W
+            self.conv_op = F.conv3d
+        else:
+            raise ValueError(f"Dimension {dim} not supported. Use 2 or 3.")
+
+        self.apply_nonlin = lambda x: F.softmax(x, 1)
+        self.ce_loss_func = torch.nn.CrossEntropyLoss(reduction="none")
 
         self.set_kernel()
 
@@ -67,38 +63,51 @@ class TI_Loss(torch.nn.Module):
             self.interaction_list.append(temp_pair)
 
     def set_kernel(self):
-        """
-        Sets the connectivity kernel based on user's sepcification of dim, connectivity, min_thick
-        """
         k = 2 * self.min_thick + 1
+        np_kernel = None
+
         if self.dim == 2:
             if self.connectivity == 4:
                 np_kernel = np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
             elif self.connectivity == 8:
                 np_kernel = np.ones((k, k))
+            # Shape for Conv2d: (Out=1, In=1, H, W)
+            if np_kernel is not None:
+                self.kernel = torch.from_numpy(np_kernel).unsqueeze(0).unsqueeze(0)
 
         elif self.dim == 3:
             if self.connectivity == 6:
-                np_kernel = np.array(
-                    [
-                        [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
-                        [[0, 1, 0], [1, 1, 1], [0, 1, 0]],
-                        [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
-                    ]
-                )
+                # 6-connectivity structure
+                np_kernel = np.zeros((3, 3, 3))
+                # Center
+                np_kernel[1, 1, 1] = 1
+                # Neighbors
+                np_kernel[0, 1, 1] = 1
+                np_kernel[2, 1, 1] = 1  # Z neighbors
+                np_kernel[1, 0, 1] = 1
+                np_kernel[1, 2, 1] = 1  # Y neighbors
+                np_kernel[1, 1, 0] = 1
+                np_kernel[1, 1, 2] = 1  # X neighbors
             elif self.connectivity == 26:
                 np_kernel = np.ones((k, k, k))
 
-        self.kernel = torch.from_numpy(
-            np.expand_dims(np.expand_dims(np_kernel, axis=0), axis=0)
-        )
+            # Shape for Conv3d: (Out=1, In=1, D, H, W)
+            if np_kernel is not None:
+                self.kernel = torch.from_numpy(np_kernel).unsqueeze(0).unsqueeze(0)
+
+        if np_kernel is None:
+            raise ValueError(
+                f"Invalid connectivity {self.connectivity} for dim {self.dim}"
+            )
 
     def topological_interaction_module(self, P):
         """
-        Given a discrete segmentation map and the intended topological interactions, this module computes the critical voxels map.
-        :param P: Discrete segmentation map
-        :return: Critical voxels map
+        P: Discrete segmentation map (B, 1, H, W) or (B, 1, D, H, W)
         """
+        # Ensure kernel is on the same device/dtype as input P
+        if self.kernel.device != P.device:
+            self.kernel = self.kernel.to(P.device)
+
         critical_voxels_map = torch.zeros_like(P, dtype=torch.double)
 
         for ind, interaction in enumerate(self.interaction_list):
@@ -106,7 +115,6 @@ class TI_Loss(torch.nn.Module):
             label_A = interaction[1]
             label_C = interaction[2]
 
-            # Get Masks
             mask_A = torch.where(P == label_A, 1.0, 0.0).double()
             if interaction_type:
                 mask_C = torch.where(P == label_C, 1.0, 0.0).double()
@@ -115,13 +123,13 @@ class TI_Loss(torch.nn.Module):
             else:
                 mask_C = torch.where(P == label_C, 1.0, 0.0).double()
 
-            # Get Neighbourhood Information
+            # Apply Convolution (2D or 3D handled by self.conv_op)
             neighbourhood_C = self.conv_op(mask_C, self.kernel.double(), padding="same")
             neighbourhood_C = torch.where(neighbourhood_C >= 1.0, 1.0, 0.0)
+
             neighbourhood_A = self.conv_op(mask_A, self.kernel.double(), padding="same")
             neighbourhood_A = torch.where(neighbourhood_A >= 1.0, 1.0, 0.0)
 
-            # Get the pixels which induce errors
             violating_A = neighbourhood_C * mask_A
             violating_C = neighbourhood_A * mask_C
             violating = violating_A + violating_C
@@ -135,29 +143,33 @@ class TI_Loss(torch.nn.Module):
 
     def forward(self, x, y):
         """
-        The forward function computes the TI loss value.
-        :param x: Likelihood map of shape: b, c, x, y(, z) with c = total number of classes
-        :param y: GT of shape: b, c, x, y(, z) with c=1. The GT should only contain values in [0,L) range where L is the total number of classes.
-        :return:  TI loss value
+        x: Logits (B, C, H, W) or (B, C, D, H, W)
+        y: GT (B, 1, H, W) or (B, 1, D, H, W)
         """
-
         if x.device.type == "cuda":
-            self.kernel = self.kernel.cuda(x.device.index)
+            # Ensure kernel follows device even if initialized on CPU
+            if self.kernel.device != x.device:
+                self.kernel = self.kernel.to(x.device)
 
         # Obtain discrete segmentation map
         x_softmax = self.apply_nonlin(x)
         P = torch.argmax(x_softmax, dim=1)
+        # P is now (B, H, W) or (B, D, H, W) -> unsqueeze to restore channel
         P = torch.unsqueeze(P.double(), dim=1)
         del x_softmax
 
-        # Call the Topological Interaction Module
         critical_voxels_map = self.topological_interaction_module(P)
 
-        # Compute the TI loss value
+        # Compute TI loss
+        # CE Loss returns (B, spatial...), we unsqueeze to (B, 1, spatial...) to match map
         ce_tensor = torch.unsqueeze(
             self.ce_loss_func(x.double(), y[:, 0].long()), dim=1
         )
-        ce_tensor[:, 0] = ce_tensor[:, 0] * torch.squeeze(critical_voxels_map, dim=1)
+
+        # Mask the CE loss with critical voxels
+        ce_tensor = ce_tensor * critical_voxels_map
+
+        # Sum over spatial dims and mean over batch
         ce_loss_value = ce_tensor.sum(dim=self.sum_dim_list).mean()
 
         return ce_loss_value
