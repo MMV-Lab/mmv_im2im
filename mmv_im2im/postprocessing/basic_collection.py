@@ -78,6 +78,8 @@ def generate_classmap(im: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
     # convert tensor to numpy
     if torch.is_tensor(im):
         im = im.cpu().numpy()
+    if len(im.shape) == 4 and im.shape[0] != 1:
+        im = im[None, ...]
     assert len(im.shape) == 4 or len(im.shape) == 5, "extract seg only accepts 4D/5D"
     assert im.shape[0] == 1, "extract seg requires first dim to be 1"
 

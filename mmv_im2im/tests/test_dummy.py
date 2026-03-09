@@ -49,9 +49,9 @@ def test_connectivity_loss(dims):
     pred_softmax = F.softmax(logits, dim=1)
     target_one_hot = F.one_hot(target_indices, num_classes=n_classes).float()
     if dims == 2:
-        target_one_hot = target_one_hot.permute(0, 3, 1, 2)  
+        target_one_hot = target_one_hot.permute(0, 3, 1, 2)
     else:
-        target_one_hot = target_one_hot.permute(0, 4, 1, 2, 3)  
+        target_one_hot = target_one_hot.permute(0, 4, 1, 2, 3)
 
     loss = loss_fn(pred_softmax, target_one_hot)
     assert not torch.isnan(loss)

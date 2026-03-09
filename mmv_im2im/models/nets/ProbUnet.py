@@ -16,7 +16,7 @@ class ConvBlock(nn.Module):
         dropout=0.0,
     ):
         super().__init__()
-        # padding=None in MONAI Convolution defaults to "same" padding
+
         layers = [
             Convolution(
                 spatial_dims,
@@ -227,14 +227,17 @@ class ProbabilisticUNet(nn.Module):
         mu_post, logvar_post = None, None
 
         if train_posterior and seg is not None:
+
             if seg.shape[1] != self.out_channels:
                 seg_temp = seg
                 if seg_temp.shape[1] == 1:
                     seg_temp = seg_temp.squeeze(1)
+
+                seg_one_hot = F.one_hot(seg_temp.long(), num_classes=self.out_channels)
+
+                dims = list(range(seg_one_hot.ndim))
                 seg_one_hot = (
-                    F.one_hot(seg_temp.long(), num_classes=self.out_channels)
-                    .permute(0, 3, 1, 2)
-                    .float()
+                    seg_one_hot.permute(0, dims[-1], *dims[1:-1]).contiguous().float()
                 )
             else:
                 seg_one_hot = seg.float()
