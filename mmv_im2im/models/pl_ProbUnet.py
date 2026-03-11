@@ -40,14 +40,23 @@ class Model(pl.LightningModule):
     def run_step(self, batch):
         x, y = batch["IM"], batch["GT"]
 
-        # Ensure x is (B, C, H, W)
-        if x.ndim == 5 and x.shape[-1] == 1:
+        if x.ndim > 4 and x.shape[-1] == 1:
             x = x.squeeze(-1)
-        # Ensure y is (B, 1, H, W) for passing to model and loss
-        if y.ndim == 5 and y.shape[-1] == 1:
+
+        if y.ndim > 4 and y.shape[-1] == 1:
             y = y.squeeze(-1)
-        if y.ndim == 3:
-            y = y.unsqueeze(1)  # Add channel dim if missing (B, H, W) -> (B, 1, H, W)
+
+        if y.ndim == x.ndim - 1:
+            y = y.unsqueeze(1)
+
+        # # Ensure x is (B, C, H, W)
+        # if x.ndim == 5 and x.shape[-1] == 1:
+        #     x = x.squeeze(-1)
+        # # Ensure y is (B, 1, H, W) for passing to model and loss
+        # if y.ndim == 5 and y.shape[-1] == 1:
+        #     y = y.squeeze(-1)
+        # if y.ndim == 3:
+        #     y = y.unsqueeze(1)  # Add channel dim if missing (B, H, W) -> (B, 1, H, W)
 
         # Forward pass (Train Posterior)
         output = self(x, seg=y, train_posterior=True)
