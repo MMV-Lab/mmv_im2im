@@ -2,37 +2,28 @@ mode: train
 
 data:
   category: "pair"
-  data_path: "/mnt/eternus/users/Jair/Trainings/Retrain2/DataMax"
+  data_path: "path/to/your/data"
+  extra: # Info for heurisctis nnUnet
+    patch_size: [256, 256]
+    spacing: [1.0, 1.0]
+    modality: "non-CT"
+    #vram_gb: 40 #if you use cuda automatically its computed in other case you should provide
   dataloader:
     train:
       dataloader_type:  
         module_name: monai.data
-        func_name: Dataset # PersistentDataset CacheDataset Dataset
-      # dataset_params:
-      # # For CacheDataset
-      #   # cache_rate: 1.0 
-      #   # num_workers: 8
-      # # For PersistentDataset
-      #   # pickle_protocol: 2
-      #   # cache_dir: ./cache28
+        func_name: Dataset 
       dataloader_params:
-        batch_size: 2
+        batch_size: 4
         pin_memory: True
         num_workers: 4
         persistent_workers: False
     val:
       dataloader_type:  
         module_name: monai.data
-        func_name: Dataset # PersistentDataset CacheDataset Dataset
-      # dataset_params:
-      # # For CacheDataset
-      #   # cache_rate: 1.0 
-      #   # num_workers: 4
-      # # For PersistentDataset
-      #   # pickle_protocol: 2
-      #   # cache_dir: ./cache28
+        func_name: Dataset 
       dataloader_params:
-        batch_size: 2
+        batch_size: 4
         pin_memory: True
         num_workers: 4
         persistent_workers: False
@@ -63,17 +54,10 @@ data:
       params:
         channel_wise: True
         keys: ["IM"]
-    ##Activate this if the image sape is not divisible by 2^n = k  n number of reducction 2 in channels ProbabilisticUNet ([1, 2, 2, 2, 2] ->2^4 = 16 =k) 
-    # - module_name: monai.transforms
-    #   func_name: DivisiblePadd
-    #   params:
-    #     keys: ["IM", "GT"]
-    #     k: 16
     - module_name: monai.transforms
       func_name: EnsureTyped
       params:
         keys: ["IM", "GT"]
-
   augmentation:
     - module_name: monai.transforms
       func_name: RandFlipd
@@ -105,34 +89,34 @@ data:
         keys: ["IM", "GT"]
 
 model:
-  framework: ProbUnet
+  framework: nnUnet
   # model_extra:
   #   pre-train: path to ckp file
   #   extend: True  option to tranfer learing (change output layer)
   net:
-    module_name: mmv_im2im.models.nets.ProbUnet
-    func_name: ProbabilisticUNet
+    module_name: monai.networks.nets
+    func_name: DynUNet
     params:
-      in_channels: 2 #entry chanels
-      out_channels: 3 # one for each for each class on the gt 
-      spatial_dims: 2 #2d o 3d for convolutions
-      latent_dim: 6
-      channels: [32, 64, 128, 256, 512]
-      strides: [1, 2, 2, 2, 2]
+      spatial_dims: 2 # 2d or 3d for convolutions
+      in_channels: 2 # nuber of channels in the input IM
+      out_channels: 3 # One per class
+      # DynUNet initial values 
+      kernel_size: [[3, 3], [3, 3], [3, 3], [3, 3], [3, 3]]
+      strides: [[1, 1], [2, 2], [2, 2], [2, 2], [2, 2]]
+      upsample_kernel_size: [[2, 2], [2, 2], [2, 2], [2, 2]]
+      filters: [32, 64, 128, 256, 512]
       dropout: 0.2
-
+      res_block: True # Enables residual connections standard in modern nnU-Nets
+      deep_supervision: False
+      task: 'segmentation' # segmentation/regression       
   criterion:
-    module_name: mmv_im2im.utils.elbo_loss
-    func_name: ELBOLoss
+    module_name: mmv_im2im.utils.gdl_regularized
+    func_name: RegularizedGeneralizedDiceFocalLoss
     params:
       spatial_dims: 2 #2d or 3d
-      task: "segment" 
-      beta: 0.5 # The beta parameter for ELBO loss
       n_classes: 3  # Number of classes (counting background)
-      kl_clamp: 20.0 # for kl stability and convergence
-      #elbo_class_weights:  None
-
-      ################# Set the desired used regularizer true and the desired parameters ############################
+      gdl_focal_weight: 1.0  
+      #gdl_class_weights: [1,1,1]
 
       #Fractal-Dimension
       use_fractal_regularization: False  # Set to True to enable fractal regularization and then the parametert for this
@@ -159,7 +143,6 @@ model:
       use_homology_regularization: False
       homology_weight: 1
       homology_warmup_epochs: 150 # distribute the impact in the given n epochs -> recomend weight 1
-      homology_interval: 3 # apply the regularizator just every n epoch to help with heavy computations
       homology_class_context: 2 # n take n clases whithout 0,  [1,4,n] especific classes, 'general' all the seg like one class
       homology_metric: mse # simm, mse , l1, l2  
       homology_features: all # all (h0,h1) cc (conceted components) holes
@@ -177,7 +160,6 @@ model:
       use_topological_complexity: False
       topological_complexity_weight: 1
       complexity_warmup_epochs: 150 # distribute the impact in the given n epochs -> recomend weight 1
-      complexity_interval: 3 # apply the regularizator just every n epoch to help with heavy computations
       complexity_features: all # all (h0,h1) cc (conceted components) holes
       complexity_downsample_scale: 0.3 # reduction on the sizes for PD generation (>1) original gt size
       complexity_class_context: 2 # n take n clases whithout 0,  [1,4,n] especific classes, 'general' all the seg like one class
@@ -186,12 +168,6 @@ model:
       complexity_k_top: 500 #If filtering then keep the 2000 most significatives topology features to prevent memory problems     
       complexity_temperature: 0.05 #relaxation for Betti number Lower approx discrete count, higher smoother gradients.
       complexity_auto_balance: True #Enables dynamic inverse-frequency weighting per batch. 
-
-      #GDL
-      use_gdl_focal_regularization: False
-      gdl_focal_weight: 1
-      gdl_warmup_epochs: 150 # distribute the impact in the given n epochs -> recomend weight 1
-      #gdl_class_weights: [1,1,2]
 
       #Hauss
       use_hausdorff_regularization: False
@@ -210,12 +186,11 @@ model:
       topological_exclusion: [] 
       topological_min_thick: 1 # Default value.
 
-
   optimizer:
     module_name: torch.optim
     func_name: AdamW
     params:
-      lr: 0.001 # 0.001
+      lr: 0.01 # 0.001
       weight_decay: 0.01 # 0.01
 
   scheduler:
@@ -235,7 +210,7 @@ trainer:
     precision: 32 #16
     max_epochs: 3000
     detect_anomaly: False
-    log_every_n_steps: 10 # less than the number of training iterations
+    log_every_n_steps: 2 # less than the number of training iterations
     # gradient_clip_val: 0.5 
     # gradient_clip_algorithm: "norm"
   callbacks:

@@ -111,7 +111,10 @@ class MapExtractor(object):
             self.pre_process = parse_monai_ops_vanilla(self.data_cfg.preprocess)
 
     def process_one_image(
-        self, img: Union[DaskArray, NumpyArray], out_fn: Union[str, Path] = None
+        self,
+        img: Union[DaskArray, NumpyArray],
+        dim: int = 2,
+        out_fn: Union[str, Path] = None,
     ):
 
         if isinstance(img, DaskArray):
@@ -131,7 +134,8 @@ class MapExtractor(object):
         # run pre-processing on tensor if needed
         if self.pre_process is not None:
             x = self.pre_process(x)
-            x = x[0]
+            if dim == 2:
+                x = x[0]
 
         # choose different inference function for different types of models
         with torch.no_grad():
@@ -412,7 +416,7 @@ class MapExtractor(object):
                 else:
                     inp = im_input
 
-                logits = self.process_one_image(inp)
+                logits = self.process_one_image(inp, dim=2)
                 samplesz.append(np.squeeze(logits))
 
             # Multi-prediction aggregation
@@ -464,6 +468,7 @@ class MapExtractor(object):
     def _process_vol2vol(self, img, pred_cfg, original_postprocess, pert_opt):
         """New direct 3D volume processing logic."""
         # Input img is (C, Z, Y, X) or (Z, Y, X)
+        # Handle dummy channel if missing
         if len(img.shape) == 3:
             img = img[None, ...]  # (C, Z, Y, X)
 
@@ -478,7 +483,7 @@ class MapExtractor(object):
 
             # Process one image will handle 4D input by adding batch dim -> (1, C, Z, Y, X)
             # Ensure spatial_dims is set to 3 in setup
-            logits = self.process_one_image(inp)
+            logits = self.process_one_image(inp, dim=3)
             samples_vol.append(np.squeeze(logits))
 
         # Multi-prediction aggregation (3D)

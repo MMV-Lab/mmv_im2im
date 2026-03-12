@@ -35,7 +35,8 @@ class ELBOLoss(nn.Module):
         spatial_dims: int = 2,
         kl_clamp: float = None,
         elbo_class_weights: list = None,
-        task: str = "segment",
+        task: str = "segmentation",
+        regression_loss_type: str = "mse",
         # --- Fractal Regularization ---
         use_fractal_regularization: bool = False,
         fractal_weight: float = 0.1,
@@ -112,6 +113,7 @@ class ELBOLoss(nn.Module):
         self.spatial_dims = spatial_dims
         self.kl_clamp = kl_clamp
         self.task = task
+        self.regression_loss_type = regression_loss_type.lower()
         self.kl_divergence_calculator = KLDivergence()
 
         # Class weights for the main reconstruction loss (Cross Entropy)
@@ -122,149 +124,150 @@ class ELBOLoss(nn.Module):
         else:
             self.elbo_class_weights = None
 
-        # --- Initialize Regularizers ---
-        reg_used = []
+        if self.task == "segmentation":
+            # --- Initialize Regularizers ---
+            reg_used = []
 
-        # 1. Fractal
-        self.use_fractal_regularization = use_fractal_regularization
-        if self.use_fractal_regularization:
-            self.fractal_weight = fractal_weight
-            self.fractal_warmup_epochs = fractal_warmup_epochs
-            reg_used.append(f"Fractal-Dimension {fractal_mode}")
-            from mmv_im2im.utils.fractal_layers import FractalDimension
+            # 1. Fractal
+            self.use_fractal_regularization = use_fractal_regularization
+            if self.use_fractal_regularization:
+                self.fractal_weight = fractal_weight
+                self.fractal_warmup_epochs = fractal_warmup_epochs
+                reg_used.append(f"Fractal-Dimension {fractal_mode}")
+                from mmv_im2im.utils.fractal_layers import FractalDimension
 
-            self.fractal_dimension_calculator = FractalDimension(
-                num_kernels=fractal_num_kernels,
-                mode=fractal_mode,
-                to_binary=fractal_to_binary,
-                spatial_dims=self.spatial_dims,
-            )
+                self.fractal_dimension_calculator = FractalDimension(
+                    num_kernels=fractal_num_kernels,
+                    mode=fractal_mode,
+                    to_binary=fractal_to_binary,
+                    spatial_dims=self.spatial_dims,
+                )
 
-        # 2. Topological (TI Loss)
-        self.use_topological_regularization = use_topological_regularization
-        if self.use_topological_regularization:
-            self.topological_weight = topological_weight
-            self.topological_warmup_epochs = topological_warmup_epochs
-            reg_used.append("Topological-Restrictions (TI Loss)")
-            from mmv_im2im.utils.topological_loss import TI_Loss
+            # 2. Topological (TI Loss)
+            self.use_topological_regularization = use_topological_regularization
+            if self.use_topological_regularization:
+                self.topological_weight = topological_weight
+                self.topological_warmup_epochs = topological_warmup_epochs
+                reg_used.append("Topological-Restrictions (TI Loss)")
+                from mmv_im2im.utils.topological_loss import TI_Loss
 
-            self.topological_loss_calculator = TI_Loss(
-                dim=self.spatial_dims,
-                connectivity=topological_connectivity,
-                inclusion=topological_inclusion if topological_inclusion else [],
-                exclusion=topological_exclusion if topological_exclusion else [],
-                min_thick=topological_min_thick,
-            )
+                self.topological_loss_calculator = TI_Loss(
+                    dim=self.spatial_dims,
+                    connectivity=topological_connectivity,
+                    inclusion=topological_inclusion if topological_inclusion else [],
+                    exclusion=topological_exclusion if topological_exclusion else [],
+                    min_thick=topological_min_thick,
+                )
 
-        # 3. Connectivity
-        self.use_connectivity_regularization = use_connectivity_regularization
-        if self.use_connectivity_regularization:
-            self.connectivity_weight = connectivity_weight
-            self.connectivity_warmup_epochs = connectivity_warmup_epochs
-            reg_used.append(f"Connectivity Coherence {connectivity_mode}")
-            from mmv_im2im.utils.connectivity_loss import ConnectivityCoherenceLoss
+            # 3. Connectivity
+            self.use_connectivity_regularization = use_connectivity_regularization
+            if self.use_connectivity_regularization:
+                self.connectivity_weight = connectivity_weight
+                self.connectivity_warmup_epochs = connectivity_warmup_epochs
+                reg_used.append(f"Connectivity Coherence {connectivity_mode}")
+                from mmv_im2im.utils.connectivity_loss import ConnectivityCoherenceLoss
 
-            self.connectivity_coherence_calculator = ConnectivityCoherenceLoss(
-                spatial_dims=self.spatial_dims,
-                connectivity_mode=connectivity_mode,
-                kernel_shape=kernel_shape,
-                connectivity_kernel_size=connectivity_kernel_size,
-                ignore_background=connectivity_ignore_background,
-                num_classes=n_classes,
-                lambda_density=lambda_density,
-                lambda_gradient=lambda_gradient,
-                metric_density=connectivity_metric_density,
-                metric_gradient=connectivity_metric_gradient,
-            )
+                self.connectivity_coherence_calculator = ConnectivityCoherenceLoss(
+                    spatial_dims=self.spatial_dims,
+                    connectivity_mode=connectivity_mode,
+                    kernel_shape=kernel_shape,
+                    connectivity_kernel_size=connectivity_kernel_size,
+                    ignore_background=connectivity_ignore_background,
+                    num_classes=n_classes,
+                    lambda_density=lambda_density,
+                    lambda_gradient=lambda_gradient,
+                    metric_density=connectivity_metric_density,
+                    metric_gradient=connectivity_metric_gradient,
+                )
 
-        # 4. GDL Focal (MONAI)
-        self.use_gdl_focal_regularization = use_gdl_focal_regularization
-        if self.use_gdl_focal_regularization:
-            self.gdl_focal_weight = gdl_focal_weight
-            self.gdl_warmup_epochs = gdl_warmup_epochs
-            reg_used.append("Generalized Dice Focal")
-            from monai.losses import GeneralizedDiceFocalLoss
+            # 4. GDL Focal (MONAI)
+            self.use_gdl_focal_regularization = use_gdl_focal_regularization
+            if self.use_gdl_focal_regularization:
+                self.gdl_focal_weight = gdl_focal_weight
+                self.gdl_warmup_epochs = gdl_warmup_epochs
+                reg_used.append("Generalized Dice Focal")
+                from monai.losses import GeneralizedDiceFocalLoss
 
-            monai_focal_weights = (
-                torch.tensor(gdl_class_weights, dtype=torch.float32)
-                if gdl_class_weights
-                else None
-            )
-            # MONAI losses are generally dimension-agnostic given correct input shape
-            self.gdl_focal_loss_calculator = GeneralizedDiceFocalLoss(
-                softmax=True, to_onehot_y=True, weight=monai_focal_weights
-            )
+                monai_focal_weights = (
+                    torch.tensor(gdl_class_weights, dtype=torch.float32)
+                    if gdl_class_weights
+                    else None
+                )
+                # MONAI losses are generally dimension-agnostic given correct input shape
+                self.gdl_focal_loss_calculator = GeneralizedDiceFocalLoss(
+                    softmax=True, to_onehot_y=True, weight=monai_focal_weights
+                )
 
-        # 5. Hausdorff
-        self.use_hausdorff_regularization = use_hausdorff_regularization
-        if self.use_hausdorff_regularization:
-            self.hausdorff_weight = hausdorff_weight
-            self.hausdorff_warmup_epochs = hausdorff_warmup_epochs
-            self.hausdorff_downsample_scale = hausdorff_downsample_scale
-            self.hausdorff_dt_iterations = hausdorff_dt_iterations
-            self.hausdorff_include_background = hausdorff_include_background
-            reg_used.append("Hausdorff")
-            from mmv_im2im.utils.hausdorff_loss import HausdorffLoss
+            # 5. Hausdorff
+            self.use_hausdorff_regularization = use_hausdorff_regularization
+            if self.use_hausdorff_regularization:
+                self.hausdorff_weight = hausdorff_weight
+                self.hausdorff_warmup_epochs = hausdorff_warmup_epochs
+                self.hausdorff_downsample_scale = hausdorff_downsample_scale
+                self.hausdorff_dt_iterations = hausdorff_dt_iterations
+                self.hausdorff_include_background = hausdorff_include_background
+                reg_used.append("Hausdorff")
+                from mmv_im2im.utils.hausdorff_loss import HausdorffLoss
 
-            self.hausdorff_loss_calculator = HausdorffLoss(
-                spatial_dims=self.spatial_dims,
-                dt_iterations=self.hausdorff_dt_iterations,
-                include_background=self.hausdorff_include_background,
-            )
+                self.hausdorff_loss_calculator = HausdorffLoss(
+                    spatial_dims=self.spatial_dims,
+                    dt_iterations=self.hausdorff_dt_iterations,
+                    include_background=self.hausdorff_include_background,
+                )
 
-        # 6. Homology (Persistence Image)
-        self.use_homology_regularization = use_homology_regularization
-        if self.use_homology_regularization:
-            self.homology_interval = max(1, homology_interval)
-            self.homology_weight = homology_weight
-            self.homology_warmup_epochs = homology_warmup_epochs
-            self.homology_downsample_scale = homology_downsample_scale
-            reg_used.append("Persistence Image (Homology)")
-            from mmv_im2im.utils.homology_loss import HomologyLoss
+            # 6. Homology (Persistence Image)
+            self.use_homology_regularization = use_homology_regularization
+            if self.use_homology_regularization:
+                self.homology_interval = max(1, homology_interval)
+                self.homology_weight = homology_weight
+                self.homology_warmup_epochs = homology_warmup_epochs
+                self.homology_downsample_scale = homology_downsample_scale
+                reg_used.append("Persistence Image (Homology)")
+                from mmv_im2im.utils.homology_loss import HomologyLoss
 
-            self.homology_calculator = HomologyLoss(
-                spatial_dims=self.spatial_dims,
-                resolution=homology_resolution,
-                sigma=homology_sigma,
-                features=homology_features,
-                class_context=homology_class_context,
-                metric=homology_metric,
-                chunks=chunks,
-                filtering=homology_filtering,
-                treshold=homology_threshold,
-                k_top=homology_k_top,
-                weighting_power=weighting_power,
-                composite_flag=composite_flag,
-            )
+                self.homology_calculator = HomologyLoss(
+                    spatial_dims=self.spatial_dims,
+                    resolution=homology_resolution,
+                    sigma=homology_sigma,
+                    features=homology_features,
+                    class_context=homology_class_context,
+                    metric=homology_metric,
+                    chunks=chunks,
+                    filtering=homology_filtering,
+                    treshold=homology_threshold,
+                    k_top=homology_k_top,
+                    weighting_power=weighting_power,
+                    composite_flag=composite_flag,
+                )
 
-        # 7. Topological Complexity
-        self.use_topological_complexity = use_topological_complexity
-        if self.use_topological_complexity:
-            self.complexity_interval = max(1, complexity_interval)
-            self.topological_complexity_weight = topological_complexity_weight
-            self.complexity_warmup_epochs = complexity_warmup_epochs
-            self.complexity_downsample_scale = complexity_downsample_scale
-            if complexity_metric == "wasserstein":
-                reg_used.append("Persistence Complexity (Diagrams)")
-            else:
-                reg_used.append("Persistence Complexity (Entropy-Betti)")
-            from mmv_im2im.utils.topological_complexity_loss import (
-                TopologicalComplexityLoss,
-            )
+            # 7. Topological Complexity
+            self.use_topological_complexity = use_topological_complexity
+            if self.use_topological_complexity:
+                self.complexity_interval = max(1, complexity_interval)
+                self.topological_complexity_weight = topological_complexity_weight
+                self.complexity_warmup_epochs = complexity_warmup_epochs
+                self.complexity_downsample_scale = complexity_downsample_scale
+                if complexity_metric == "wasserstein":
+                    reg_used.append("Persistence Complexity (Diagrams)")
+                else:
+                    reg_used.append("Persistence Complexity (Entropy-Betti)")
+                from mmv_im2im.utils.topological_complexity_loss import (
+                    TopologicalComplexityLoss,
+                )
 
-            self.topological_complexity_calculator = TopologicalComplexityLoss(
-                spatial_dims=self.spatial_dims,
-                features=complexity_features,
-                class_context=complexity_class_context,
-                metric=complexity_metric,
-                threshold=complexity_threshold,
-                k_top=complexity_k_top,
-                temperature=complexity_temperature,
-                auto_balance=complexity_auto_balance,
-            )
+                self.topological_complexity_calculator = TopologicalComplexityLoss(
+                    spatial_dims=self.spatial_dims,
+                    features=complexity_features,
+                    class_context=complexity_class_context,
+                    metric=complexity_metric,
+                    threshold=complexity_threshold,
+                    k_top=complexity_k_top,
+                    temperature=complexity_temperature,
+                    auto_balance=complexity_auto_balance,
+                )
 
-        if len(reg_used) > 0:
-            print(f"Active Regularizers: {reg_used}")
+            if len(reg_used) > 0:
+                print(f"Active Regularizers: {reg_used}")
 
     def _get_warmup_factor(self, current_epoch, warmup_epochs):
         if torch.is_tensor(current_epoch):
@@ -342,7 +345,7 @@ class ELBOLoss(nn.Module):
             self.elbo_class_weights = self.elbo_class_weights.to(logits.device)
 
         # --- 2. Base Reconstruction Loss (Cross Entropy) ---
-        if self.task == "segment":
+        if self.task == "segmentation":
             reconstruction_loss = F.cross_entropy(
                 logits,
                 y_true_flat.long(),
@@ -350,7 +353,19 @@ class ELBOLoss(nn.Module):
                 weight=self.elbo_class_weights,
             )
         else:
-            reconstruction_loss = F.huber_loss(logits, y_true, reduction="mean")
+            target = (
+                y_true_ch.float() if y_true_ch.shape == logits.shape else y_true.float()
+            )
+            if self.regression_loss_type == "mse":
+                reconstruction_loss = F.mse_loss(logits, target, reduction="mean")
+            elif self.regression_loss_type == "l1":
+                reconstruction_loss = F.l1_loss(logits, target, reduction="mean")
+            elif self.regression_loss_type == "huber":
+                reconstruction_loss = F.huber_loss(logits, target, reduction="mean")
+            else:
+                raise ValueError(
+                    f"Regression loss should be mse/l1/huber but : {self.regression_loss_type} was given"
+                )
 
         # --- 3. KL Divergence ---
         kl_div = self.kl_divergence_calculator(
@@ -360,7 +375,7 @@ class ELBOLoss(nn.Module):
         total_loss = reconstruction_loss + (self.beta * kl_div)
 
         # --- 4. Regularizers ---
-        if self.task == "segment":
+        if self.task == "segmentation":
 
             # Helper: Softmax Probs
             if (

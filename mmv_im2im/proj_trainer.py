@@ -7,6 +7,7 @@ import lightning as pl
 import torch
 from mmv_im2im.data_modules import get_data_module
 from mmv_im2im.utils.misc import parse_ops_list
+from mmv_im2im.utils.nnHeuristic import get_nnunet_plans
 import pyrallis
 
 import warnings
@@ -40,6 +41,34 @@ class ProjectTrainer(object):
 
     def run_training(self):
         self.data = get_data_module(self.data_cfg)
+
+        if self.model_cfg.net["func_name"] == "DynUNet":
+            # 1. Gather inputs for heuristic
+            # You might need to add these fields to your YAML or extract them from data
+            extra_params = (
+                self.data_cfg.extra if self.data_cfg.extra is not None else {}
+            )
+            patch_size = extra_params.get("patch_size", [256, 256])
+            spacing = extra_params.get("spacing", [1.0, 1.0])
+            modality = extra_params.get("modality", "non-CT")
+
+            plans = get_nnunet_plans(patch_size, spacing, modality)
+
+            self.model_cfg.net["params"].update(
+                {
+                    "kernel_size": plans["kernel_size"],
+                    "strides": plans["strides"],
+                    "filters": plans["filters"],
+                    "upsample_kernel_size": plans["upsample_kernel_size"],
+                }
+            )
+
+            print(f"✅ nnU-Net configured for {len(patch_size)}D.")
+            print(f"Filters: {plans['filters']}")
+            print(f"Strides: {plans['strides']}")
+            print(f"Kernel size: {plans['kernel_size']}")
+            print(f"Upsample Kernel size: {plans['upsample_kernel_size']}")
+
         model_category = self.model_cfg.framework
         model_module = import_module(f"mmv_im2im.models.pl_{model_category}")
         my_model_func = getattr(model_module, "Model")

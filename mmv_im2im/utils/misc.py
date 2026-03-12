@@ -1,11 +1,10 @@
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Sequence, Tuple
 from pathlib import Path
 from functools import partial
 import importlib
 import numpy as np
 import inspect
 from bioio import BioImage
-from typing import Sequence, Tuple
 from monai.data import ImageReader
 from monai.utils import ensure_tuple, require_pkg
 from monai.config import PathLike
@@ -19,33 +18,41 @@ class monai_bio_reader(ImageReader):
         super().__init__()
         self.kwargs = kwargs
 
+    def verify_suffix(self, filename: Union[Sequence[PathLike], PathLike]) -> bool:
+        return True
+
     def read(self, data: Union[Sequence[PathLike], PathLike]):
         filenames: Sequence[PathLike] = ensure_tuple(data)
         img_ = []
         for name in filenames:
-            try:
-                img_.append(BioImage(f"{name}", reader=bioio_tifffile.Reader))
-
-            except Exception:
+            if str(name).endswith(".npy"):
+                img_.append(np.load(str(name)))
+            else:
                 try:
-                    img_.append(BioImage(f"{name}"))
-                except Exception as e:
-                    print(f"Error: {e}")
-                    print(f"Image {name} failed at read process check the format.")
+                    img_.append(BioImage(f"{name}", reader=bioio_tifffile.Reader))
+                except Exception:
+                    try:
+                        img_.append(BioImage(f"{name}"))
+                    except Exception as e:
+                        print(f"Error: {e}")
+                        print(f"Image {name} failed at read process check the format.")
 
         return img_ if len(filenames) > 1 else img_[0]
 
     def get_data(self, img) -> Tuple[np.ndarray, Dict]:
+        if isinstance(img, np.ndarray):
+            return img, {}
+
         img_array: List[np.ndarray] = []
 
         for img_obj in ensure_tuple(img):
-            data = img_obj.get_image_data(**self.kwargs)
-            img_array.append(data)
+            if isinstance(img_obj, np.ndarray):
+                img_array.append(img_obj)
+            else:
+                data = img_obj.get_image_data(**self.kwargs)
+                img_array.append(data)
 
         return _stack_images(img_array, {}), {}
-
-    def verify_suffix(self, filename: Union[Sequence[PathLike], PathLike]) -> bool:
-        return True
 
 
 """
@@ -80,7 +87,7 @@ def parse_config_func_without_params(info):
 
 
 def parse_config(info):
-    # univeral configuration parser
+    # universal configuration parser
     my_func = parse_config_func_without_params(info)
     if "params" in info:
         if inspect.isclass(my_func):
@@ -111,9 +118,6 @@ def parse_ops_list(trans_func: List[Dict]):
     # load functions according to config
     for trans_dict in trans_func:
         op_list.append(parse_config(trans_dict))
-        # trans_module = importlib.import_module(trans_dict["module_name"])
-        # trans_func = getattr(trans_module, trans_dict["func_name"])
-        # op_list.append(trans_func(**trans_dict["params"]))
     return op_list
 
 
@@ -172,52 +176,44 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
             df = pd.read_csv(data)
             assert "source_path" in df.columns, "column source_path not found"
             assert "target_path" in df.columns, "column target_path not found"
-
-            # check if costmap is needed
-            if "costmap_path" in df.columns:
-                cm_flag = True
-            else:
-                cm_flag = False
+            cm_flag = "costmap_path" in df.columns
 
             for row in df.itertuples():
+                item = {
+                    "source_fn": row.source_path,
+                    "target_fn": row.target_path,
+                }
                 if cm_flag:
-                    dataset_list.append(
-                        {
-                            "source_fn": row.source_path,
-                            "target_fn": row.target_path,
-                            "costmap_fn": row.costmap_path,
-                        }
-                    )
-                else:
-                    dataset_list.append(
-                        {
-                            "source_fn": row.source_path,
-                            "target_fn": row.target_path,
-                        }  # noqa E501
-                    )
+                    item["costmap_fn"] = row.costmap_path
+                dataset_list.append(item)
+
         elif data.is_dir():
             all_filename = sorted(data.glob("*_IM.*"))
             assert len(all_filename) > 0, f"no file found in {data}"
-
             all_filename.sort()
+
             for fn in all_filename:
-                target_fn = data / fn.name.replace("_IM.", "_GT.")
-                costmap_fn = data / fn.name.replace("_IM.", "_CM.")
-                if costmap_fn.is_file():
-                    dataset_list.append(
-                        {
-                            "source_fn": fn,
-                            "target_fn": target_fn,
-                            "costmap_fn": costmap_fn,
-                        }
-                    )
+                # Extension agnostic matching
+                basename = fn.name[: fn.name.rfind("_IM.")]
+                target_fn_list = list(data.glob(f"{basename}_GT.*"))
+                costmap_fn_list = list(data.glob(f"{basename}_CM.*"))
+
+                item = {"source_fn": fn}
+                if target_fn_list:
+                    item["target_fn"] = target_fn_list[0]
                 else:
-                    dataset_list.append(
-                        {
-                            "source_fn": fn,
-                            "target_fn": target_fn,
-                        }
-                    )
+                    # Fallback to original behavior
+                    item["target_fn"] = data / fn.name.replace("_IM.", "_GT.")
+
+                if costmap_fn_list:
+                    item["costmap_fn"] = costmap_fn_list[0]
+                else:
+                    # Fallback to original behavior, only add if exists
+                    costmap_fn_fallback = data / fn.name.replace("_IM.", "_CM.")
+                    if costmap_fn_fallback.is_file():
+                        item["costmap_fn"] = costmap_fn_fallback
+
+                dataset_list.append(item)
         else:
             print(f"{data} is not a valid file or directory")
 
@@ -231,7 +227,6 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
 
         source_path = Path(data["source_dir"]).expanduser()
         target_path = Path(data["target_dir"]).expanduser()
-
         data_type = data["image_type"]
 
         all_filename = sorted(source_path.glob(f"*.{data_type}"))
@@ -240,45 +235,62 @@ def generate_dataset_dict(data: Union[str, Path, Dict]) -> List[Dict]:
 
         for fn in all_filename:
             target_fn = target_path / fn.name
+
+            # Allow fallback if extensions differ (e.g. source is .tiff, target is .npy)
+            if not target_fn.is_file():
+                matched_target = list(target_path.glob(f"{fn.stem}.*"))
+                if matched_target:
+                    target_fn = matched_target[0]
+
+            item = {"source_fn": fn, "target_fn": target_fn}
+
             if cm_path is not None:
                 costmap_fn = cm_path / fn.name
-                dataset_list.append(
-                    {
-                        "source_fn": fn,
-                        "target_fn": target_fn,
-                        "costmap_fn": costmap_fn,
-                    }  # noqa E501
-                )
-            else:
-                dataset_list.append({"source_fn": fn, "target_fn": target_fn})
+                if not costmap_fn.is_file():
+                    matched_cm = list(cm_path.glob(f"{fn.stem}.*"))
+                    if matched_cm:
+                        costmap_fn = matched_cm[0]
+                item["costmap_fn"] = costmap_fn
 
+            dataset_list.append(item)
     else:
         print("unsupported data type")
 
     assert len(dataset_list) > 0, f"empty dataset in {data}"
-
     return dataset_list
 
 
 def load_one_folder(data) -> List:
     dataset_list = []
-
+    data = Path(data)
     all_filename = sorted(data.glob("*_IM.*"))
     assert len(all_filename) > 0, f"no file found in {data}"
 
     # parse how many images associated with one subject
-    basename = all_filename[0].stem
-    basename = basename[: basename.rfind("_")]
-    subject_files = sorted(data.glob(f"{basename}_*.*"))
-    all_tags = [sfile.stem[sfile.stem.rfind("_") + 1 :] for sfile in subject_files]
+    first_fn = all_filename[0]
+    basename_template = first_fn.name[: first_fn.name.rfind("_IM")]
+    subject_files = sorted(data.glob(f"{basename_template}_*.*"))
+
+    all_tags = list(
+        set([sfile.stem[sfile.stem.rfind("_") + 1 :] for sfile in subject_files])
+    )
+    all_tags.sort()
 
     all_filename.sort()
     for fn in all_filename:
         path_list = {}
+        current_basename = fn.name[: fn.name.rfind("_IM")]
+
         for tag_name in all_tags:
-            fn_full = data / fn.name.replace("_IM.", f"_{tag_name}.")
-            path_list[tag_name] = fn_full
-        dataset_list.append(path_list)
+            tag_files = list(data.glob(f"{current_basename}_{tag_name}.*"))
+            if len(tag_files) > 0:
+                path_list[tag_name] = tag_files[0]
+            else:
+                # Original behavior fallback
+                path_list[tag_name] = data / fn.name.replace("_IM.", f"_{tag_name}.")
+
+        if len(path_list) > 0:
+            dataset_list.append(path_list)
 
     return dataset_list
 
@@ -301,8 +313,19 @@ def load_subfolders(data) -> List:
     for fn in all_filename:
         path_list = {}
         for tag_name in all_tags:
-            fn_full = data / Path(tag_name) / fn.name
-            path_list[tag_name] = fn_full
+            target_dir = data / Path(tag_name)
+            fn_exact = target_dir / fn.name
+
+            # If extensions are identical, standard match works
+            if fn_exact.is_file():
+                path_list[tag_name] = fn_exact
+            else:
+                # If they differ (e.g. .npy vs .tiff), search by stem
+                matched = list(target_dir.glob(f"{fn.stem}.*"))
+                if matched:
+                    path_list[tag_name] = matched[0]
+                else:
+                    path_list[tag_name] = fn_exact
         dataset_list.append(path_list)
 
     return dataset_list
@@ -325,14 +348,24 @@ def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
             data = eval(data)
         except Exception as e:
             print(f"data path is recognized as a string ... due to {e}")
+
     dataset_list = []
     if isinstance(data, str) or isinstance(data, Path):
         data = Path(data).expanduser()
         if data.is_file():
-            # should be a csv of dataframe
+            # Support for CSV loading
+            import pandas as pd
 
-            # TODO: add loading
-            pass
+            df = pd.read_csv(data)
+            for row in df.itertuples(index=False):
+                row_dict = row._asdict()
+                item = {}
+                if "IM" in row_dict:
+                    item["IM"] = Path(row_dict["IM"])
+                if "GT" in row_dict:
+                    item["GT"] = Path(row_dict["GT"])
+                dataset_list.append(item)
+
         elif data.is_dir():
             if len(sorted(data.glob("*_IM.*"))) > 0:
                 dataset_list = load_one_folder(data)
@@ -358,5 +391,4 @@ def generate_dataset_dict_monai(data: Union[str, Path, Dict]) -> List[Dict]:
         print("unsupported data type")
 
     assert len(dataset_list) > 0, "empty dataset"
-
     return dataset_list
