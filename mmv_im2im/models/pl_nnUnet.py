@@ -32,7 +32,6 @@ class Model(pl.LightningModule):
         self.verbose = verbose
         self.weighted_loss = False
         self.seg_flag = False
-
         if train:
             if "use_costmap" in model_info_xx.criterion[
                 "params"
@@ -83,23 +82,27 @@ class Model(pl.LightningModule):
             ), "Costmap is detected, but no use_costmap param in criterion"
             cm = batch["CM"]
 
-        # only for badly formated data file
         if x.size()[-1] == 1:
             x = torch.squeeze(x, dim=-1)
             y = torch.squeeze(y, dim=-1)
 
         y_hat = self(x)
 
+        # Handle potential MONAI DynUNet deep supervision outputs safely
+        if torch.is_tensor(y_hat) and y_hat.ndim == x.ndim + 1:
+            # DynUNet interpolates and stacks intermediate predictions along dim=1.
+            # We unbind and take the primary full-resolution output (index 0).
+            y_hat = y_hat[:, 0, ...]
+        elif isinstance(y_hat, (list, tuple)):
+            y_hat = y_hat[0]
+
         if self.task == "regression":
-            # Global Average Pooling: Dim reduction 2D / 3D
-            #  [B, C, H, W] -> [B, C]
+            # Global Average Pooling  [B, C, H, W] -> [B, C]
             y_hat = y_hat.view(y_hat.size(0), y_hat.size(1), -1).mean(dim=-1)
-            # GT: [B, C]
             y = y.view(y.size(0), -1).float()
         else:
             if isinstance(self.criterion, torch.nn.CrossEntropyLoss):
-                # in case of CrossEntropy related error
-                y = torch.squeeze(y, dim=1)  # remove C dimension
+                y = torch.squeeze(y, dim=1)
 
         if isinstance(self.criterion, regularized):
             current_epoch = self.current_epoch

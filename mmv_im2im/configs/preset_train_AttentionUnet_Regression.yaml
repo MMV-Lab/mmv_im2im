@@ -1,0 +1,146 @@
+mode: train
+
+data:
+  category: "pair"
+  data_path: "path/to/yor/data" #_IM.tiff (imagen) , _GT.npy (numpy vector) in this case 
+  dataloader:
+    train:
+      dataloader_type:  
+        module_name: monai.data
+        func_name: Dataset # PersistentDataset CacheDataset Dataset
+      # dataset_params:
+      # # For CacheDataset
+      #   # cache_rate: 1.0 
+      #   # num_workers: 8
+      # # For PersistentDataset
+      #   # pickle_protocol: 2
+      #   # cache_dir: ./tmp0dmp0
+      dataloader_params:
+        batch_size: 2
+        pin_memory: True
+        num_workers: 4
+        persistent_workers: False
+    val:
+      dataloader_type:  
+        module_name: monai.data
+        func_name: Dataset # PersistentDataset CacheDataset Dataset
+      # dataset_params:
+      # # For CacheDataset
+      #   # cache_rate: 1.0 
+      #   # num_workers: 4
+      # # For PersistentDataset
+      #   # pickle_protocol: 2
+      #   # cache_dir: ./tmp0dmp0
+      dataloader_params:
+        batch_size: 2
+        pin_memory: True
+        num_workers: 4
+        persistent_workers: False
+  preprocess:
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["IM"]
+        dimension_order_out: "YX"
+        C: 0
+        T: 0
+        Z: 0
+    - module_name: monai.transforms
+      func_name: LoadImaged
+      params:
+        keys: ["GT"]
+        dtype: float #int
+    - module_name: monai.transforms
+      func_name: EnsureChannelFirstd  
+      params:
+        keys: ["IM"]
+        channel_dim: "no_channel" 
+    - module_name: monai.transforms
+      func_name: NormalizeIntensityd
+      params:
+        channel_wise: True
+        keys: ["IM"]
+    # Activate this if the image sape is not divisible by 2^n = k  n number of reducction 2 in channels AttentionUnet ([1, 2, 2, 2, 2] ->2^4 = 16 =k) 
+    # - module_name: monai.transforms
+    #   func_name: DivisiblePadd
+    #   params:
+    #     keys: ["IM", "GT"]
+    #     k: 16
+    - module_name: monai.transforms
+      func_name: EnsureTyped
+      params:
+        keys: ["IM", "GT"]
+
+  # augmentation:
+  #   - module_name: monai.transforms
+  #     func_name: RandHistogramShiftd
+  #     params:
+  #       prob: 0.2
+  #       num_control_points: 50
+  #       keys: ["IM"]
+
+model:
+  framework: FCN
+  # model_extra:
+  #   pre-train: path to ckp file
+  #   extend: True  option to tranfer learing (change output layer)
+  net:
+    module_name: monai.networks.nets
+    func_name: AttentionUnet
+    params:
+      in_channels: 1 # nuber of channels in the input IM
+      out_channels: 4 # Vector size on this case [v1,...,vn]-> n
+      spatial_dims: 2 # 2d or 3d for convolutions
+      channels: [32, 64, 128, 256, 512]
+      strides: [1, 2, 2, 2, 2]
+      dropout: 0.2
+      task: "regression" 
+  criterion:
+    module_name: torch.nn
+    func_name: HuberLoss #HuberLoss/L1Loss/MSELoss for vectors 
+    params:
+      reduction: 'mean' 
+      delta: 1.0 
+ 
+  optimizer:
+    module_name: torch.optim
+    func_name: AdamW
+    params:
+      lr: 0.01 # 0.001
+      weight_decay: 0.01 # 0.01
+
+  scheduler:
+    module_name: torch.optim.lr_scheduler
+    func_name: ReduceLROnPlateau
+    params:
+      mode: 'min'
+      factor: 0.2
+      patience: 25
+    monitor: 'val_loss'
+
+trainer:
+  verbose: True
+  # strategy: ddp_find_unused_parameters_true #avoid timeout
+  # gpus: 1 #number or list of gpus to use
+  params:
+    precision: 32 #16
+    max_epochs: 3000
+    detect_anomaly: False
+    log_every_n_steps: 2 # less than the number of training iterations
+    # gradient_clip_val: 0.5 
+    # gradient_clip_algorithm: "norm"
+  callbacks:
+    - module_name: lightning.pytorch.callbacks.early_stopping
+      func_name: EarlyStopping
+      params:
+        monitor: 'val_loss'
+        patience: 60
+        verbose: True
+    - module_name: lightning.pytorch.callbacks.model_checkpoint
+      func_name: ModelCheckpoint
+      params:
+        monitor: 'val_loss'
+        filename: '{epoch}-{val_loss:.5f}'
+        mode: min
+        save_top_k: 5
+        save_last: true
