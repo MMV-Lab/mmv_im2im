@@ -16,7 +16,7 @@ from mmv_im2im.utils.misc import generate_test_dataset_dict, parse_config
 from mmv_im2im.utils.for_transform import parse_monai_ops_vanilla
 from skimage.io import imsave as save_rgb
 import bioio_tifffile
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from monai.inferers import sliding_window_inference
 
 # https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction_guide.html#predicting
@@ -154,6 +154,14 @@ class ProjectTester(object):
                     y_hat = y_hat.cuda()
             else:
                 y_hat = self.model(x)
+
+            if isinstance(y_hat, dict):
+                try:
+                    y_hat = y_hat["pred"]
+                except Exception:
+                    raise ValueError(
+                        f"y_hat is a dictionary but the key 'pred' it's not found the y_hat output is:  {y_hat}"
+                    )
 
         ###############################################################################
         #

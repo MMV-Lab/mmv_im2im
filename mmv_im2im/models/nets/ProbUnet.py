@@ -125,11 +125,13 @@ class ProbabilisticUNet(nn.Module):
         up_kernel_size=3,
         latent_dim=6,
         dropout=0.0,
+        task="segmentation",
     ):
         super().__init__()
         self.spatial_dims = spatial_dims
         self.out_channels = out_channels
         self.latent_dim = latent_dim
+        self.task = task
 
         # Backbone Encoder
         self.unet_encoder = nn.ModuleList()
@@ -144,7 +146,6 @@ class ProbabilisticUNet(nn.Module):
         self.unet_decoder = nn.ModuleList()
         rev_c = channels[::-1]
         rev_s = strides[::-1]
-        # We decode len(channels) - 1 times to match the skip connections
         for i in range(len(channels) - 1):
             self.unet_decoder.append(
                 UpConv(
@@ -169,6 +170,8 @@ class ProbabilisticUNet(nn.Module):
             dropout,
             latent_dim,
         )
+
+        # on regression out_channels spaciol concatyenation
         self.posterior_net = Encoder(
             spatial_dims,
             in_channels + out_channels,
@@ -227,19 +230,33 @@ class ProbabilisticUNet(nn.Module):
         mu_post, logvar_post = None, None
 
         if train_posterior and seg is not None:
-            if seg.shape[1] != self.out_channels:
-                seg_temp = seg
-                if seg_temp.shape[1] == 1:
-                    seg_temp = seg_temp.squeeze(1)
-                seg_one_hot = (
-                    F.one_hot(seg_temp.long(), num_classes=self.out_channels)
-                    .permute(0, 3, 1, 2)
-                    .float()
-                )
+            if self.task == "regression":
+                # seg -> [B, out_channels]
+                # expand
+                dims_to_add = len(x.shape) - 2
+                seg_spatial = seg.view(seg.shape[0], seg.shape[1], *([1] * dims_to_add))
+                seg_input = seg_spatial.expand(-1, -1, *x.shape[2:]).float()
             else:
-                seg_one_hot = seg.float()
+                # regular segmentation
+                if seg.shape[1] != self.out_channels:
+                    seg_temp = seg
+                    if seg_temp.shape[1] == 1:
+                        seg_temp = seg_temp.squeeze(1)
 
-            cat_input = torch.cat([x, seg_one_hot], dim=1)
+                    seg_one_hot = F.one_hot(
+                        seg_temp.long(), num_classes=self.out_channels
+                    )
+
+                    dims = list(range(seg_one_hot.ndim))
+                    seg_input = (
+                        seg_one_hot.permute(0, dims[-1], *dims[1:-1])
+                        .contiguous()
+                        .float()
+                    )
+                else:
+                    seg_input = seg.float()
+
+            cat_input = torch.cat([x, seg_input], dim=1)
             mu_post, logvar_post = self.posterior_net(cat_input)
             z_sample = self.reparameterize(mu_post, logvar_post)
         else:
@@ -250,6 +267,12 @@ class ProbabilisticUNet(nn.Module):
             z_sample.shape[0], self.latent_dim, *([1] * self.spatial_dims)
         ).expand(-1, -1, *unet_x.shape[2:])
         reconstruction = self.f_comb(torch.cat([unet_x, z_b], dim=1))
+
+        #  (GAP)
+        if self.task == "regression":
+            reconstruction = reconstruction.view(
+                reconstruction.size(0), reconstruction.size(1), -1
+            ).mean(dim=-1)
 
         return {
             "pred": reconstruction,

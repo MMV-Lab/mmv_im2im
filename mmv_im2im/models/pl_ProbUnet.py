@@ -11,6 +11,18 @@ from mmv_im2im.utils.model_utils import init_weights
 class Model(pl.LightningModule):
     def __init__(self, model_info_xx, train=True, verbose=False):
         super().__init__()
+
+        if isinstance(model_info_xx.net["params"], dict):
+            self.task = model_info_xx.net["params"].get("task", "segmentation")
+
+        if self.task != "regression" and self.task != "segmentation":
+            raise ValueError(
+                f"Task should be regression/segmentation : {self.task} was given"
+            )
+
+        if "utils.elbo_loss" in model_info_xx.criterion["module_name"]:
+            model_info_xx.criterion["params"]["task"] = self.task
+
         self.net = parse_config(model_info_xx.net)
         init_weights(self.net, init_type="kaiming")
         self.model_info = model_info_xx
@@ -40,25 +52,29 @@ class Model(pl.LightningModule):
     def run_step(self, batch):
         x, y = batch["IM"], batch["GT"]
 
-        # Ensure x is (B, C, H, W)
-        if x.ndim == 5 and x.shape[-1] == 1:
+        if x.ndim > 4 and x.shape[-1] == 1:
             x = x.squeeze(-1)
-        # Ensure y is (B, 1, H, W) for passing to model and loss
-        if y.ndim == 5 and y.shape[-1] == 1:
-            y = y.squeeze(-1)
-        if y.ndim == 3:
-            y = y.unsqueeze(1)  # Add channel dim if missing (B, H, W) -> (B, 1, H, W)
+
+        if self.task == "regression":
+            if y.ndim > 2 and y.shape[-1] == 1:
+                y = y.squeeze(-1)
+            #  [B, out_channels]
+            y = y.view(y.size(0), -1)
+        else:
+            if y.ndim > 4 and y.shape[-1] == 1:
+                y = y.squeeze(-1)
+            if y.ndim == x.ndim - 1:
+                y = y.unsqueeze(1)
 
         # Forward pass (Train Posterior)
         output = self(x, seg=y, train_posterior=True)
 
         # Calculate Loss
-        # Ensure 'epoch' is a number, not a tensor, to avoid issues in elbo_loss warmup
         current_ep = int(self.current_epoch)
 
         loss = self.criterion(
             logits=output["pred"],
-            y_true=y,  # (B, 1, H, W) Integer labels usually
+            y_true=y,
             prior_mu=output["prior_mu"],
             prior_logvar=output["prior_logvar"],
             post_mu=output["mu_post"],
