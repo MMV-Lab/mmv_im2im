@@ -2,7 +2,7 @@ mode: train
 
 data:
   category: "pair"
-  data_path: "/mnt/eternus/users/Jair/Trainings/Retrain2/DataMax"
+  data_path: "path/to/your/data"
   dataloader:
     train:
       dataloader_type:  
