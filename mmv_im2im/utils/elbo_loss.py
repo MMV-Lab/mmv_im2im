@@ -1,12 +1,27 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from typing import Union
 
 
 class KLDivergence(nn.Module):
     """
     Calculates the KL Divergence between two diagonal Gaussian distributions.
     Used for the Probabilistic U-Net latent space regularization.
+
+    CHANGE: Numerically stable KL computation.
+    The original formula computed exp(logvar_q) and exp(logvar_p) independently,
+    which can overflow (→ inf) when logvar values are large and the clamp is
+    disabled. The reformulated version uses exp(logvar_q - logvar_p) and
+    exp(-logvar_p), keeping the exponent as a difference which is bounded even
+    when individual logvars are large:
+
+      Original: (exp(lq) + (mu_q - mu_p)^2) / exp(lp)
+      Stable:    exp(lq - lp)  +  (mu_q - mu_p)^2 * exp(-lp)
+
+    These are mathematically identical but the stable form avoids intermediate
+    overflow. The improvement is most relevant in early training when the
+    posterior and prior are far apart.
     """
 
     def __init__(self):
@@ -17,10 +32,14 @@ class KLDivergence(nn.Module):
             logvar_q = torch.clamp(logvar_q, min=-kl_clamp, max=kl_clamp)
             logvar_p = torch.clamp(logvar_p, min=-kl_clamp, max=kl_clamp)
 
+        # CHANGE: Stable formulation using log-domain subtraction.
+        # exp(logvar_q) / exp(logvar_p) = exp(logvar_q - logvar_p)
+        # (mu_q - mu_p)^2 / exp(logvar_p) = (mu_q - mu_p)^2 * exp(-logvar_p)
         kl_batch_sum = 0.5 * torch.sum(
             logvar_p
             - logvar_q
-            + (torch.exp(logvar_q) + (mu_q - mu_p) ** 2) / torch.exp(logvar_p)
+            + torch.exp(logvar_q - logvar_p)
+            + (mu_q - mu_p) ** 2 * torch.exp(-logvar_p)
             - 1,
             dim=1,
         )
@@ -48,7 +67,7 @@ class ELBOLoss(nn.Module):
         use_topological_regularization: bool = False,
         topological_weight: float = 0.1,
         topological_warmup_epochs: int = 10,
-        topological_connectivity: int = 4,  # Use 6 or 26 for 3D
+        topological_connectivity: int = 4,
         topological_inclusion: list = None,
         topological_exclusion: list = None,
         topological_min_thick: int = 1,
@@ -69,13 +88,15 @@ class ELBOLoss(nn.Module):
         gdl_focal_weight: float = 1.0,
         gdl_warmup_epochs: int = 10,
         gdl_class_weights: list = None,
-        # --- Hausdorff Regularization (MONAI) ---
+        # --- Hausdorff Regularization ---
         use_hausdorff_regularization: bool = False,
         hausdorff_weight: float = 0.1,
         hausdorff_downsample_scale: float = 0.5,
-        hausdorff_dt_iterations: int = 30,
+        hausdorff_dt_iterations: Union[int, str] = "auto",
         hausdorff_warmup_epochs: int = 10,
         hausdorff_include_background: bool = False,
+        hausdorff_distance_mode: str = "l2",
+        hausdorff_normalize_weights: bool = True,
         # --- Homology Regularization (Persistence Image) ---
         use_homology_regularization: bool = False,
         homology_weight: float = 0.1,
@@ -93,6 +114,7 @@ class ELBOLoss(nn.Module):
         chunks: int = 2000,
         weighting_power: float = 2.0,
         composite_flag: bool = True,
+        homology_adaptive_sigma: bool = True,
         # --- Topological Complexity Regularization ---
         use_topological_complexity: bool = False,
         topological_complexity_weight: float = 0.1,
@@ -106,6 +128,9 @@ class ELBOLoss(nn.Module):
         complexity_k_top: int = 2000,
         complexity_temperature: float = 0.01,
         complexity_auto_balance: bool = True,
+        complexity_normalize_lifetimes: bool = True,
+        # --- Warmup schedule ---
+        warmup_schedule: str = "linear",  # "linear" or "cosine"
     ):
         super().__init__()
         self.beta = beta
@@ -114,9 +139,9 @@ class ELBOLoss(nn.Module):
         self.kl_clamp = kl_clamp
         self.task = task
         self.regression_loss_type = regression_loss_type.lower()
+        self.warmup_schedule = warmup_schedule
         self.kl_divergence_calculator = KLDivergence()
 
-        # Class weights for the main reconstruction loss (Cross Entropy)
         if elbo_class_weights is not None:
             self.elbo_class_weights = torch.tensor(
                 elbo_class_weights, dtype=torch.float32
@@ -125,7 +150,6 @@ class ELBOLoss(nn.Module):
             self.elbo_class_weights = None
 
         if self.task == "segmentation":
-            # --- Initialize Regularizers ---
             reg_used = []
 
             # 1. Fractal
@@ -180,7 +204,7 @@ class ELBOLoss(nn.Module):
                     metric_gradient=connectivity_metric_gradient,
                 )
 
-            # 4. GDL Focal (MONAI)
+            # 4. GDL Focal
             self.use_gdl_focal_regularization = use_gdl_focal_regularization
             if self.use_gdl_focal_regularization:
                 self.gdl_focal_weight = gdl_focal_weight
@@ -193,7 +217,6 @@ class ELBOLoss(nn.Module):
                     if gdl_class_weights
                     else None
                 )
-                # MONAI losses are generally dimension-agnostic given correct input shape
                 self.gdl_focal_loss_calculator = GeneralizedDiceFocalLoss(
                     softmax=True, to_onehot_y=True, weight=monai_focal_weights
                 )
@@ -213,6 +236,8 @@ class ELBOLoss(nn.Module):
                     spatial_dims=self.spatial_dims,
                     dt_iterations=self.hausdorff_dt_iterations,
                     include_background=self.hausdorff_include_background,
+                    distance_mode=hausdorff_distance_mode,
+                    normalize_weights=hausdorff_normalize_weights,
                 )
 
             # 6. Homology (Persistence Image)
@@ -234,10 +259,11 @@ class ELBOLoss(nn.Module):
                     metric=homology_metric,
                     chunks=chunks,
                     filtering=homology_filtering,
-                    treshold=homology_threshold,
+                    threshold=homology_threshold,
                     k_top=homology_k_top,
                     weighting_power=weighting_power,
                     composite_flag=composite_flag,
+                    adaptive_sigma=homology_adaptive_sigma,
                 )
 
             # 7. Topological Complexity
@@ -264,12 +290,21 @@ class ELBOLoss(nn.Module):
                     k_top=complexity_k_top,
                     temperature=complexity_temperature,
                     auto_balance=complexity_auto_balance,
+                    normalize_lifetimes=complexity_normalize_lifetimes,
                 )
 
             if len(reg_used) > 0:
                 print(f"Active Regularizers: {reg_used}")
 
     def _get_warmup_factor(self, current_epoch, warmup_epochs):
+        """
+        CHANGE: Added cosine warmup schedule as an alternative to linear.
+        Rationale: Linear warmup introduces the regularizer with a step-like
+        gradient increase that can cause loss spikes. Cosine warmup starts
+        very gently (near 0), accelerates in the middle, and smoothly
+        approaches 1.0. This produces more stable early-training dynamics,
+        especially for the heavy topological regularizers.
+        """
         if torch.is_tensor(current_epoch):
             current_epoch = current_epoch.detach().cpu().item()
         if torch.is_tensor(warmup_epochs):
@@ -280,26 +315,32 @@ class ELBOLoss(nn.Module):
 
         if current_epoch >= warmup_epochs:
             return 1.0
-        return current_epoch / warmup_epochs
+
+        t = current_epoch / warmup_epochs  # in [0, 1)
+
+        if self.warmup_schedule == "cosine":
+            # Cosine warmup: starts at 0, ends at 1
+            import math
+
+            return 0.5 * (1.0 - math.cos(math.pi * t))
+        else:
+            # Default: linear warmup
+            return t
 
     def _downsample_inputs(self, logits, y_true, scale_factor):
         """Downsamples inputs for computationally expensive topological losses."""
         if scale_factor >= 1.0:
             return logits, y_true
 
-        # Determine mode based on dimensionality
         if self.spatial_dims == 3:
             mode = "trilinear"
         else:
             mode = "bilinear"
 
-        # Downsample Logits
         logits_small = F.interpolate(
             logits, scale_factor=scale_factor, mode=mode, align_corners=False
         )
 
-        # Downsample GT
-        # y_true can be (B, H, W), (B, D, H, W) or with channel dim
         if y_true.ndim == logits.ndim - 1:
             y_true_float = y_true.unsqueeze(1).float()
         else:
@@ -309,7 +350,6 @@ class ELBOLoss(nn.Module):
             y_true_float, scale_factor=scale_factor, mode="nearest"
         )
 
-        # Squeeze back if needed
         if y_true.ndim == logits.ndim - 1:
             y_true_small = y_true_small.squeeze(1)
 
@@ -326,11 +366,10 @@ class ELBOLoss(nn.Module):
         """
 
         # --- 1. Input Standardization ---
-        # Ensure y_true has the right shape
-        if y_true.ndim == logits.ndim:  # Has channel dim (B, 1, ...)
+        if y_true.ndim == logits.ndim:
             y_true_ch = y_true
             y_true_flat = y_true.squeeze(1)
-        elif y_true.ndim == logits.ndim - 1:  # No channel dim (B, ...)
+        elif y_true.ndim == logits.ndim - 1:
             y_true_ch = y_true.unsqueeze(1)
             y_true_flat = y_true
         else:
@@ -344,7 +383,7 @@ class ELBOLoss(nn.Module):
         ):
             self.elbo_class_weights = self.elbo_class_weights.to(logits.device)
 
-        # --- 2. Base Reconstruction Loss (Cross Entropy) ---
+        # --- 2. Base Reconstruction Loss ---
         if self.task == "segmentation":
             reconstruction_loss = F.cross_entropy(
                 logits,
@@ -377,13 +416,14 @@ class ELBOLoss(nn.Module):
         # --- 4. Regularizers ---
         if self.task == "segmentation":
 
-            # Helper: Softmax Probs
-            if (
+            probs = None
+            needs_probs = (
                 self.use_fractal_regularization
                 or self.use_connectivity_regularization
                 or self.use_homology_regularization
                 or self.use_topological_complexity
-            ):
+            )
+            if needs_probs:
                 probs = F.softmax(logits, dim=1)
 
             # A. Fractal Dimension
@@ -392,12 +432,8 @@ class ELBOLoss(nn.Module):
                     epoch, self.fractal_warmup_epochs
                 )
                 if fractal_factor > 0:
-                    # Slice foreground depending on dimensions
                     if self.n_classes > 1:
-                        if self.spatial_dims == 3:
-                            fg_probs = 1.0 - probs[:, 0:1, :, :, :]
-                        else:
-                            fg_probs = 1.0 - probs[:, 0:1, :, :]
+                        fg_probs = 1.0 - probs[:, 0:1, ...]
                     else:
                         fg_probs = probs
 
@@ -405,7 +441,6 @@ class ELBOLoss(nn.Module):
                     with torch.no_grad():
                         fd_true = self.fractal_dimension_calculator(y_fractal)
                     fd_pred = self.fractal_dimension_calculator(fg_probs)
-                    # fd_pred = torch.clamp(fd_pred, min=0.0, max=3.0) -> jut if nan still appear
                     fractal_loss = F.mse_loss(fd_pred, fd_true)
                     total_loss += (self.fractal_weight * fractal_factor) * fractal_loss
 
@@ -426,11 +461,9 @@ class ELBOLoss(nn.Module):
                     epoch, self.connectivity_warmup_epochs
                 )
                 if connectivity_factor > 0:
-                    # Create One-Hot GT (B, C, ...)
                     y_true_onehot = F.one_hot(
                         y_true_flat.long(), num_classes=self.n_classes
                     )
-                    # Permute: Last dim (C) moves to dim 1
                     permute_dims = (0, logits.ndim - 1) + tuple(
                         range(1, logits.ndim - 1)
                     )
@@ -477,32 +510,37 @@ class ELBOLoss(nn.Module):
                 homology_factor = self._get_warmup_factor(
                     epoch, self.homology_warmup_epochs
                 )
-                if epoch % self.homology_interval == 0:
-                    if homology_factor > 0:
+                if epoch % self.homology_interval == 0 and homology_factor > 0:
+                    if self.homology_downsample_scale >= 1.0:
+                        probs_h = probs
+                        y_true_h = y_true_flat
+                    else:
                         logits_h, y_true_h = self._downsample_inputs(
                             logits, y_true_flat, self.homology_downsample_scale
                         )
                         probs_h = F.softmax(logits_h, dim=1)
-                        h_loss = self.homology_calculator(probs_h, y_true_h)
-                        total_loss += (self.homology_weight * homology_factor) * h_loss
+
+                    h_loss = self.homology_calculator(probs_h, y_true_h)
+                    total_loss += (self.homology_weight * homology_factor) * h_loss
 
             # G. Topological Complexity
             if self.use_topological_complexity:
                 complexity_factor = self._get_warmup_factor(
                     epoch, self.complexity_warmup_epochs
                 )
-                if epoch % self.complexity_interval == 0:
-                    if complexity_factor > 0:
+                if epoch % self.complexity_interval == 0 and complexity_factor > 0:
+                    if self.complexity_downsample_scale >= 1.0:
+                        probs_c = probs
+                        y_true_c = y_true_flat
+                    else:
                         logits_c, y_true_c = self._downsample_inputs(
                             logits, y_true_flat, self.complexity_downsample_scale
                         )
                         probs_c = F.softmax(logits_c, dim=1)
 
-                        c_loss = self.topological_complexity_calculator(
-                            probs_c, y_true_c
-                        )
-                        total_loss += (
-                            self.topological_complexity_weight * complexity_factor
-                        ) * c_loss
+                    c_loss = self.topological_complexity_calculator(probs_c, y_true_c)
+                    total_loss += (
+                        self.topological_complexity_weight * complexity_factor
+                    ) * c_loss
 
         return total_loss
