@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
 import logging
 from typing import Union
 from dask.array.core import Array as DaskArray

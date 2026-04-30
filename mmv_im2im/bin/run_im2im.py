@@ -22,6 +22,7 @@ from mmv_im2im.configs.config_base import (
     parse_adaptor,
     configuration_validation,
 )
+from mmv_im2im.proj_trainer_multishape import VariableSizeProjectTrainer
 
 ###############################################################################
 
@@ -33,6 +34,7 @@ logging.basicConfig(
 
 ###############################################################################
 TRAIN_MODE = "train"
+TRAIN_MULTISHAPE_MODE = "train-multishape"
 INFER_MODE = "inference"
 MAP_MODE = "uncertainty_map"
 
@@ -70,12 +72,35 @@ def main():
             else:
                 exe = ProjectTrainer(cfg)
                 exe.run_training()
+
+        elif cfg.mode.lower() == TRAIN_MULTISHAPE_MODE:
+            if (
+                cfg.data.dataloader.train.dataloader_type["func_name"]
+                == "PersistentDataset"
+            ):
+                # Mirror the same PersistentDataset cache handling used in
+                # standard training mode.
+                cache_root = Path(cfg.data.dataloader.train.dataset_params["cache_dir"])
+                cache_root.mkdir(exist_ok=True)
+                with tempfile.TemporaryDirectory(dir=cache_root) as tmp_exp:
+                    train_cache = Path(tmp_exp) / "train"
+                    val_cache = Path(tmp_exp) / "val"
+                    cfg.data.dataloader.train.dataset_params["cache_dir"] = train_cache
+                    cfg.data.dataloader.val.dataset_params["cache_dir"] = val_cache
+                    exe = VariableSizeProjectTrainer(cfg)
+                    exe.run_training()
+            else:
+                exe = VariableSizeProjectTrainer(cfg)
+                exe.run_training()
+
         elif cfg.mode.lower() == INFER_MODE:
             exe = ProjectTester(cfg)
             exe.run_inference()
+
         elif cfg.mode.lower() == MAP_MODE:
             exe = MapExtractor(cfg)
             exe.run_inference()
+
         else:
             log.error(f"Mode {cfg.mode} is not supported yet")
             sys.exit(1)

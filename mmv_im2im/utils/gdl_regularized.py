@@ -1,16 +1,21 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import math
+from typing import Union
 from monai.losses import GeneralizedDiceFocalLoss
 
 
 class RegularizedGeneralizedDiceFocalLoss(nn.Module):
+    """
+    Regularized Generalized Dice + Focal loss for deterministic segmentation models.
+    """
 
     def __init__(
         self,
         n_classes: int = 2,
         spatial_dims: int = 2,
-        # --- Main Loss Parameters (GeneralizedDiceFocalLoss) ---
+        # --- Main Loss Parameters ---
         gdl_focal_weight: float = 1.0,
         gdl_class_weights: list = None,
         # --- Fractal Regularization ---
@@ -40,13 +45,15 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
         lambda_gradient: float = 0.2,
         connectivity_metric_density: str = "huber",
         connectivity_metric_gradient: str = "cosine",
-        # --- Hausdorff Regularization (MONAI) ---
+        # --- Hausdorff Regularization ---
         use_hausdorff_regularization: bool = False,
         hausdorff_weight: float = 0.1,
         hausdorff_downsample_scale: float = 0.5,
-        hausdorff_dt_iterations: int = 30,
+        hausdorff_dt_iterations: Union[int, str] = "auto",
         hausdorff_warmup_epochs: int = 10,
         hausdorff_include_background: bool = False,
+        hausdorff_distance_mode: str = "l2",
+        hausdorff_normalize_weights: bool = True,
         # --- Homology Regularization (Persistence Image) ---
         use_homology_regularization: bool = False,
         homology_weight: float = 0.1,
@@ -64,6 +71,7 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
         chunks: int = 2000,
         weighting_power: float = 2.0,
         composite_flag: bool = True,
+        homology_adaptive_sigma: bool = True,
         # --- Topological Complexity Regularization ---
         use_topological_complexity: bool = False,
         topological_complexity_weight: float = 0.1,
@@ -77,25 +85,28 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
         complexity_k_top: int = 2000,
         complexity_temperature: float = 0.01,
         complexity_auto_balance: bool = True,
+        complexity_normalize_lifetimes: bool = True,
+        # --- Warmup schedule ---
+        warmup_schedule: str = "linear",  # "linear" or "cosine"
     ):
         super().__init__()
         self.n_classes = n_classes
         self.spatial_dims = spatial_dims
+        self.warmup_schedule = warmup_schedule
 
-        # Main Segmentation Loss
         self.gdl_focal_weight = gdl_focal_weight
         monai_focal_weights = (
             torch.tensor(gdl_class_weights, dtype=torch.float32)
             if gdl_class_weights
             else None
         )
-
         self.main_seg_loss_calculator = GeneralizedDiceFocalLoss(
             softmax=True, to_onehot_y=True, weight=monai_focal_weights
         )
 
         reg_used = []
 
+        # 1. Fractal
         self.use_fractal_regularization = use_fractal_regularization
         if self.use_fractal_regularization:
             self.fractal_weight = fractal_weight
@@ -110,7 +121,7 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 spatial_dims=self.spatial_dims,
             )
 
-        # Topological (TI Loss)
+        # 2. Topological (TI Loss)
         self.use_topological_regularization = use_topological_regularization
         if self.use_topological_regularization:
             self.topological_weight = topological_weight
@@ -126,7 +137,7 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 min_thick=topological_min_thick,
             )
 
-        # Connectivity
+        # 3. Connectivity
         self.use_connectivity_regularization = use_connectivity_regularization
         if self.use_connectivity_regularization:
             self.connectivity_weight = connectivity_weight
@@ -147,7 +158,7 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 metric_gradient=connectivity_metric_gradient,
             )
 
-        # Hausdorff (MONAI)
+        # 4. Hausdorff
         self.use_hausdorff_regularization = use_hausdorff_regularization
         if self.use_hausdorff_regularization:
             self.hausdorff_weight = hausdorff_weight
@@ -162,9 +173,11 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 spatial_dims=self.spatial_dims,
                 dt_iterations=self.hausdorff_dt_iterations,
                 include_background=self.hausdorff_include_background,
+                distance_mode=hausdorff_distance_mode,
+                normalize_weights=hausdorff_normalize_weights,
             )
 
-        # Homology (Persistence Image)
+        # 5. Homology (Persistence Image)
         self.use_homology_regularization = use_homology_regularization
         if self.use_homology_regularization:
             self.homology_interval = max(1, homology_interval)
@@ -183,13 +196,14 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 metric=homology_metric,
                 chunks=chunks,
                 filtering=homology_filtering,
-                treshold=homology_threshold,
+                threshold=homology_threshold,
                 k_top=homology_k_top,
                 weighting_power=weighting_power,
                 composite_flag=composite_flag,
+                adaptive_sigma=homology_adaptive_sigma,
             )
 
-        # Topological Complexity
+        # 6. Topological Complexity
         self.use_topological_complexity = use_topological_complexity
         if self.use_topological_complexity:
             self.complexity_interval = max(1, complexity_interval)
@@ -210,12 +224,14 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 k_top=complexity_k_top,
                 temperature=complexity_temperature,
                 auto_balance=complexity_auto_balance,
+                normalize_lifetimes=complexity_normalize_lifetimes,
             )
 
         if len(reg_used) > 0:
             print(f"Active Regularizers in GDL Loss: {reg_used}")
 
     def _get_warmup_factor(self, current_epoch, warmup_epochs):
+
         if torch.is_tensor(current_epoch):
             current_epoch = current_epoch.detach().cpu().item()
         if torch.is_tensor(warmup_epochs):
@@ -226,24 +242,27 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
 
         if current_epoch >= warmup_epochs:
             return 1.0
-        return current_epoch / warmup_epochs
+
+        t = current_epoch / warmup_epochs
+
+        if self.warmup_schedule == "cosine":
+            return 0.5 * (1.0 - math.cos(math.pi * t))
+        else:
+            return t
 
     def _downsample_inputs(self, logits, y_true, scale_factor):
         if scale_factor >= 1.0:
             return logits, y_true
 
-        # Determine mode
         if self.spatial_dims == 3:
             mode = "trilinear"
         else:
             mode = "bilinear"
 
-        # Downsample Logits
         logits_small = F.interpolate(
             logits, scale_factor=scale_factor, mode=mode, align_corners=False
         )
 
-        # Downsample GT
         if y_true.ndim == logits.ndim - 1:
             y_true_float = y_true.unsqueeze(1).float()
         else:
@@ -253,7 +272,6 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
             y_true_float, scale_factor=scale_factor, mode="nearest"
         )
 
-        # Squeeze back if needed
         if y_true.ndim == logits.ndim - 1:
             y_true_small = y_true_small.squeeze(1)
 
@@ -263,8 +281,6 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
         """
         Computes the combined segmentation loss with structural regularizers.
         """
-
-        # --- Input Standardization ---
         if y_true.ndim == logits.ndim:
             y_true_ch = y_true
             y_true_flat = y_true.squeeze(1)
@@ -276,29 +292,25 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 f"y_true shape {y_true.shape} incompatible with logits {logits.shape}"
             )
 
-        # ---  Main Segmentation Loss (GDL + Focal) ---
         primary_loss = self.main_seg_loss_calculator(logits, y_true_ch.long())
         total_loss = self.gdl_focal_weight * primary_loss
 
-        # --- Regularizers ---
-
-        if (
+        probs = None
+        needs_probs = (
             self.use_fractal_regularization
             or self.use_connectivity_regularization
             or self.use_homology_regularization
             or self.use_topological_complexity
-        ):
+        )
+        if needs_probs:
             probs = F.softmax(logits, dim=1)
 
-        #  Fractal Dimension
+        # Fractal Dimension
         if self.use_fractal_regularization:
             fractal_factor = self._get_warmup_factor(epoch, self.fractal_warmup_epochs)
             if fractal_factor > 0:
                 if self.n_classes > 1:
-                    if self.spatial_dims == 3:
-                        fg_probs = 1.0 - probs[:, 0:1, :, :, :]
-                    else:
-                        fg_probs = 1.0 - probs[:, 0:1, :, :]
+                    fg_probs = 1.0 - probs[:, 0:1, ...]
                 else:
                     fg_probs = probs
 
@@ -306,7 +318,6 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                 with torch.no_grad():
                     fd_true = self.fractal_dimension_calculator(y_fractal)
                 fd_pred = self.fractal_dimension_calculator(fg_probs)
-                # fd_pred = torch.clamp(fd_pred, min=0.0, max=3.0) -> jut if nan still appear
                 fractal_loss = F.mse_loss(fd_pred, fd_true)
                 total_loss += (self.fractal_weight * fractal_factor) * fractal_loss
 
@@ -336,7 +347,7 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                     self.connectivity_weight * connectivity_factor
                 ) * conn_loss
 
-        #  Hausdorff (MONAI)
+        # Hausdorff
         if self.use_hausdorff_regularization:
             hausdorff_factor = self._get_warmup_factor(
                 epoch, self.hausdorff_warmup_epochs
@@ -356,36 +367,42 @@ class RegularizedGeneralizedDiceFocalLoss(nn.Module):
                     h_loss = torch.tensor(0.0, device=logits.device)
                 total_loss += (self.hausdorff_weight * hausdorff_factor) * h_loss
 
-        #  Homology (Persistence Image)
+        # Homology (Persistence Image)
         if self.use_homology_regularization:
             homology_factor = self._get_warmup_factor(
                 epoch, self.homology_warmup_epochs
             )
-            if epoch % self.homology_interval == 0:
-                if homology_factor > 0:
+            if epoch % self.homology_interval == 0 and homology_factor > 0:
+                if self.homology_downsample_scale >= 1.0:
+                    probs_h = probs
+                    y_true_h = y_true_flat
+                else:
                     logits_h, y_true_h = self._downsample_inputs(
                         logits, y_true_flat, self.homology_downsample_scale
                     )
                     probs_h = F.softmax(logits_h, dim=1)
 
-                    h_loss = self.homology_calculator(probs_h, y_true_h)
-                    total_loss += (self.homology_weight * homology_factor) * h_loss
+                h_loss = self.homology_calculator(probs_h, y_true_h)
+                total_loss += (self.homology_weight * homology_factor) * h_loss
 
-        #  Topological Complexity
+        # Topological Complexity
         if self.use_topological_complexity:
             complexity_factor = self._get_warmup_factor(
                 epoch, self.complexity_warmup_epochs
             )
-            if epoch % self.complexity_interval == 0:
-                if complexity_factor > 0:
+            if epoch % self.complexity_interval == 0 and complexity_factor > 0:
+                if self.complexity_downsample_scale >= 1.0:
+                    probs_c = probs
+                    y_true_c = y_true_flat
+                else:
                     logits_c, y_true_c = self._downsample_inputs(
                         logits, y_true_flat, self.complexity_downsample_scale
                     )
                     probs_c = F.softmax(logits_c, dim=1)
 
-                    c_loss = self.topological_complexity_calculator(probs_c, y_true_c)
-                    total_loss += (
-                        self.topological_complexity_weight * complexity_factor
-                    ) * c_loss
+                c_loss = self.topological_complexity_calculator(probs_c, y_true_c)
+                total_loss += (
+                    self.topological_complexity_weight * complexity_factor
+                ) * c_loss
 
         return total_loss

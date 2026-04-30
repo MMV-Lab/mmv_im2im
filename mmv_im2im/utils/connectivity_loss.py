@@ -35,7 +35,6 @@ class ConnectivityCoherenceLoss(nn.Module):
         if self.spatial_dims not in [2, 3]:
             raise ValueError("spatial_dims must be 2 or 3.")
 
-        # Select metric functions
         self.density_loss_fn = self._get_metric_function(metric_density)
         self.gradient_loss_fn = self._get_metric_function(metric_gradient)
 
@@ -58,10 +57,8 @@ class ConnectivityCoherenceLoss(nn.Module):
                 f"Kernel shape should be square or gaussian. {self.kernel_shape} given."
             )
 
-        # --- Prepare Sobel Kernels for Vectorized Gradient Alignment ---
         self._init_sobel_kernels()
 
-        # --- Initialize Kernel Sizes ---
         if self.connectivity_mode in ["single", "learneable-single"]:
             k = self.connectivity_kernel_size
             k = k if k % 2 != 0 else k + 1
@@ -75,15 +72,11 @@ class ConnectivityCoherenceLoss(nn.Module):
                 2**i + 1 for i in range(1, self.connectivity_kernel_size + 1)
             ]
 
-        # --- Initialize Filters ---
         self.kernels_are_learnable = "learneable" in self.connectivity_mode
 
         if self.kernels_are_learnable:
             self.learnable_filters = nn.ParameterList()
             for k in self.kernel_sizes:
-                # Shape depends on dims:
-                # 2D: (num_classes, 1, k, k)
-                # 3D: (num_classes, 1, k, k, k)
                 shape = (self.num_classes, 1) + (k,) * self.spatial_dims
                 w_init = torch.empty(shape)
                 nn.init.normal_(w_init, mean=0.0, std=0.01)
@@ -93,7 +86,6 @@ class ConnectivityCoherenceLoss(nn.Module):
 
     def _init_sobel_kernels(self):
         if self.spatial_dims == 2:
-            # Shape: (1, 1, 3, 3)
             sobel_x = torch.tensor(
                 [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=torch.float32
             ).view(1, 1, 3, 3)
@@ -104,18 +96,12 @@ class ConnectivityCoherenceLoss(nn.Module):
             self.register_buffer("sobel_y", sobel_y)
 
         elif self.spatial_dims == 3:
-            # 3D Sobel Kernels construction (3x3x3)
-            # Smooth (1D): [1, 2, 1]
-            # Diff (1D):   [-1, 0, 1]
             smooth = torch.tensor([1, 2, 1], dtype=torch.float32)
             diff = torch.tensor([-1, 0, 1], dtype=torch.float32)
 
-            # Helper to create outer products
             def outer3(v1, v2, v3):
                 return torch.einsum("i,j,k->ijk", v1, v2, v3).view(1, 1, 3, 3, 3)
 
-            # Sobel X: Diff(x) * Smooth(y) * Smooth(z) -> indices k(z), j(y), i(x)
-            # PyTorch Conv3d order is (Depth, Height, Width) i.e. (z, y, x)
             sobel_x = outer3(smooth, smooth, diff)
             sobel_y = outer3(smooth, diff, smooth)
             sobel_z = outer3(diff, smooth, smooth)
@@ -130,15 +116,14 @@ class ConnectivityCoherenceLoss(nn.Module):
             center = k // 2
             shape = (k,) * self.spatial_dims
 
-            if self.kernel_shape == "single":
+            if self.kernel_shape == "square":
                 kernel = torch.ones((1, 1) + shape) / (k**self.spatial_dims - 1)
-                # Set center to 0
                 if self.spatial_dims == 2:
                     kernel[0, 0, center, center] = 0.0
                 else:
                     kernel[0, 0, center, center, center] = 0.0
             else:
-                # Gaussian
+                # Gaussian kernel
                 sigma = max(0.5, 0.2 * float(k))
                 coords = torch.arange(0, k) - center
                 if self.spatial_dims == 2:
@@ -160,7 +145,6 @@ class ConnectivityCoherenceLoss(nn.Module):
 
                 kernel = kernel.view((1, 1) + shape)
 
-            # Expand to (Num_Classes, 1, K, K, [K])
             repeat_shape = (self.num_classes, 1) + (1,) * self.spatial_dims
             kernel_expanded = kernel.repeat(repeat_shape)
 
@@ -187,16 +171,13 @@ class ConnectivityCoherenceLoss(nn.Module):
         return torch.mean(torch.sqrt((pred - target) ** 2 + eps**2))
 
     def _cosine_loss(self, pred, target):
-        # Flatten: (B, C, ...) -> (B, C, Total_Pixels)
         target_flat = target.reshape(target.shape[0], target.shape[1], -1)
         pred_flat = pred.reshape(pred.shape[0], pred.shape[1], -1)
-        # Cosine Similarity across the spatial dimension (dim=2 in flat)
         return 1.0 - F.cosine_similarity(pred_flat, target_flat, dim=2).mean()
 
     def _compute_gradient_loss_vectorized(self, pred, target):
         """
         Vectorized gradient calculation using grouped convolutions.
-        Adapts to 2D or 3D.
         """
         start_idx = 1 if self.ignore_background else 0
         p_slice = pred[:, start_idx:].contiguous()
@@ -206,38 +187,51 @@ class ConnectivityCoherenceLoss(nn.Module):
         if n_channels_eff == 0:
             return torch.tensor(0.0, device=pred.device)
 
-        # Convolution op and expansion shape
         if self.spatial_dims == 2:
             conv_op = F.conv2d
             expand_shape = (n_channels_eff, 1, 1, 1)
+            # Stack x and y Sobel kernels: output has 2*n_channels channels
+            sx = self.sobel_x.repeat(expand_shape)
+            sy = self.sobel_y.repeat(expand_shape)
+            # Concat along out_channels dim so one conv handles both axes
+            sobel_all = torch.cat([sx, sy], dim=0)
+            p_grads = conv_op(p_slice, sobel_all, padding=1, groups=n_channels_eff)
+            t_grads = conv_op(t_slice, sobel_all, padding=1, groups=n_channels_eff)
+            g_x_pred, g_y_pred = (
+                p_grads[:, :n_channels_eff],
+                p_grads[:, n_channels_eff:],
+            )
+            g_x_true, g_y_true = (
+                t_grads[:, :n_channels_eff],
+                t_grads[:, n_channels_eff:],
+            )
+            loss = self.gradient_loss_fn(g_x_pred, g_x_true) + self.gradient_loss_fn(
+                g_y_pred, g_y_true
+            )
         else:
             conv_op = F.conv3d
             expand_shape = (n_channels_eff, 1, 1, 1, 1)
-
-        # Expand Sobel kernels
-        sx = self.sobel_x.repeat(expand_shape)
-        sy = self.sobel_y.repeat(expand_shape)
-
-        # Compute gradients
-        g_x_pred = conv_op(p_slice, sx, padding=1, groups=n_channels_eff)
-        g_y_pred = conv_op(p_slice, sy, padding=1, groups=n_channels_eff)
-        g_x_true = conv_op(t_slice, sx, padding=1, groups=n_channels_eff)
-        g_y_true = conv_op(t_slice, sy, padding=1, groups=n_channels_eff)
-
-        loss = self.gradient_loss_fn(g_x_pred, g_x_true) + self.gradient_loss_fn(
-            g_y_pred, g_y_true
-        )
-
-        if self.spatial_dims == 3:
+            sx = self.sobel_x.repeat(expand_shape)
+            sy = self.sobel_y.repeat(expand_shape)
             sz = self.sobel_z.repeat(expand_shape)
-            g_z_pred = conv_op(p_slice, sz, padding=1, groups=n_channels_eff)
-            g_z_true = conv_op(t_slice, sz, padding=1, groups=n_channels_eff)
-            loss = loss + self.gradient_loss_fn(g_z_pred, g_z_true)
+            sobel_all = torch.cat([sx, sy, sz], dim=0)
+            p_grads = conv_op(p_slice, sobel_all, padding=1, groups=n_channels_eff)
+            t_grads = conv_op(t_slice, sobel_all, padding=1, groups=n_channels_eff)
+            g_x_pred = p_grads[:, :n_channels_eff]
+            g_y_pred = p_grads[:, n_channels_eff : 2 * n_channels_eff]
+            g_z_pred = p_grads[:, 2 * n_channels_eff :]
+            g_x_true = t_grads[:, :n_channels_eff]
+            g_y_true = t_grads[:, n_channels_eff : 2 * n_channels_eff]
+            g_z_true = t_grads[:, 2 * n_channels_eff :]
+            loss = (
+                self.gradient_loss_fn(g_x_pred, g_x_true)
+                + self.gradient_loss_fn(g_y_pred, g_y_true)
+                + self.gradient_loss_fn(g_z_pred, g_z_true)
+            )
 
         return loss
 
     def forward(self, y_pred_softmax, y_true_one_hot):
-        # Ensure inputs are contiguous
         y_pred_softmax = y_pred_softmax.contiguous()
         y_true_one_hot = y_true_one_hot.float().contiguous()
 
@@ -257,9 +251,9 @@ class ConnectivityCoherenceLoss(nn.Module):
         if self.lambda_density <= 0:
             return total_loss
 
-        density_loss_accum = []
+        density_loss_sum = torch.tensor(0.0, device=device)
+        num_kernels_applied = 0
 
-        # Prepare list of kernels
         if self.kernels_are_learnable:
             kernels_to_use = self.learnable_filters
         else:
@@ -272,29 +266,29 @@ class ConnectivityCoherenceLoss(nn.Module):
             padding = k // 2
             weight = weight.contiguous()
 
-            # --- Vectorized Convolution ---
             pred_neighbor_avg = conv_op(
                 y_pred_softmax, weight, padding=padding, groups=self.num_classes
             )
-            true_neighbor_avg = conv_op(
-                y_true_one_hot, weight, padding=padding, groups=self.num_classes
-            )
 
-            # --- Slice Relevant Channels ---
+            with torch.no_grad():
+                true_neighbor_avg = conv_op(
+                    y_true_one_hot, weight, padding=padding, groups=self.num_classes
+                )
+
             p_neigh_rel = pred_neighbor_avg[:, start_idx:]
             t_neigh_rel = true_neighbor_avg[:, start_idx:]
             p_pixel_rel = y_pred_softmax[:, start_idx:]
             t_pixel_rel = y_true_one_hot[:, start_idx:]
 
-            # --- Full-Consistency Logic ---
             loss_a = self.density_loss_fn(p_neigh_rel, t_pixel_rel)
             loss_b = self.density_loss_fn(p_pixel_rel, t_neigh_rel)
             loss_c = self.density_loss_fn(p_neigh_rel, t_neigh_rel)
 
-            density_loss_accum.append(loss_a + loss_b + loss_c)
+            density_loss_sum = density_loss_sum + (loss_a + loss_b + loss_c)
+            num_kernels_applied += 1
 
-        if density_loss_accum:
-            density_term = torch.stack(density_loss_accum).mean()
+        if num_kernels_applied > 0:
+            density_term = density_loss_sum / num_kernels_applied
             total_loss = total_loss + (self.lambda_density * density_term)
 
         return total_loss

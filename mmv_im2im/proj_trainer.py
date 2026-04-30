@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
 import logging
 from pathlib import Path
 from importlib import import_module
@@ -10,9 +13,6 @@ from mmv_im2im.utils.misc import parse_ops_list
 from mmv_im2im.utils.nnHeuristic import get_nnunet_plans
 import pyrallis
 
-import warnings
-
-warnings.simplefilter(action="ignore", category=FutureWarning)
 torch.set_float32_matmul_precision("medium")
 ###############################################################################
 
@@ -42,9 +42,8 @@ class ProjectTrainer(object):
     def run_training(self):
         self.data = get_data_module(self.data_cfg)
 
+        dynunet_info = None
         if self.model_cfg.net["func_name"] == "DynUNet":
-            # 1. Gather inputs for heuristic
-            # You might need to add these fields to your YAML or extract them from data
             extra_params = (
                 self.data_cfg.extra if self.data_cfg.extra is not None else {}
             )
@@ -63,6 +62,13 @@ class ProjectTrainer(object):
                 }
             )
 
+            dynunet_info = (
+                f"nnU-Net configured for {len(patch_size)}D.\n"
+                f"Filters: {plans['filters']}\n"
+                f"Strides: {plans['strides']}\n"
+                f"Kernel size: {plans['kernel_size']}\n"
+                f"Upsample Kernel size: {plans['upsample_kernel_size']}\n"
+            )
             print(f"✅ nnU-Net configured for {len(patch_size)}D.")
             print(f"Filters: {plans['filters']}")
             print(f"Strides: {plans['strides']}")
@@ -127,6 +133,13 @@ class ProjectTrainer(object):
             pyrallis.dump(
                 self.data_cfg, open(save_path / Path("data_config.yaml"), "w")
             )
+            if dynunet_info is not None:
+                nnunet_cfg_path = save_path / "nnUnet_parameter_generation.txt"
+                with open(nnunet_cfg_path, "w") as f:
+                    f.write(dynunet_info)
+                print(
+                    f"Inferred model configuration saved in -> {nnunet_cfg_path} for inference configuration"
+                )
 
         print("start training ... ")
         trainer.fit(model=self.model, datamodule=self.data)

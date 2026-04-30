@@ -2,26 +2,23 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.jit import script
+from typing import Union
 
 
 @script
 def chamfer_distance_transform_gpu(
-    input_mask: torch.Tensor, iterations: int = 30, spatial_dims: int = 2
+    input_mask: torch.Tensor, iterations: int, spatial_dims: int = 2
 ) -> torch.Tensor:
-    """
-    Computes a GPU-native Distance Transform using iterative Min-Pooling.
-    Operates on the union of classes to ensure global geometric consistency.
-    """
-    # Initialize: 0 inside the object, large value outside
-    # We use a large enough constant to act as infinity
+    H = input_mask.shape[-2]
+    W = input_mask.shape[-1]
+    inf_val = float(H + W)
+
     dist_map = torch.where(
         input_mask > 0.5,
-        torch.tensor(0.0, device=input_mask.device, dtype=input_mask.dtype),
-        torch.tensor(200.0, device=input_mask.device, dtype=input_mask.dtype),
+        torch.zeros(1, device=input_mask.device, dtype=input_mask.dtype),
+        torch.full((1,), inf_val, device=input_mask.device, dtype=input_mask.dtype),
     )
 
-    # Optimization: Use MaxPool on negative values to simulate Min-Pooling
-    # This stays 100% on GPU and is fully JIT-compatible
     for _ in range(iterations):
         neg_dist = -dist_map
         if spatial_dims == 2:
@@ -29,11 +26,8 @@ def chamfer_distance_transform_gpu(
         else:
             pooled = F.max_pool3d(neg_dist, kernel_size=3, stride=1, padding=1)
 
-        # Manhattan-like propagation: dist = min(current, neighbors + 1)
         dist_new = -pooled + 1.0
         dist_map = torch.min(dist_map, dist_new)
-
-        # Enforce 0 inside the binary mask
         dist_map = torch.where(input_mask > 0.5, 0.0, dist_map)
 
     return dist_map
@@ -41,62 +35,83 @@ def chamfer_distance_transform_gpu(
 
 class HausdorffLoss(nn.Module):
     """
-    Optimized Hausdorff Loss that treats all foreground classes as a single
-    global structure. This prevents inter-class geometric conflicts.
+    Hausdorff Loss with automatic dt_iterations estimation.
     """
 
     def __init__(
         self,
         spatial_dims: int = 2,
-        dt_iterations: int = 30,
+        dt_iterations: Union[int, str] = "auto",
         include_background: bool = False,
+        distance_mode: str = "l2",
+        normalize_weights: bool = True,
+        coverage_fraction: float = 0.25,
+        dt_iterations_min: int = 10,
+        dt_iterations_max: int = 200,
     ):
         super().__init__()
+        if not (isinstance(dt_iterations, int) or dt_iterations == "auto"):
+            raise ValueError(
+                f"dt_iterations must be a positive integer or 'auto', got: {dt_iterations!r}"
+            )
         self.spatial_dims = spatial_dims
         self.dt_iterations = dt_iterations
         self.include_background = include_background
+        self.distance_mode = distance_mode
+        self.normalize_weights = normalize_weights
+        self.coverage_fraction = coverage_fraction
+        self.dt_iterations_min = dt_iterations_min
+        self.dt_iterations_max = dt_iterations_max
+
+    @staticmethod
+    def estimate_iterations(
+        spatial_shape: torch.Size,
+        coverage_fraction: float = 0.25,
+        min_iters: int = 10,
+        max_iters: int = 200,
+    ) -> int:
+        min_dim = min(spatial_shape)
+        estimated = int(min_dim * coverage_fraction)
+        return max(min_iters, min(estimated, max_iters))
+
+    def _resolve_iterations(self, spatial_shape: torch.Size) -> int:
+        if self.dt_iterations != "auto":
+            return int(self.dt_iterations)
+        return self.estimate_iterations(
+            spatial_shape,
+            self.coverage_fraction,
+            self.dt_iterations_min,
+            self.dt_iterations_max,
+        )
 
     def forward(self, logits: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            logits: (B, C, ...) raw network outputs.
-            y_true: (B, 1, ...) label indices.
-        """
-
-        # Convert to Probabilities and Get Global Foreground
         probs = F.softmax(logits, dim=1)
 
-        # Union of all foreground classes:
-        # We take all channels except index 0 (background) and sum them or take max.
-        # Max is more stable for Hausdorff.
         if not self.include_background and probs.shape[1] > 1:
             global_probs = torch.max(probs[:, 1:, ...], dim=1, keepdim=True)[0]
-
-            # Global Ground Truth (any label > 0 is foreground)
             global_gt = (y_true > 0).float()
         else:
-            # If we include background or it's a single channel, use everything
             global_probs = probs
             global_gt = y_true.float()
 
-        # Compute Distance Transforms on GPU (Union based)
-        # DT to nearest background pixel
-        gt_dist_map = chamfer_distance_transform_gpu(
-            global_gt, iterations=self.dt_iterations, spatial_dims=self.spatial_dims
-        )
+        iters = self._resolve_iterations(global_gt.shape[2:])
 
-        # DT to nearest foreground pixel (Inverted DT)
+        gt_dist_map = chamfer_distance_transform_gpu(
+            global_gt, iterations=iters, spatial_dims=self.spatial_dims
+        )
         bg_dist_map = chamfer_distance_transform_gpu(
             1.0 - global_gt,
-            iterations=self.dt_iterations,
+            iterations=iters,
             spatial_dims=self.spatial_dims,
         )
 
-        # Weighted Loss Computation
-        # We penalize based on (probs - gt)^2 * (distance^2)
-        # This informs the optimizer to move the union of boundaries to the GT boundaries
-        weight_map = gt_dist_map**2 + bg_dist_map**2
+        if self.distance_mode == "l2":
+            weight_map = gt_dist_map**2 + bg_dist_map**2
+        else:
+            weight_map = gt_dist_map + bg_dist_map
 
-        loss = torch.mean(((global_probs - global_gt) ** 2) * weight_map)
+        if self.normalize_weights:
+            norm_factor = weight_map.detach().quantile(0.99).clamp(min=1.0)
+            weight_map = weight_map / norm_factor
 
-        return loss
+        return torch.mean(((global_probs - global_gt) ** 2) * weight_map)
