@@ -47,7 +47,8 @@ dependencies = [
     "ome-types",     
     "imageio", 
     "zarr",
-    "torch_topological", 
+    "torch_topological==0.1.9", 
+    "gudhi==3.11.0",
 ]
 
 [project.optional-dependencies]
